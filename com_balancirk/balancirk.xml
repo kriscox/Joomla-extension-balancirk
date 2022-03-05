@@ -4,7 +4,7 @@
 
     <name>Balancirk</name>
     <!-- The following elements are optional and free of formatting constraints -->
-    <creationDate>March 2021</creationDate>
+    <creationDate>March 2022</creationDate>
     <!-- Dummy author, feel free to replace anywhere you see it-->
     <author>Kris Cox</author>
     <authorUrl>https://cococo.be</authorUrl>
@@ -44,13 +44,15 @@
 
     <administration>
         <!-- The link that will appear in the Admin panel's "Components" menu -->
-        <!--<menu link="index.php?option=com_balancirk">Balancirk</menu> -->
+        <menu link="index.php?option=com_balancirk">Balancirk</menu> -->
         <!-- List of files and folders to copy. Note the 'folder' attribute.
              This is the name of the folder in your component package to copy FROM -->
         <files folder="admin/">
             <folder>language</folder>
-            <folder>sql</folder>
-            <folder>tables</folder>
+            <folder>services</folder>
+            <folder>src</folder>
+            <folder>tmpl</folder>
+            <!-- <folder>tables</folder> -->
         </files>
 
         <languages>
@@ -61,7 +63,7 @@
 
     </administration>
 
-    <install>
+    <!-- <install>
         <sql>
             <file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
         </sql>
@@ -75,7 +77,7 @@
         <schemas>
             <schemapath type="mysql">sql/updates/mysql</schemapath>
         </schemas>
-    </update>
+    </update> -->
 
 </extension>
 
