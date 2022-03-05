@@ -23,6 +23,7 @@ use Joomla\CMS\User\User;
  */
 class BalancirkStudentListModel extends ListModel
 {
+    protected $student;
 
     /**
      * Constructor.
@@ -120,6 +121,11 @@ class BalancirkStudentListModel extends ListModel
      */
     public function getStudentInformation($id)
     {
-        $children = getItems();
+        $student = getItems();
+        return $student;
+    }
+
+    public function getStudent()
+    {
     }
 }

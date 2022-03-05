@@ -7,14 +7,14 @@ CREATE TABLE `#__Balancirk_Student` (
     `parent_id` INT NOT NULL,
     `birthdate` DATE,
     `dialcode` SMALLINT,
-    `phone` DECIMAL[10],
+    `phone` DECIMAL(10),
     `email` VARCHAR(255),
     `remarks` TEXT,
     `use_photos` BOOLEAN NOT NULL,
-    `uitpassnr` DECIMAL[13],
+    `uitpassnr` DECIMAL(13),
     PRIMARY KEY (`id`),
     INDEX (`name`, `firstname`, `parent_id`),
     FOREIGN KEY (parent_id)
         REFERENCES `#__users`(`id`)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
+        ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE = InnoDB; 

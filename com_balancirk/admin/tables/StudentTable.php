@@ -1,11 +1,11 @@
 <?php
 
 // No direct access
- defined('_JEXEC') or die('Restricted access');
+defined('_JEXEC') or die('Restricted access');
 
- namespace CoCoCo\Component\Balancirk\Site\Model;
+namespace CoCoCo\Component\Balancirk\Site\Model;
 
- /**
+/**
  * @package     Joomla.Administrator
  * @subpackage  com_balancirk
  *
@@ -20,13 +20,13 @@
  */
 class BalancirkStudentTable extends JTable
 {
-	/**
-	 * Constructor
-	 *
-	 * @param   JDatabaseDriver  &$db  A database connector object
-	 */
-	function __construct(&$db)
-	{
-		parent::__construct('#__Balancirk_Student', 'id', $db);
-	}
+    /**
+     * Constructor
+     *
+     * @param   JDatabaseDriver  &$db  A database connector object
+     */
+    function __construct(&$db)
+    {
+        parent::__construct('#__Balancirk_Student', 'id', $db);
+    }
 }
