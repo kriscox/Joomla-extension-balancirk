@@ -12,6 +12,6 @@ use Joomla\CMS\Language\Text;
 
 defined('_JEXEC') or die('Restricted access');
 ?>
-<h1>Students view</h1>
+<h1><?= Text::_('COM_BALANCIRK_LABEL_STUDENT') ?></h1>
 
-<h2>List of students</h2>
+<h2><?= Text::_('COM_BALANCIRK_LABEL_STUDENT_LIST') ?></h2>
