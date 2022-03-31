@@ -10,7 +10,7 @@
 
 use Joomla\CMS\Language\Text;
 
-defined('_JEXEC') or die('Restricted access');
+\defined('_JEXEC') or die('Restricted access');
 ?>
 <h1><?= Text::_('COM_BALANCIRK_LABEL_STUDENT') ?></h1>
 

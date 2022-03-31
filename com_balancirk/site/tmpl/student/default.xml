@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-    <layout title="Leerling">
-        <message><![CDATA[Leerling overview]]></message>
+    <layout title="COM_BALANCIRK_LABEL_STUDENT">
+        <message><![CDATA[COM_BALANCIRK_LABEL_STUDENT_OVERVIEW]]></message>
     </layout>
 </metadata>

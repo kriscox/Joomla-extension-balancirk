@@ -10,7 +10,7 @@
 
 namespace CoCoCo\Component\Balancirk\Administrator\View\Student;
 
-defined('_JEXEC') or die;
+\defined('_JEXEC') or die;
 
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 

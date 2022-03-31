@@ -10,8 +10,9 @@
 
 use Joomla\CMS\Language\Text;
 
-defined('_JEXEC') or die('Restricted access');
+\defined('_JEXEC') or die('Restricted access');
 ?>
+
 <h1>Students view</h1>
 
 <h2>List of students</h2>

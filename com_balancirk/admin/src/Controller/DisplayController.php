@@ -10,7 +10,7 @@
 
 namespace CoCoCo\Component\Balancirk\Administrator\Controller;
 
-defined('_JEXEC') or die;
+\defined('_JEXEC') or die;
 
 use Joomla\CMS\MVC\Controller\BaseController;
 
@@ -19,18 +19,21 @@ use Joomla\CMS\MVC\Controller\BaseController;
  *
  * @package     Joomla.Administrator
  * @subpackage  com_Balancirk
+ * @since       __DEPLOY_VERSION__
  */
 class DisplayController extends BaseController
 {
+
     /**
-     * The default view for the display method
-     * 
-     * @var string
+     * The default view.
+     *
+     * @var    string
+     * @since  __DEPLOY_VERSION__
      */
     protected $default_view = 'overview';
 
     public function display($cachable = false, $urlparams = array())
     {
-        return parent::display($cachable, $urlparams);
+        return parent::display();
     }
 }

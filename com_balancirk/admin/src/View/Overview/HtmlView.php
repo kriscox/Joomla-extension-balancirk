@@ -10,12 +10,14 @@
 
 namespace CoCoCo\Component\Balancirk\Administrator\View\Overview;
 
-defined('_JEXEC') or die;
+\defined('_JEXEC') or die;
 
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 
 /**
- * Main "Student" Admin View
+ * HtmlView class for main "Overview" Admin View
+ * 
+ * @since   __DEPLOY_VERSION__
  */
 class HtmlView extends BaseHtmlView
 {
@@ -23,7 +25,10 @@ class HtmlView extends BaseHtmlView
      * Display the main "Overview" view
      *
      * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
+     * 
      * @return  void
+     * 
+     * @since   __DEPLOY_VERSION__
      */
     function display($tpl = null)
     {

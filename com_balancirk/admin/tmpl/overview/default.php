@@ -13,10 +13,9 @@ use Joomla\CMS\Router\Route;
 
 
 
-defined('_JEXEC') or die('Restricted access');
+\defined('_JEXEC') or die('Restricted access');
 ?>
+
 <h1><?= Text::_('COM_BALANCIRK_NAME') ?></h1>
 
 <h2><?= Text::_('COM_BALANCIRK_MENU') ?></h2>
-
-<a href="<?php echo Route::_(RouteHelper::getFooRoute($item->slug, $item->catid, $item->language)); ?>">
