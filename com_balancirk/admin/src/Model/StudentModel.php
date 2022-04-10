@@ -77,4 +77,16 @@ class StudentModel extends AdminModel
     {
         $table->generateAlias();
     }
+
+    /**
+     * Return all fieldnames
+     *
+     * @return  list
+     *
+     * @since   __BUMP_VERSION__
+     */
+    protected function getFieldnames()
+    {
+        return $this->fieldset;
+    }
 }

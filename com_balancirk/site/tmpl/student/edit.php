@@ -4,8 +4,8 @@
  * @package     Joomla.Administrator
  * @subpackage  com_balancirk
  *
- * @copyright   Copyright (C) 2022 CoCoCo, Inc. 
- * @license     GNU General Public License version 3
+ * @copyright   Copyright (C) 2022 CoCoCo, Inc. All rights reserved.
+ * @license     GNU General Public License version 3.
  */
 \defined('_JEXEC') or die;
 
@@ -22,9 +22,8 @@ $layout  = 'edit';
 $tmpl = $input->get('tmpl', '', 'cmd') === 'component' ? '&tmpl=component' : '';
 ?>
 <form action="<?php echo Route::_('index.php?option=com_balancirk&layout=' . $layout . $tmpl . '&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="student-form" class="form-validate">
-    <?php foreach ($this->item->getProperties() as $key => $prop) {
-        echo $this->getForm()->renderField($key);
-    } ?>
+    <?php echo $this->getForm()->renderField('name'); ?>
+    <?php echo $this->getForm()->renderField('alias'); ?>
     <input type="hidden" name="task" value="">
     <?php echo HTMLHelper::_('form.token'); ?>
 </form>

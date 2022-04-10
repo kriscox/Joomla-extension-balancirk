@@ -2,16 +2,16 @@
 <form>
     <fieldset>
         <field name="id" type="number" label="JGLOBAL_FIELD_ID_LABEL" default="0" class="readonly" readonly="true" />
-        <field name="name" type="text" label="JGLOBAL_FIELD_ID_LABEL" size="50" required="true" />
-        <field name="surname" type="text" label="JGLOBAL_FIELD_ID_LABEL" size="50" required="true" />
-        <field name="username" type="text" label="JGLOBAL_FIELD_ID_LABEL" size="50" required="true" />
-        <field name="email" type="email" label="JGLOBAL_FIELD_ID_LABEL" required="true" />
-        <field name="street" type="text" label="JGLOBAL_FIELD_ID_LABEL" size="255" />
-        <field name="number" type="text" label="JGLOBAL_FIELD_ID_LABEL" size="10" />
-        <field name="bus" type="text" label="JGLOBAL_FIELD_ID_LABEL" size="10" />
-        <field name="postalcode" type="text" label="JGLOBAL_FIELD_ID_LABEL" size="10" />
-        <field name="municipality" type="text" label="JGLOBAL_FIELD_ID_LABEL" size="50" />
-        <field name="phone" type="text" label="JGLOBAL_FIELD_ID_LABEL" size="15" />
-        <field name="subscription_date" label="JGLOBAL_FIELD_ID_LABEL" type="calendar" />
+        <field name="name" type="text" label="JGLOBAL_FIELD_NAME_LABEL" size="50" required="true" />
+        <field name="surname" type="text" label="JGLOBAL_FIELD_SURNAME_LABEL" size="50" required="true" />
+        <field name="username" type="text" label="JGLOBAL_FIELD_USERNAME_LABEL" size="50" required="true" />
+        <field name="email" type="email" label="JGLOBAL_FIELD_EMAIL_LABEL" required="true" />
+        <field name="street" type="text" label="JGLOBAL_FIELD_STREET_LABEL" size="255" />
+        <field name="number" type="text" label="JGLOBAL_FIELD_NUMBER_LABEL" size="10" />
+        <field name="bus" type="text" label="JGLOBAL_FIELD_BUS_LABEL" size="10" />
+        <field name="postalcode" type="text" label="JGLOBAL_FIELD_POSTALCODE_LABEL" size="10" />
+        <field name="municipality" type="text" label="JGLOBAL_FIELD_MUNICIPALITY_LABEL" size="50" />
+        <field name="phone" type="text" label="JGLOBAL_FIELD_PHONE_LABEL" size="15" />
+        <field name="subscription_date" label="JGLOBAL_FIELD_SUBSCRIPTION_DATE_LABEL" type="calendar" required="false"/>
     </fieldset>
 </form>
