@@ -36,10 +36,13 @@
             <menu link="option=com_balancirk?view=student">COM_BALANCIRK_LABEL_STUDENT</menu>
         </submenu>
         <files folder="admin/">
+            <filename>..\balancirk.xml</filename>
             <folder>language</folder>
             <folder>services</folder>
             <folder>src</folder>
             <folder>tmpl</folder>
+            <folder>sql</folder>
+            <folder>forms</folder>
             <!-- <folder>tables</folder> -->
         </files>
 
@@ -54,7 +57,7 @@
 
     </administration>
 
-    <!-- <install>
+    <install>
         <sql>
             <file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
         </sql>
@@ -64,7 +67,7 @@
             <file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
         </sql>
     </uninstall>
-    <update>
+    <!-- <update>
         <schemas>
             <schemapath type="mysql">sql/updates/mysql</schemapath>
         </schemas>

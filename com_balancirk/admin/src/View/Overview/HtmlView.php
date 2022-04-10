@@ -21,6 +21,7 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
  */
 class HtmlView extends BaseHtmlView
 {
+    protected $items;
     /**
      * Display the main "Overview" view
      *
@@ -32,6 +33,7 @@ class HtmlView extends BaseHtmlView
      */
     function display($tpl = null)
     {
+        $this->items = $this->get('Items');
         parent::display($tpl);
     }
 }

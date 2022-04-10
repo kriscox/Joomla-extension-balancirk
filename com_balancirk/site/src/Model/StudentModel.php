@@ -7,7 +7,7 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\CMS\User\User;
-
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 /**
  * @package     Joomla.Site
@@ -19,7 +19,7 @@ use Joomla\CMS\User\User;
 
 /**
  * Balancirk Student ListModel
- * @since 0.0.1
+ * @since __BUMP_VERSION__
  */
 class BalancirkStudentListModel extends ListModel
 {
@@ -31,7 +31,7 @@ class BalancirkStudentListModel extends ListModel
      * @param   array  $config  An optional associative array of configuration settings.
      *
      * @see     \JController
-     * @since   0.0.1
+     * @since   __BUMP_VERSION__
      */
     public function __construct($config = array())
     {
@@ -64,7 +64,7 @@ class BalancirkStudentListModel extends ListModel
      *
      * @return  JTable  A JTable object
      *
-     * @since   0.0.1
+     * @since   __BUMP_VERSION__
      */
     public function getTable($type = 'StudentTable', $prefix = 'Balancirk', $config = null)
     {
@@ -76,7 +76,7 @@ class BalancirkStudentListModel extends ListModel
      *
      * @return  \JDatabaseQuery
      *
-     * @since   0.0.1
+     * @since   __BUMP_VERSION__
      */
     protected function getListQuery()
     {
@@ -117,7 +117,7 @@ class BalancirkStudentListModel extends ListModel
      * 
      *  @return 
      * 
-     *  @since 0.0.1
+     *  @since __BUMP_VERSION__
      */
     public function getStudentInformation($id)
     {
