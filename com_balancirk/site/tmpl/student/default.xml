@@ -3,4 +3,17 @@
     <layout title="COM_BALANCIRK_LABEL_STUDENT">
         <message><![CDATA[COM_BALANCIRK_LABEL_STUDENT_OVERVIEW]]></message>
     </layout>
+    <fields name="request">
+        <fieldset name="request"
+            addfieldprefix="CoCoCo\Component\Balancirk\Administator\Field">
+            <field name="id"
+                type="Modal_Student"
+                label="COM_BALANCIRK_LABEL_STUDENT"
+                required="true"
+                select="true"
+                new="true"
+                edit="true"
+                clear="true" />
+        </fieldset>
+    </fields>
 </metadata>

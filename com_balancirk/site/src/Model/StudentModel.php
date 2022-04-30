@@ -6,8 +6,9 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ListModel;
-use Joomla\CMS\User\User;
-use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+//use Joomla\CMS\User\User;
+use Joomla\CMS\Language\Text;
+//use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 /**
  * @package     Joomla.Site
@@ -18,11 +19,14 @@ use Joomla\CMS\MVC\Model\BaseDatabaseModel;
  */
 
 /**
- * Balancirk Student ListModel
+ * Student Model
  * @since __BUMP_VERSION__
  */
-class BalancirkStudentListModel extends ListModel
+class StudentModel extends ListModel
 {
+    /**
+     * @var student
+     */
     protected $student;
 
     /**
@@ -105,9 +109,9 @@ class BalancirkStudentListModel extends ListModel
             );
 
         // Filter on the current logged-in user as parent
-        if ($parent = User::getIdentity()) {
-            $query->where($db->quoteName('a.parent_id') . ' = ' . $db->quote($parent));
-        }
+        //if ($parent = Factory::getApplication()->getIdentity()) {
+        //    $query->where($db->quoteName('a.parent_id') . ' = ' . $db->quote($parent->id));
+        // }
 
         return $query;
     }
@@ -121,11 +125,40 @@ class BalancirkStudentListModel extends ListModel
      */
     public function getStudentInformation($id)
     {
-        $student = getItems();
+        $student = $this->getStudent($id);
         return $student;
     }
 
-    public function getStudent()
+    public function getStudent($id = null)
     {
+        // Filter on the current logged-in user as parent
+        $parent = Factory::getApplication()->getIdentity();
+
+        if ($this->_item === null) {
+            $this->_item = array();
+        }
+
+        if (!isset($this->_item[$id])) {
+            try {
+                $db = $this->getDbo();
+                $query = $db->getQuery(true);
+                $query->select('*')
+                    ->from($db->quoteName('#__members', 'a'));
+                //    ->where($db->quoteName('a.parent_id') . ' = ' . $db->quote($parent->id));
+                if ($id != null) {
+                    $query->where('a.id = ' . (int) $id);
+                }
+                $db->setQuery($query);
+                $data = $db->loadObject();
+                if (empty($data)) {
+                    throw new \Exception(Text::_('COM_BALANCIRK_ERROR_STUDENT_NOT_FOUND'), 404);
+                }
+                $this->_item[$id] = $data;
+            } catch (\Exception $e) {
+                $this->_item[$id] = false;
+                throw $e;
+            }
+        }
+        return $this->_item[$id];
     }
 }

@@ -15,6 +15,7 @@ namespace CoCoCo\Component\Balancirk\Administrator\Table;
 use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Table\Table;
 use Joomla\Database\DatabaseDriver;
+use Joomla\CMS\Factory;
 
 /**
  * Students Table class.

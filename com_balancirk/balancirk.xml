@@ -24,6 +24,11 @@
         <folder>tmpl</folder>
     </files>
 
+    <media folder="media/" destination="com_balancirk">
+        <folder>js</folder>
+        <filename>joomla.asset.json</filename>
+    </media>
+
     <languages>
         <language tag="nl-BE">site/language/nl-BE/nl-BE.com_balancirk.ini</language>
         <language tag="fr-BE">site/language/fr-BE/fr-BE.com_balancirk.ini</language>
@@ -31,9 +36,9 @@
     </languages>
 
     <administration>
-        <menu view="overview">COM_BALANCIRK_ADMIN_MENU</menu>
+        <menu link="option=com_balancirk&amp;view=overview">COM_BALANCIRK_ADMIN_MENU</menu>
         <submenu>
-            <menu link="option=com_balancirk?view=student">COM_BALANCIRK_LABEL_STUDENT</menu>
+            <menu link="option=com_balancirk&amp;view=students">COM_BALANCIRK_LABEL_STUDENT_OVERVIEW</menu>
         </submenu>
         <files folder="admin/">
             <filename>..\balancirk.xml</filename>

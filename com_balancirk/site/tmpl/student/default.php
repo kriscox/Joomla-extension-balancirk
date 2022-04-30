@@ -13,5 +13,5 @@ use Joomla\CMS\Language\Text;
 \defined('_JEXEC') or die('Restricted access');
 ?>
 <h1><?= Text::_('COM_BALANCIRK_LABEL_STUDENT') ?></h1>
-
-<h2><?= Text::_('COM_BALANCIRK_LABEL_STUDENT_LIST') ?></h2>
+<?php
+echo $this->student->id;

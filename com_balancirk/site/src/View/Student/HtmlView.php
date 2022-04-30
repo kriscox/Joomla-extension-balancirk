@@ -22,6 +22,14 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 class HtmlView extends BaseHtmlView
 {
     /**
+     * The student object details
+     *
+     * @var    \JObject
+     * @since  __BUMP_VERSION__
+     */
+    protected $student;
+
+    /**
      * Execute and display a template script.
      *
      * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
@@ -30,6 +38,7 @@ class HtmlView extends BaseHtmlView
      */
     function display($tpl = null)
     {
+        $this->student = $this->get('Student');
         parent::display($tpl);
     }
 }
