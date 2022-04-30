@@ -31,12 +31,13 @@ use Joomla\CMS\Router\Route;
                     <table class="table" id="studentList">
                         <thead>
                             <tr>
-                                <th scope="col" style="width:1%" class="text-center d-none d-md-table-cell">
-                                    <?php echo Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_NAME'); ?>
-                                </th>
                                 <th scope="col">
                                     <?php echo Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_ID'); ?>
                                 </th>
+                                <th scope="col" style="width:1%" class="text-center d-none d-md-table-cell">
+                                    <?php echo Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_NAME'); ?>
+                                </th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -45,13 +46,13 @@ use Joomla\CMS\Router\Route;
                             foreach ($this->items as $i => $item) :
                             ?>
                                 <tr class="row<?php echo $i % 2; ?>">
+                                    <td class="d-none d-md-table-cell">
+                                        <?php echo $item->id; ?>
+                                    </td>
                                     <th scope="row" class="has-context">
                                         <a class="hasTooltip" href="<?php echo Route::_('index.php?option=com_balancirk&task=student.edit&id=' . (int) $item->id); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?> <?php echo $this->escape(addslashes($item->name)); ?>">
                                             <?php echo $editIcon; ?><?php echo $this->escape($item->name); ?> <?php echo $this->escape($item->surname); ?></a>
                                     </th>
-                                    <td class="d-none d-md-table-cell">
-                                        <?php echo $item->id; ?>
-                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
