@@ -19,15 +19,15 @@ use Joomla\CMS\Language\Text;
  */
 
 /**
- * Student Model
+ * Member Model
  * @since __BUMP_VERSION__
  */
-class StudentModel extends ListModel
+class MemberModel extends ListModel
 {
     /**
-     * @var student
+     * @var member
      */
-    protected $student;
+    protected $member;
 
     /**
      * Constructor.
@@ -70,7 +70,7 @@ class StudentModel extends ListModel
      *
      * @since   __BUMP_VERSION__
      */
-    public function getTable($type = 'StudentTable', $prefix = 'Balancirk', $config = null)
+    public function getTable($type = 'MemberTable', $prefix = 'Balancirk', $config = null)
     {
         return JTable::getInstance($type, $prefix, $config);
     }
@@ -117,19 +117,19 @@ class StudentModel extends ListModel
     }
 
     /**
-     * Get student information from table to be shown
+     * Get member information from table to be shown
      * 
      *  @return 
      * 
      *  @since __BUMP_VERSION__
      */
-    public function getStudentInformation($id)
+    public function getMemberInformation($id)
     {
-        $student = $this->getStudent($id);
-        return $student;
+        $member = $this->getMember($id);
+        return $member;
     }
 
-    public function getStudent($id = null)
+    public function getMember($id = null)
     {
         // Filter on the current logged-in user as parent
         $parent = Factory::getApplication()->getIdentity();
@@ -151,7 +151,7 @@ class StudentModel extends ListModel
                 $db->setQuery($query);
                 $data = $db->loadObject();
                 if (empty($data)) {
-                    throw new \Exception(Text::_('COM_BALANCIRK_ERROR_STUDENT_NOT_FOUND'), 404);
+                    throw new \Exception(Text::_('COM_BALANCIRK_ERROR_MEMBER_NOT_FOUND'), 404);
                 }
                 $this->_item[$id] = $data;
             } catch (\Exception $e) {

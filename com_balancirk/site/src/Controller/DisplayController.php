@@ -29,7 +29,7 @@ class DisplayController extends BaseController
      * 
      * @var string
      */
-    protected $default_view = 'student';
+    protected $default_view = 'member';
 
     /**
      * Constructor.

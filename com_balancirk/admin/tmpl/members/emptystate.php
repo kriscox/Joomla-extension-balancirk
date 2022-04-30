@@ -19,6 +19,6 @@ $displayData = [
 ];
 $user = Factory::getApplication()->getIdentity();
 if ($user->authorise('core.create', 'com_balancirk') || count($user->getAuthorisedCategories('com_balancirk', 'core.create')) > 0) {
-    $displayData['createURL'] = 'index.php?option=com_balancirk&task=student.add';
+    $displayData['createURL'] = 'index.php?option=com_balancirk&task=member.add';
 }
 echo LayoutHelper::render('joomla.content.emptystate', $displayData);

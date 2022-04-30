@@ -8,7 +8,7 @@
  * @license     GNU General Public License version 3
  */
 
-namespace CoCoCo\Component\Balancirk\Administrator\View\Student;
+namespace CoCoCo\Component\Balancirk\Administrator\View\Member;
 
 \defined('_JEXEC') or die;
 
@@ -18,7 +18,7 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 
 /**
- * View to edit a student.
+ * View to edit a member.
  *
  * @since  __BUMP_VERSION__
  */
@@ -61,8 +61,8 @@ class HtmlView extends BaseHtmlView
     {
         Factory::getApplication()->input->set('hidemainmenu', true);
         $isNew = ($this->item->id == 0);
-        ToolbarHelper::title($isNew ? Text::_('COM_BALANCIRK_MANAGER_STUDENT_NEW') : Text::_('COM_BALANCIRK_MANAGER_STUDENT_EDIT'), 'address student§');
-        ToolbarHelper::apply('student.apply');
-        ToolbarHelper::cancel('student.cancel', 'JTOOLBAR_CLOSE');
+        ToolbarHelper::title($isNew ? Text::_('COM_BALANCIRK_MANAGER_MEMBER_NEW') : Text::_('COM_BALANCIRK_MANAGER_MEMBER_EDIT'), 'address member§');
+        ToolbarHelper::apply('member.apply');
+        ToolbarHelper::cancel('member.cancel', 'JTOOLBAR_CLOSE');
     }
 }

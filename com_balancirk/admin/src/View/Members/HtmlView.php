@@ -8,7 +8,7 @@
  * @license	    GNU General Public License version 3; see LICENSE.txt
  */
 
-namespace CoCoCo\Component\Balancirk\Administrator\View\Students;
+namespace CoCoCo\Component\Balancirk\Administrator\View\Members;
 
 \defined('_JEXEC') or die;
 
@@ -18,12 +18,12 @@ use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 
 /**
- * Main "Students" Admin View
+ * Main "Members" Admin View
  */
 class HtmlView extends BaseHtmlView
 {
     /**
-     * Display the main "Students" view
+     * Display the main "Members" view
      *
      * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
      * @return  void
@@ -45,7 +45,7 @@ class HtmlView extends BaseHtmlView
     {
         // Get the toolbar object instance
         $toolbar = Toolbar::getInstance('toolbar');
-        ToolbarHelper::title(Text::_('COM_BALANCIRK_MANAGER_STUDENTS'), 'address student');
-        $toolbar->addNew('student.add');
+        ToolbarHelper::title(Text::_('COM_BALANCIRK_MANAGER_MEMBERS'), 'address member');
+        $toolbar->addNew('member.add');
     }
 }

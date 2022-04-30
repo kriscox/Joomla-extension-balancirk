@@ -18,11 +18,11 @@ use Joomla\Database\DatabaseDriver;
 use Joomla\CMS\Factory;
 
 /**
- * Students Table class.
+ * Members Table class.
  *
  * @since  __BUMP_VERSION__
  */
-class StudentTable extends Table
+class MemberTable extends Table
 {
     /**
      * Constructor
@@ -33,7 +33,7 @@ class StudentTable extends Table
      */
     public function __construct(DatabaseDriver $db)
     {
-        $this->typeAlias = 'com_balancirk.student';
+        $this->typeAlias = 'com_balancirk.member';
         parent::__construct('#__members', 'id', $db);
     }
     /**

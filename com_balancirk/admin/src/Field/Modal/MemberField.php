@@ -17,13 +17,14 @@ use Joomla\CMS\Form\FormField;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Session\Session;
+use Joomla\CMS\Application\WebApplication;
 
 /**
  * Supports a modal Stduent picker.
  *
  * @since  __DEPLOY_VERSION__
  */
-class StudentField extends FormField
+class MemberField extends FormField
 {
     /**
      * The form field type.
@@ -31,7 +32,7 @@ class StudentField extends FormField
      * @var     string
      * @since   __DEPLOY_VERSION__
      */
-    protected $type = 'Modal_Student';
+    protected $type = 'Modal_Member';
     /**
      * Method to get the field input markup.
      *
@@ -44,11 +45,11 @@ class StudentField extends FormField
         $allowClear  = ((string) $this->element['clear'] != 'false');
         $allowSelect = ((string) $this->element['select'] != 'false');
 
-        // The active Student id field.
+        // The active Member id field.
         $value = (int) $this->value > 0 ? (int) $this->value : '';
 
         // Create the modal id.
-        $modalId = 'Student_' . $this->id;
+        $modalId = 'Member_' . $this->id;
 
         // Add the modal field script to the document head.
         HTMLHelper::_(
@@ -68,28 +69,28 @@ class StudentField extends FormField
             if (!isset($scriptSelect[$this->id])) {
                 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
                 $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
-                $wa->addInlineScript("function jSelectStudent_"
+                $wa->addInlineScript("function jSelectMember_"
                     . $this->id
-                    . "(id, title, object) { window.processModalSelect('Student', '"
+                    . "(id, title, object) { window.processModalSelect('Member', '"
                     . $this->id . "', id, title, '', object);}");
 
                 $scriptSelect[$this->id] = true;
             }
         }
         // Setup variables for display.
-        $linkStudents = 'index.php?option=com_balancirk&amp;view=students&amp;layout=modal&amp;tmpl=component&amp;'
+        $linkMembers = 'index.php?option=com_balancirk&amp;view=members&amp;layout=modal&amp;tmpl=component&amp;'
             . Session::getFormToken() . '=1';
-        $linkStudent  = 'index.php?option=com_balancirk&amp;view=student&amp;layout=modal&amp;tmpl=component&amp;'
+        $linkMember  = 'index.php?option=com_balancirk&amp;view=member&amp;layout=modal&amp;tmpl=component&amp;'
             . Session::getFormToken() . '=1';
-        $modalTitle   = Text::_('COM_BALANCIRK_CHANGE_STUDENT');
+        $modalTitle   = Text::_('COM_BALANCIRK_CHANGE_MEMBER');
 
-        $urlSelect = $linkStudents . '&amp;function=jSelectStudent_' . $this->id;
+        $urlSelect = $linkMembers . '&amp;function=jSelectMember_' . $this->id;
         // 
         if ($value) {
             $db    = Factory::getContainer()->get('DatabaseDriver');
             $query = $db->getQuery(true)
                 ->select($db->quoteName('name'))
-                ->from($db->quoteName('#__students_details'))
+                ->from($db->quoteName('#__members_details'))
                 ->where($db->quoteName('id') . ' = ' . (int) $value);
             $db->setQuery($query);
             try {
@@ -98,14 +99,14 @@ class StudentField extends FormField
                 Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
             }
         }
-        $title = empty($title) ? Text::_('COM_BALANCIRK_SELECT_A_STUDENT') : htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-        // The current student display field.
+        $title = empty($title) ? Text::_('COM_BALANCIRK_SELECT_A_MEMBER') : htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+        // The current member display field.
         $html  = '';
-        if ($allowSelect || $allowNew || $allowEdit || $allowClear) {
+        if ($allowSelect || $allowClear) {  //Removed $allowNew || $allowEdit
             $html .= '<span class="input-group">';
         }
         $html .= '<input class="form-control" id="' . $this->id . '_name" type="text" value="' . $title . '" readonly size="35">';
-        // Select student button
+        // Select member button
         if ($allowSelect) {
             $html .= '<button'
                 . ' class="btn btn-primary hasTooltip' . ($value ? ' hidden' : '') . '"'
@@ -113,11 +114,11 @@ class StudentField extends FormField
                 . ' data-bs-toggle="modal"'
                 . ' type="button"'
                 . ' data-bs-target="#ModalSelect' . $modalId . '"'
-                . ' title="' . HTMLHelper::tooltipText('COM_BALANCIRK_CHANGE_STUDENT') . '">'
+                . ' title="' . HTMLHelper::tooltipText('COM_BALANCIRK_CHANGE_MEMBER') . '">'
                 . '<span class="icon-file" aria-hidden="true"></span> ' . Text::_('JSELECT')
                 . '</button>';
         }
-        // Clear student button
+        // Clear member button
         if ($allowClear) {
             $html .= '<button'
                 . ' class="btn btn-secondary' . ($value ? '' : ' hidden') . '"'
@@ -127,10 +128,10 @@ class StudentField extends FormField
                 . '<span class="icon-remove" aria-hidden="true"></span>' . Text::_('JCLEAR')
                 . '</button>';
         }
-        if ($allowSelect || $allowNew || $allowEdit || $allowClear) {
+        if ($allowSelect || $allowClear) { // removed || $allowNew || $allowEdit 
             $html .= '</span>';
         }
-        // Select student modal
+        // Select member modal
         if ($allowSelect) {
             $html .= HTMLHelper::_(
                 'bootstrap.renderModal',
@@ -154,7 +155,7 @@ class StudentField extends FormField
             . $class . ' data-required="' . (int) $this->required
             . '" name="' . $this->name
             . '" data-text="'
-            . htmlspecialchars(Text::_('COM_BALANCIRK_SELECT_A_STUDENT', true), ENT_COMPAT, 'UTF-8')
+            . htmlspecialchars(Text::_('COM_BALANCIRK_SELECT_A_MEMBER', true), ENT_COMPAT, 'UTF-8')
             . '" value="' . $value . '">';
         return $html;
     }

@@ -6,9 +6,9 @@
   "license": "GPL-3.0",
   "assets": [
     {
-      "name": "com_balancirk.admin-students-modal",
+      "name": "com_balancirk.admin-members-modal",
       "type": "script",
-      "uri": "com_balancirk/admin-students-modal.js",
+      "uri": "com_balancirk/admin-members-modal.js",
       "dependencies": ["core"],
       "attributes": {
         "defer": true

@@ -17,13 +17,13 @@ use Joomla\CMS\Session\Session;
 
 $app = Factory::getApplication();
 $wa = $this->document->getWebAssetManager();
-$wa->useScript('com_balancirk.admin-students-modal');
-$function  = $app->input->getCmd('function', 'jSelectStudents');
+$wa->useScript('com_balancirk.admin-members-modal');
+$function  = $app->input->getCmd('function', 'jSelectMembers');
 $onclick   = $this->escape($function);
 ?>
 <div class="container-popup">
 
-    <form action="<?php echo Route::_('index.php?option=com_balancirk&view=students&layout=modal&tmpl=component&function=' . $function . '&' . Session::getFormToken() . '=1'); ?>" method="post" name="adminForm" id="adminForm" class="form-inline">
+    <form action="<?php echo Route::_('index.php?option=com_balancirk&view=members&layout=modal&tmpl=component&function=' . $function . '&' . Session::getFormToken() . '=1'); ?>" method="post" name="adminForm" id="adminForm" class="form-inline">
         <?php if (empty($this->items)) : ?>
             <div class="alert alert-warning">
                 <?php echo Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?>

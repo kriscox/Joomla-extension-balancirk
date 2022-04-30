@@ -20,7 +20,7 @@ use Joomla\CMS\MVC\Model\AdminModel;
  *
  * @since  __BUMP_VERSION__
  */
-class StudentModel extends AdminModel
+class MemberModel extends AdminModel
 {
     /**
      * The type alias for this content type.
@@ -28,7 +28,7 @@ class StudentModel extends AdminModel
      * @var    string
      * @since  __BUMP_VERSION__
      */
-    public $typeAlias = 'com_balancirk.student';
+    public $typeAlias = 'com_balancirk.member';
 
     /**
      * Method to get the row form.
@@ -43,7 +43,7 @@ class StudentModel extends AdminModel
     public function getForm($data = [], $loadData = true)
     {
         // Get the form.
-        $form = $this->loadForm($this->typeAlias, 'student', ['control' => 'jform', 'load_data' => $loadData]);
+        $form = $this->loadForm($this->typeAlias, 'member', ['control' => 'jform', 'load_data' => $loadData]);
         if (empty($form)) {
             return false;
         }

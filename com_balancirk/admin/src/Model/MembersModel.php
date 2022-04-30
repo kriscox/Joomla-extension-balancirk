@@ -19,7 +19,7 @@ use Joomla\CMS\MVC\Model\ListModel;
  *
  * @since  __BUMP_VERSION__
  */
-class StudentsModel extends ListModel
+class MembersModel extends ListModel
 {
     /**
      * Constructor.

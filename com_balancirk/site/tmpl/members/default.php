@@ -2,7 +2,7 @@
 
 /**
  * @package 	com_balancirk
- * @subpackage 	student
+ * @subpackage 	member
  *
  * @copyright   Copyright (C) 2022 CoCoCo. All rights reserved.
  * @license     GNU General Public License version 3; see LICENSE.txt
@@ -15,9 +15,9 @@ use Joomla\CMS\Router\Route;
 \defined('_JEXEC') or die('Restricted access');
 ?>
 
-<h1>Students view</h1>
+<h1>Members view</h1>
 
-<h2>List of students</h2>
+<h2>List of members</h2>
 
 <form action="<?php echo Route::_('index.php?option=com_balancirk'); ?>" method="post" name="adminForm" id="adminForm">
     <div class="row">
@@ -28,16 +28,15 @@ use Joomla\CMS\Router\Route;
                         <?php echo Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?>
                     </div>
                 <?php else : ?>
-                    <table class="table" id="studentList">
+                    <table class="table" id="memberList">
                         <thead>
                             <tr>
-                                <th scope="col">
-                                    <?php echo Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_ID'); ?>
-                                </th>
                                 <th scope="col" style="width:1%" class="text-center d-none d-md-table-cell">
                                     <?php echo Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_NAME'); ?>
                                 </th>
-
+                                <th scope="col">
+                                    <?php echo Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_ID'); ?>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -46,13 +45,13 @@ use Joomla\CMS\Router\Route;
                             foreach ($this->items as $i => $item) :
                             ?>
                                 <tr class="row<?php echo $i % 2; ?>">
+                                    <th scope="row" class="has-context">
+                                        <a class="hasTooltip" href="<?php echo Route::_('index.php?option=com_balancirk&task=member.edit&id=' . (int) $item->id); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?> <?php echo $this->escape(addslashes($item->name)); ?>">
+                                            <?php echo $editIcon; ?><?php echo $this->escape($item->name); ?> <?php echo $this->escape($item->surname); ?></a>
+                                    </th>
                                     <td class="d-none d-md-table-cell">
                                         <?php echo $item->id; ?>
                                     </td>
-                                    <th scope="row" class="has-context">
-                                        <a class="hasTooltip" href="<?php echo Route::_('index.php?option=com_balancirk&task=student.edit&id=' . (int) $item->id); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?> <?php echo $this->escape(addslashes($item->name)); ?>">
-                                            <?php echo $editIcon; ?><?php echo $this->escape($item->name); ?> <?php echo $this->escape($item->surname); ?></a>
-                                    </th>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

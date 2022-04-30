@@ -8,26 +8,26 @@
  * @license	    GNU General Public License version 3; see LICENSE.txt
  */
 
-namespace CoCoCo\Component\Balancirk\Site\View\Student;
+namespace CoCoCo\Component\Balancirk\Site\View\Member;
 
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 
 /**
- * Main "Student" Admin View
+ * Main "Member" Admin View
  * 
  * @since  __BUMP_VERSION__
  */
 class HtmlView extends BaseHtmlView
 {
     /**
-     * The student object details
+     * The member object details
      *
      * @var    \JObject
      * @since  __BUMP_VERSION__
      */
-    protected $student;
+    protected $member;
 
     /**
      * Execute and display a template script.
@@ -38,7 +38,7 @@ class HtmlView extends BaseHtmlView
      */
     function display($tpl = null)
     {
-        $this->student = $this->get('Student');
+        $this->member = $this->get('Member');
         parent::display($tpl);
     }
 }

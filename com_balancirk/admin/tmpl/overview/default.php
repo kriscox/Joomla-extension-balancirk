@@ -2,7 +2,7 @@
 
 /**
  * @package 	com_balancirk
- * @subpackage 	student
+ * @subpackage 	member
  *
  * @copyright   Copyright (C) 2022 CoCoCo. All rights reserved.
  * @license     GNU General Public License version 3; see LICENSE.txt

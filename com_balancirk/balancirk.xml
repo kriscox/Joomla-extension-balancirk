@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="component" method="upgrade">
+<extension type="component"
+    method="upgrade">
     <!-- 'version' attribute for extension tag is no longer used -->
 
     <name>Balancirk</name>
@@ -24,7 +25,8 @@
         <folder>tmpl</folder>
     </files>
 
-    <media folder="media/" destination="com_balancirk">
+    <media folder="media/"
+        destination="com_balancirk">
         <folder>js</folder>
         <filename>joomla.asset.json</filename>
     </media>
@@ -36,9 +38,10 @@
     </languages>
 
     <administration>
-        <menu link="option=com_balancirk&amp;view=overview">COM_BALANCIRK_ADMIN_MENU</menu>
+        <menu link="option=com_balancirk">COM_BALANCIRK_ADMIN_MENU</menu>
         <submenu>
-            <menu link="option=com_balancirk&amp;view=students">COM_BALANCIRK_LABEL_STUDENT_OVERVIEW</menu>
+            <menu link="option=com_balancirk&amp;view=overview">COM_BALANCIRK_LABEL_OVERVIEW</menu>
+            <menu link="option=com_balancirk&amp;view=members">COM_BALANCIRK_LABEL_MEMBER_OVERVIEW</menu>
         </submenu>
         <files folder="admin/">
             <filename>..\balancirk.xml</filename>
@@ -64,12 +67,14 @@
 
     <install>
         <sql>
-            <file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+            <file driver="mysql"
+                charset="utf8">sql/install.mysql.utf8.sql</file>
         </sql>
     </install>
     <uninstall>
         <sql>
-            <file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
+            <file driver="mysql"
+                charset="utf8">sql/uninstall.mysql.utf8.sql</file>
         </sql>
     </uninstall>
     <!-- <update>
@@ -80,7 +85,8 @@
 
     <changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-test/Second-attempt/balancirk_changelog.xml</changelogurl>
     <updateservers>
-        <server type="extension" name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/Second-attempt/balancirk_update.xml</server>
+        <server type="extension"
+            name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/Second-attempt/balancirk_update.xml</server>
     </updateservers>
 
 </extension>
