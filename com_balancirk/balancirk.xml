@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<extension type="component"
+    method="upgrade">
+
+    <name>Balancirk</name>
+    <creationDate>June 2022</creationDate>
+    <author>Kris Cox</author>
+    <authorEmail>kris.cox@cococo.be</authorEmail>
+    <authorUrl>https://cococo.be</authorUrl>
+    <copyright>CoCoCo</copyright>
+    <license>GPL v3</license>
+
+    <version>0.0.1</version>
+    <description>COM_BALANCIRK_MODULE_DESCRIPTION</description>
+
+    <namespace path="src">CoCoCo\Component\Balancirk</namespace>
+
+    <scriptfile>script.php</scriptfile>
+
+    <!-- Site files -->
+    <files folder="site">
+        <folder>src</folder>
+        <folder>tmpl</folder>
+    </files>
+
+    <administration>
+        <!-- menu entries-->
+        <menu view="Balancirk">COM_BALANCIRK</menu>
+        <submenu>
+            <menu link="option=com_balancirk">COM_STUDENTS</menu>
+        </submenu>
+
+        <files folder="admin">
+            <folder>src</folder>
+            <folder>services</folder>
+            <folder>tmpl</folder>
+        </files>
+    </administration>
+
+    <changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_changelog.xml</changelogurl>
+    <updateservers>
+        <server type="extension"
+            name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_update.xml</server>
+    </updateservers>
+</extension>
