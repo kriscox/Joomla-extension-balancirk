@@ -15,6 +15,10 @@ use Joomla\CMS\Extension\Service\Provider\CategoryFactory;
 use Joomla\CMS\Extension\Service\Provider\ComponentDispatcherFactory;
 use Joomla\CMS\Extension\Service\Provider\MVCFactory;
 use Joomla\CMS\HTML\Registry;
+<<<<<<< HEAD
+=======
+use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
+>>>>>>> cc6c2a0 (Initial)
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use CoCoCo\Component\Balancirk\Administrator\Extension\BalancirkComponent;
@@ -40,11 +44,22 @@ return new class implements ServiceProviderInterface
         $container->registerServiceProvider(new CategoryFactory('\\CoCoCo\Component\Balancirk'));
         $container->registerServiceProvider(new MVCFactory('\\CoCoCo\Component\Balancirk'));
         $container->registerServiceProvider(new ComponentDispatcherFactory('\\CoCoCo\Component\Balancirk'));
+<<<<<<< HEAD
+=======
+
+>>>>>>> cc6c2a0 (Initial)
         $container->set(
             ComponentInterface::class,
             function (Container $container) {
                 $component = new BalancirkComponent($container->get(ComponentDispatcherFactoryInterface::class));
+<<<<<<< HEAD
                 $component->setRegistry($container->get(Registry::class));
+=======
+
+                $component->setRegistry($container->get(Registry::class));
+                $component->setMVCFactory($container->get(MVCFactoryInterface::class));
+
+>>>>>>> cc6c2a0 (Initial)
                 return $component;
             }
         );

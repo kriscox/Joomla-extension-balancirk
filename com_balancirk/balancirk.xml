@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="utf-8" ?>
 <extension type="component"
     method="upgrade">
+=======
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" method="upgrade">
+>>>>>>> cc6c2a0 (Initial)
 
     <name>Balancirk</name>
     <creationDate>June 2022</creationDate>
@@ -17,6 +22,23 @@
 
     <scriptfile>script.php</scriptfile>
 
+<<<<<<< HEAD
+=======
+    <install>
+        <!-- Runs on install -->
+        <sql>
+            <file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+        </sql>
+    </install>
+
+    <uninstall>
+        <!-- Runs on uninstall -->
+        <sql>
+            <file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
+        </sql>
+    </uninstall>
+
+>>>>>>> cc6c2a0 (Initial)
     <!-- Site files -->
     <files folder="site">
         <folder>src</folder>
@@ -27,19 +49,41 @@
         <!-- menu entries-->
         <menu view="Balancirk">COM_BALANCIRK</menu>
         <submenu>
+<<<<<<< HEAD
             <menu link="option=com_balancirk">COM_STUDENTS</menu>
         </submenu>
 
         <files folder="admin">
             <folder>src</folder>
             <folder>services</folder>
+=======
+            <menu link="option=com_balancirk&amp;view=students">COM_BALANCIRK_STUDENTS</menu>
+            <menu link="option=com_balancirk&amp;view=members">COM_BALANCIRK_MEMBERS</menu>
+        </submenu>
+
+        <languages>
+            <language tag="en-GB">admin/language/en-GB/en-GB.com_balancirk.ini</language>
+        </languages>
+
+        <files folder="admin">
+            <file>access.xml</file>
+            <!-- <file>config.xml</file> -->
+            <folder>src</folder>
+            <folder>services</folder>
+            <folder>forms</folder>
+            <folder>sql</folder>
+>>>>>>> cc6c2a0 (Initial)
             <folder>tmpl</folder>
         </files>
     </administration>
 
     <changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_changelog.xml</changelogurl>
     <updateservers>
+<<<<<<< HEAD
         <server type="extension"
             name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_update.xml</server>
+=======
+        <server type="extension" name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_update.xml</server>
+>>>>>>> cc6c2a0 (Initial)
     </updateservers>
 </extension>

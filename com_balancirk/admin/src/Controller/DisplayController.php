@@ -27,7 +27,11 @@ class DisplayController extends BaseController
      * @var    string
      * @since  0.0.1
      */
+<<<<<<< HEAD
     protected $default_view =  'balancirk';
+=======
+    protected $default_view =  'members';
+>>>>>>> cc6c2a0 (Initial)
 
     /**
      * Method to display a view.
