@@ -38,7 +38,13 @@ use Joomla\CMS\Router\Route;
                                     <?php echo Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_NAME'); ?>
                                 </th>
                                 <th scope="col" style="width:1%" class="text-center d-none d-md-table-cell">
-                                    <?php echo Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_NAME'); ?>
+                                    <?php echo Text::_('COM_BALANCIRK_LABEL_USERNAME'); ?>
+                                </th>
+                                <th scope="col" style="width:1%" class="text-center d-none d-md-table-cell">
+                                    <?php echo Text::_('COM_BALANCIRK_LABEL_EMAIL'); ?>
+                                </th>
+                                <th scope="col" style="width:1%" class="text-center d-none d-md-table-cell">
+                                    <?php echo Text::_('COM_BALANCIRK_LABEL_PHONE'); ?>
                                 </th>
 
                             </tr>
@@ -55,6 +61,15 @@ use Joomla\CMS\Router\Route;
                                     <th scope="row" class="has-context">
                                         <a class="hasTooltip" href="<?php echo Route::_('index.php?option=com_balancirk&task=member.edit&id=' . (int) $item->id); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?> <?php echo $this->escape(addslashes($item->name)); ?>">
                                             <?php echo $editIcon; ?><?php echo $this->escape($item->name); ?> <?php echo $this->escape($item->surname); ?></a>
+                                    </th>
+                                    <th scope="row" class="has-context">
+                                        <?php echo $this->escape($item->username); ?>
+                                    </th>
+                                    <th scope="row" class="has-context">
+                                        <?php echo $this->escape($item->email); ?>
+                                    </th>
+                                    <th scope="row" class="has-context">
+                                        <?php echo $this->escape($item->phone); ?>
                                     </th>
                                 </tr>
                             <?php endforeach; ?>

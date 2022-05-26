@@ -12,16 +12,50 @@ namespace CoCoCo\Component\Balancirk\Administrator\View\Members;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Helper\ContentHelper;
+use Joomla\CMS\Language\Associations;
+use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\MVC\View\GenericDataException;
+
 
 /**
  * Main "Members" Admin View
  */
 class HtmlView extends BaseHtmlView
 {
+    /**
+     * An array of members
+     *
+     * @var  array
+     */
+    protected $members;
+
+    /**
+     * The model state
+     *
+     * @var  \JObject
+     */
+    protected $state;
+
+    /**
+     * Form object for search filters
+     *
+     * @var  \JForm
+     */
+    public $filterForm;
+
+    /**
+     * The active search filters
+     *
+     * @var  array
+     */
+    public $activeFilters;
+
     /**
      * Display the main "Members" view
      *
@@ -43,6 +77,8 @@ class HtmlView extends BaseHtmlView
 
     protected function addToolbar()
     {
+
+
         // Get the toolbar object instance
         $toolbar = Toolbar::getInstance('toolbar');
         ToolbarHelper::title(Text::_('COM_BALANCIRK_MANAGER_MEMBERS'), 'address member');

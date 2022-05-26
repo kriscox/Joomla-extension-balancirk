@@ -6,7 +6,7 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ListModel;
-//use Joomla\CMS\User\User;
+use Joomla\CMS\User\User;
 use Joomla\CMS\Language\Text;
 //use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
@@ -39,7 +39,7 @@ class MemberModel extends ListModel
      */
     public function __construct($config = array())
     {
-        if (empty($config['filter_fields'])) {
+        /* if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
                 'id', 'a.id',
                 'firstname', 'a.firstname',
@@ -53,7 +53,7 @@ class MemberModel extends ListModel
                 'use_photos', 'a.use_photos',
                 'uitpassnr', 'a.uitpassnr'
             );
-        }
+        } */
 
         parent::__construct($config);
     }
@@ -92,9 +92,7 @@ class MemberModel extends ListModel
         $query->select(
             $db->quoteName(
                 array(
-                    'a.id', 'a.firstname', 'a.name', 'a.parent_id', 'a.birthdate',
-                    'a.dialcode', 'a.phone', 'a.email', 'a.remarks',
-                    'a.use_photos', 'a.uitpassnr'
+                    'p.id', 'a.firstname', 'p.name', 'p.phone', 'p.email'
                 )
             )
         );
@@ -102,16 +100,10 @@ class MemberModel extends ListModel
         $query->from($db->quoteName($this->getTable(), 'a'));
 
         // Join with users (parent is joomla-user)
-        $query->select($db->quoteName('p.name'))
-            ->join(
-                'INNER',
-                $db->quoteName('#__users', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('a.parent_id')
-            );
-
-        // Filter on the current logged-in user as parent
-        //if ($parent = Factory::getApplication()->getIdentity()) {
-        //    $query->where($db->quoteName('a.parent_id') . ' = ' . $db->quote($parent->id));
-        // }
+        $query->join(
+            'INNER',
+            $db->quoteName('#__users', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('a.id')
+        );
 
         return $query;
     }
@@ -123,16 +115,16 @@ class MemberModel extends ListModel
      * 
      *  @since __BUMP_VERSION__
      */
-    public function getMemberInformation($id)
-    {
-        $member = $this->getMember($id);
-        return $member;
-    }
-
     public function getMember($id = null)
     {
+
+        $db = $this->getDbo();
+        $query = $this->getListQuery();
+
         // Filter on the current logged-in user as parent
-        $parent = Factory::getApplication()->getIdentity();
+        if ($id === null) {
+            $id = Factory::getApplication()->getIdentity();
+        }
 
         if ($this->_item === null) {
             $this->_item = array();
@@ -140,13 +132,8 @@ class MemberModel extends ListModel
 
         if (!isset($this->_item[$id])) {
             try {
-                $db = $this->getDbo();
-                $query = $db->getQuery(true);
-                $query->select('*')
-                    ->from($db->quoteName('#__members', 'a'));
-                //    ->where($db->quoteName('a.parent_id') . ' = ' . $db->quote($parent->id));
                 if ($id != null) {
-                    $query->where('a.id = ' . (int) $id);
+                    $query->where($db->quoteName('p.id') . ' = ' . $db->quote($id));
                 }
                 $db->setQuery($query);
                 $data = $db->loadObject();

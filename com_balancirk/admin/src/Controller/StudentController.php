@@ -15,10 +15,10 @@ namespace CoCoCo\Component\Balancirk\Administrator\Controller;
 use Joomla\CMS\MVC\Controller\FormController;
 
 /**
- * Controller for a single member
+ * Controller for a single Student
  *
  * @since  __BUMP_VERSION__
  */
-class MemberController extends FormController
+class StudentController extends FormController
 {
 }
