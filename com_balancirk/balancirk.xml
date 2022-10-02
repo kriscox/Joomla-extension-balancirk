@@ -1,11 +1,6 @@
-<<<<<<< HEAD
 <?xml version="1.0" encoding="utf-8" ?>
 <extension type="component"
     method="upgrade">
-=======
-<?xml version="1.0" encoding="utf-8"?>
-<extension type="component" method="upgrade">
->>>>>>> cc6c2a0 (Initial)
 
     <name>Balancirk</name>
     <creationDate>June 2022</creationDate>
@@ -22,8 +17,6 @@
 
     <scriptfile>script.php</scriptfile>
 
-<<<<<<< HEAD
-=======
     <install>
         <!-- Runs on install -->
         <sql>
@@ -38,16 +31,12 @@
         </sql>
     </uninstall>
 
-<<<<<<< HEAD
->>>>>>> cc6c2a0 (Initial)
     <!-- Site files -->
-=======
     <!-- Site Main File Copy Section -->
     <!-- Note the folder attribute: This attribute describes the folder
 		to copy FROM in the package to install therefore files copied
 		in this section are copied from /site/ in the package -->
 
->>>>>>> 2a1c65d (Further development)
     <files folder="site">
         <folder>src</folder>
         <folder>tmpl</folder>
@@ -61,33 +50,12 @@
         <!-- menu entries-->
         <menu view="Balancirk">COM_BALANCIRK</menu>
         <submenu>
-<<<<<<< HEAD
             <menu link="option=com_balancirk">COM_STUDENTS</menu>
         </submenu>
 
         <files folder="admin">
             <folder>src</folder>
             <folder>services</folder>
-=======
-            <menu link="option=com_balancirk&amp;view=students">COM_BALANCIRK_STUDENTS</menu>
-            <menu link="option=com_balancirk&amp;view=members">COM_BALANCIRK_MEMBERS</menu>
-            <menu link="option=com_balancirk&amp;view=lessons">COM_BALANCIRK_LESSONS</menu>
-            <menu link="option=com_balancirk&amp;view=lessontypes">COM_BALANCIRK_LESSON_TYPES</menu>
-        </submenu>
-
-        <languages>
-            <language tag="en-GB">admin/language/en-GB/com_balancirk.ini</language>
-            <language tag="en-GB">admin/language/en-GB/com_balancirk.sys.ini</language>
-        </languages>
-
-        <files folder="admin">
-            <file>access.xml</file>
-            <!-- <file>config.xml</file> -->
-            <folder>src</folder>
-            <folder>services</folder>
-            <folder>forms</folder>
-            <folder>sql</folder>
->>>>>>> cc6c2a0 (Initial)
             <folder>tmpl</folder>
         </files>
     </administration>
@@ -99,12 +67,8 @@
 
     <changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_changelog.xml</changelogurl>
     <updateservers>
-<<<<<<< HEAD
         <server type="extension"
             name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_update.xml</server>
-=======
-        <server type="extension" name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_update.xml</server>
->>>>>>> cc6c2a0 (Initial)
     </updateservers>
 
 </extension>
