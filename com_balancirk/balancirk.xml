@@ -55,10 +55,16 @@
 
         <files folder="admin">
             <folder>src</folder>
+            <folder>language</folder>
             <folder>sql</folder>
             <folder>services</folder>
             <folder>tmpl</folder>
         </files>
+
+        <languages folder="admin">
+           <language tag="en-GB">language/en-GB/com_balancirk.ini</language> 
+           <language tag="en-GB">language/en-GB/com_balancirk.sys.ini</language> 
+        </languages>
     </administration>
 
     <!-- Change And Update Section-->
