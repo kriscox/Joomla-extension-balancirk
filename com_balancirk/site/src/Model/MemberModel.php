@@ -13,24 +13,16 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-<<<<<<< HEAD
-use Joomla\CMS\MVC\Model\BaseDatabaseModel;
-=======
 use Joomla\CMS\MVC\Model\AdminModel;
->>>>>>> cc6c2a0 (Initial)
 
 /**
  * Member model for the Joomla Balancirk component.
  *
  * @since  0.0.1
  */
-<<<<<<< HEAD
-class MemberModel extends BaseDatabaseModel
-=======
 // TODO: Add AdminModel functionalities
 // update, read, write + from 
 class MemberModel extends AdminModel
->>>>>>> cc6c2a0 (Initial)
 {
     /**
      * @var    
@@ -38,8 +30,6 @@ class MemberModel extends AdminModel
     protected $member;
 
     /**
-<<<<<<< HEAD
-=======
      * getForm function.
      *
      * @param   array    $data      Data for the form.
@@ -54,7 +44,6 @@ class MemberModel extends AdminModel
     }
 
     /**
->>>>>>> cc6c2a0 (Initial)
      * Get the member.
      *
      * @return  Member  
