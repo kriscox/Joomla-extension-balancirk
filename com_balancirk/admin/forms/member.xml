@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form>
     <fieldset>
-        <FIELD name="id" type="number" label="COM_BALANCIRK_TABLE_TABLEHEAD_ID" class="readonly" readonly="true" />
-        <FIELD name="firstname" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_FIRSTNAME" maxlength="255" required="true" />
-        <FIELD name="name" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_NAME" maxlength="255" required="true" />
-        <FIELD name="username" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_USERNAME" maxlength="255" required="true" />
-        <FIELD name="email" type="email" label="COM_BALANCIRK_TABLE_TABLEHEAD_EMAIL" required="true" validate="email" />
-        <FIELD name="street" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_STREET" maxlength="255" />
-        <FIELD name="number" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_NUMBER" maxlength="10" />
-        <FIELD name="bus" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_BUS" maxlength="10" />
-        <FIELD name="postcode" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_POSTALCODE" maxlength="10" />
-        <FIELD name="municipality" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_MUNICIPALITY" maxlength="50" />
-        <FIELD name="phone" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_PHONE" maxlength="15" />
-        <FIELD name="registerdate" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_REGISTERDATE" readonly="true" format="%D %b %Y" />
-        <FIELD name="last logindate" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_LASTLOGINDATE" readonly="true" format="%D %b %Y" />
+        <field name="id" type="number" label="COM_BALANCIRK_TABLE_TABLEHEAD_ID" class="readonly" readonly="true" />
+        <field name="firstname" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_FIRSTNAME" maxlength="255" required="true" />
+        <field name="name" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_NAME" maxlength="255" required="true" />
+        <field name="username" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_USERNAME" maxlength="255" required="true" />
+        <field name="email" type="email" label="COM_BALANCIRK_TABLE_TABLEHEAD_EMAIL" required="true" validate="email" />
+        <field name="street" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_STREET" maxlength="255" />
+        <field name="number" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_NUMBER" maxlength="10" />
+        <field name="bus" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_BUS" maxlength="10" />
+        <field name="postcode" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_POSTALCODE" maxlength="10" />
+        <field name="municipality" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_MUNICIPALITY" maxlength="50" />
+        <field name="phone" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_PHONE" maxlength="15" />
+        <field name="registerdate" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_REGISTERDATE" readonly="true" format="%D %b %Y" />
+        <field name="last logindate" type=" calendar" label=" COM_BALANCIRK_TABLE_TABLEHEAD_LASTLOGINDATE" readonly=" true" format=" %D %b %Y" />
     </fieldset>
 </form>

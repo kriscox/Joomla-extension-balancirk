@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-    <layout title="COM_BALANCIRK_BALANCIRK_VIEW_DEFAULT_TITLE">
+    <layout title="COM_BALANCIRK_VIEW_MEMBER_TITLE">
         <message>
             <![CDATA[COM_BALANCIRK_VIEW_DEFAULT_DESC]]>
         </message>
     </layout>
     <fields name="member">
         <fieldset name="member">
+<<<<<<< HEAD
 <<<<<<< HEAD
             <field name="wllll_member"
                 type="text"
@@ -23,3 +24,9 @@
     </fields>
 </metadata>
 >>>>>>> cc6c2a0 (Initial)
+=======
+            <field name="which_member" type="text" label="COM_BALANCIRK_MEMBER_CHOICE" default="Anybody" />
+        </fieldset>
+    </fields>
+</metadata>
+>>>>>>> 2a1c65d (Further development)

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+    <fieldset>
+        <field name="ID" type="number" label="COM_BALANCIRK_TABLE_TABLEHEAD_ID" class="readonly" readonly="true" />
+        <field name="name" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_NAME" maxlength="255" required="true" />
+        <field name="type" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_TYPE" maxlength="255" required="true" />
+        <field name="fee" type="number" label="COM_BALANCIRK_TABLE_TABLEHEAD_FEE" required="true" />
+        <field name="year" type="number" label="COM_BALANCIRK_TABLE_TABLEHEAD_YEAR" maxlength="255" />
+        <field name="start" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_START" maxlength="10" />
+        <field name="end" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_END" maxlength="10" />
+        <field name="start_registration" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_START_REGISTRATION" maxlength="10" />
+        <field name="end_registration" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_END_REGISTRATION" maxlength="10" />
+        <field name="state" type="list" label="COM_BALANCIRK_TABLE_TABLEHEAD_STATE" default="1" id="published" class="custom-select-color-state" size="1">
+            <option value="1">COM_BALANCIRK_STATUS_ACTIVE</option>
+            <option value="0">COM_BALANCIRK_STATUS_PAST</option>
+            <option value="2">COM_BALANCIRK_STATUS_NEXT</option>
+            <option value="-2">TRASHED</option>
+        </field>
+    </fieldset>
+</form>

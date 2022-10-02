@@ -38,12 +38,24 @@
         </sql>
     </uninstall>
 
+<<<<<<< HEAD
 >>>>>>> cc6c2a0 (Initial)
     <!-- Site files -->
+=======
+    <!-- Site Main File Copy Section -->
+    <!-- Note the folder attribute: This attribute describes the folder
+		to copy FROM in the package to install therefore files copied
+		in this section are copied from /site/ in the package -->
+
+>>>>>>> 2a1c65d (Further development)
     <files folder="site">
         <folder>src</folder>
         <folder>tmpl</folder>
     </files>
+
+    <languages folder="site">
+        <language tag="en-GB">language/en-GB/com_balancirk.ini</language>
+    </languages>
 
     <administration>
         <!-- menu entries-->
@@ -59,10 +71,13 @@
 =======
             <menu link="option=com_balancirk&amp;view=students">COM_BALANCIRK_STUDENTS</menu>
             <menu link="option=com_balancirk&amp;view=members">COM_BALANCIRK_MEMBERS</menu>
+            <menu link="option=com_balancirk&amp;view=lessons">COM_BALANCIRK_LESSONS</menu>
+            <menu link="option=com_balancirk&amp;view=lessontypes">COM_BALANCIRK_LESSON_TYPES</menu>
         </submenu>
 
         <languages>
-            <language tag="en-GB">admin/language/en-GB/en-GB.com_balancirk.ini</language>
+            <language tag="en-GB">admin/language/en-GB/com_balancirk.ini</language>
+            <language tag="en-GB">admin/language/en-GB/com_balancirk.sys.ini</language>
         </languages>
 
         <files folder="admin">
@@ -77,6 +92,11 @@
         </files>
     </administration>
 
+    <!-- Change And Update Section-->
+    <!-- This section contains links to the sites where update and change 
+        configuration is found for automatic update within the joomla 
+        administrator site within extensions-->
+
     <changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_changelog.xml</changelogurl>
     <updateservers>
 <<<<<<< HEAD
@@ -86,4 +106,5 @@
         <server type="extension" name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_update.xml</server>
 >>>>>>> cc6c2a0 (Initial)
     </updateservers>
+
 </extension>

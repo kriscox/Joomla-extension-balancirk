@@ -71,9 +71,10 @@ INSERT INTO `#__balancirk_students` (
 *                                                                                                 * 
 **************************************************************************************************/
 
-CREATE TABLE IF NOT EXISTS `#__balancirk_parent` (
+CREATE TABLE IF NOT EXISTS `#__balancirk_parents` (
     `parent` int(11) NOT NULL,
     `child` int(11) NOT NULL,
+    `primary` tinyint(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`parent`, `child`),
     CONSTRAINT `fk_parent` 
         FOREIGN KEY (parent) 
@@ -83,9 +84,93 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_parent` (
             REFERENCES `#__balancirk_students` (id)
 );
 
-INSERT INTO `#__balancirk_parent` (
-    `parent`, `child`
+INSERT INTO `#__balancirk_parents` (
+    `parent`, `child`, `primary`
 ) VALUES
-    (156, 1),
-    (156, 2);
+    (156, 1, 1),
+    (156, 2, 0);
 
+/**************************************************************************************************
+*                                                                                                 * 
+*  SQL script for table types                                                                     * 
+*                                                                                                 * 
+**************************************************************************************************/
+
+CREATE TABLE IF NOT EXISTS `#__balancirk_types` (
+    `id` int(11) NOT NULL PRIMARY KEY,
+    `name` varchar(40) NOT NULL
+);
+
+/**************************************************************************************************
+*                                                                                                 * 
+*  SQL script for table lessons                                                                   * 
+*                                                                                                 * 
+**************************************************************************************************/
+
+CREATE TABLE IF NOT EXISTS `#__balancirk_lessons` (
+    `id` int(11) NOT NULL PRIMARY KEY,
+    `name` varchar(40) NOT NULL,
+    `type` int(11) NOT NULL,
+    `fee` float NOT NULL,
+    `year` tinyint(4) NOT NULL,
+    `start` date NOT NULL,
+    `end` date NOT NULL,
+    `start registration` date NOT NULL,
+    `end registration` date NOT NULL,
+    `state` char(15) NOT NULL,
+    CONSTRAINT `fk_types`
+        FOREIGN KEY (type)
+            REFERENCES `#__balancirk_types` (id)
+);
+
+CREATE OR REPLACE VIEW `#__balancirk_lessons_complete` 
+    AS SELECT a.`id`, a.`name`, b.`name` as `type`, a.`fee`, a.`year`, a.`start`, a.`end`, 
+            a.`start registration`, a.`end registration`, a.`state` 
+            FROM `#__balancirk_lessons` a
+                INNER JOIN `#__balancirk_types` b
+                    ON a.type = b.id;
+
+/**************************************************************************************************
+*                                                                                                 * 
+*  SQL script for table hours                                                                     * 
+*                                                                                                 * 
+**************************************************************************************************/
+
+CREATE TABLE IF NOT EXISTS `#__balancirk_hours`(
+    `id` int(11) NOT NULL PRIMARY KEY,
+    `day` varchar(40) NOT NULL,
+    `lesson` int(11) NOT NULL,
+    CONSTRAINT `fk_lessons`
+        FOREIGN KEY (lesson)
+            REFERENCES `#__balancirk_lessons` (id)
+);
+
+/**************************************************************************************************
+*                                                                                                 * 
+*  SQL script for table presences                                                                 * 
+*                                                                                                 * 
+**************************************************************************************************/
+
+CREATE TABLE IF NOT EXISTS `#__balancirk_presences`(
+    `lesson` int(11) NOT NULL,
+    `student` int(11) NOT NULL,
+    PRIMARY KEY (`lesson`, `student`), 
+    CONSTRAINT `fk_lesson`
+        FOREIGN KEY (lesson)
+            REFERENCES `#__balancirk_lessons` (id),
+    CONSTRAINT `fk_student`
+        FOREIGN KEY (student)
+            REFERENCES `#__balancirk_students` (id)
+);
+
+/**************************************************************************************************
+*                                                                                                 * 
+*  SQL script for table teachers                                                                  * 
+*                                                                                                 * 
+**************************************************************************************************/
+
+CREATE TABLE IF NOT EXISTS `#__balancirk_teachers`(
+        `member` int(11) NOT NULL,
+        `les` int(11) NOT NULL,
+        PRIMARY KEY (`member`, `les`)
+);

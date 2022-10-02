@@ -1,22 +1,21 @@
 <?php
 
 /**
- * @package     Joomla.Administrator
+ * @package     Joomlm.site
  * @subpackage  com_balancirk
  *
  * @copyright   Copyright (C) 2022 CoCoCo. All rights reserved.
  * @license     GNU General Public License version 3.
  */
 
-namespace CoCoCo\Component\Balancirk\Administrator\Model;
+namespace CoCoCo\Component\Balancirk\Site\Model;
 
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\MVC\Model\ListModel;
-use Joomla\Database\ParameterType;
 
 /**
- * MembersModel class to display the list off members.
+ * MembersModel class to display the list off students.
  *
  * @since  0.0.1
  */
@@ -36,7 +35,6 @@ class MembersModel extends ListModel
         if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
                 'id', 'a.id',
-                'username', 'a.username',
                 'name', 'a.name',
                 'firstname', 'a.firstname',
                 'email', 'a.email',
@@ -100,7 +98,7 @@ class MembersModel extends ListModel
     }
 
     /**
-     * Build an SQL query to load the list data.
+     * Build an SQL query to load the list datm.
      *
      * @return  \JDatabaseQuery
      *
@@ -111,6 +109,10 @@ class MembersModel extends ListModel
         // Create a new query object.
         $db = $this->getDbo();
         $query = $db->getQuery(true);
+
+        // Get the current logged in user.
+        $app = \Joomla\CMS\Factory::getApplication();
+        $user = $app->getIdentity();
 
         // Select the required fields from the table.
         $query->select(
@@ -124,6 +126,8 @@ class MembersModel extends ListModel
             )
         );
         $query->from($db->quoteName('#__balancirk_members', 'a'));
+
+        $query->where('a.id = ' . $user->id);
 
         // Filter by search in title.
         $search = $this->getState('filter.search');
@@ -143,7 +147,7 @@ class MembersModel extends ListModel
     }
 
     /**
-     * Method to get a list of members.
+     * Method to get a list of walks.
      * Overridden to add a check for access levels.
      *
      * @return  mixed  An array of data items on success, false on failure.

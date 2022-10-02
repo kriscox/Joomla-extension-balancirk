@@ -16,11 +16,11 @@ use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
 
 /**
- * MembersModel class to display the list off members.
+ * LessonsModel class to display the list off lessons.
  *
  * @since  0.0.1
  */
-class MembersModel extends ListModel
+class LessonsModel extends ListModel
 {
     /**
      * Constructor.
@@ -36,17 +36,14 @@ class MembersModel extends ListModel
         if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
                 'id', 'a.id',
-                'username', 'a.username',
                 'name', 'a.name',
-                'firstname', 'a.firstname',
-                'email', 'a.email',
-                'street', 'a.street',
-                'number', 'a.number',
-                'bus', 'a.bus',
-                'postalcode', 'a.postalcode',
-                'municipality', 'a.municipality',
-                'phone', 'a.phone',
-                'activation', 'a.activation'
+                'type', 'a.type',
+                'fee', 'a.fee',
+                'year', 'a.year',
+                'start', 'a.start',
+                'end', 'a.end',
+                'start_registration', 'a.start_registration',
+                'end_registration', 'a.end_registration',
             );
         }
 
@@ -116,22 +113,20 @@ class MembersModel extends ListModel
         $query->select(
             $db->quoteName(
                 [
-                    'a.id', 'a.name', 'a.firstname', 'a.username',
-                    'a.email', 'a.street', 'a.number', 'a.bus', 'a.postalcode',
-                    'a.municipality', 'a.phone', 'a.block', 'a.sendEmail',
-                    'a.registerDate', 'a.lastvisitDate', 'a.activation'
+                    'a.id', 'a.name', 'a.type', 'a.fee', 'a.year',
+                    'a.start', 'a.end', 'a.start_registration',
+                    'a.end_registration'
                 ]
             )
         );
-        $query->from($db->quoteName('#__balancirk_members', 'a'));
+        $query->from($db->quoteName('#__balancirk_lessons_complete', 'a'));
 
         // Filter by search in title.
         $search = $this->getState('filter.search');
 
         if (!empty($search)) {
             $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
-            $query->where('(a.name LIKE ' . $search . ')', 'OR');
-            $query->where('(a.firstname LIKE ' . $search . ')');
+            $query->where('(a.name LIKE ' . $search . ')');
         }
 
         // Add the list ordering clause.
@@ -143,7 +138,7 @@ class MembersModel extends ListModel
     }
 
     /**
-     * Method to get a list of members.
+     * Method to get a list of lessons.
      * Overridden to add a check for access levels.
      *
      * @return  mixed  An array of data items on success, false on failure.

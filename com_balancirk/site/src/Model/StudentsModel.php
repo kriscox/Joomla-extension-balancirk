@@ -1,14 +1,14 @@
 <?php
 
 /**
- * @package     Joomla.Administrator
+ * @package     Joomla.site
  * @subpackage  com_balancirk
  *
  * @copyright   Copyright (C) 2022 CoCoCo. All rights reserved.
  * @license     GNU General Public License version 3.
  */
 
-namespace CoCoCo\Component\Balancirk\Administrator\Model;
+namespace CoCoCo\Component\Balancirk\Site\Model;
 
 \defined('_JEXEC') or die;
 
@@ -16,11 +16,11 @@ use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
 
 /**
- * MembersModel class to display the list off members.
+ * StudentsModel class to display the list off students.
  *
  * @since  0.0.1
  */
-class MembersModel extends ListModel
+class StudentsModel extends ListModel
 {
     /**
      * Constructor.
@@ -28,15 +28,16 @@ class MembersModel extends ListModel
      * @param   array  $config  An optional associative array of configuration settings.
      *
      * @see     \JControllerLegacy
+     * @see     \Joomla\CMS\MVC\Controller\BaseController
      *
      * @since   __BUMP_VERSION__
      */
     public function __construct($config = [])
     {
+
         if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
                 'id', 'a.id',
-                'username', 'a.username',
                 'name', 'a.name',
                 'firstname', 'a.firstname',
                 'email', 'a.email',
@@ -46,7 +47,8 @@ class MembersModel extends ListModel
                 'postalcode', 'a.postalcode',
                 'municipality', 'a.municipality',
                 'phone', 'a.phone',
-                'activation', 'a.activation'
+                'birthdate', 'a.birthdate',
+                'state', 'a.state'
             );
         }
 
@@ -112,18 +114,38 @@ class MembersModel extends ListModel
         $db = $this->getDbo();
         $query = $db->getQuery(true);
 
+        // Get the current logged in user.
+        $app = \Joomla\CMS\Factory::getApplication();
+        $user = $app->getIdentity();
+
         // Select the required fields from the table.
         $query->select(
             $db->quoteName(
                 [
-                    'a.id', 'a.name', 'a.firstname', 'a.username',
-                    'a.email', 'a.street', 'a.number', 'a.bus', 'a.postalcode',
-                    'a.municipality', 'a.phone', 'a.block', 'a.sendEmail',
-                    'a.registerDate', 'a.lastvisitDate', 'a.activation'
+                    'id', 'name', 'firstname',
+                    'email', 'street', 'number', 'bus', 'postalcode',
+                    'municipality', 'phone', 'birthdate', 'state'
                 ]
             )
         );
-        $query->from($db->quoteName('#__balancirk_members', 'a'));
+        $query->from($db->quoteName('#__balancirk_students', 'a'));
+
+        //Filter users based on logged in user
+        $query->join(
+            'INNER',
+            $db->quoteName('#__balancirk_parents', 'p'),
+            'a.id = p.child AND p.parent = ' . $user->id
+        );
+
+        // Filter by published state
+        $published = (string) $this->getState('filter.published');
+
+        if (is_numeric($published)) {
+            $query->where($db->quoteName('a.state') . ' = :published');
+            $query->bind(':published', $published, ParameterType::INTEGER);
+        } elseif ($published === '') {
+            $query->where('(' . $db->quoteName('a.state') . ' = 0 OR ' . $db->quoteName('a.state') . ' = 1)');
+        }
 
         // Filter by search in title.
         $search = $this->getState('filter.search');
@@ -139,11 +161,12 @@ class MembersModel extends ListModel
         $orderDirn = $this->state->get('list.direction', 'ASC');
 
         $query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
+
         return $query;
     }
 
     /**
-     * Method to get a list of members.
+     * Method to get a list of walks.
      * Overridden to add a check for access levels.
      *
      * @return  mixed  An array of data items on success, false on failure.

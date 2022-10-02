@@ -46,7 +46,7 @@ class MembersTable extends Table
     public function generateAlias()
     {
         if (empty($this->alias)) {
-            $this->alias = $this->name;
+            $this->alias = $this->username;
         }
         $this->alias = ApplicationHelper::stringURLSafe($this->alias, $this->language);
         if (trim(str_replace('-', '', $this->alias)) == '') {
