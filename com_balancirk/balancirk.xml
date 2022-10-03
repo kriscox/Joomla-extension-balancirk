@@ -40,8 +40,9 @@
     <administration>
         <menu link="option=com_balancirk">COM_BALANCIRK_ADMIN_MENU</menu>
         <submenu>
-            <menu link="option=com_balancirk&amp;view=overview">COM_BALANCIRK_LABEL_OVERVIEW</menu>
-            <menu link="option=com_balancirk&amp;view=members">COM_BALANCIRK_LABEL_MEMBER_OVERVIEW</menu>
+            <menu link="option=com_balancirk&amp;view=students">COM_BALANCIRK_LABEL_STUDENTS_OVERVIEW</menu>
+            <menu link="option=com_balancirk&amp;view=members">COM_BALANCIRK_LABEL_MEMBERS_OVERVIEW</menu>
+            <menu link="option=com_balancirk&amp;view=lessons">COM_BALANCIRK_LABEL_LESSONS_OVERVIEW</menu>
         </submenu>
         <files folder="admin/">
             <!-- <filename>..\balancirk.xml</filename> -->
