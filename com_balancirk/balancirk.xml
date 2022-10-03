@@ -53,6 +53,7 @@
             <folder>sql</folder>
             <folder>forms</folder>
             <!-- <folder>tables</folder> -->
+            <file>access.xml</file>
         </files>
 
         <languages>
