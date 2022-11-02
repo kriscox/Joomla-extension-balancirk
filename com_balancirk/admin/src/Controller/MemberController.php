@@ -24,4 +24,13 @@ class MemberController extends FormController
     /* Not necessairy as he caluclates it itself
     protected $view_item = 'member';
     protected $view_list = 'members';*/
+
+    /**
+     *  Register a member in Joomla
+     */
+    public function register()
+    {
+        $input = JFactory::getApplication()->input;
+        $values = $input->get('', 0, 'int');
+    }
 }
