@@ -64,7 +64,7 @@ class HtmlView extends BaseHtmlView
 	 */
 	public function display($tpl = null)
 	{
-		$this->form  = $this->get('Form');
+		$this->form = $this->get('Form');
 		$this->item = $this->get('Item');
 
 		if (count($errors = $this->get('Errors')))

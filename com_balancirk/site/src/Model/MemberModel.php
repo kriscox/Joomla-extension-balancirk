@@ -150,7 +150,7 @@ class MemberModel extends AdminModel
 	protected function loadFormData()
 	{
 		$app = Factory::getApplication();
-		$data = $app->getUserState('com_balancirk.edit.member.data', array());
+		$data = $app->getUserState('com_balancirk.member.data', array());
 
 		if (empty($data))
 		{
@@ -194,7 +194,7 @@ class MemberModel extends AdminModel
 	 * created for this purpose
 	 *
 	 * @param   array					$data 	form data
-	 * @return  void
+	 * @return  boolean
 	 * @throws  \InvalidArgmentException 	if userdata format is fault
 	 * @throws  \UnexcpectedValueException 	if userdata is fault
 	 * @throws  \RuntimeException 			if saving does not works
@@ -220,7 +220,7 @@ class MemberModel extends AdminModel
 		{
 			$app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError(), 'error');
 
-			return;
+			return false;
 		}
 
 		// Throws \RuntimeException
@@ -228,7 +228,7 @@ class MemberModel extends AdminModel
 		{
 			$app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError(), 'error');
 
-			return;
+			return false;
 		}
 
 		// Fetch created userid.
@@ -298,6 +298,10 @@ class MemberModel extends AdminModel
 		if ($send != true)
 		{
 			$app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . 'Error sending email', 'error');
+
+			return false;
 		}
+
+		return true;
 	}
 }
