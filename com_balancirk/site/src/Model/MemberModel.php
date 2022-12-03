@@ -14,10 +14,13 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 
 use Exception;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Mail\Mail;
 use Joomla\CMS\User\User;
+use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\User\UserHelper;
 use Joomla\CMS\MVC\Model\AdminModel;
+use Joomla\Registry\Registry;
 use Joomla\CMS\Application\ApplicationHelper;
 
 /**
@@ -56,9 +59,10 @@ class MemberModel extends AdminModel
 	 */
 	protected function canDelete($record)
 	{
-		if (!empty($record->id)) {
-
+		if (!empty($record->id))
+		{
 			$app = Factory::getApplication();
+
 			return $app->getIdentity()->authorise('core.delete', 'com_balancirk.members.' . (int) $record->id);
 		}
 
@@ -79,7 +83,8 @@ class MemberModel extends AdminModel
 		$user = Factory::getApplication()->getIdentity();
 
 		// Check for existing article.
-		if (!empty($record->id)) {
+		if (!empty($record->id))
+		{
 			return $user->authorise('core.edit.state', 'com_balancirk.members.' . (int) $record->id);
 		}
 
@@ -90,7 +95,7 @@ class MemberModel extends AdminModel
 	/**
 	 * Method to get a table object, load it if necessary.
 	 *
-	 * @param   string  $name	 The table name. Optional.
+	 * @param   string  $name	  The table name. Optional.
 	 * @param   string  $prefix   The class prefix. Optional.
 	 * @param   array   $options  Configuration array for model. Optional.
 	 *
@@ -104,7 +109,8 @@ class MemberModel extends AdminModel
 		$name = 'members';
 		$prefix = 'Table';
 
-		if ($table = $this->_createTable($name, $prefix, $options)) {
+		if ($table = $this->_createTable($name, $prefix, $options))
+		{
 			return $table;
 		}
 
@@ -114,7 +120,7 @@ class MemberModel extends AdminModel
 	/**
 	 * Method to get the row form.
 	 *
-	 * @param	array   $data	   Data from the form.
+	 * @param	array   $data	    Data from the form.
 	 * @param	boolean $loadData   True if the form is to load its own data (default case), false if not.
 	 *
 	 * @return  \JForm|boolean  A \JForm object on success, false on failure
@@ -126,9 +132,11 @@ class MemberModel extends AdminModel
 		// Get the form.
 		$form = $this->loadForm($this->typeAlias, 'member', ['control' => 'jform', 'load_data' => $loadData]);
 
-		if (empty($form)) {
+		if (empty($form))
+		{
 			return false;
 		}
+
 		return $form;
 	}
 
@@ -144,7 +152,8 @@ class MemberModel extends AdminModel
 		$app = Factory::getApplication();
 		$data = $app->getUserState('com_balancirk.edit.member.data', array());
 
-		if (empty($data)) {
+		if (empty($data))
+		{
 			$data = $this->getItem();
 
 			// Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
@@ -200,18 +209,25 @@ class MemberModel extends AdminModel
 		$data['activation'] = $hash;
 		$data['block'] = 1;
 
+		// TODO get the default user group. now it's fixed to Registered
+		$data['groups'] = array(2);
+
 		$app = Factory::getApplication();
 		$user = new User;
 
 		// Throws \InvalidArgumentException, \UnexpectedValueException
-		if (!$user->bind($data)) {
+		if (!$user->bind($data))
+		{
 			$app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError(), 'error');
+
 			return;
 		}
 
 		// Throws \RuntimeException
-		if (!$user->save()) {
+		if (!$user->save())
+		{
 			$app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError(), 'error');
+
 			return;
 		}
 
@@ -237,5 +253,51 @@ class MemberModel extends AdminModel
 		// Execute query
 		$db->setQuery($query);
 		$db->execute();
+
+		// Send activation mail
+		$mailer = Factory::getMailer();
+
+		// Set the sender
+		$config = new \JConfig;
+		$sender = array(
+			$config->mailfrom,
+			$config->fromname
+		);
+
+		// Get the activation url
+		$linkMode = $config->force_ssl == 2 ? 1 : 0;
+		$activationUrl = Route::link(
+			'site',
+			'index.php?option=com_users&task=registration.activate&token=' . $hash,
+			false,
+			$linkMode,
+			true
+		);
+
+		// TODO Message configureerbaar maken in de backend
+		// Set the mailbody
+		$message = "
+		Hallo {$data['firstname']},
+
+		Bedankt om je te registreren.
+
+		Om je account te kunnen gebruiken moet je deze nog activeren via deze link: {$activationUrl}
+
+		Met vriendelijke circusgroeten,
+
+		Rudi en Kris
+		";
+
+		// Set the Recipient
+		$send = $mailer->addRecipient($data['email'])
+			->setSender($sender)
+			->setSubject("Welkom bij balancirk")
+			->setBody($message)
+			->Send();
+
+		if ($send != true)
+		{
+			$app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . 'Error sending email', 'error');
+		}
 	}
 }

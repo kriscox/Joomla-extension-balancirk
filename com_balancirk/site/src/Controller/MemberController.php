@@ -50,12 +50,16 @@ class MemberController extends FormController
 	 * Register the user based on the input values in $key
 	 *
 	 * @param   array	   $key	List of fields of the form
-	 * @return  none
+	 *
+	 * @return	void
 	 *
 	 * @since   __BUMP_VERSION__
 	 **/
 	public function register($key = null)
 	{
+		// Check if token is correct. Security measure
+		$this->checkToken();
+
 		// Get data from the form
 		$formData = $this->input->get('jform', [], 'array');
 
@@ -68,12 +72,17 @@ class MemberController extends FormController
 		$this->setRedirect("/");
 
 		// Register the user
-		try {
+		try
+		{
 			$model->register($formData);
-		} catch (\UnexpectedValueException $e) {
+		}
+		catch (\UnexpectedValueException $e)
+		{
 			$app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $e->getMessage(), 'error');
-			$this->setRedirect();
-		} catch (\RuntimeException $e) {
+			$this->setRedirect($uri = Uri::getInstance());
+		}
+		catch (\RuntimeException $e)
+		{
 			$app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $e->getMessage(), 'error');
 			$this->setRedirect($uri = Uri::getInstance());
 		}

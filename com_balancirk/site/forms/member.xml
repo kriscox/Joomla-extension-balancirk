@@ -14,7 +14,8 @@
         <field name="phone" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_PHONE" maxlength="15" />
         <field name="registerdate" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_REGISTERDATE" readonly="true" format="%D %b %Y" />
         <field name="last logindate" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_LASTLOGINDATE" readonly=" true" format=" %D %b %Y" />
-		<field name="password1" type="password1" label="COM_BALANCIRK_REGISTRATION_PASSWORD1_LABEL" default="secret" />
-		<field name="password2" type="password2" label="COM_BALANCIRK_REGISTRATION_PASSWORD2_LABEL" default="secret" />
+		//TODO password validation
+		<field name="password1" type="password" label="COM_BALANCIRK_REGISTRATION_PASSWORD1_LABEL" class="required validate-password" filter="raw" validate="password" required="true"/>
+		<field name="password2" type="password" label="COM_BALANCIRK_REGISTRATION_PASSWORD2_LABEL" class="required validate-password" filter="raw" validate="password" required="true"/>
     </fieldset>
 </form>

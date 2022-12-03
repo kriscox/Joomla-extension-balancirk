@@ -24,34 +24,39 @@ use Joomla\Database\DatabaseDriver;
  */
 class MembersTable extends Table
 {
-    /**
-     * Constructor
-     *
-     * @param   DatabaseDriver  $db  Database connector object
-     *
-     * @since   __BUMP_VERSION__
-     */
-    public function __construct(DatabaseDriver $db)
-    {
-        $this->typeAlias = 'com_balancirk.member';
-        parent::__construct('#__balancirk_members', 'id', $db);
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param   DatabaseDriver  $db  Database connector object
+	 *
+	 * @since   __BUMP_VERSION__
+	 */
+	public function __construct(DatabaseDriver $db)
+	{
+		$this->typeAlias = 'com_balancirk.member';
+		parent::__construct('#__balancirk_members', 'id', $db);
+	}
 
-    /**
-     * Generate a valid alias from title / date.
-     * Remains public to be able to check for duplicated alias before saving
-     *
-     * @return  string
-     */
-    public function generateAlias()
-    {
-        if (empty($this->alias)) {
-            $this->alias = $this->username;
-        }
-        $this->alias = ApplicationHelper::stringURLSafe($this->alias, $this->language);
-        if (trim(str_replace('-', '', $this->alias)) == '') {
-            $this->alias = Factory::getDate()->format('Y-m-d-H-i-s');
-        }
-        return $this->alias;
-    }
+	/**
+	 * Generate a valid alias from title / date.
+	 * Remains public to be able to check for duplicated alias before saving
+	 *
+	 * @return  string
+	 */
+	public function generateAlias()
+	{
+		if (empty($this->alias))
+		{
+			$this->alias = $this->username;
+		}
+
+		$this->alias = ApplicationHelper::stringURLSafe($this->alias, $this->language);
+
+		if (trim(str_replace('-', '', $this->alias)) == '')
+		{
+			$this->alias = Factory::getDate()->format('Y-m-d-H-i-s');
+		}
+
+		return $this->alias;
+	}
 }

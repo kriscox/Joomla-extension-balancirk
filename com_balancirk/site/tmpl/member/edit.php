@@ -28,22 +28,12 @@ HTMLHelper::_('behavior.keepalive');
 
 ?>
 
-<form action="<?= Route::_('index.php?option=com_balancirk&view=member&layout=register'); ?>" method="post" name="adminForm" id="member-form" class="form-validate">
+<form action="<?= Route::_('index.php?option=com_balancirk&view=member&layout=edit') ?>" method="post" name="adminForm" id="member-form" class="form-validate">
 	<div>
 		<div class="row registration-form">
 			<?= $this->form->renderField('id'); ?>
 			<div class="col-12 col-md-6">
 				<?= $this->form->renderField('username'); ?>
-			</div>
-			<div class="col-12 col-md-6">
-			</div>
-			<div class="col-12 col-md-6">
-				<?= $this->form->renderField('password1'); ?>
-			</div>
-			<div class="col-12 col-md-6">
-			</div>
-			<div class="col-12 col-md-6">
-				<?= $this->form->renderField('password2'); ?>
 			</div>
 		</div>
 		<div class="row registration-form">
@@ -82,8 +72,8 @@ HTMLHelper::_('behavior.keepalive');
 
 	<div class="row title-alias form-vertical mb-3">
 		<div class="col-12 col-md-6">
-			<button type="button" class="balancirk_button" onclick="Joomla.submitbutton('member.register')">
-				<?= Text::_('JREGISTER') ?>
+			<button type="button" class="balancirk_button" onclick="Joomla.submitbutton('member.save')">
+				<?= Text::_('JSAVE') ?>
 			</button>
 		</div>
 		<div class="col-12 col-md-6">

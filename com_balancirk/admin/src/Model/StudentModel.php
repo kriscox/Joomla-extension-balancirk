@@ -26,154 +26,161 @@ use Jooma\CMS\CMSApplicationInterface;
  */
 class StudentModel extends AdminModel
 {
-    /**
-     * The type alias for this content type.
-     *
-     * @var    string
-     * @since  0.0.1
-     */
-    public $typeAlias = 'com_balancirk.student';
+	/**
+	 * The type alias for this content type.
+	 *
+	 * @var    string
+	 * @since  0.0.1
+	 */
+	public $typeAlias = 'com_balancirk.student';
 
-    /**
-     * The prefix to use with controller messages.
-     *
-     * @var    string
-     * @since  0.0.1
-     */
-    protected $text_prefix = 'COM_BALANCIRK';
+	/**
+	 * The prefix to use with controller messages.
+	 *
+	 * @var    string
+	 * @since  0.0.1
+	 */
+	protected $text_prefix = 'COM_BALANCIRK';
 
 
-    /**
-     * Method to test whether a record can be deleted.
-     *
-     * @param   object  $record  A record object.
-     *
-     * @return  boolean  True if allowed to delete the record. Defaults to the permission set in the component.
-     *
-     * @since   0.0.1
-     */
-    protected function canDelete($record)
-    {
-        if (!empty($record->id)) {
+	/**
+	 * Method to test whether a record can be deleted.
+	 *
+	 * @param   object  $record  A record object.
+	 *
+	 * @return  boolean  True if allowed to delete the record. Defaults to the permission set in the component.
+	 *
+	 * @since   0.0.1
+	 */
+	protected function canDelete($record)
+	{
+		if (!empty($record->id))
+		{
+			$app = Factory::getApplication();
 
-            $app = Factory::getApplication();
-            return $app->getIdentity()->authorise('core.delete', 'com_balancirk.students.' . (int) $record->id);
-        }
+			return $app->getIdentity()->authorise('core.delete', 'com_balancirk.students.' . (int) $record->id);
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    /**
-     * Method to test whether a record can have its state edited.
-     *
-     * @param   object  $record  A record object.
-     *
-     * @return  boolean  True if allowed to change the state of the record. Defaults to the permission set in the component.
-     *
-     * @since   0.0.1
-     */
-    protected function canEditState($record)
-    {
-        $user = Factory::getApplication()->getIdentity();
+	/**
+	 * Method to test whether a record can have its state edited.
+	 *
+	 * @param   object  $record  A record object.
+	 *
+	 * @return  boolean  True if allowed to change the state of the record. Defaults to the permission set in the component.
+	 *
+	 * @since   0.0.1
+	 */
+	protected function canEditState($record)
+	{
+		$user = Factory::getApplication()->getIdentity();
 
-        // Check for existing article.
-        if (!empty($record->id)) {
-            return $user->authorise('core.edit.state', 'com_balancirk.students.' . (int) $record->id);
-        }
+		// Check for existing article.
+		if (!empty($record->id))
+		{
+			return $user->authorise('core.edit.state', 'com_balancirk.students.' . (int) $record->id);
+		}
 
-        // Default to component settings if neither article nor category known.
-        return parent::canEditState($record);
-    }
+		// Default to component settings if neither article nor category known.
+		return parent::canEditState($record);
+	}
 
-    /**
-     * Method to get a table object, load it if necessary.
-     *
-     * @param   string  $name     The table name. Optional.
-     * @param   string  $prefix   The class prefix. Optional.
-     * @param   array   $options  Configuration array for model. Optional.
-     *
-     * @return  Table  A Table object
-     *
-     * @since   0.0.1
-     * @throws  \Exception
-     */
-    public function getTable($name = '', $prefix = '', $options = array())
-    {
-        $name = 'students';
-        $prefix = 'Table';
+	/**
+	 * Method to get a table object, load it if necessary.
+	 *
+	 * @param   string  $name     The table name. Optional.
+	 * @param   string  $prefix   The class prefix. Optional.
+	 * @param   array   $options  Configuration array for model. Optional.
+	 *
+	 * @return  Table  A Table object
+	 *
+	 * @since   0.0.1
+	 * @throws  \Exception
+	 */
+	public function getTable($name = '', $prefix = '', $options = array())
+	{
+		$name = 'students';
+		$prefix = 'Table';
 
-        if ($table = $this->_createTable($name, $prefix, $options)) {
-            return $table;
-        }
+		if ($table = $this->_createTable($name, $prefix, $options))
+		{
+			return $table;
+		}
 
-        throw new \Exception(Text::sprintf('JLIB_APPLICATION_ERROR_TABLE_NAME_NOT_SUPPORTED', $name), 0);
-    }
+		throw new \Exception(Text::sprintf('JLIB_APPLICATION_ERROR_TABLE_NAME_NOT_SUPPORTED', $name), 0);
+	}
 
-    /**
-     * Method to get the row form.
-     *
-     * @param    array   $data       Data from the form.
-     * @param    boolean $loadData   True if the form is to load its own data (default case), false if not.
-     *
-     * @return  \JForm|boolean  A \JForm object on success, false on failure
-     *
-     * @since   0.0.1
-     */
-    public function getForm($data = [], $loadData = true)
-    {
-        // Get the form.
-        $form = $this->loadForm($this->typeAlias, 'student', ['control' => 'jform', 'load_data' => $loadData]);
-        if (empty($form)) {
-            return false;
-        }
-        return $form;
-    }
+	/**
+	 * Method to get the row form.
+	 *
+	 * @param   array   $data       Data from the form.
+	 * @param   boolean $loadData   True if the form is to load its own data (default case), false if not.
+	 *
+	 * @return  \JForm|boolean  A \JForm object on success, false on failure
+	 *
+	 * @since   0.0.1
+	 */
+	public function getForm($data = [], $loadData = true)
+	{
+		// Get the form.
+		$form = $this->loadForm($this->typeAlias, 'student', ['control' => 'jform', 'load_data' => $loadData]);
 
-    /**
-     * Method to get the data that should be injected in the form.
-     *
-     * @return  mixed  The data for the form.
-     *
-     * @since  0.0.1
-     */
-    protected function loadFormData()
-    {
-        // Check the session for previously entered form data.
-        $app = Factory::getApplication();
-        $data = $app->getUserState('com_balancirk.edit.student.data', array());
+		if (empty($form))
+		{
+			return false;
+		}
 
-        if (empty($data)) {
-            $data = $this->getItem();
+		return $form;
+	}
 
-            // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
-        }
+	/**
+	 * Method to get the data that should be injected in the form.
+	 *
+	 * @return  mixed  The data for the form.
+	 *
+	 * @since  0.0.1
+	 */
+	protected function loadFormData()
+	{
+		// Check the session for previously entered form data.
+		$app = Factory::getApplication();
+		$data = $app->getUserState('com_balancirk.edit.student.data', array());
 
-        $this->preprocessData($this->typeAlias, $data);
+		if (empty($data))
+		{
+			$data = $this->getItem();
 
-        return $data;
-    }
+			// Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
+		}
 
-    /**
-     * Method to change the published state of one or more records.
-     *
-     * @param   array    &$pks   A list of the primary keys to change.
-     * @param   integer  $value  The value of the published state.
-     *
-     * @return  boolean  True on success.
-     *
-     * @since   0.0.1
-     */
-    public function publish(&$pks, $value = 1)
-    {
-        /* this is a very simple method to change the state of each item selected */
-        $db = $this->getDbo();
+		$this->preprocessData($this->typeAlias, $data);
 
-        $query = $db->getQuery(true);
+		return $data;
+	}
 
-        $query->update('`#__balancirk_students`');
-        $query->set('state = ' . $value);
-        $query->where('id IN (' . implode(',', $pks) . ')');
-        $db->setQuery($query);
-        $db->execute();
-    }
+	/**
+	 * Method to change the published state of one or more records.
+	 *
+	 * @param   array    $pks    A list of the primary keys to change.
+	 * @param   integer  $value  The value of the published state.
+	 *
+	 * @return  void  True on success.
+	 *
+	 * @since   0.0.1
+	 */
+	public function publish(&$pks, $value = 1)
+	{
+		// This is a very simple method to change the state of each item selected
+		$db = $this->getDbo();
+
+		$query = $db->getQuery(true);
+
+		$query->update('`#__balancirk_students`');
+		$query->set('state = ' . $value);
+		$query->where('id IN (' . implode(',', $pks) . ')');
+		$db->setQuery($query);
+		$db->execute();
+	}
 }
