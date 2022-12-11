@@ -100,7 +100,7 @@ class HtmlView extends BaseHtmlView
 		{
 			if ($isNew)
 			{
-				$toolbar->apply('member.save');
+				$toolbar->apply('member.register');
 			}
 			else
 			{

@@ -13,11 +13,15 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\AdminModel;
-use Joomla\CMS\Language\Text;
 use Joomla\CMS\Form\Form;
+use Joomla\CMS\User\User;
 use Joomla\CMS\Table\Table;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\User\UserHelper;
+use Joomla\CMS\MVC\Model\AdminModel;
 use Jooma\CMS\CMSApplicationInterface;
+use Joomla\CMS\Application\ApplicationHelper;
 
 /**
  * Item model for member.
@@ -179,5 +183,125 @@ class MemberModel extends AdminModel
 		$query->where('id IN (' . implode(',', $pks) . ')');
 		$db->setQuery($query);
 		$db->execute();
+	}
+
+	/**
+	 * Register user and save additional fields
+	 *
+	 * The user is register in Joomla and the additional fields are added using the view specially
+	 * created for this purpose
+	 *
+	 * @param   array					$data 	form data
+	 * @return  boolean
+	 * @throws  \InvalidArgmentException 	if userdata format is fault
+	 * @throws  \UnexcpectedValueException 	if userdata is fault
+	 * @throws  \RuntimeException 			if saving does not works
+	 *
+	 * @since   0.0.1
+	 **/
+	public function register($data)
+	{
+		// TODO: check the activation of the user. Redicect page, mail send and ...
+
+		$hash = ApplicationHelper::getHash(UserHelper::genRandomPassword());
+		$data['activation'] = $hash;
+		$data['block'] = 1;
+
+		// TODO get the default user group. now it's fixed to Registered
+		$data['groups'] = array(2);
+
+		$app = Factory::getApplication();
+		$user = new User;
+
+		// Throws \InvalidArgumentException, \UnexpectedValueException
+		if (!$user->bind($data))
+		{
+			$app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError(), 'error');
+
+			return false;
+		}
+
+		// Throws \RuntimeException
+		if (!$user->save())
+		{
+			$app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError(), 'error');
+
+			return false;
+		}
+
+		// Fetch created userid.
+		$id = $user->id;
+
+		// Fill extra information in table
+		$db = $this->getDbo();
+
+		// Define columns and their values
+		$columns = array('id', 'firstname', 'street', 'number', 'bus', 'postalcode', 'municipality', 'phone');
+		$values = array(
+			$id, $data['firstname'], $data['street'], $data['number'], $data['bus'],
+			$data['postalcode'], $data['municipality'], $data['phone']
+		);
+
+		// Create query and don't forget to quote everything
+		$query = $db->getQuery(true)
+			->insert($db->quoteName('#__balancirk_members_additional'))
+			->columns($db->quoteName($columns))
+			->values(implode(',', array_map(fn ($n) => $db->quote($n), $values)));
+
+		// Execute query
+		$db->setQuery($query);
+		$db->execute();
+
+		// Send activation mail
+		$mailer = Factory::getMailer();
+
+		// Set the sender
+		$config = new \JConfig;
+		$sender = array(
+			$config->mailfrom,
+			$config->fromname
+		);
+
+		// Get the activation url
+		$linkMode = $config->force_ssl == 2 ? 1 : 0;
+		$activationUrl = Route::link(
+			'site',
+			'index.php?option=com_users&task=registration.activate&token=' . $hash,
+			false,
+			$linkMode,
+			true
+		);
+
+		// TODO Message configureerbaar maken in de backend
+		// Set the mailbody
+		$message = "
+		Hallo {$data['firstname']},
+
+		Bedankt om je te registreren.
+
+		Om je account te kunnen gebruiken moet je deze nog activeren via deze link: {$activationUrl}
+
+		Je wachtwoord is gezet op : {$hash}. Je kan dit via de website aanpassen.
+
+		Met vriendelijke circusgroeten,
+
+		Rudi en Kris
+		";
+
+		// Set the Recipient
+		$send = $mailer->addRecipient($data['email'])
+			->setSender($sender)
+			->setSubject("Welkom bij balancirk")
+			->setBody($message)
+			->Send();
+
+		if ($send != true)
+		{
+			$app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . 'Error sending email', 'error');
+
+			return false;
+		}
+
+		return true;
 	}
 }

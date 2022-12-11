@@ -14,11 +14,7 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_members_additional` (
     `postalcode` varchar(10),
     `municipality` varchar(50),
     `phone` char(15),
-    `ordering` int(11) NOT NULL DEFAULT 0,
-    CONSTRAINT `fk_users` 
-        FOREIGN KEY (id) 
-            REFERENCES `#__users` (id)
-        ON UPDATE RESTRICT
+    `ordering` int(11) NOT NULL DEFAULT 0
 );
 
 /* Add dummy data for tests. Must be removed afterwards */

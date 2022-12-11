@@ -53,6 +53,7 @@
             <folder>tmpl</folder>
             <folder>sql</folder>
             <folder>forms</folder>
+			<folder>layouts</folder>
             <!-- <folder>tables</folder> -->
             <file>access.xml</file>
         </files>
@@ -82,10 +83,10 @@
         </schemas>
     </update> -->
 
-    <changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-test/Second-attempt/balancirk_changelog.xml</changelogurl>
+    <changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_changelog.xml</changelogurl>
     <updateservers>
         <server type="extension"
-            name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/Second-attempt/balancirk_update.xml</server>
+            name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_update.xml</server>
     </updateservers>
 
 </extension>

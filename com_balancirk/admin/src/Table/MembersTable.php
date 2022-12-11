@@ -42,6 +42,8 @@ class MembersTable extends Table
 	 * Remains public to be able to check for duplicated alias before saving
 	 *
 	 * @return  string
+	 *
+	 * @since	__BUMP_VERSION__
 	 */
 	public function generateAlias()
 	{

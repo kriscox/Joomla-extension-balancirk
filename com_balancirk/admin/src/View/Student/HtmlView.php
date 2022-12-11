@@ -14,15 +14,14 @@ namespace CoCoCo\Component\Balancirk\Administrator\View\Student;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
-use Joomla\CMS\MVC\View\GenericDataException;
-use Joomla\CMS\Toolbar\ToolbarHelper;
-use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Toolbar\Toolbar;
+use Joomla\CMS\Helper\ContentHelper;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\MVC\View\GenericDataException;
+use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 
 /**
  * View class for a list of student.
- * 
  *
  * @since  0.0.1
  */
@@ -88,7 +87,7 @@ class HtmlView extends BaseHtmlView
 	protected function addToolbar()
 	{
 		Factory::getApplication()->input->set('hidemainmenu', true);
-		$isNew      = ($this->item->id == 0);
+		$isNew      = ($this->item->id == null);
 
 		$canDo = ContentHelper::getActions('com_balancirk');
 
@@ -109,6 +108,7 @@ class HtmlView extends BaseHtmlView
 				$toolbar->apply('student.apply');
 			}
 		}
+
 		$toolbar->cancel('student.cancel', 'JTOOLBAR_CLOSE');
 	}
 }
