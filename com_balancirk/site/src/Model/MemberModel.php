@@ -238,10 +238,10 @@ class MemberModel extends AdminModel
 		$db = $this->getDbo();
 
 		// Define columns and their values
-		$columns = array('id', 'firstname', 'street', 'number', 'bus', 'postalcode', 'municipality', 'phone');
+		$columns = array('id', 'firstname', 'street', 'number', 'bus', 'postcode', 'municipality', 'phone');
 		$values = array(
 			$id, $data['firstname'], $data['street'], $data['number'], $data['bus'],
-			$data['postalcode'], $data['municipality'], $data['phone']
+			$data['postcode'], $data['municipality'], $data['phone']
 		);
 
 		// Create query and don't forget to quote everything

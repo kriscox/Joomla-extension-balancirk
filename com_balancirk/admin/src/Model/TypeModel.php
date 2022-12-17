@@ -20,11 +20,11 @@ use Joomla\CMS\Table\Table;
 use Jooma\CMS\CMSApplicationInterface;
 
 /**
- * Item model for student.
+ * Item model for type.
  *
  * @since  0.0.1
  */
-class StudentModel extends AdminModel
+class TypeModel extends AdminModel
 {
 	/**
 	 * The type alias for this content type.
@@ -32,7 +32,7 @@ class StudentModel extends AdminModel
 	 * @var    string
 	 * @since  0.0.1
 	 */
-	public $typeAlias = 'com_balancirk.student';
+	public $typeAlias = 'com_balancirk.type';
 
 	/**
 	 * The prefix to use with controller messages.
@@ -42,50 +42,49 @@ class StudentModel extends AdminModel
 	 */
 	protected $text_prefix = 'COM_BALANCIRK';
 
+	/**
+	 * Method to test whether a record can be deleted.
+	 *
+	 * @param   object  $record  A record object.
+	 *
+	 * @return  boolean  True if allowed to delete the record. Defaults to the permission set in the component.
+	 *
+	 * @since   0.0.1
+	 */
+	protected function canDelete($record)
+	{
+		if (!empty($record->id))
+		{
+			$app = Factory::getApplication();
 
-	// /**
-	//  * Method to test whether a record can be deleted.
-	//  *
-	//  * @param   object  $record  A record object.
-	//  *
-	//  * @return  boolean  True if allowed to delete the record. Defaults to the permission set in the component.
-	//  *
-	//  * @since   0.0.1
-	//  */
-	// protected function canDelete($record)
-	// {
-	// 	if (!empty($record->id))
-	// 	{
-	// 		$app = Factory::getApplication();
+			return $app->getIdentity()->authorise('core.delete', 'com_balancirk.type.' . (int) $record->id);
+		}
 
-	// 		return $app->getIdentity()->authorise('core.delete', 'com_balancirk.students.' . (int) $record->id);
-	// 	}
+		return false;
+	}
 
-	// 	return false;
-	// }
+	/**
+	 * Method to test whether a record can have its state edited.
+	 *
+	 * @param   object  $record  A record object.
+	 *
+	 * @return  boolean  True if allowed to change the state of the record. Defaults to the permission set in the component.
+	 *
+	 * @since   0.0.1
+	 */
+	protected function canEditState($record)
+	{
+		$user = Factory::getApplication()->getIdentity();
 
-	// /**
-	//  * Method to test whether a record can have its state edited.
-	//  *
-	//  * @param   object  $record  A record object.
-	//  *
-	//  * @return  boolean  True if allowed to change the state of the record. Defaults to the permission set in the component.
-	//  *
-	//  * @since   0.0.1
-	//  */
-	// protected function canEditState($record)
-	// {
-	// 	$user = Factory::getApplication()->getIdentity();
+		// Check for existing article.
+		if (!empty($record->id))
+		{
+			return $user->authorise('core.edit.state', 'com_balancirk.type.' . (int) $record->id);
+		}
 
-	// 	// Check for existing article.
-	// 	if (!empty($record->id))
-	// 	{
-	// 		return $user->authorise('core.edit.state', 'com_balancirk.students.' . (int) $record->id);
-	// 	}
-
-	// 	// Default to component settings if neither article nor category known.
-	// 	return parent::canEditState($record);
-	// }
+		// Default to component settings if neither article nor category known.
+		return parent::canEditState($record);
+	}
 
 	/**
 	 * Method to get a table object, load it if necessary.
@@ -101,7 +100,7 @@ class StudentModel extends AdminModel
 	 */
 	public function getTable($name = '', $prefix = '', $options = array())
 	{
-		$name = 'students';
+		$name = 'types';
 		$prefix = 'Table';
 
 		if ($table = $this->_createTable($name, $prefix, $options))
@@ -125,13 +124,12 @@ class StudentModel extends AdminModel
 	public function getForm($data = [], $loadData = true)
 	{
 		// Get the form.
-		$form = $this->loadForm($this->typeAlias, 'student', ['control' => 'jform', 'load_data' => $loadData]);
+		$form = $this->loadForm($this->typeAlias, 'type', ['control' => 'jform', 'load_data' => $loadData]);
 
 		if (empty($form))
 		{
 			return false;
 		}
-
 		return $form;
 	}
 
@@ -140,13 +138,12 @@ class StudentModel extends AdminModel
 	 *
 	 * @return  mixed  The data for the form.
 	 *
-	 * @since  0.0.1
+	 * @since   0.0.1
 	 */
 	protected function loadFormData()
 	{
-		// Check the session for previously entered form data.
 		$app = Factory::getApplication();
-		$data = $app->getUserState('com_balancirk.edit.student.data', array());
+		$data = $app->getUserState('com_balancirk.edit.type.data', array());
 
 		if (empty($data))
 		{
@@ -158,29 +155,5 @@ class StudentModel extends AdminModel
 		$this->preprocessData($this->typeAlias, $data);
 
 		return $data;
-	}
-
-	/**
-	 * Method to change the published state of one or more records.
-	 *
-	 * @param   array    $pks    A list of the primary keys to change.
-	 * @param   integer  $value  The value of the published state.
-	 *
-	 * @return  void  True on success.
-	 *
-	 * @since   0.0.1
-	 */
-	public function publish(&$pks, $value = 1)
-	{
-		// This is a very simple method to change the state of each item selected
-		$db = $this->getDbo();
-
-		$query = $db->getQuery(true);
-
-		$query->update('`#__balancirk_students`');
-		$query->set('state = ' . $value);
-		$query->where('id IN (' . implode(',', $pks) . ')');
-		$db->setQuery($query);
-		$db->execute();
 	}
 }

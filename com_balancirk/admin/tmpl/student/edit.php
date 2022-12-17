@@ -22,7 +22,7 @@ HTMLHelper::_('behavior.keepalive');
 
 <form action="<?= Route::_('index.php?option=com_balancirk&view=student&layout=edit&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="student-form" class="form-validate">
 
-	<?= LayoutHelper::render('joomla.edit.title_alias', $this); ?>
+	<?= LayoutHelper::render('student.edit.fullname', $this); ?>
 
 	<div>
 		<?= HTMLHelper::_('uitab.startTabSet', 'myTab', array('active' => 'details')); ?>
@@ -38,13 +38,14 @@ HTMLHelper::_('behavior.keepalive');
 						<?= $this->form->renderField('email'); ?>
 						<?= $this->form->renderField('phone'); ?>
 						<?= $this->form->renderField('birthdate'); ?>
+						<?= $this->form->renderField('uitpas'); ?>
 					</div>
 				</div>
 			</div>
 			<div class="col-md-3">
 				<div class="card card-light">
 					<div class="card-body">
-						<?= LayoutHelper::render('joomla.edit.global', $this); ?>
+						<?= $this->form->renderField('state'); ?>
 					</div>
 				</div>
 			</div>

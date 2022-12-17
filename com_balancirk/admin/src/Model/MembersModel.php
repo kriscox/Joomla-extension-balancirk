@@ -45,8 +45,8 @@ class MembersModel extends ListModel
 				'street', 'a.street',
 				'number', 'a.number',
 				'bus', 'a.bus',
-				'postalcode', 'a.postalcode',
-				'municipality', 'a.municipality',
+				'postcode', 'a.postcode',
+				'city', 'a.city',
 				'phone', 'a.phone',
 				'activation', 'a.activation'
 			);
@@ -119,8 +119,8 @@ class MembersModel extends ListModel
 			$db->quoteName(
 				[
 					'a.id', 'a.name', 'a.firstname', 'a.username',
-					'a.email', 'a.street', 'a.number', 'a.bus', 'a.postalcode',
-					'a.municipality', 'a.phone', 'a.block', 'a.sendEmail',
+					'a.email', 'a.street', 'a.number', 'a.bus', 'a.postcode',
+					'a.city', 'a.phone', 'a.block', 'a.sendEmail',
 					'a.registerDate', 'a.lastvisitDate', 'a.activation'
 				]
 			)

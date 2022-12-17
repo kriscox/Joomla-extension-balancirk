@@ -45,7 +45,7 @@ class StudentsModel extends ListModel
 				'street', 'a.street',
 				'number', 'a.number',
 				'bus', 'a.bus',
-				'postalcode', 'a.postalcode',
+				'postcode', 'a.postcode',
 				'municipality', 'a.municipality',
 				'phone', 'a.phone',
 				'birthdate', 'a.birthdate',
@@ -124,7 +124,7 @@ class StudentsModel extends ListModel
 			$db->quoteName(
 				[
 					'id', 'name', 'firstname',
-					'email', 'street', 'number', 'bus', 'postalcode',
+					'email', 'street', 'number', 'bus', 'postcode',
 					'municipality', 'phone', 'birthdate', 'state'
 				]
 			)

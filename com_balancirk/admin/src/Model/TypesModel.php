@@ -16,11 +16,11 @@ use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
 
 /**
- * StudentsModel class to display the list off students.
+ * TypesModel class to display the list off types.
  *
  * @since  0.0.1
  */
-class StudentsModel extends ListModel
+class TypesModel extends ListModel
 {
 	/**
 	 * Constructor.
@@ -28,28 +28,16 @@ class StudentsModel extends ListModel
 	 * @param   array  $config  An optional associative array of configuration settings.
 	 *
 	 * @see     \JControllerLegacy
-	 * @see     \Joomla\CMS\MVC\Controller\BaseController
 	 *
 	 * @since   __BUMP_VERSION__
 	 */
 	public function __construct($config = [])
 	{
-
 		if (empty($config['filter_fields']))
 		{
 			$config['filter_fields'] = array(
 				'id', 'a.id',
 				'name', 'a.name',
-				'firstname', 'a.firstname',
-				'email', 'a.email',
-				'street', 'a.street',
-				'number', 'a.number',
-				'bus', 'a.bus',
-				'postcode', 'a.postcode',
-				'city', 'a.city',
-				'phone', 'a.phone',
-				'birthdate', 'a.birthdate',
-				'state', 'a.state'
 			);
 		}
 
@@ -70,14 +58,6 @@ class StudentsModel extends ListModel
 	 */
 	protected function populateState($ordering = 'a.id', $direction = 'asc')
 	{
-		$search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
-		$this->setState('filter.search', $search);
-
-		$published = $this->getUserStateFromRequest($this->context . '.filter.published', 'filter_published', '');
-		$this->setState('filter.published', $published);
-
-		// List state information.
-		parent::populateState($ordering, $direction);
 	}
 
 	/**
@@ -97,7 +77,6 @@ class StudentsModel extends ListModel
 	{
 		// Compile the store id.
 		$id .= ':' . $this->getState('filter.search');
-		$id .= ':' . $this->getState('filter.published');
 
 		return parent::getStoreId($id);
 	}
@@ -119,26 +98,11 @@ class StudentsModel extends ListModel
 		$query->select(
 			$db->quoteName(
 				[
-					'id', 'name', 'firstname',
-					'email', 'street', 'number', 'bus', 'postcode',
-					'city', 'phone', 'birthdate', 'state'
+					'a.id', 'a.name'
 				]
 			)
 		);
-		$query->from($db->quoteName('#__balancirk_students', 'a'));
-
-		// Filter by published state
-		$published = (string) $this->getState('filter.published');
-
-		if (is_numeric($published))
-		{
-			$query->where($db->quoteName('a.state') . ' = :published');
-			$query->bind(':published', $published, ParameterType::INTEGER);
-		}
-		elseif ($published === '')
-		{
-			$query->where('(' . $db->quoteName('a.state') . ' = 0 OR ' . $db->quoteName('a.state') . ' = 1)');
-		}
+		$query->from($db->quoteName('#__balancirk_types', 'a'));
 
 		// Filter by search in title.
 		$search = $this->getState('filter.search');
@@ -146,8 +110,7 @@ class StudentsModel extends ListModel
 		if (!empty($search))
 		{
 			$search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
-			$query->where('(a.name LIKE ' . $search . ')', 'OR');
-			$query->where('(a.firstname LIKE ' . $search . ')');
+			$query->where('(a.name LIKE ' . $search . ')');
 		}
 
 		// Add the list ordering clause.
@@ -155,12 +118,11 @@ class StudentsModel extends ListModel
 		$orderDirn = $this->state->get('list.direction', 'ASC');
 
 		$query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
-
 		return $query;
 	}
 
 	/**
-	 * Method to get a list of walks.
+	 * Method to get a list of types.
 	 * Overridden to add a check for access levels.
 	 *
 	 * @return  mixed  An array of data items on success, false on failure.

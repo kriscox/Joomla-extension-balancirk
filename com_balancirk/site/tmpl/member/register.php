@@ -63,7 +63,7 @@ HTMLHelper::_('behavior.keepalive');
 				<?= $this->form->renderField('bus'); ?>
 			</div>
 			<div class="col-12 col-md-6">
-				<?= $this->form->renderField('postalcode'); ?>
+				<?= $this->form->renderField('postcode'); ?>
 			</div>
 			<div class="col-12 col-md-6">
 				<?= $this->form->renderField('municipality'); ?>

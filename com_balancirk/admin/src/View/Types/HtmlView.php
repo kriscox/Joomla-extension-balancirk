@@ -8,7 +8,7 @@
  * @license     GNU General Public License version 3.
  */
 
-namespace CoCoCo\Component\Balancirk\Administrator\View\Lessons;
+namespace CoCoCo\Component\Balancirk\Administrator\View\Types;
 
 \defined('_JEXEC') or die;
 
@@ -20,19 +20,19 @@ use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Helper\ContentHelper;
 
 /**
- * View class for a list of lessons
+ * View class for a list of types
  *
  * @since  0.0.1
  */
 class HtmlView extends BaseHtmlView
 {
 	/**
-	 * List of lessons of Balancirk.
+	 * List of types of Balancirk.
 	 *
+	 * @var	$types;
 	 * @since  0.0.1
 	 */
-	protected $lessons;
-
+	protected $types;
 
 	/**
 	 * The pagination object
@@ -65,7 +65,7 @@ class HtmlView extends BaseHtmlView
 	/**
 	 * Method to display the view.
 	 *
-	 * @param   string $tpl A template file to load. [optional] 
+	 * @param   string $tpl A template file to load. [optional]
 	 *
 	 * @return  void
 	 *
@@ -73,10 +73,9 @@ class HtmlView extends BaseHtmlView
 	 */
 	public function display($tpl = null): void
 	{
-		# todo: adapt fields
+		# TODO: adapt fields
 		$this->items       = $this->get('Items');
 		$this->pagination    = $this->get('Pagination');
-		$this->state         = $this->get('State');
 		$this->filterForm    = $this->get('FilterForm');
 		$this->activeFilters = $this->get('ActiveFilters');
 
@@ -108,49 +107,13 @@ class HtmlView extends BaseHtmlView
 		// Get the toolbar object instance
 		$toolbar = Toolbar::getInstance('toolbar');
 
-		ToolbarHelper::title(Text::_('COM_BALANCIRK_LESSONS_PAGE_TITLE'), 'Lessons');
+		ToolbarHelper::title(Text::_('COM_BALANCIRK_TYPES_PAGE_TITLE'), 'Types');
 
 		$canDo = ContentHelper::getActions('com_balancirk');
 
 		if ($canDo->get('core.create'))
 		{
-			$toolbar->addNew('lesson.add');
-		}
-
-		if ($canDo->get('core.edit.state'))
-		{
-			$dropdown = $toolbar->dropdownButton('status-group')
-				->text('JTOOLBAR_CHANGE_STATUS')
-				->toggleSplit(false)
-				->icon('icon-ellipsis-h')
-				->buttonClass('btn btn-action')
-				->listCheck(true);
-
-			$childBar = $dropdown->getChildToolbar();
-
-			$childBar->publish('lessons.past')->listCheck(true);
-
-			$childBar->unpublish('lessons.next')->listCheck(true);
-
-			$childBar->archive('lessons.archive')->listCheck(true);
-
-			if ($this->state->get('filter.published') != -2)
-			{
-				$childBar->trash('lessons.trash')->listCheck(true);
-			}
-		}
-
-		if ($this->state->get('filter.published') == -2 && $canDo->get('core.delete'))
-		{
-			$toolbar->delete('lessons.delete')
-				->text('JTOOLBAR_EMPTY_TRASH')
-				->message('JGLOBAL_CONFIRM_DELETE')
-				->listCheck(true);
-		}
-
-		if ($canDo->get('core.create'))
-		{
-			$toolbar->preferences('com_balancirk');
+			$toolbar->addNew('type.add');
 		}
 	}
 }

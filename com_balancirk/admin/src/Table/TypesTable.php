@@ -16,11 +16,11 @@ use Joomla\CMS\Table\Table;
 use Joomla\Database\DatabaseDriver;
 
 /**
- * Lesson table class.
+ * Type table class.
  *
  * @since  0.0.1
  */
-class LessonsTable extends Table
+class TypesTable extends Table
 {
 	/**
 	 * Constructor
@@ -31,7 +31,7 @@ class LessonsTable extends Table
 	 */
 	public function __construct(DatabaseDriver $db)
 	{
-		$this->typeAlias = 'com_balancirk.lessons';
-		parent::__construct('#__balancirk_lessons', 'id', $db);
+		$this->typeAlias = 'com_balancirk.types';
+		parent::__construct('#__balancirk_types', 'id', $db);
 	}
 }

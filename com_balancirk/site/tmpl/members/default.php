@@ -80,7 +80,7 @@ use Joomla\CMS\Layout\LayoutHelper;
 						$this->escape($item->bus); ?>
 				</th>
 				<th scope="row" class="has-context">
-					<?= $this->escape($item->postalcode) . " " .
+					<?= $this->escape($item->postcode) . " " .
 						$this->escape($item->municipality); ?>
 				</th>
 				<th scope="row" class="has-context">

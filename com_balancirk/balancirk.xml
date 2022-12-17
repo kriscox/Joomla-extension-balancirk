@@ -39,14 +39,8 @@
     </languages>
 
     <administration>
-        <menu link="option=com_balancirk">COM_BALANCIRK_ADMIN_MENU</menu>
-        <submenu>
-            <menu link="option=com_balancirk&amp;view=students">COM_BALANCIRK_LABEL_STUDENTS_OVERVIEW</menu>
-            <menu link="option=com_balancirk&amp;view=members">COM_BALANCIRK_LABEL_MEMBERS_OVERVIEW</menu>
-            <menu link="option=com_balancirk&amp;view=lessons">COM_BALANCIRK_LABEL_LESSONS_OVERVIEW</menu>
-        </submenu>
         <files folder="admin/">
-            <!-- <filename>..\balancirk.xml</filename> -->
+            <!-- <folder>tables</folder> -->
             <folder>language</folder>
             <folder>services</folder>
             <folder>src</folder>
@@ -54,8 +48,9 @@
             <folder>sql</folder>
             <folder>forms</folder>
 			<folder>layouts</folder>
-            <!-- <folder>tables</folder> -->
-            <file>access.xml</file>
+			<folder>presets</folder>
+            <!-- <filename>..\balancirk.xml</filename> -->
+            <filename>access.xml</filename>
         </files>
 
         <languages>
@@ -63,7 +58,41 @@
             <language tag="en-GB">admin/language/en-GB/com_balancirk.sys.ini</language>
         </languages>
 
+		<menu img="class:comment">
+			COM_BALANCIRK_ADMIN_MENU
+			<params>
+				<dashboard>com_balancirk.dashboard</dashboard>
+			</params>
+		</menu>
+        <submenu>
+            <menu link="option=com_balancirk&amp;view=students">
+				COM_BALANCIRK_LABEL_STUDENTS_OVERVIEW
+				<params>
+					<menu-quicktask-title>COM_BALANCIRK_LABEL_STUDENTS_OVERVIEW</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_balancirk&amp;view=student&amp;layout=edit</menu-quicktask>
+				</params>
+			</menu>
+            <menu link="option=com_balancirk&amp;view=members">
+				COM_BALANCIRK_LABEL_MEMBERS_OVERVIEW
+				<params>
+					<menu-quicktask-title>COM_BALANCIRK_LABEL_MEMBERS_OVERVIEW</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_balancirk&amp;view=member&amp;layout=edit</menu-quicktask>
+				</params>
+			</menu>
+            <menu link="option=com_balancirk&amp;view=lessons">
+				COM_BALANCIRK_LABEL_LESSONS_OVERVIEW
+				<params>
+					<menu-quicktask-title>COM_BALANCIRK_LABEL_LESSONS_OVERVIEW</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_balancirk&amp;view=lesson&amp;layout=edit</menu-quicktask>
+				</params>
+			</menu>
+        </submenu>
+
     </administration>
+
+	<dashboards>
+		<dashboard title="COM_BALANCIRK_DASHBOARD_TITLE" icon="none fa-regular fa-graduation-cap">com_balancirk.dashboard</dashboard>
+	</dashboards>
 
     <install>
         <sql>
@@ -71,19 +100,24 @@
                 charset="utf8">sql/install.mysql.utf8.sql</file>
         </sql>
     </install>
+	   
     <uninstall>
         <sql>
             <file driver="mysql"
                 charset="utf8">sql/uninstall.mysql.utf8.sql</file>
         </sql>
     </uninstall>
+	   
     <!-- <update>
         <schemas>
             <schemapath type="mysql">sql/updates/mysql</schemapath>
         </schemas>
     </update> -->
 
+	<scriptfile>script.php</scriptfile>
+
     <changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_changelog.xml</changelogurl>
+	   
     <updateservers>
         <server type="extension"
             name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_update.xml</server>

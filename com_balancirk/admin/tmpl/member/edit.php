@@ -60,7 +60,7 @@ HTMLHelper::_('behavior.keepalive');
 						<?= $this->form->renderField('number'); ?>
 						<?= $this->form->renderField('bus'); ?>
 						<?= $this->form->renderField('postcode'); ?>
-						<?= $this->form->renderField('municipality'); ?>
+						<?= $this->form->renderField('city'); ?>
 					</div>
 				</div>
 			</div>

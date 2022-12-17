@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_members_additional` (
     `street` varchar(255),
     `number` varchar(10),
     `bus` varchar(10),
-    `postalcode` varchar(10),
-    `municipality` varchar(50),
+    `postcode` varchar(10),
+    `city` varchar(50),
     `phone` char(15),
     `ordering` int(11) NOT NULL DEFAULT 0
 );
@@ -20,13 +20,13 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_members_additional` (
 /* Add dummy data for tests. Must be removed afterwards */
 INSERT INTO `#__balancirk_members_additional` (
     `id`, `firstname`, `street`, `number`, `bus`, 
-    `postalcode`, `municipality`, `phone`
+    `postcode`, `city`, `phone`
 ) VALUES
 ('156', 'Kris', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32478260721'),
 ('157', 'Nora', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32456354336');
 
 CREATE OR REPLACE VIEW `#__balancirk_members` 
-    AS SELECT u.* , m.firstname, m.street, m.number, m.bus, m.postalcode, m.municipality,
+    AS SELECT u.* , m.firstname, m.street, m.number, m.bus, m.postcode, m.city,
             m.phone, m.ordering
             FROM `#__balancirk_members_additional` m
                 INNER JOIN `#__users` u
@@ -38,17 +38,19 @@ CREATE OR REPLACE VIEW `#__balancirk_members`
 *                                                                                                 * 
 **************************************************************************************************/
 CREATE TABLE IF NOT EXISTS `#__balancirk_students` (
-    `id` int(11) NOT NULL PRIMARY KEY,
+    `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `name` varchar(255) NOT NULL,
     `firstname` varchar(255) NOT NULL,
     `street` varchar(255),
     `number` varchar(10),
     `bus` varchar(10),
-    `postalcode` varchar(10),
-    `municipality` varchar(50),
+    `postcode` varchar(10),
+    `city` varchar(50),
     `phone` char(15),
     `email` varchar(100) NOT NULL,
     `birthdate` date NOT NULL,
+	`UITPas` varchar(13),
+	`photo` varchar(255),
     `state` char(15),
     `ordering` int(11) NOT NULL DEFAULT 0
 );
@@ -56,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_students` (
 /* Add dummy data for tests. Must be removed afterwards */
 INSERT INTO `#__balancirk_students` (
     `id`, `firstname`, `name`, `street`, `number`, `bus`, 
-    `postalcode`, `municipality`, `phone`, `email`, `birthdate`, `state`
+    `postcode`, `city`, `phone`, `email`, `birthdate`, `state`
 ) VALUES
 ('1', 'Kris', 'Cox', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32478260721', 'cox.kris@gmail.com', '1973-10-09', '1'),
 ('2', 'Nora', 'Cox', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32456354336', 'cox.nora@gmail.com', '2009-11-01', '1');
@@ -93,7 +95,7 @@ INSERT INTO `#__balancirk_parents` (
 **************************************************************************************************/
 
 CREATE TABLE IF NOT EXISTS `#__balancirk_types` (
-    `id` int(11) NOT NULL PRIMARY KEY,
+    `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `name` varchar(40) NOT NULL
 );
 
@@ -104,15 +106,15 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_types` (
 **************************************************************************************************/
 
 CREATE TABLE IF NOT EXISTS `#__balancirk_lessons` (
-    `id` int(11) NOT NULL PRIMARY KEY,
+    `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `name` varchar(40) NOT NULL,
     `type` int(11) NOT NULL,
     `fee` float NOT NULL,
-    `year` tinyint(4) NOT NULL,
+    `year` decimal(4,0) NOT NULL,
     `start` date NOT NULL,
     `end` date NOT NULL,
-    `start registration` date NOT NULL,
-    `end registration` date NOT NULL,
+    `start_registration` date NOT NULL,
+    `end_registration` date NOT NULL,
     `state` char(15) NOT NULL,
     CONSTRAINT `fk_types`
         FOREIGN KEY (type)
@@ -121,7 +123,7 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_lessons` (
 
 CREATE OR REPLACE VIEW `#__balancirk_lessons_complete` 
     AS SELECT a.`id`, a.`name`, b.`name` as `type`, a.`fee`, a.`year`, a.`start`, a.`end`, 
-            a.`start registration`, a.`end registration`, a.`state` 
+            a.`start_registration`, a.`end_registration`, a.`state` 
             FROM `#__balancirk_lessons` a
                 INNER JOIN `#__balancirk_types` b
                     ON a.type = b.id;
@@ -133,7 +135,7 @@ CREATE OR REPLACE VIEW `#__balancirk_lessons_complete`
 **************************************************************************************************/
 
 CREATE TABLE IF NOT EXISTS `#__balancirk_hours`(
-    `id` int(11) NOT NULL PRIMARY KEY,
+    `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `day` varchar(40) NOT NULL,
     `lesson` int(11) NOT NULL,
     CONSTRAINT `fk_lessons`

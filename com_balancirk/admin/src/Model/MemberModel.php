@@ -174,16 +174,41 @@ class MemberModel extends AdminModel
 	protected function prepareTable($table)
 	{
 		// This is a very simple method to change the state of each item selected
-		$db = $this->getDbo();
+		// $db = $this->getDbo();
 
-		$query = $db->getQuery(true);
+		// $query = $db->getQuery(true);
 
-		$query->update('`#__balancirk_members`');
-		$query->set('state = ' . $value);
-		$query->where('id IN (' . implode(',', $pks) . ')');
-		$db->setQuery($query);
-		$db->execute();
+		// $query->update('`#__balancirk_members`');
+		// $query->set('state = ' . $value);
+		// $query->where('id IN (' . implode(',', $pks) . ')');
+		// $db->setQuery($query);
+		// $db->execute();
 	}
+
+	/**
+	 * Save edited values of a member
+	 *
+	 * Save the new values of a member profile
+	 *
+	 * @param	array 	$data	Form data
+	 * @return	boolean
+	 * @throws	\RuntimeException
+	 **/
+	public function edit($data)
+	{
+		// Get user object
+		$app = Factory::getApplication();
+		$user = new User($data['id']);
+
+		$user->bind($data);
+		$user->save();
+
+		// Save additional data to the database
+		$this->saveToTable($data['id'], $data);
+
+		return true;
+	}
+
 
 	/**
 	 * Register user and save additional fields
@@ -204,7 +229,9 @@ class MemberModel extends AdminModel
 		// TODO: check the activation of the user. Redicect page, mail send and ...
 
 		$hash = ApplicationHelper::getHash(UserHelper::genRandomPassword());
+		$password = UserHelper::genRandomPassword();
 		$data['activation'] = $hash;
+		$data['password'] = $password;
 		$data['block'] = 1;
 
 		// TODO get the default user group. now it's fixed to Registered
@@ -232,25 +259,8 @@ class MemberModel extends AdminModel
 		// Fetch created userid.
 		$id = $user->id;
 
-		// Fill extra information in table
-		$db = $this->getDbo();
-
-		// Define columns and their values
-		$columns = array('id', 'firstname', 'street', 'number', 'bus', 'postalcode', 'municipality', 'phone');
-		$values = array(
-			$id, $data['firstname'], $data['street'], $data['number'], $data['bus'],
-			$data['postalcode'], $data['municipality'], $data['phone']
-		);
-
-		// Create query and don't forget to quote everything
-		$query = $db->getQuery(true)
-			->insert($db->quoteName('#__balancirk_members_additional'))
-			->columns($db->quoteName($columns))
-			->values(implode(',', array_map(fn ($n) => $db->quote($n), $values)));
-
-		// Execute query
-		$db->setQuery($query);
-		$db->execute();
+		// Save additional data to the database
+		$this->saveToTable($id, $data, true);
 
 		// Send activation mail
 		$mailer = Factory::getMailer();
@@ -275,13 +285,13 @@ class MemberModel extends AdminModel
 		// TODO Message configureerbaar maken in de backend
 		// Set the mailbody
 		$message = "
-		Hallo {$data['firstname']},
+		Hallo {$data['firstname']} {$data['lastname']},
 
 		Bedankt om je te registreren.
 
 		Om je account te kunnen gebruiken moet je deze nog activeren via deze link: {$activationUrl}
 
-		Je wachtwoord is gezet op : {$hash}. Je kan dit via de website aanpassen.
+		Je wachtwoord is gezet op : {$password}. Je kan dit via de website aanpassen.
 
 		Met vriendelijke circusgroeten,
 
@@ -303,5 +313,59 @@ class MemberModel extends AdminModel
 		}
 
 		return true;
+	}
+
+	/**
+	 * Save data to member_additional table
+	 *
+	 * Save the custom fields to our #__member_additional table
+	 *
+	 * @param	int		$id		Id of the user to save
+	 * @param 	array 	$data 	Data to save
+	 * @param	boolean	$insert	True inserts new row, false updates existing row
+	 * @return	void
+	 * @throws	conditon
+	 **/
+	public function saveToTable(int $id, array $data, $insert = false)
+	{
+		// Fill extra information in table
+		$db = $this->getDbo();
+
+		// Define columns and their values
+		$columns = array('id', 'firstname', 'street', 'number', 'bus', 'postcode', 'city', 'phone');
+		$values = array(
+			$id, $data['firstname'], $data['street'], $data['number'], $data['bus'],
+			$data['postcode'], $data['city'], $data['phone']
+		);
+
+		// Create query and don't forget to quote everything
+		$query = $db->getQuery(true);
+		if ($insert)
+		{
+			$query->insert($db->quoteName('#__balancirk_members_additional'))
+				->columns($db->quoteName($columns))
+				->values(implode(',', array_map(fn ($n) => $db->quote($n), $values)));
+		}
+		else
+		{
+			$fields = array();
+
+			foreach ($columns as $key)
+			{
+				if ($key != 'id')
+				{
+					array_push($fields, $db->quoteName($key) . " = " . $db->quote($data[$key]));
+				}
+			}
+			$query->update($db->quoteName('#__balancirk_members_additional'))
+				->set($fields)
+				->where(
+					array($db->quoteName('id') . ' = ' . $id)
+				);
+		}
+
+		// Execute query
+		$db->setQuery($query);
+		$db->execute();
 	}
 }

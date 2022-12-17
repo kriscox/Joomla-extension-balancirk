@@ -99,7 +99,7 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 											$this->escape($item->bus); ?>
 									</td>
 									<td scope="row" class="d-none d-md-table-cell">
-										<?= $this->escape($item->postalcode) . " " .
+										<?= $this->escape($item->postcode) . " " .
 											$this->escape($item->city); ?>
 									</td>
 									<td scope="row" class="d-none d-md-table-cell">
@@ -109,7 +109,7 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 										<?= HtmlHelper::date($item->birthdate, Text::_('DATE_FORMAT_FILTER_DATE')); ?>
 									</td>
 									<td class="article-status">
-										<?= $states[$item->state]; ?>
+										<?= $this->escape($item->state); ?>
 									</td>
 								</tr>
 							<?php endforeach; ?>

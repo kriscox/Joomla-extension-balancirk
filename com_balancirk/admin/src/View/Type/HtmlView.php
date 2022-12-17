@@ -8,7 +8,7 @@
  * @license     GNU General Public License version 3.
  */
 
-namespace CoCoCo\Component\Balancirk\Administrator\View\Lesson;
+namespace CoCoCo\Component\Balancirk\Administrator\View\Type;
 
 \defined('_JEXEC') or die;
 
@@ -66,7 +66,6 @@ class HtmlView extends BaseHtmlView
 	{
 		$this->form  = $this->get('Form');
 		$this->item = $this->get('Item');
-		$this->hours = $this->get('hours');
 
 		if (count($errors = $this->get('Errors')))
 		{
@@ -94,20 +93,21 @@ class HtmlView extends BaseHtmlView
 		$toolbar = Toolbar::getInstance();
 
 		ToolbarHelper::title(
-			Text::_('COM_BALANCIRK_LESSON_PAGE_TITLE_' . ($isNew ? 'ADD_LESSON' : 'EDIT_LESSON'))
+			Text::_('COM_BALANCIRK_TYPE_PAGE_TITLE_' . ($isNew ? 'ADD_TYPE' : 'EDIT_TYPE'))
 		);
 
 		if ($canDo->get('core.create'))
 		{
 			if ($isNew)
 			{
-				$toolbar->apply('lesson.save');
+				$toolbar->apply('type.save');
 			}
 			else
 			{
-				$toolbar->apply('lesson.save');
+				$toolbar->apply('type.save');
 			}
 		}
-		$toolbar->cancel('lesson.cancel', 'JTOOLBAR_CLOSE');
+
+		$toolbar->cancel('type.cancel', 'JTOOLBAR_CLOSE');
 	}
 }

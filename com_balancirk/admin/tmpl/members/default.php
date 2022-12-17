@@ -54,9 +54,6 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_NAME', 'a.name', $listDirn, $listOrder); ?>
 								</th>
 								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
-									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_USERNAME', 'a.username', $listDirn, $listOrder); ?>
-								</th>
-								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_EMAIL', 'a.email', $listDirn, $listOrder); ?>
 								</th>
 								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
@@ -94,41 +91,38 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 									<td class="d-none d-md-table-cell text-center">
 										<?= $item->id; ?>
 									</td>
-									<th scope="row" class="has-context">
+									<td scope="row" class="has-context">
 										<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&task=member.edit&id=' . $item->id); ?>">
 											<?= $editIcon; ?> <?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
 										</a>
-									</th>
-									<th scope="row" class="has-context">
-										<?= $this->escape($item->username); ?>
-									</th>
-									<th scope="row" class="has-context">
+									</td>
+									<td scope="row" class="has-context">
 										<?= $this->escape($item->email); ?>
-									</th>
-									<th scope="row" class="has-context">
+									</td>
+									<td scope="row" class="has-context">
 										<?= $this->escape($item->street) . " " .
 											$this->escape($item->number) . " " .
 											$this->escape($item->bus); ?>
-									</th>
-									<th scope="row" class="has-context">
-										<?= $this->escape($item->postalcode) . " " .
-											$this->escape($item->municipality); ?>
-									</th>
-									<th scope="row" class="has-context">
+									</td>
+									<td scope="row" class="has-context">
+										<?= $this->escape($item->postcode) . " " .
+											$this->escape($item->city); ?>
+									</td>
+									<td scope="row" class="has-context">
 										<?= $this->escape($item->phone); ?>
-									</th>
-									<th scope="row" class="has-context">
+									</td>
+									<td scope="row" class="has-context">
 										<?= $this->escape($item->block); ?>
-									</th>
-									<th scope="row" class="has-context">
+									</td>
+									<td scope="row" class="has-context">
 										<?= $this->escape($item->sendEmail); ?>
-									</th>
-									<th scope="row" class="has-context">
+									</td>
+									<td scope="row" class="has-context">
 										<?= $this->escape($item->registerDate); ?>
-									</th>
-									<th scope="row" class="has-context">
+									</td>
+									<td scope="row" class="has-context">
 										<?= $this->escape($item->lastvisitDate); ?>
-									</th>
+									</td>
 								</tr>
 							<?php endforeach; ?>
 						</tbody>
