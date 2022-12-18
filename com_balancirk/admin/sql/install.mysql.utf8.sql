@@ -168,7 +168,21 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_presences`(
 **************************************************************************************************/
 
 CREATE TABLE IF NOT EXISTS `#__balancirk_teachers`(
-        `member` int(11) NOT NULL,
-        `les` int(11) NOT NULL,
-        PRIMARY KEY (`member`, `les`)
+    `member` int(11) NOT NULL,
+    `les` int(11) NOT NULL,
+    PRIMARY KEY (`member`, `les`)
+);
+
+/**************************************************************************************************
+*                                                                                                 * 
+*  SQL script for table holidays                                                                  * 
+*                                                                                                 * 
+**************************************************************************************************/
+
+CREATE TABLE IF NOT EXISTS `#__balancirk_holidays`(
+	`year` decimal(4,0) NOT NULL,
+	`startDate` date NOT NULL,
+	`endDate` date NOT NULL,
+	`summary` varchar(100) NOT NULL,
+	PRIMARY KEY (`year`, `startDate`)
 );

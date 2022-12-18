@@ -49,5 +49,13 @@
 			quicktask="index.php?option=com_balancirk&amp;task=type.add"
 			quicktask-title="COM_BALANCIRK_MENU_ADD_TYPE"
 		/>
+		<menuitem 
+			type="component" 
+			title="COM_BALANCIRK_HOLIDAYS_OVERVIEW" 
+			element="com_balancirk" 
+			link="index.php?option=com_balancirk&amp;view=holidays" 
+			quicktask="index.php?option=com_balancirk&amp;task=holiday.add"
+			quicktask-title="COM_BALANCIRK_MENU_ADD_TYPE"
+		/>
 	</menuitem>
 </menu>

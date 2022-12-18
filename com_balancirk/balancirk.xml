@@ -26,10 +26,9 @@
         <folder>forms</folder>
     </files>
 
-    <!-- <media folder="media/"
+    <media folder="media/"
         destination="com_balancirk">
         <folder>js</folder>
-        <filename>joomla.asset.json</filename>
     </media> -->
 
     <languages>
@@ -87,7 +86,6 @@
 				</params>
 			</menu>
         </submenu>
-
     </administration>
 
 	<dashboards>

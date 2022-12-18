@@ -21,28 +21,28 @@ use Joomla\CMS\MVC\Controller\BaseController;
  */
 class DisplayController extends BaseController
 {
-    /**
-     * The default view.
-     *
-     * @var    string
-     * @since  0.0.1
-     */
-    protected $default_view =  'members';
+	/**
+	 * The default view.
+	 *
+	 * @var    string
+	 * @since  0.0.1
+	 */
+	protected $default_view =  'members';
 
-    /**
-     * Method to display a view.
-     *
-     * @param   boolean  cachable   If true, the view output will be cached
-     * @param   array    urlparams  An array of safe URL parameters and their variable types, for valid values see {@link FilterInput::clean()}.
-     *
-     * @return  BaseController|bool  This object to support chaining.
-     *
-     * @since   0.0.1
-     *
-     * @throws  \Exception
-     */
-    public function display($cachable = false, $urlparams = [])
-    {
-        return parent::display();
-    }
+	/**
+	 * Method to display a view.
+	 *
+	 * @param   boolean  cachable   If true, the view output will be cached
+	 * @param   array    urlparams  An array of safe URL parameters and their variable types, for valid values see {@link FilterInput::clean()}.
+	 *
+	 * @return  BaseController|bool  This object to support chaining.
+	 *
+	 * @since   0.0.1
+	 *
+	 * @throws  \Exception
+	 */
+	public function display($cachable = false, $urlparams = [])
+	{
+		return parent::display();
+	}
 }
