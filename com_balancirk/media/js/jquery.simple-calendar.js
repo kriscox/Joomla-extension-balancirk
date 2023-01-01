@@ -42,6 +42,8 @@
 		init: function () {
 			var container = $(this.element);
 			var todayDate = this.currentDate;
+			var change = false;
+			var newEvent = null;
 
 			var calendar = $('<div class="calendar"></div>');
 			var header = $('<header>' +
@@ -209,6 +211,9 @@
 				if (!$(this).hasClass('disabled')) {
 					plugin.fillUp(e.pageX, e.pageY);
 					plugin.displayEvents(events);
+				} else {
+					plugin.fillUp(e.pageX, e.pageY);
+					plugin.createEvent(date);
 				}
 				plugin.settings.onDateSelect(date, events);
 			});
@@ -216,6 +221,7 @@
 			//Binding event container close
 			$(plugin.element).on('click', '.event-container .close', function (e) {
 				plugin.empty(e.pageX, e.pageY);
+				plugin.NewEvent = null;
 			});
 		},
 		displayEvents: function (events) {
@@ -228,11 +234,8 @@
 				var $event = $('' +
 					'<div class="event">' +
 					' <div class="event-date">' + plugin.formatDateEvent(startDate, endDate) + '</div>' +
-					' <input type="text" name="summary" onchange=updateEvent(this.value, ' + startDate + ', event.id)" class="event-summary" value="' +
-					event.summary + '"</input>' +
+					' <div class="event-summary">' + event.summary + '</div>' +
 					'</div>');
-				// TODO: Change value
-
 				$event.data('event', event);
 				$event.click(plugin.settings.onEventSelect);
 
@@ -241,6 +244,33 @@
 
 				container.append($event);
 			})
+		},
+		createEvent: function (date) {
+			var plugin = this;
+			var container = $(this.element).find('.event-wrapper');
+			date.setHours(12) //get noon to avoid possible date incorrection on conversion with ISOString
+
+			plugin.newEvent = {
+				year: (date.getMonth() > 9 ? date.getFullYear() : date.getFullYear() - 1).toString(),
+				startDate: date.toISOString()
+					.split("T")[0],
+				endDate: date.toISOString()
+					.split("T")[0],
+				summary: "test"
+			}
+			var $event = $('<div class="event">' +
+				' <div class="event-date">' + plugin.formatDateEvent(date, date) + '</div>' +
+				' <input id="event-summary" class="event-summary" type="text">' +
+				' <button id="event-save" class="event-save" onclick="" >' +
+				' <i class="fas fa-save"></i> </button> ' +
+				' </div></div>');
+			container.append($event);
+			container.find('.event-summary')['change']((e) => { plugin.newEvent.summary = e.target.value });
+			container.find('.event-save')['click']((e) => {
+				plugin.addEvent(plugin.newEvent);
+				plugin.empty(e.pageX, e.pageY);
+				plugin.NewEvent = null;
+			});
 		},
 		addEvent: function (newEvent) {
 			var plugin = this;
