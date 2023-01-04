@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form>
     <fieldset>
-        <field name="id" type="hidden" label="COM_BALANCIRK_TABLE_TABLEHEAD_ID" class="readonly" readonly="true" />
+        <field name="id" type="number" label="COM_BALANCIRK_TABLE_TABLEHEAD_ID" class="hidden" readonly="true" />
         <field name="firstname" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_FIRSTNAME" maxlength="255" required="true" />
         <field name="name" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_NAME" maxlength="255" required="true" />
-        <field name="username" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_USERNAME" maxlength="255" required="true" />
         <field name="email" type="email" label="COM_BALANCIRK_TABLE_TABLEHEAD_EMAIL" required="true" validate="email" />
         <field name="street" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_STREET" maxlength="255" />
         <field name="number" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_NUMBER" maxlength="10" />
@@ -12,10 +11,13 @@
         <field name="postcode" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_POSTCODE" maxlength="10" />
         <field name="city" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_MUNICIPALITY" maxlength="50" />
         <field name="phone" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_PHONE" maxlength="15" />
-        <field name="registerdate" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_REGISTERDATE" readonly="true" format="%D %b %Y" />
-        <field name="last logindate" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_LASTLOGINDATE" readonly=" true" format=" %D %b %Y" />
-		//TODO password validation
-		<field name="password1" type="password" label="COM_BALANCIRK_REGISTRATION_PASSWORD1_LABEL" class="required validate-password" filter="raw" validate="password" required="true"/>
-		<field name="password2" type="password" label="COM_BALANCIRK_REGISTRATION_PASSWORD2_LABEL" class="required validate-password" filter="raw" validate="password" required="true"/>
+        <field name="birthdate" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_BIRTHDATE" readonly="false" required="true" format="%d %b %Y" translateformat="true"/>
+		<field name="uitpas" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_UITPAS" maxlength="13" minlenght="13" />
+		<field name="state" type="list" label="JSTATUS" default="1" class="custom-select-color-state" size="1">
+            <option value="1">COM_BALANCIRK_STATUS_UNSUBSCRIBED</option>
+            <option value="0">COM_BALANCIRK_STATUS_SUBSCRIBED</option>
+            <option value="2">JARCHIVED</option>
+            <option value="-2">JTRASHED</option>
+        </field>
     </fieldset>
 </form>

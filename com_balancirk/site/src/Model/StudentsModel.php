@@ -46,7 +46,7 @@ class StudentsModel extends ListModel
 				'number', 'a.number',
 				'bus', 'a.bus',
 				'postcode', 'a.postcode',
-				'municipality', 'a.municipality',
+				'city', 'a.city',
 				'phone', 'a.phone',
 				'birthdate', 'a.birthdate',
 				'state', 'a.state'
@@ -125,7 +125,7 @@ class StudentsModel extends ListModel
 				[
 					'id', 'name', 'firstname',
 					'email', 'street', 'number', 'bus', 'postcode',
-					'municipality', 'phone', 'birthdate', 'state'
+					'city', 'phone', 'birthdate', 'state'
 				]
 			)
 		);

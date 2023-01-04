@@ -81,7 +81,7 @@ use Joomla\CMS\Layout\LayoutHelper;
 				</th>
 				<th scope="row" class="has-context">
 					<?= $this->escape($item->postcode) . " " .
-						$this->escape($item->municipality); ?>
+						$this->escape($item->city); ?>
 				</th>
 				<th scope="row" class="has-context">
 					<?= $this->escape($item->phone); ?>

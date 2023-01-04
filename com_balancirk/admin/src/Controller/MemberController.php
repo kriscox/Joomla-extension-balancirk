@@ -142,7 +142,7 @@ class MemberController extends FormController
 		$form = $model->getForm($data, false);
 
 		// Set the default redirection url
-		$redirectUrl = Route::_('index.php?option=com_balancirk&view=member&layout=edit', false);
+		$redirectUrl = Route::_('index.php?option=' . $this->option . '&view=member&layout=edit', false);
 
 		// Validate data and fill form data cache
 		$validData = $model->validate($form, $data);
@@ -172,7 +172,7 @@ class MemberController extends FormController
 			$app->setUserState('com_balancirk.edit.member.data', null);
 
 			// Set return to homepage
-			$redirectUrl = Route::_('/administrator/index.php?option=com_balancirk&view=members', false);
+			$redirectUrl = Route::_('/administrator/index.php?option=' . $this->option . '&view=members', false);
 		}
 
 		// Redirect back to the form in all cases

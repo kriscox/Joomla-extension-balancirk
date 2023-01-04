@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_students` (
     `phone` char(15),
     `email` varchar(100) NOT NULL,
     `birthdate` date NOT NULL,
-	`UITPas` varchar(13),
+	`uitpas` varchar(13),
 	`photo` varchar(255),
     `state` char(15),
     `ordering` int(11) NOT NULL DEFAULT 0

@@ -31,7 +31,7 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 	<div class="row">
 		<div class="col-md-12">
 			<div id="j-main-container" class="j-main-container">
-				<!-- < ?= LayoutHelper::render('joomla.searchtools.default', array('view' => $this)); ?> -->
+				<?= LayoutHelper::render('students.filter', array('view' => $this)); ?>
 				<?php if (empty($this->items)) : ?>
 					<div class="alert alert-info">
 						<span class="fa fa-info-circle" aria-hidden="true"></span><span class="sr-only"><?= Text::_('INFO'); ?></span>
@@ -40,7 +40,7 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 				<?php else : ?>
 					<table class="table" id="studentList">
 						<caption id="captionTable">
-							<?= Text::_('COM_BALANCIRK_STUDENTS_TABLE_CAPTION'); ?>, <?= Text::_('JGLOBAL_SORTED_BY'); ?>
+							<?= Text::_('COM_BALANCIRK_STUDENTS_TABLE_CAPTION'); ?>
 						</caption>
 						<thead>
 							<tr>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+
+    <fields name="filter">
+        <field name="published" type="status" label="JOPTION_SELECT_PUBLISHED" onchange="this.form.submit();">
+            <option value="">JOPTION_SELECT_PUBLISHED</option>
+        </field>
+    </fields>
+
+	
+    <fields name="list">
+        <field name="fullordering" type="list" label="JGLOBAL_SORT_BY" default="a.name ASC" onchange="this.form.submit();">
+            <option value="">JGLOBAL_SORT_BY</option>
+            <option value="a.name ASC">JSTATUS_ASC</option>
+            <option value="a.name DESC">JSTATUS_DESC</option>
+            <option value="a.firstname ASC">JGLOBAL_TITLE_ASC</option>
+            <option value="a.firstname DESC">JGLOBAL_TITLE_DESC</option>
+            <option value="a.birthdate ASC">COM_BALANCIRK_TABLE_SORT_BDATE_ASC</option>
+            <option value="a.birthdate DESC">COM_BALANCIRK_TABLE_SORT_BDATE_DESC</option>
+            <option value="a.id ASC">JGRID_HEADING_ID_ASC</option>
+            <option value="a.id DESC">JGRID_HEADING_ID_DESC</option>
+        </field>
+    </fields>
+</form>

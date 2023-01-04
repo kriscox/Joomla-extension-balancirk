@@ -43,7 +43,7 @@ class MembersModel extends ListModel
 				'number', 'a.number',
 				'bus', 'a.bus',
 				'postcode', 'a.postcode',
-				'municipality', 'a.municipality',
+				'city', 'a.city',
 				'phone', 'a.phone',
 				'activation', 'a.activation'
 			);
@@ -121,7 +121,7 @@ class MembersModel extends ListModel
 				[
 					'a.id', 'a.name', 'a.firstname', 'a.username',
 					'a.email', 'a.street', 'a.number', 'a.bus', 'a.postcode',
-					'a.municipality', 'a.phone', 'a.block', 'a.sendEmail',
+					'a.city', 'a.phone', 'a.block', 'a.sendEmail',
 					'a.registerDate', 'a.lastvisitDate', 'a.activation'
 				]
 			)

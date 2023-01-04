@@ -10,13 +10,16 @@
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Router\Route;
-use Joomla\CMS\Layout\LayoutHelper;
+use Joomla\CMS\HTML\HTMLHelper;
 
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 JHtml::_('jquery.framework');
 ?>
-<h1>Test</h1>
-<div id="holidayContainer" class="calendar-container" />
+<form action="<?= Route::_('index.php?option=com_balancirk&view=holidays'); ?>" method="post" name="holidaysForm" id="holidays-form" class="form-validate">
+	<div id="holidayContainer" class="calendar-container">
+	</div> <!-- placeholder for the agenda -->
+	<input type="hidden" name="events" id="events">
+	<input type="hidden" name="task" value>
+	<?= HTMLHelper::_('form.token'); ?>
+</form>

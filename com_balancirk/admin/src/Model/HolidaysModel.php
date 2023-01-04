@@ -12,16 +12,25 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ListModel;
-use Joomla\Database\ParameterHoliday;
+use Joomla\CMS\Form\FormFactoryAwareInterface;
 
 /**
  * HolidaysModel class to display the list off holidays.
  *
  * @since  0.0.1
  */
-class HolidaysModel extends ListModel
+class HolidaysModel extends ListModel implements FormFactoryAwareInterface
 {
+	/**
+	 * The holiday alias for this content holiday.
+	 *
+	 * @var    string
+	 * @since  0.0.1
+	 */
+	public $holidaysAlias = 'com_balancirk.holidays';
+
 	/**
 	 * Constructor.
 	 *
@@ -87,5 +96,46 @@ class HolidaysModel extends ListModel
 		$items = parent::getItems();
 
 		return $items;
+	}
+
+	/**
+	 * Method to get the row form.
+	 *
+	 * @param   array   $data       Data from the form.
+	 * @param   boolean $loadData   True if the form is to load its own data (default case), false if not.
+	 *
+	 * @return  \JForm|boolean  A \JForm object on success, false on failure
+	 *
+	 * @since   0.0.1
+	 */
+	public function getForm($data = [], $loadData = true)
+	{
+		// Get the form.
+		$form = $this->loadForm($this->holidaysAlias, 'holidays', ['control' => 'jform', 'load_data' => $loadData]);
+
+		if (empty($form))
+		{
+			return false;
+		}
+
+		return $form;
+	}
+
+	/**
+	 * Method to get the data that should be injected in the form.
+	 *
+	 * @return  mixed  The data for the form.
+	 *
+	 * @since   0.0.1
+	 */
+	protected function loadFormData()
+	{
+		$app = Factory::getApplication();
+
+		$data = $this->getItems();
+
+		$this->preprocessData($this->holidaysAlias, $data);
+
+		return $data;
 	}
 }
