@@ -14,10 +14,9 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 
 use Exception;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
-use Joomla\CMS\Application\ApplicationHelper;
+use Joomla\CMS\Application\CMSApplicationInterface;
 
 /**
  * Student model for the Joomla Balancirk component.
@@ -26,8 +25,6 @@ use Joomla\CMS\Application\ApplicationHelper;
  */
 class StudentModel extends AdminModel
 {
-	// TODO: Add AdminModel functionalities update, read, write + from
-
 	/**
 	 * The type alias for this content type.
 	 *
@@ -145,6 +142,7 @@ class StudentModel extends AdminModel
 	 */
 	protected function loadFormData()
 	{
+		/** @var CMSApplicationInterface */
 		$app = Factory::getApplication();
 		$data = $app->getUserState('com_balancirk.student.data', array());
 
@@ -202,5 +200,33 @@ class StudentModel extends AdminModel
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check if parent is primairy
+	 *
+	 * Check if the given parent id is the primairy parent of the student.
+	 *
+	 * @param	int	$parent		Parent id
+	 * @param	int	$student	Student id
+	 *
+	 * @return	boolean	true if it is the primary parent id in other cases false
+	 *
+	 * @since __BUMP_VERSION__
+	 */
+	public function isPrimairyParent(int $parent = null, int $student = null)
+	{
+		// Check if the user is the primary parent of the student
+		$db 	= $this->getDbo();
+		$query 	= $db->getQuery(true);
+		$query->select($db->quote('*'))
+			->from($db->quoteName('#__balancirk_parents'))
+			->where(
+				$db->quoteName('child') . ' = ' . $db->quote($student),
+				$db->quoteName('parent') . ' = ' . $db->quote($parent),
+				$db->quoteName('primary') . ' = 1'
+			);
+
+		return ($db->setQuery($query)->getNumRows() >= 1);
 	}
 }

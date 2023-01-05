@@ -26,7 +26,17 @@ $states = array(
 
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 ?>
+<div class="row">
+	<div class="col-md-12">
+		<nav aria-label="Toolbar">
+			<button class="button-new btn btn-success" type="button" onclick="Joomla.submitbutton('student.add')">
+				<span class=" icon-new" aria-hidden="true"></span>
+				<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
+			</button>
 
+		</nav>
+	</div>
+</div>
 <form action="<?= Route::_('index.php?option=com_balancirk&view=students'); ?>" method="post" name="adminForm" id="adminForm">
 	<div class="row">
 		<div class="col-md-12">
@@ -62,12 +72,20 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 							?>
 								<tr class="row<?= $i % 2; ?>">
 									<td class="text-center">
-										<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
+										<?php if ($item->primary == 1) : ?>
+											<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
+										<?php endif; ?>
 									</td>
 									<td scope="row" class="d-none d-md-table-cell">
-										<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&task=student.edit&id=' . $item->id); ?>">
-											<?= $editIcon; ?><?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
-										</a>
+										<?php if ($item->primary == 1) : ?>
+											<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&task=student.edit&id=' . $item->id); ?>">
+												<?= $editIcon; ?><?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
+											</a>
+										<?php else : ?>
+											<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&view=student&layout=default&id=' . $item->id); ?>">
+												<?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
+											</a>
+										<?php endif; ?>
 									</td>
 									<td scope="row" class="d-none d-md-table-cell">
 										<?= HtmlHelper::date($item->birthdate, Text::_('DATE_FORMAT_FILTER_DATE')); ?>

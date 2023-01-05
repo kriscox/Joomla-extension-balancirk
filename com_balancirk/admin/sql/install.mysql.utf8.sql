@@ -145,6 +145,24 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_hours`(
 
 /**************************************************************************************************
 *                                                                                                 * 
+*  SQL script for table subscriptions                                                             * 
+*                                                                                                 * 
+**************************************************************************************************/
+
+CREATE TABLE IF NOT EXISTS `#__balancirk_subscriptions`(
+    `lesson` int(11) NOT NULL,
+    `student` int(11) NOT NULL,
+    PRIMARY KEY (`lesson`, `student`), 
+    CONSTRAINT `fk_lesson`
+        FOREIGN KEY (lesson)
+            REFERENCES `#__balancirk_lessons` (id),
+    CONSTRAINT `fk_student`
+        FOREIGN KEY (student)
+            REFERENCES `#__balancirk_students` (id)
+);
+
+/**************************************************************************************************
+*                                                                                                 * 
 *  SQL script for table presences                                                                 * 
 *                                                                                                 * 
 **************************************************************************************************/
