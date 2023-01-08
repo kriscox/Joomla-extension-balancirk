@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS `#__balancirk_presences`;
 *  SQL script to remove table SUBSCRIPTIONS                                                       * 
 *                                                                                                 * 
 **************************************************************************************************/
+DROP VIEW IF EXISTS `#__balancirk_subscriptions_view`;
 DROP TABLE IF EXISTS `#__balancirk_subscriptions`;
 
 /**************************************************************************************************

@@ -16,25 +16,25 @@ use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 
 /**
- * HTML Student view class for the balancirk component.
+ * HTML subscription view class for the balancirk component.
  *
  * @since  0.0.1
  */
 class HtmlView extends BaseHtmlView
 {
 	/**
-	 * The \JForm object
+	 * The list of students
 	 *
-	 * @var  \JForm
+	 * @var  array
 	 */
-	protected $form;
+	protected $students;
 
 	/**
-	 * The active item
+	 * The list of lessons currently open to subscription
 	 *
-	 * @var  object
+	 * @var  array
 	 */
-	protected $item;
+	protected $lessons;
 
 	/**
 	 * The model state
@@ -59,9 +59,8 @@ class HtmlView extends BaseHtmlView
 	 */
 	public function display($tpl = null)
 	{
-		$this->form = $this->get('Form');
-		$this->item = $this->get('Item');
-		$this->state = $this->get('State');
+		$this->students = $this->get('Students');
+		$this->lessons = $this->get('Lessons');
 
 		if (count($errors = $this->get('Errors')))
 		{

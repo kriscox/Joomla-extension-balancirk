@@ -16,5 +16,6 @@
 "phpfmt.passes": [
 "AllmanStyleBraces"
 ],
-"intelephense.format.braces": "allman"
+"intelephense.format.braces": "allman",
+"zenMode.hideLineNumbers": false
 }

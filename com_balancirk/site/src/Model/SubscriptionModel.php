@@ -14,12 +14,10 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 
 use Exception;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
-use Joomla\CMS\Application\ApplicationHelper;
 use CoCoCo\Component\Balancirk\Site\Model\StudentModel;
-use CoCoCo\Component\Balancirk\Site\Model\PrecenseModel;
+use CoCoCo\Component\Balancirk\Site\Model\PresenceModel;
 
 /**
  * Subscription model for the Joomla Balancirk component.
@@ -63,11 +61,12 @@ class SubscriptionModel extends AdminModel
 			$parentid = $app->getIdentity()->id;
 
 			/** @var StudentModel */
-			$studentModel = $this->parent::getModel('Student');
+			$studentModel = $this->getMVCFactory()->createModel('Students', 'Site');
 			/** @var PresenceModel */
-			$presenceModel = $this->parent::getModel('Presence');
+			$presenceModel = $this->getMVCFactory()->createModel('Presence', 'Site');
 
 			return ($studentModel->isPrimairyParent($parentid, $record->student) &&
+				($presenceModel->numberOfPresences($record->student, $record->lesson) <= 2) &&
 				$app->getIdentity()->authorise('core.delete', 'com_balancirk.subscription.' . (int) $record->id)
 			);
 		}
@@ -121,5 +120,35 @@ class SubscriptionModel extends AdminModel
 		}
 
 		return $form;
+	}
+
+	/**
+	 * Method to get the students from the user.
+	 *
+	 * @return  array  An array with all students
+	 *
+	 * @since   __BUMP_VERSION__
+	 */
+	public function getStudents()
+	{
+		/** @var studentsModel */
+		$model = $this->getMVCFactory()->createModel('Students', 'Site');
+
+		return $model->getItems();
+	}
+
+	/**
+	 * Method to get the lessons which are open
+	 *
+	 * @return  array	An array with all lessons which are open to subscribe
+	 *
+	 * @since   __BUMP_VERSION__
+	 */
+	public function getLessons()
+	{
+		/** @var lessonsModel */
+		$model = $this->getMVCFactory()->createModel('Lessons', 'Site');
+
+		return $model->getItems();
 	}
 }

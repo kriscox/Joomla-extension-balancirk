@@ -68,6 +68,7 @@ class MemberController extends FormController
 		$data = $this->input->get('jform', array(), 'array');
 
 		// Get the model and the form used
+		/** @var memberModel */
 		$model = $this->getModel('member');
 		$form = $model->getForm($data, false);
 

@@ -15,8 +15,6 @@
             <option value="a.name DESC">COM_BALANCIRK_TABLE_SORT_NAME_DESC</option>
             <option value="a.firstname ASC">COM_BALANCIRK_TABLE_SORT_FIRSTNAME_ASC</option>
             <option value="a.firstname DESC">COM_BALANCIRK_TABLE_SORT_FIRSTNAME_DESC</option>
-            <option value="a.birthdate ASC">COM_BALANCIRK_TABLE_SORT_BDATE_ASC</option>
-            <option value="a.birthdate DESC">COM_BALANCIRK_TABLE_SORT_BDATE_DESC</option>
         </field>
     </fields>
 </form>

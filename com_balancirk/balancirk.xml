@@ -33,8 +33,8 @@
     </media> -->
 
     <languages>
-        <!-- <language tag="nl-BE">site/language/nl-BE/com_balancirk.ini</language>
-        <language tag="fr-BE">site/language/fr-BE/com_balancirk.ini</language> -->
+        <language tag="nl-BE">site/language/nl-BE/com_balancirk.ini</language>
+        <!-- <language tag="fr-BE">site/language/fr-BE/com_balancirk.ini</language> -->
         <language tag="en-GB">site/language/en-GB/com_balancirk.ini</language>
     </languages>
 

@@ -14,13 +14,12 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 
 use Exception;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Mail\Mail;
 use Joomla\CMS\User\User;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\User\UserHelper;
 use Joomla\CMS\MVC\Model\AdminModel;
-use Joomla\Registry\Registry;
+use Joomla\CMS\Application\SiteApplication;
 use Joomla\CMS\Application\ApplicationHelper;
 
 /**
@@ -149,6 +148,7 @@ class MemberModel extends AdminModel
 	 */
 	protected function loadFormData()
 	{
+		/** @var  SiteApplication*/
 		$app = Factory::getApplication();
 		$data = $app->getUserState('com_balancirk.member.data', array());
 
@@ -162,29 +162,6 @@ class MemberModel extends AdminModel
 		$this->preprocessData($this->typeAlias, $data);
 
 		return $data;
-	}
-
-	/**
-	 * Prepare and sanitise the table prior to saving.
-	 *
-	 * @param   \Joomla\CMS\Table\Table  $table  The Table object
-	 *
-	 * @return  void
-	 *
-	 * @since   0.0.1
-	 */
-	protected function prepareTable($table)
-	{
-		// This is a very simple method to change the state of each item selected
-		$db = $this->getDbo();
-
-		$query = $db->getQuery(true);
-
-		$query->update('`#__balancirk_members`');
-		$query->set('state = ' . $value);
-		$query->where('id IN (' . implode(',', $pks) . ')');
-		$db->setQuery($query);
-		$db->execute();
 	}
 
 	/**
@@ -258,7 +235,7 @@ class MemberModel extends AdminModel
 		$mailer = Factory::getMailer();
 
 		// Set the sender
-		$config = new \JConfig;
+		$config = new JConfig;
 		$sender = array(
 			$config->mailfrom,
 			$config->fromname

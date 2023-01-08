@@ -16,11 +16,11 @@ use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
 
 /**
- * StudentsModel class to display the list off students.
+ * SubscriptionsModel class to display the list off subscriptions.
  *
  * @since  0.0.1
  */
-class StudentsModel extends ListModel
+class SubscriptionsModel extends ListModel
 {
 	/**
 	 * Constructor.
@@ -38,17 +38,16 @@ class StudentsModel extends ListModel
 		if (empty($config['filter_fields']))
 		{
 			$config['filter_fields'] = array(
-				'id', 'a.id',
 				'name', 'a.name',
 				'firstname', 'a.firstname',
-				'email', 'a.email',
-				'street', 'a.street',
-				'number', 'a.number',
-				'bus', 'a.bus',
-				'postcode', 'a.postcode',
-				'city', 'a.city',
-				'phone', 'a.phone',
-				'birthdate', 'a.birthdate',
+				'lesson', 'a.lesson',
+				'type', 'a.type',
+				'fee', 'a.fee',
+				'year', 'a.year',
+				'start', 'a.start',
+				'end', 'a.end',
+				'start', 'a.start_registration',
+				'end_registration', 'a.end_registration',
 				'state', 'a.state'
 			);
 		}
@@ -68,38 +67,16 @@ class StudentsModel extends ListModel
 	 *
 	 * @since   0.0.1
 	 */
-	protected function populateState($ordering = 'a.id', $direction = 'asc')
+	protected function populateState($ordering = 'a.year', $direction = 'asc')
 	{
 		$search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
 		$this->setState('filter.search', $search);
 
-		$published = $this->getUserStateFromRequest($this->context . '.filter.published', 'filter_published', '');
-		$this->setState('filter.published', $published);
+		$current = $this->getUserStateFromRequest($this->context . '.filter.current', 'filter_current', '');
+		$this->setState('filter.current', $current);
 
 		// List state information.
 		parent::populateState($ordering, $direction);
-	}
-
-	/**
-	 * Method to get a store id based on model configuration state.
-	 *
-	 * This is necessary because the model is used by the component and
-	 * different modules that might need different sets of data or different
-	 * ordering requirements.
-	 *
-	 * @param   string  $id  A prefix for the store id.
-	 *
-	 * @return  string  A store id.
-	 *
-	 * @since   0.0.1
-	 */
-	protected function getStoreId($id = '')
-	{
-		// Compile the store id.
-		$id .= ':' . $this->getState('filter.search');
-		$id .= ':' . $this->getState('filter.published');
-
-		return parent::getStoreId($id);
 	}
 
 	/**
@@ -123,30 +100,30 @@ class StudentsModel extends ListModel
 		$query->select(
 			$db->quoteName(
 				[
-					'a.id', 'name', 'firstname',
-					'email', 'street', 'number', 'bus', 'postcode',
-					'city', 'phone', 'birthdate', 'state', 'primary'
+					'id', 'name', 'firstname', 'lesson',
+					'type', 'fee', 'year', 'start', 'end',
+					'start_registration', 'end_registration', 'state'
 				]
 			)
 		);
-		$query->from($db->quoteName('#__balancirk_students', 'a'));
+		$query->from($db->quoteName('#__balancirk_subscriptions_view', 'a'));
 
 		// Filter users based on logged in user
 		$query->join(
 			'INNER',
 			$db->quoteName('#__balancirk_parents', 'p'),
-			'a.id = p.child AND p.parent = ' . $user->id
+			'a.studentid = p.child AND p.parent = ' . $user->id
 		);
 
-		// Filter by published state
-		$published = (string) $this->getState('filter.published');
+		// Filter by current state
+		$current = (string) $this->getState('filter.current');
 
-		if (is_numeric($published))
+		if (is_numeric($current))
 		{
-			$query->where($db->quoteName('a.state') . ' = :published');
-			$query->bind(':published', $published, ParameterType::INTEGER);
+			$query->where($db->quoteName('a.state') . ' = :current');
+			$query->bind(':current', $current, ParameterType::INTEGER);
 		}
-		elseif ($published === '')
+		elseif ($current === '')
 		{
 			$query->where('(' . $db->quoteName('a.state') . ' = 0 OR ' . $db->quoteName('a.state') . ' = 1)');
 		}
@@ -158,11 +135,12 @@ class StudentsModel extends ListModel
 		{
 			$search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
 			$query->where('(a.name LIKE ' . $search . ')', 'OR');
-			$query->where('(a.firstname LIKE ' . $search . ')');
+			$query->where('(a.firstname LIKE ' . $search . ')', 'OR');
+			$query->where('(a.lesson LIKE ' . $search . ')');
 		}
 
 		// Add the list ordering clause.
-		$orderCol  = $this->state->get('list.ordering', 'a.id');
+		$orderCol  = $this->state->get('list.ordering', 'a.year');
 		$orderDirn = $this->state->get('list.direction', 'ASC');
 
 		$query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));

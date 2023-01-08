@@ -70,14 +70,15 @@ INSERT INTO `#__balancirk_students` (
 **************************************************************************************************/
 
 CREATE TABLE IF NOT EXISTS `#__balancirk_parents` (
+	`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `parent` int(11) NOT NULL,
     `child` int(11) NOT NULL,
     `primary` tinyint(1) NOT NULL DEFAULT 0,
-    PRIMARY KEY (`parent`, `child`),
-    CONSTRAINT `fk_parent` 
+    UNIQUE (`parent`, `child`),
+    CONSTRAINT `fk_parent_parent` 
         FOREIGN KEY (parent) 
             REFERENCES `#__balancirk_members_additional` (id),
-    CONSTRAINT `fk_childs` 
+    CONSTRAINT `fk_parent_childs` 
         FOREIGN KEY (child) 
             REFERENCES `#__balancirk_students` (id)
 );
@@ -99,6 +100,13 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_types` (
     `name` varchar(40) NOT NULL
 );
 
+INSERT INTO `#__balancirk_types`(
+	`id`, `name`
+)
+	VALUES (
+		1, 'Jaarmodule'
+	);
+
 /**************************************************************************************************
 *                                                                                                 * 
 *  SQL script for table lessons                                                                   * 
@@ -116,7 +124,7 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_lessons` (
     `start_registration` date NOT NULL,
     `end_registration` date NOT NULL,
     `state` char(15) NOT NULL,
-    CONSTRAINT `fk_types`
+    CONSTRAINT `fk_lesson_types`
         FOREIGN KEY (type)
             REFERENCES `#__balancirk_types` (id)
 );
@@ -126,7 +134,12 @@ CREATE OR REPLACE VIEW `#__balancirk_lessons_complete`
             a.`start_registration`, a.`end_registration`, a.`state` 
             FROM `#__balancirk_lessons` a
                 INNER JOIN `#__balancirk_types` b
-                    ON a.type = b.id;
+                    ON a.`type` = b.`id`;
+
+INSERT INTO `#__balancirk_lessons` (
+	`id`, `name`, `type`, `fee` , `year`, `start`, `end`, `start_registration`, `end_registration`, `state`
+)
+	VALUES (1, 'Multi', 1, 210, 2022, '2022-09-15', '2023-05-29', '2022-06-01', '2022-12-31', 1);
 
 /**************************************************************************************************
 *                                                                                                 * 
@@ -138,7 +151,7 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_hours`(
     `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `day` varchar(40) NOT NULL,
     `lesson` int(11) NOT NULL,
-    CONSTRAINT `fk_lessons`
+    CONSTRAINT `fk_hour_lessons`
         FOREIGN KEY (lesson)
             REFERENCES `#__balancirk_lessons` (id)
 );
@@ -150,17 +163,32 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_hours`(
 **************************************************************************************************/
 
 CREATE TABLE IF NOT EXISTS `#__balancirk_subscriptions`(
+	`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, 
     `lesson` int(11) NOT NULL,
     `student` int(11) NOT NULL,
-    PRIMARY KEY (`lesson`, `student`), 
-    CONSTRAINT `fk_lesson`
+    UNIQUE (`lesson`, `student`), 
+    CONSTRAINT `fk_subscription_lesson`
         FOREIGN KEY (lesson)
             REFERENCES `#__balancirk_lessons` (id),
-    CONSTRAINT `fk_student`
+    CONSTRAINT `fk_subscription_student`
         FOREIGN KEY (student)
             REFERENCES `#__balancirk_students` (id)
 );
 
+CREATE OR REPLACE VIEW `#__balancirk_subscriptions_view`
+	AS SELECT t.`id` as 'studentid', t.`name`, t.`firstname`, 
+		l.`id` as 'lessonid', l.`name` as 'lesson', l.`type`, l.`fee`, l.`year`,
+		l.`start`, l.`end`, l.`start_registration`, l.`end_registration`, l.`state`
+		FROM `#__balancirk_subscriptions` as s
+			INNER JOIN `#__balancirk_lessons` as l
+				ON s.`lesson` = l.`id`
+			INNER JOIN `#__balancirk_students` as t
+				on s.`student` = t.`id`;
+
+INSERT INTO `#__balancirk_subscriptions` (
+	`id`, `lesson`, `student`
+)
+	VALUES(1, 1, 2);
 /**************************************************************************************************
 *                                                                                                 * 
 *  SQL script for table presences                                                                 * 
@@ -168,14 +196,15 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_subscriptions`(
 **************************************************************************************************/
 
 CREATE TABLE IF NOT EXISTS `#__balancirk_presences`(
-    `lesson` int(11) NOT NULL,
+	`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`lesson` int(11) NOT NULL,
     `student` int(11) NOT NULL,
-    PRIMARY KEY (`lesson`, `student`), 
-    CONSTRAINT `fk_lesson`
-        FOREIGN KEY (lesson)
+    UNIQUE (`lesson`, `student`), 
+    CONSTRAINT `fk_presence_lesson`
+        FOREIGN KEY (`lesson`)
             REFERENCES `#__balancirk_lessons` (id),
-    CONSTRAINT `fk_student`
-        FOREIGN KEY (student)
+    CONSTRAINT `fk_presence_student`
+        FOREIGN KEY (`student`)
             REFERENCES `#__balancirk_students` (id)
 );
 
@@ -186,9 +215,10 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_presences`(
 **************************************************************************************************/
 
 CREATE TABLE IF NOT EXISTS `#__balancirk_teachers`(
+	`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `member` int(11) NOT NULL,
     `les` int(11) NOT NULL,
-    PRIMARY KEY (`member`, `les`)
+    UNIQUE (`member`, `les`)
 );
 
 /**************************************************************************************************
@@ -198,9 +228,10 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_teachers`(
 **************************************************************************************************/
 
 CREATE TABLE IF NOT EXISTS `#__balancirk_holidays`(
+	`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`year` decimal(4,0) NOT NULL,
 	`startDate` date NOT NULL,
 	`endDate` date NOT NULL,
 	`summary` varchar(100) NOT NULL,
-	PRIMARY KEY (`year`, `startDate`)
+	UNIQUE (`year`, `startDate`)
 );

@@ -33,11 +33,13 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 				<span class=" icon-new" aria-hidden="true"></span>
 				<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
 			</button>
-
+			<a href="<?= Route::_('index.php?option=com_balancirk&view=subscriptions', false); ?>">
+				<button class="btn btn-primary" type="button"><?= TEXT::_('COM_BALANCIRK_SUBSCRIPTIONS_LINK') ?></button>
+			</a>
 		</nav>
 	</div>
 </div>
-<form action="<?= Route::_('index.php?option=com_balancirk&view=students'); ?>" method="post" name="adminForm" id="adminForm">
+<form action=" <?= Route::_('index.php?option=com_balancirk&view=students'); ?>" method="post" name="adminForm" id="adminForm">
 	<div class="row">
 		<div class="col-md-12">
 			<div id="j-main-container" class="j-main-container">

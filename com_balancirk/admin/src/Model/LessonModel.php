@@ -55,8 +55,8 @@ class LessonModel extends AdminModel
 	{
 		if (!empty($record->id))
 		{
-
 			$app = Factory::getApplication();
+
 			return $app->getIdentity()->authorise('core.delete', 'com_balancirk.lesson.' . (int) $record->id);
 		}
 
@@ -114,8 +114,8 @@ class LessonModel extends AdminModel
 	/**
 	 * Method to get the row form.
 	 *
-	 * @param    array   $data       Data from the form.
-	 * @param    boolean $loadData   True if the form is to load its own data (default case), false if not.
+	 * @param   array   $data       Data from the form.
+	 * @param   boolean $loadData   True if the form is to load its own data (default case), false if not.
 	 *
 	 * @return  \JForm|boolean  A \JForm object on success, false on failure
 	 *
@@ -125,10 +125,12 @@ class LessonModel extends AdminModel
 	{
 		// Get the form.
 		$form = $this->loadForm($this->typeAlias, 'lesson', ['control' => 'jform', 'load_data' => $loadData]);
+
 		if (empty($form))
 		{
 			return false;
 		}
+
 		return $form;
 	}
 
@@ -159,18 +161,16 @@ class LessonModel extends AdminModel
 	/**
 	 * Load individual lessons with date and hour
 	 *
-	 * @param   $lesson is the id of the lesson
+	 * @param   int $lesson is the id of the lesson
 	 *
 	 * @return  array of hours
 	 *
 	 * @since   0.0.1
 	 */
-	public function getHours()
+	public function getHours(int $lesson)
 	{
 		// Get the database connection
 		$db = $this->getDbo();
-
-		$lesson = $this->getItem()->id;
 
 		$query = $db->getQuery(true);
 

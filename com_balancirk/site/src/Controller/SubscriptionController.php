@@ -59,7 +59,7 @@ class SubscriptionController extends FormController
 	 */
 	protected function allowAdd($data = array())
 	{
-		$user 	= Factory::getUser();
+		$user 	= Factory::getApplication()->getIdentity();
 
 		/** @var StudentModel */
 		$model	= $this->getModel('Student');
