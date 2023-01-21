@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package     Joomla.Administrator
+ * @package     Joomla.site
  * @subpackage  com_balancirk
  *
  * @copyright   Copyright (C) 2022 CoCoCo. All rights reserved.
@@ -23,13 +23,12 @@ $states = array(
 	'2' => Text::_('COM_BALANCIRK_LESSON_STATUS_NEXT'),
 	'-2' => Text::_('JTRASHED')
 );
-
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 ?>
 <div class="row">
 	<div class="col-md-12">
 		<nav aria-label="Toolbar">
-			<button class="button-new btn btn-success" type="button" onclick="Joomla.submitbutton('subscription.add')">
+			<button class="button-new btn btn-success" type="button" onclick="location.href = 'index.php?option=com_balancirk&view=subscription';">
 				<span class=" icon-new" aria-hidden="true"></span>
 				<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
 			</button>

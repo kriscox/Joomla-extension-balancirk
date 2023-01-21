@@ -8,7 +8,7 @@
  * @license     GNU General Public License version 3.
  */
 
-namespace CoCoCo\Component\Balancirk\Site\Table;
+namespace CoCoCo\Component\Balancirk\Administrator\Table;
 
 \defined('_JEXEC') or die;
 
@@ -20,7 +20,7 @@ use Joomla\Database\DatabaseDriver;
  *
  * @since  0.0.1
  */
-class TypesTable extends Table
+class SubscriptionsTable extends Table
 {
 	/**
 	 * Constructor

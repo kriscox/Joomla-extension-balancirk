@@ -51,6 +51,13 @@ class HtmlView extends BaseHtmlView
 	protected $canDo;
 
 	/**
+	 * The \JForm object
+	 *
+	 * @var  \JForm
+	 */
+	protected $form;
+
+	/**
 	 * Display the view.
 	 *
 	 * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
@@ -61,6 +68,7 @@ class HtmlView extends BaseHtmlView
 	{
 		$this->students = $this->get('Students');
 		$this->lessons = $this->get('Lessons');
+		$this->form = $this->get('Form');
 
 		if (count($errors = $this->get('Errors')))
 		{

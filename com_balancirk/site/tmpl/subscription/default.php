@@ -23,6 +23,7 @@ use Joomla\CMS\Layout\LayoutHelper;
 
 defined('_JEXEC') or die;
 
+HTMLHelper::_('behavior.formvalidator');
 HTMLHelper::_('behavior.keepalive');
 ?>
 
@@ -31,33 +32,40 @@ HTMLHelper::_('behavior.keepalive');
 		<span class="fa fa-info-circle" aria-hidden="true"></span><span class="sr-only"><?= Text::_('INFO'); ?></span>
 		<?= Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?>
 	</div>
-<?php endif; ?>
 
-<form>
-	<div class="col col-md-6">
-		<div class="row">
-			<?php foreach ($this->students as $student) : ?>
-				<input type="checkbox" class="form-check-input" name="<?php $student ?> value=" <?php $student ?>>
-				<label class="form-check-label"><?php $student ?> </label>
-			<?php endforeach; ?>
-		</div>
-	</div>
-	<div class="col col-md-6">
-		<div class="row">
-			<label class="col-form-label">
-				<?= Text::_('COM_BALANCIRK_TABLE_HEADER_LESSON'); ?>
-			</label>
-			<div class="input-group mb-3">
-				<div class="input-group-prepend">
-					<label class="input-group-text" for="inputGroupSelect01">Options</label>
-				</div>
-				<select class="custom-select" id="inputGroupSelect01">
-					<option selected>Choose...</option>
-					<?php foreach ($this->lessons as $lesson) : ?>
-						<option value="<?= $lesson ?>"> <?= $lesson ?> </option>
-					<?php endforeach; ?>
-				</select>
+<?php else : ?>
+	<form action="<?= Route::_('index.php?option=com_balancirk&view=subscription'); ?>" method="post" id="subscription-form" name="adminForm" class="form-validate">
+		<div class="col col-md-6">
+			<div class="row">
+				<?php foreach ($this->students as $student) : ?>
+					<div class="input-group">
+						<input type="checkbox" class="form-check-input" name="<?= $student->id ?>" value="">
+						<label class="form-check-label"> <?= $student->firstname ?> <?= $student->name ?></label>
+					</div>
+				<?php endforeach; ?>
 			</div>
 		</div>
-	</div>
-</form>
+		<div class="col col-md-6">
+			<div class="row">
+				<fieldset addfieldpath="com_balancirk/src/Field/">
+					<?= $this->form->renderField('lessons'); ?>
+				</fieldset>
+			</div>
+		</div>
+		<input type="hidden" class="hidden" name="task" value="">
+		<?= HTMLHelper::_('form.token'); ?>
+		<div class="row title-alias form-vertical mb-3">
+			<div class="col-12 col-md-6">
+				<button type="button" class="balancirk_button" onclick="Joomla.submitbutton('subscription.add')">
+					<span class="icon-save"> <?= Text::_('JSAVE') ?> </span>
+				</button>
+			</div>
+			<div class="col-12 col-md-6">
+				<button type="button" class="balancirk_button" onclick="Joomla.submitbutton('subscription.cancel')">
+					<span class="icon-cancel"> <?= Text::_('JCANCEL') ?></span>
+				</button>
+			</div>
+		</div>
+
+	</form>
+<?php endif; ?>

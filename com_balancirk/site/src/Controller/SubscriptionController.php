@@ -27,8 +27,8 @@ class SubscriptionController extends FormController
 	/**
 	 * Cancel and return to the students list page.
 	 *
-	 * Implement the cancel button to return to the students list page on pressing the button with
-	 * task student.cancel
+	 * Implement the cancel button to return to the subscriptions list page on pressing the button with
+	 * task subscriptions.cancel
 	 *
 	 * @param   array	   $key	List of fields of the for
 	 *
@@ -42,7 +42,7 @@ class SubscriptionController extends FormController
 
 		// Set up the redirect back to the previous page (put in the header in HtmlView.php)
 		$this->redirect(
-			'/administrator/index.php?option=' . $this->option . '&view=students'
+			'/administrator/index.php?option=' . $this->option . '&view=subscriptions'
 		);
 	}
 
@@ -90,5 +90,27 @@ class SubscriptionController extends FormController
 
 		return ($studentModel->isPrimairyParent($user->id, $data['student']) &&
 			$presenceModel->numberOfPresences($data['student'], $data['lesson']) <= 2);
+	}
+
+	/**
+	 * Add subscription
+	 *
+	 * Add the subscription for the lesson and the students chosen
+	 *
+	 * @param	array	$key	List of fields of the form
+	 *
+	 * @return	void
+	 *
+	 * @version __BUMP_VERSION__
+	 **/
+	public function add(array $key = null)
+	{
+		// Check if token is correct. Security measure
+		$this->checkToken();
+
+		if ($this->allowAdd())
+		{
+			parent::add($key);
+		}
 	}
 }

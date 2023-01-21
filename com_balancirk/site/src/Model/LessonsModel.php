@@ -48,7 +48,7 @@ class LessonsModel extends ListModel
 			)
 		)
 			->from($db->quoteName('#__balancirk_lessons', 'a'))
-			->where($today . ' between `start_date` and `end_date`');
+			->where($db->quote($today) . ' between `start_registration` and `end_registration`');
 
 		$query->order('name');
 

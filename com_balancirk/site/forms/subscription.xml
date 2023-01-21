@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form>
-    <fieldset>
-        <field name="id" type="number" label="COM_BALANCIRK_TABLE_TABLEHEAD_ID" class="hidden" readonly="true" />
-        <field name="name" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_NAME" maxlength="255" required="true" />
-        <field name="email" type="email" label="COM_BALANCIRK_TABLE_TABLEHEAD_EMAIL" required="true" validate="email" />
+    <fieldset addfieldprefix="CoCoCo\Component\Balancirk\Site\Field">
+		<field name="lessons" type="lessons" labal="COM_BALANCIRK_TABLE_TABLEHEAD_LESSONS" required="true" />
     </fieldset>
 </form>
