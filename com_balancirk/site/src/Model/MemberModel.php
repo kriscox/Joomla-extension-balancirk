@@ -179,7 +179,7 @@ class MemberModel extends AdminModel
 	 *
 	 * @since   0.0.1
 	 **/
-	public function register($data)
+	public function register(array $data)
 	{
 		// TODO: check the activation of the user. Redicect page, mail send and ...
 
