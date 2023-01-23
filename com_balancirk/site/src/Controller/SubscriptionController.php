@@ -11,9 +11,11 @@
 namespace CoCoCo\Component\Balancirk\Site\Controller;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Router\Route;
 use Joomla\CMS\MVC\Controller\FormController;
-use CoCoCo\Component\Balancirk\Site\Model\PresenceModel;
 use CoCoCo\Component\Balancirk\Site\Model\StudentModel;
+use CoCoCo\Component\Balancirk\Site\Model\PresenceModel;
+use CoCoCo\Component\Balancirk\Site\Model\SubscriptionModel;
 
 \defined('_JEXEC') or die;
 
@@ -108,9 +110,28 @@ class SubscriptionController extends FormController
 		// Check if token is correct. Security measure
 		$this->checkToken();
 
-		if ($this->allowAdd())
+		$data = $this->input->get('jform', array(), 'array');
+
+		/** @var SubscriptionModel */
+		$model = $this->getModel();
+
+		/** @var CMSApplication */
+		$app = Factory::getApplication();
+		$app->setUserState('com_balancirk.subscription.data', $data);
+
+		if ($this->allowAdd($data))
 		{
-			parent::add($key);
+			if ($model->add($data))
+			{
+				$app->setUserState('com_balancirk.subscription.data', null);
+				$redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscriptions');
+			}
+			else
+			{
+				$redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscription');
+			}
 		}
+
+		$this->setRedirect($redirectUrl);
 	}
 }

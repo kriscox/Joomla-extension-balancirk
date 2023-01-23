@@ -142,8 +142,9 @@ class StudentModel extends AdminModel
 	 */
 	protected function loadFormData()
 	{
-		/** @var CMSApplicationInterface */
+		/** @var CMSApplication */
 		$app = Factory::getApplication();
+
 		$data = $app->getUserState('com_balancirk.student.data', array());
 
 		if (empty($data))
@@ -221,12 +222,17 @@ class StudentModel extends AdminModel
 		$query 	= $db->getQuery(true);
 		$query->select($db->quote('*'))
 			->from($db->quoteName('#__balancirk_parents'))
-			->where(
-				$db->quoteName('child') . ' = ' . $db->quote($student),
-				$db->quoteName('parent') . ' = ' . $db->quote($parent),
-				$db->quoteName('primary') . ' = 1'
-			);
+			->where($db->quoteName('child') . ' = ' . $db->quote($student))
+			->where($db->quoteName('parent') . ' = ' . $db->quote($parent))
+			->where($db->quoteName('primary') . ' = 1');
 
-		return ($db->setQuery($query)->getNumRows() >= 1);
+		if ($db->setQuery($query)->execute())
+		{
+			return $db->getNumRows() >= 1;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

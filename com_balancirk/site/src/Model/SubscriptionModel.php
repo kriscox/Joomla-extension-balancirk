@@ -151,4 +151,31 @@ class SubscriptionModel extends AdminModel
 
 		return $model->getItems();
 	}
+
+	/**
+	 * Add subscription to the database
+	 *
+	 * Add if not exists the subscription to the database
+	 *
+	 * @param 	array $data array of subscriptions to
+	 *
+	 * @return 	boolean
+	 *
+	 * @version	__BUMP_VERSION__
+	 **/
+	public function add(array $data = null)
+	{
+		$values = array();
+		array_push($values, $data['student']);
+		array_push($values, $data['lesson']);
+
+		$db = $this->getDbo();
+		$query = $db->getQuery(true);
+		$query->insert($db->quoteName('#__balancirk_subscriptions'))
+			->columns($db->quoteName(array('student', 'lesson')))
+			->values(implode(',', $values));
+		$db->setQuery($query)->execute();
+
+		return true;
+	}
 }

@@ -36,21 +36,14 @@ HTMLHelper::_('behavior.keepalive');
 <?php else : ?>
 	<form action="<?= Route::_('index.php?option=com_balancirk&view=subscription'); ?>" method="post" id="subscription-form" name="adminForm" class="form-validate">
 		<div class="col col-md-6">
-			<div class="row">
-				<?php foreach ($this->students as $student) : ?>
-					<div class="input-group">
-						<input type="checkbox" class="form-check-input" name="<?= $student->id ?>" value="">
-						<label class="form-check-label"> <?= $student->firstname ?> <?= $student->name ?></label>
-					</div>
-				<?php endforeach; ?>
-			</div>
+			<fieldset>
+				<?= $this->form->renderField('student'); ?>
+			</fieldset>
 		</div>
 		<div class="col col-md-6">
-			<div class="row">
-				<fieldset addfieldpath="com_balancirk/src/Field/">
-					<?= $this->form->renderField('lessons'); ?>
-				</fieldset>
-			</div>
+			<fieldset addfieldpath="com_balancirk/src/Field/">
+				<?= $this->form->renderField('lesson'); ?>
+			</fieldset>
 		</div>
 		<input type="hidden" class="hidden" name="task" value="">
 		<?= HTMLHelper::_('form.token'); ?>

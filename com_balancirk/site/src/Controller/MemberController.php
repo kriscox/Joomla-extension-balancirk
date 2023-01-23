@@ -62,6 +62,7 @@ class MemberController extends FormController
 		$this->checkToken();
 
 		// Get the curren application
+		/** @var CMSApplication */
 		$app = Factory::getApplication();
 
 		// Get data from the form
