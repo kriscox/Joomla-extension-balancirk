@@ -178,4 +178,27 @@ class SubscriptionModel extends AdminModel
 
 		return true;
 	}
+
+	/**
+	 * Delete subscription to the database
+	 *
+	 * Delete if not exists the subscription to the database
+	 *
+	 * @param   array  $pks  An array of record primary keys.
+	 *
+	 * @return 	boolean
+	 *
+	 * @version	__BUMP_VERSION__
+	 **/
+	public function delete(&$pks)
+	{
+		$db = $this->getDbo();
+		$query = $db->getQuery(true);
+		$query->delete($db->quoteName('#__balancirk_subscriptions'))
+			->where($db->quoteName('student') . ' = ' . $pks['student'])
+			->where($db->quoteName('lesson') . ' = ' . $pks['lesson']);
+		$db->setQuery($query)->execute();
+
+		return true;
+	}
 }

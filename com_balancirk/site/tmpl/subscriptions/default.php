@@ -38,7 +38,7 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 		</nav>
 	</div>
 </div>
-<form action="<?= Route::_('index.php?option=com_balancirk&view=subscriptions'); ?>" method="post" name="adminForm" id="adminForm">
+<form action="<?= Route::_('index.php?option=com_balancirk&view=subscription&layout=delete&'); ?>" method="post" name="adminForm" id="adminForm">
 	<div class="row">
 		<div class="col-md-12">
 			<div id="j-main-container" class="j-main-container">
@@ -56,6 +56,9 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 						</caption>
 						<thead>
 							<tr>
+								<th style="width:1%" class="text-center">
+									<?= HTMLHelper::_('grid.checkall'); ?>
+								</th>
 								<th scope="col" class="text_center d-none d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_STUDENT', 'a.firstname', $listDirn, $listOrder); ?>
 								</th>
@@ -66,11 +69,16 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_YEAR', 'a.year', $listDirn, $listOrder); ?>
 								</th>
 								<th scope="col" class="text_center d-none d-md-table-cell">
-									<?= TEXT::_('COM_BALANCIRK_SUBSCRIPTION_DELETE') ?>
+									<?= Text::_('JDELETE'); ?>
+								</th>
 							</tr>
 							<?php $n = count($this->items);
+
 							foreach ($this->items as $i => $item) : ?>
 								<tr class="row<?= $i % 2; ?>">
+									<td class="text-center">
+										<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
+									</td>
 									<td scope="row" class="d-none d-md-table-cell">
 										<?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
 									</td>
@@ -81,9 +89,9 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 										<?= $this->escape(addslashes($item->year)); ?>
 									</td>
 									<td scope="row" class="d-none d-md-table-cell">
-										<a href="<?= Route::_('index.php?option=com_balancirk&task=subscription.delete&id=' . $item->id); ?>">
-											<span class="icon-purge"> </span>
-										</a>
+										<button id='<?= $item->id ?>' type='submit' name='submit' value='<?= $item->id ?>'>
+											<span class="icon-purge" />
+										</button>
 									</td>
 								</tr>
 							<?php endforeach; ?>

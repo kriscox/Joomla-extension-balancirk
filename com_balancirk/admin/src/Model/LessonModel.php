@@ -57,7 +57,7 @@ class LessonModel extends AdminModel
 		{
 			$app = Factory::getApplication();
 
-			return $app->getIdentity()->authorise('core.delete', 'com_balancirk.lesson.' . (int) $record->id);
+			return $app->getIdentity()->authorise('core.delete');
 		}
 
 		return false;
@@ -79,7 +79,7 @@ class LessonModel extends AdminModel
 		// Check for existing article.
 		if (!empty($record->id))
 		{
-			return $user->authorise('core.edit.state', 'com_balancirk.lesson.' . (int) $record->id);
+			return $user->authorise('core.edit.state');
 		}
 
 		// Default to component settings if neither article nor category known.
@@ -167,8 +167,11 @@ class LessonModel extends AdminModel
 	 *
 	 * @since   0.0.1
 	 */
-	public function getHours(int $lesson)
+	public function getHours(int $lesson = null)
 	{
+		// Don't know if it works
+		$lesson = (!is_null($lesson) ? $lesson : (int) $this->getState('lesson.id'));
+
 		// Get the database connection
 		$db = $this->getDbo();
 

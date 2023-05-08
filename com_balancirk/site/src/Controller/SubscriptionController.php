@@ -134,4 +134,34 @@ class SubscriptionController extends FormController
 
 		$this->setRedirect($redirectUrl);
 	}
+
+	/**
+	 * Delete subscription
+	 *
+	 * Delete the subscription for the lesson and the student
+	 *
+	 * @param	array	$key	List of fields of the form
+	 *
+	 * @return	void
+	 *
+	 * @version __BUMP_VERSION__
+	 **/
+	public function delete(array $key = null)
+	{
+		// Check if token is correct. Security measure
+		$this->checkToken();
+
+		$data = $this->input->get('jform', array(), 'array');
+
+		/** @var SubscriptionModel */
+		$model = $this->getModel();
+
+		if ($this->allowDelete($data))
+		{
+			$model->delete($data);
+			$redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscriptions');
+		}
+
+		$this->setRedirect($redirectUrl);
+	}
 }
