@@ -21,7 +21,4 @@ use Joomla\CMS\MVC\Controller\FormController;
  */
 class StudentController extends FormController
 {
-    /* Not necessairy as he caluclates it itself
-    protected $view_item = 'student';
-    protected $view_list = 'students'; */
 }

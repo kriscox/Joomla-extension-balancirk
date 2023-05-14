@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @package     Joomla.Site
+ * @subpackage  com_balancirk
+ *
+ * @copyright   Copyright (C) 2022 CoCoCo. All rights reserved.
+ * @license     GNU General Public License version 3.
+ */
+
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -30,7 +38,7 @@ HTMLHelper::_('behavior.keepalive');
 			<div class="col-12 col-md-6">
 			</div>
 			<div class="col-12 col-md-6">
-				<?= $this->form->renderField('password1'); ?>
+				<?= $this->form->renderField('password'); ?>
 			</div>
 			<div class="col-12 col-md-6">
 			</div>
@@ -55,10 +63,10 @@ HTMLHelper::_('behavior.keepalive');
 				<?= $this->form->renderField('bus'); ?>
 			</div>
 			<div class="col-12 col-md-6">
-				<?= $this->form->renderField('postalcode'); ?>
+				<?= $this->form->renderField('postcode'); ?>
 			</div>
 			<div class="col-12 col-md-6">
-				<?= $this->form->renderField('municipality'); ?>
+				<?= $this->form->renderField('city'); ?>
 			</div>
 			<div class="col-12 col-md-6">
 				<?= $this->form->renderField('email'); ?>

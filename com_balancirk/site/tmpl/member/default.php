@@ -12,9 +12,9 @@ defined('_JEXEC') or die;
 ?>
 
 <div class="page-header">
-    <h1>
-        <?= $this->item->title; ?>
-    </h1>
+	<h1>
+		<?= $this->item->title; ?>
+	</h1>
 </div>
 
 

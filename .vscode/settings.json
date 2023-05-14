@@ -15,5 +15,7 @@
 "phpfmt.yoda": true,
 "phpfmt.passes": [
 "AllmanStyleBraces"
-]
+],
+"intelephense.format.braces": "allman",
+"zenMode.hideLineNumbers": false
 }

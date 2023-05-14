@@ -5,9 +5,4 @@
             <![CDATA[COM_BALANCIRK_VIEW_DEFAULT_DESC]]>
         </message>
     </layout>
-    <fields name="member">
-        <fieldset name="member">
-            <field name="which_member" type="text" label="COM_BALANCIRK_MEMBER_CHOICE" default="Anybody" />
-        </fieldset>
-    </fields>
 </metadata>

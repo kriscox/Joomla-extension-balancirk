@@ -22,150 +22,154 @@ use Joomla\Database\ParameterType;
  */
 class StudentsModel extends ListModel
 {
-    /**
-     * Constructor.
-     *
-     * @param   array  $config  An optional associative array of configuration settings.
-     *
-     * @see     \JControllerLegacy
-     * @see     \Joomla\CMS\MVC\Controller\BaseController
-     *
-     * @since   __BUMP_VERSION__
-     */
-    public function __construct($config = [])
-    {
+	/**
+	 * Constructor.
+	 *
+	 * @param   array  $config  An optional associative array of configuration settings.
+	 *
+	 * @see     \JControllerLegacy
+	 * @see     \Joomla\CMS\MVC\Controller\BaseController
+	 *
+	 * @since   __BUMP_VERSION__
+	 */
+	public function __construct($config = [])
+	{
 
-        if (empty($config['filter_fields'])) {
-            $config['filter_fields'] = array(
-                'id', 'a.id',
-                'name', 'a.name',
-                'firstname', 'a.firstname',
-                'email', 'a.email',
-                'street', 'a.street',
-                'number', 'a.number',
-                'bus', 'a.bus',
-                'postalcode', 'a.postalcode',
-                'municipality', 'a.municipality',
-                'phone', 'a.phone',
-                'birthdate', 'a.birthdate',
-                'state', 'a.state'
-            );
-        }
+		if (empty($config['filter_fields']))
+		{
+			$config['filter_fields'] = array(
+				'id', 'a.id',
+				'name', 'a.name',
+				'firstname', 'a.firstname',
+				'email', 'a.email',
+				'street', 'a.street',
+				'number', 'a.number',
+				'bus', 'a.bus',
+				'postcode', 'a.postcode',
+				'city', 'a.city',
+				'phone', 'a.phone',
+				'birthdate', 'a.birthdate',
+				'state', 'a.state'
+			);
+		}
 
-        parent::__construct($config);
-    }
+		parent::__construct($config);
+	}
 
-    /**
-     * Method to auto-populate the model state.
-     *
-     * Note. Calling getState in this method will result in recursion.
-     *
-     * @param   string  $ordering   An optional ordering field.
-     * @param   string  $direction  An optional direction (asc|desc).
-     *
-     * @return  void
-     *
-     * @since   0.0.1
-     */
-    protected function populateState($ordering = 'a.id', $direction = 'asc')
-    {
-        $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
-        $this->setState('filter.search', $search);
+	/**
+	 * Method to auto-populate the model state.
+	 *
+	 * Note. Calling getState in this method will result in recursion.
+	 *
+	 * @param   string  $ordering   An optional ordering field.
+	 * @param   string  $direction  An optional direction (asc|desc).
+	 *
+	 * @return  void
+	 *
+	 * @since   0.0.1
+	 */
+	protected function populateState($ordering = 'a.id', $direction = 'asc')
+	{
+		$search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
+		$this->setState('filter.search', $search);
 
-        $published = $this->getUserStateFromRequest($this->context . '.filter.published', 'filter_published', '');
-        $this->setState('filter.published', $published);
+		$published = $this->getUserStateFromRequest($this->context . '.filter.published', 'filter_published', '');
+		$this->setState('filter.published', $published);
 
-        // List state information.
-        parent::populateState($ordering, $direction);
-    }
+		// List state information.
+		parent::populateState($ordering, $direction);
+	}
 
-    /**
-     * Method to get a store id based on model configuration state.
-     *
-     * This is necessary because the model is used by the component and
-     * different modules that might need different sets of data or different
-     * ordering requirements.
-     *
-     * @param   string  $id  A prefix for the store id.
-     *
-     * @return  string  A store id.
-     *
-     * @since   0.0.1
-     */
-    protected function getStoreId($id = '')
-    {
-        // Compile the store id.
-        $id .= ':' . $this->getState('filter.search');
-        $id .= ':' . $this->getState('filter.published');
+	/**
+	 * Method to get a store id based on model configuration state.
+	 *
+	 * This is necessary because the model is used by the component and
+	 * different modules that might need different sets of data or different
+	 * ordering requirements.
+	 *
+	 * @param   string  $id  A prefix for the store id.
+	 *
+	 * @return  string  A store id.
+	 *
+	 * @since   0.0.1
+	 */
+	protected function getStoreId($id = '')
+	{
+		// Compile the store id.
+		$id .= ':' . $this->getState('filter.search');
+		$id .= ':' . $this->getState('filter.published');
 
-        return parent::getStoreId($id);
-    }
+		return parent::getStoreId($id);
+	}
 
-    /**
-     * Build an SQL query to load the list data.
-     *
-     * @return  \JDatabaseQuery
-     *
-     * @since   __BUMP_VERSION__
-     */
-    protected function getListQuery()
-    {
-        // Create a new query object.
-        $db = $this->getDbo();
-        $query = $db->getQuery(true);
+	/**
+	 * Build an SQL query to load the list data.
+	 *
+	 * @return  \JDatabaseQuery
+	 *
+	 * @since   __BUMP_VERSION__
+	 */
+	protected function getListQuery()
+	{
+		// Create a new query object.
+		$db = $this->getDbo();
+		$query = $db->getQuery(true);
 
-        // Select the required fields from the table.
-        $query->select(
-            $db->quoteName(
-                [
-                    'id', 'name', 'firstname',
-                    'email', 'street', 'number', 'bus', 'postalcode',
-                    'municipality', 'phone', 'birthdate', 'state'
-                ]
-            )
-        );
-        $query->from($db->quoteName('#__balancirk_students', 'a'));
+		// Select the required fields from the table.
+		$query->select(
+			$db->quoteName(
+				[
+					'id', 'name', 'firstname',
+					'email', 'street', 'number', 'bus', 'postcode',
+					'city', 'phone', 'birthdate', 'state'
+				]
+			)
+		);
+		$query->from($db->quoteName('#__balancirk_students', 'a'));
 
-        // Filter by published state
-        $published = (string) $this->getState('filter.published');
+		// Filter by published state
+		$published = (string) $this->getState('filter.published');
 
-        if (is_numeric($published)) {
-            $query->where($db->quoteName('a.state') . ' = :published');
-            $query->bind(':published', $published, ParameterType::INTEGER);
-        } elseif ($published === '') {
-            $query->where('(' . $db->quoteName('a.state') . ' = 0 OR ' . $db->quoteName('a.state') . ' = 1)');
-        }
+		if (is_numeric($published))
+		{
+			$query->where($db->quoteName('a.state') . ' = :published');
+			$query->bind(':published', $published, ParameterType::INTEGER);
+		}
+		elseif ($published === '')
+		{
+			$query->where('(' . $db->quoteName('a.state') . ' = 0 OR ' . $db->quoteName('a.state') . ' = 1)');
+		}
 
-        // Filter by search in title.
-        $search = $this->getState('filter.search');
+		// Filter by search in title.
+		$search = $this->getState('filter.search');
 
-        if (!empty($search)) {
-            $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
-            $query->where('(a.name LIKE ' . $search . ')', 'OR');
-            $query->where('(a.firstname LIKE ' . $search . ')');
-        }
+		if (!empty($search))
+		{
+			$search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
+			$query->where('(a.name LIKE ' . $search . ' OR a.firstname LIKE ' . $search . ')');
+		}
 
-        // Add the list ordering clause.
-        $orderCol  = $this->state->get('list.ordering', 'a.id');
-        $orderDirn = $this->state->get('list.direction', 'ASC');
+		// Add the list ordering clause.
+		$orderCol  = $this->state->get('list.ordering', 'a.id');
+		$orderDirn = $this->state->get('list.direction', 'ASC');
 
-        $query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
+		$query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
 
-        return $query;
-    }
+		return $query;
+	}
 
-    /**
-     * Method to get a list of walks.
-     * Overridden to add a check for access levels.
-     *
-     * @return  mixed  An array of data items on success, false on failure.
-     *
-     * @since   __BUMP_VERSION__
-     */
-    public function getItems()
-    {
-        $items = parent::getItems();
+	/**
+	 * Method to get a list of walks.
+	 * Overridden to add a check for access levels.
+	 *
+	 * @return  mixed  An array of data items on success, false on failure.
+	 *
+	 * @since   __BUMP_VERSION__
+	 */
+	public function getItems()
+	{
+		$items = parent::getItems();
 
-        return $items;
-    }
+		return $items;
+	}
 }

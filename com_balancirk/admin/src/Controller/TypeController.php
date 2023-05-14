@@ -8,6 +8,17 @@
  * @license     GNU General Public License version 3.
  */
 
+namespace CoCoCo\Component\Balancirk\Administrator\Controller;
+
 \defined('_JEXEC') or die;
-?>
-Hello Balancirk
+
+use Joomla\CMS\MVC\Controller\FormController;
+
+/**
+ * Controller for a single student.
+ *
+ * @since  0.0.1
+ */
+class TypeController extends FormController
+{
+}
