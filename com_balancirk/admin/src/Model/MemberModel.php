@@ -22,6 +22,7 @@ use Joomla\CMS\User\UserHelper;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Jooma\CMS\CMSApplicationInterface;
 use Joomla\CMS\Application\ApplicationHelper;
+use Joomla\CMS\Application\WebApplication;
 
 /**
  * Item model for member.
@@ -147,6 +148,7 @@ class MemberModel extends AdminModel
 	 */
 	protected function loadFormData()
 	{
+		// @var WebApplication
 		$app = Factory::getApplication();
 		$data = $app->getUserState('com_balancirk.edit.student.data', array());
 
@@ -160,29 +162,6 @@ class MemberModel extends AdminModel
 		$this->preprocessData($this->typeAlias, $data);
 
 		return $data;
-	}
-
-	/**
-	 * Prepare and sanitise the table prior to saving.
-	 *
-	 * @param   \Joomla\CMS\Table\Table  $table  The Table object
-	 *
-	 * @return  void
-	 *
-	 * @since   0.0.1
-	 */
-	protected function prepareTable($table)
-	{
-		// This is a very simple method to change the state of each item selected
-		// $db = $this->getDbo();
-
-		// $query = $db->getQuery(true);
-
-		// $query->update('`#__balancirk_members`');
-		// $query->set('state = ' . $value);
-		// $query->where('id IN (' . implode(',', $pks) . ')');
-		// $db->setQuery($query);
-		// $db->execute();
 	}
 
 	/**
@@ -226,12 +205,8 @@ class MemberModel extends AdminModel
 	 **/
 	public function register($data)
 	{
-		// TODO: check the activation of the user. Redicect page, mail send and ...
-
 		$hash = ApplicationHelper::getHash(UserHelper::genRandomPassword());
-		$password = UserHelper::genRandomPassword();
 		$data['activation'] = $hash;
-		$data['password'] = $password;
 		$data['block'] = 1;
 
 		// TODO get the default user group. now it's fixed to Registered
@@ -340,6 +315,7 @@ class MemberModel extends AdminModel
 
 		// Create query and don't forget to quote everything
 		$query = $db->getQuery(true);
+
 		if ($insert)
 		{
 			$query->insert($db->quoteName('#__balancirk_members_additional'))

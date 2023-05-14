@@ -42,51 +42,6 @@ class StudentModel extends AdminModel
 	 */
 	protected $text_prefix = 'COM_BALANCIRK';
 
-
-	// /**
-	//  * Method to test whether a record can be deleted.
-	//  *
-	//  * @param   object  $record  A record object.
-	//  *
-	//  * @return  boolean  True if allowed to delete the record. Defaults to the permission set in the component.
-	//  *
-	//  * @since   0.0.1
-	//  */
-	// protected function canDelete($record)
-	// {
-	// 	if (!empty($record->id))
-	// 	{
-	// 		$app = Factory::getApplication();
-
-	// 		return $app->getIdentity()->authorise('core.delete', 'com_balancirk.students.' . (int) $record->id);
-	// 	}
-
-	// 	return false;
-	// }
-
-	// /**
-	//  * Method to test whether a record can have its state edited.
-	//  *
-	//  * @param   object  $record  A record object.
-	//  *
-	//  * @return  boolean  True if allowed to change the state of the record. Defaults to the permission set in the component.
-	//  *
-	//  * @since   0.0.1
-	//  */
-	// protected function canEditState($record)
-	// {
-	// 	$user = Factory::getApplication()->getIdentity();
-
-	// 	// Check for existing article.
-	// 	if (!empty($record->id))
-	// 	{
-	// 		return $user->authorise('core.edit.state', 'com_balancirk.students.' . (int) $record->id);
-	// 	}
-
-	// 	// Default to component settings if neither article nor category known.
-	// 	return parent::canEditState($record);
-	// }
-
 	/**
 	 * Method to get a table object, load it if necessary.
 	 *
@@ -145,8 +100,11 @@ class StudentModel extends AdminModel
 	protected function loadFormData()
 	{
 		// Check the session for previously entered form data.
+		// @var CMSApplicationInterface
 		$app = Factory::getApplication();
 		$data = $app->getUserState('com_balancirk.edit.student.data', array());
+
+
 
 		if (empty($data))
 		{

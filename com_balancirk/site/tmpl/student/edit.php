@@ -76,6 +76,11 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 				<?= $this->form->renderField('uitpas'); ?>
 			</div>
 		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<?= $this->form->renderField('allow_photo'); ?>
+			</div>
+		</div>
 	</div>
 	<input type="hidden" name="jform[id]" id="jform_id" value="<?= $this->item->id ?>">
 	<input type="hidden" name="task" value="">

@@ -38,7 +38,7 @@ HTMLHelper::_('behavior.keepalive');
 			<div class="col-12 col-md-6">
 			</div>
 			<div class="col-12 col-md-6">
-				<?= $this->form->renderField('password1'); ?>
+				<?= $this->form->renderField('password'); ?>
 			</div>
 			<div class="col-12 col-md-6">
 			</div>

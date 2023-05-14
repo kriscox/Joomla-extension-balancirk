@@ -47,10 +47,11 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_students` (
     `postcode` varchar(10),
     `city` varchar(50),
     `phone` char(15),
-    `email` varchar(100) NOT NULL,
+    `email` varchar(100),
     `birthdate` date NOT NULL,
 	`uitpas` varchar(13),
 	`photo` varchar(255),
+	`allow_photo` boolean NOT NULL DEFAULT 0,
     `state` char(15),
     `ordering` int(11) NOT NULL DEFAULT 0
 );

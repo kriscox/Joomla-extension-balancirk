@@ -50,6 +50,17 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 		<div class="row">
 			<?= $this->item->uitpas ?>
 		</div>
+		<div class="row">
+			<?php if ($this->item->allow_photo)
+			{
+				print Text::_("COM_BALANCIRK_ALLOW_PHOTO_FULL");
+			}
+			else
+			{
+				print Text::_("COM_BALANCIRK_DISALLOW_PHOTO_FULL");
+			}
+			?>
+		</div>
 	</div>
 	<input type="hidden" name="jform[id]" id="jform_id" value="<?= $this->item->id ?>">
 	<input type="hidden" name="task" value="">

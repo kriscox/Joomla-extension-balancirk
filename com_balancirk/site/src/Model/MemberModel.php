@@ -155,7 +155,7 @@ class MemberModel extends AdminModel
 
 		if (empty($data))
 		{
-			$data = $this->getItem();
+			$data = $this->getItem($app->getIdentity()->id);
 
 			// Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
 		}

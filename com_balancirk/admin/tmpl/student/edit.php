@@ -39,6 +39,7 @@ HTMLHelper::_('behavior.keepalive');
 						<?= $this->form->renderField('phone'); ?>
 						<?= $this->form->renderField('birthdate'); ?>
 						<?= $this->form->renderField('uitpas'); ?>
+						<?= $this->form->renderField('allow_photo'); ?>
 					</div>
 				</div>
 			</div>

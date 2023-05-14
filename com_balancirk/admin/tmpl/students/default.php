@@ -67,6 +67,9 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 								<th scope="col" style="width:10px" class="text_center d-none d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_BIRTHDATE', 'a.birthdate', $listDirn, $listOrder); ?>
 								</th>
+								<th scope="col" style="width:10px" class="text_center d-none d-md-table-cell">
+									Foto
+								</th>
 								<th scope="col" style="width:1%; min-width:85px" class="text-center">
 									<?= HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.state', $listDirn, $listOrder); ?>
 								</th>
@@ -106,6 +109,9 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 									</td>
 									<td scope="row" class="d-none d-md-table-cell">
 										<?= HtmlHelper::date($item->birthdate, Text::_('DATE_FORMAT_FILTER_DATE')); ?>
+									</td>
+									<td scope="row" class="d-none d-md-table-cell">
+										<?= $this->escape($item->allow_photo); ?>
 									</td>
 									<td class="article-status">
 										<?= $this->escape($item->state); ?>

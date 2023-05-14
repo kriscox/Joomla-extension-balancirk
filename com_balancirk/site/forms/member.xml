@@ -15,7 +15,7 @@
         <field name="registerdate" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_REGISTERDATE" readonly="true" format="%D %b %Y" />
         <field name="last logindate" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_LASTLOGINDATE" readonly=" true" format=" %D %b %Y" />
 		//TODO password validation
-		<field name="password1" type="password" label="COM_BALANCIRK_REGISTRATION_PASSWORD1_LABEL" class="required validate-password" filter="raw" validate="password" required="true"/>
+		<field name="password" type="password" label="COM_BALANCIRK_REGISTRATION_PASSWORD1_LABEL" class="required validate-password" filter="raw" validate="password" required="true"/>
 		<field name="password2" type="password" label="COM_BALANCIRK_REGISTRATION_PASSWORD2_LABEL" class="required validate-password" filter="raw" validate="password" required="true"/>
     </fieldset>
 </form>
