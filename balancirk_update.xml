@@ -4,7 +4,7 @@
         <description>This is the balancirk plugin</description>
         <element>com_balancirk</element>
         <type>component</type>
-        <version>1.0</version>
+        <version>1.1</version>
         <changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_changelog.xml</changelogurl>
         <infourl title="agosms">https://github.com/kriscox/Joomla-extension-balancirk/blob/master/README.md</infourl>
         <downloads>

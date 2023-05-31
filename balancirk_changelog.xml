@@ -1,2 +1,10 @@
 <changelogs>
+    <changelog>
+        <element>com_balancirk</element>
+        <type>component</type>
+        <version>1.1</version>
+        <fix>
+            <item>Fixed mobile view not displaying values for members and students.</item>
+        </fix>
+	</changelog>
 </changelogs>
