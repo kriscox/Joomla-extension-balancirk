@@ -28,7 +28,7 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 <div class="row">
 	<div class="col-md-12">
 		<nav aria-label="Toolbar">
-			<button class="button-new btn btn-success" type="button" onclick="location.href = 'index.php?option=com_balancirk&view=subscription';">
+			<button class="button-new btn btn-success" type="button" onclick="location.href = '/index.php?option=com_balancirk&view=subscription&layout=edit';">
 				<span class=" icon-new" aria-hidden="true"></span>
 				<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
 			</button>
@@ -56,13 +56,13 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 						</caption>
 						<thead>
 							<tr>
-								<th style="width:1%" class="text-center">
+								<th style="width:1%" class="text-center d-none">
 									<?= HTMLHelper::_('grid.checkall'); ?>
 								</th>
-								<th scope="col" class="text_center d-none d-md-table-cell">
+								<th scope="col" class="text_center d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_STUDENT', 'a.firstname', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col" class="text_center d-none d-md-table-cell">
+								<th scope="col" class="text_center d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_LESSON', 'a.lesson', $listDirn, $listOrder); ?>
 								</th>
 								<th scope="col" class="text_center d-none d-md-table-cell">
@@ -76,13 +76,13 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 
 							foreach ($this->items as $i => $item) : ?>
 								<tr class="row<?= $i % 2; ?>">
-									<td class="text-center">
+									<td class="text-center d-none">
 										<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
 									</td>
-									<td scope="row" class="d-none d-md-table-cell">
+									<td scope="row" class="d-md-table-cell">
 										<?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
 									</td>
-									<td scope="row" class="d-none d-md-table-cell">
+									<td scope="row" class="d-md-table-cell">
 										<?= $this->escape(addslashes($item->lesson)); ?>
 									</td>
 									<td scope="row" class="d-none d-md-table-cell">

@@ -56,13 +56,13 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 						</caption>
 						<thead>
 							<tr>
-								<td style="width:1%" class="text-center">
+								<td style="width:1%" class="text-center d-none">
 									<?= HTMLHelper::_('grid.checkall'); ?>
 								</td>
-								<th scope="col" class="text_center d-none d-md-table-cell">
+								<th scope="col" class="text_center d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_NAME', 'a.name', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col" class="text_center d-none d-md-table-cell">
+								<th scope="col" class="text_center d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_BIRTHDATE', 'a.birthdate', $listDirn, $listOrder); ?>
 								</th>
 							</tr>
@@ -73,12 +73,12 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 							foreach ($this->items as $i => $item) :
 							?>
 								<tr class="row<?= $i % 2; ?>">
-									<td class="text-center">
+									<td class="text-center d-none">
 										<?php if ($item->primary == 1) : ?>
 											<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
 										<?php endif; ?>
 									</td>
-									<td scope="row" class="d-none d-md-table-cell">
+									<td scope="row" class="d-md-table-cell">
 										<?php if ($item->primary == 1) : ?>
 											<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&task=student.edit&id=' . $item->id); ?>">
 												<?= $editIcon; ?><?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
@@ -89,7 +89,7 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 											</a>
 										<?php endif; ?>
 									</td>
-									<td scope="row" class="d-none d-md-table-cell">
+									<td scope="row" class="d-md-table-cell">
 										<?= HtmlHelper::date($item->birthdate, Text::_('DATE_FORMAT_FILTER_DATE')); ?>
 									</td>
 									<td class="article-status">
