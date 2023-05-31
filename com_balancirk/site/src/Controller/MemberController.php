@@ -74,7 +74,7 @@ class MemberController extends FormController
 		$form = $model->getForm($data, false);
 
 		// Set the default redirection url
-		$redirectUrl = Route::_('index.php?option=com_balancirk&view=member&layout=register', false);
+		$redirectUrl = Route::_('index.php?option=com_balancirk&view=member&layout=register&id=0', false);
 
 		// Validate data and fill form data cache
 		$validData = $model->validate($form, $data);
