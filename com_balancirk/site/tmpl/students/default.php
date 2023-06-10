@@ -26,10 +26,12 @@ $states = array(
 
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-students-top}'); ?>
 <div class="row">
 	<div class="col-md-12">
 		<nav aria-label="Toolbar">
-			<button class="button-new btn btn-success" type="button" onclick="Joomla.submitbutton('student.add')">
+			<button class="button-new btn btn-success" type="button" onclick="location.href='index.php?option=com_balancirk&view=student&layout=edit&id=0'">
 				<span class=" icon-new" aria-hidden="true"></span>
 				<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
 			</button>
@@ -92,9 +94,6 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 									<td scope="row" class="d-none d-md-table-cell">
 										<?= HtmlHelper::date($item->birthdate, Text::_('DATE_FORMAT_FILTER_DATE')); ?>
 									</td>
-									<td class="article-status">
-										<?= $states[$item->state]; ?>
-									</td>
 								</tr>
 							<?php endforeach; ?>
 						</tbody>
@@ -108,3 +107,5 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 		</div>
 	</div>
 </form>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-students-bottom}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

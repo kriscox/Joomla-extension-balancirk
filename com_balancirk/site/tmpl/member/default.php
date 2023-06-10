@@ -17,5 +17,10 @@ defined('_JEXEC') or die;
 	</h1>
 </div>
 
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-top}'); ?>
 
-Hello <?php echo $this->member;
+Hello <?php echo $this->member; ?>
+
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-bottom}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

@@ -9,7 +9,7 @@
     <authorUrl>https://cococo.be</authorUrl>
     <copyright>CoCoCo</copyright>
     <license>GPL v3</license>
-    <version>0.0.1</version>
+    <version>1.2</version>
     <description>COM_BALANCIRK_MODULE_DESCRIPTION</description>
 
     <!-- 
@@ -37,6 +37,31 @@
         <!-- <language tag="fr-BE">site/language/fr-BE/com_balancirk.ini</language> -->
         <language tag="en-GB">site/language/en-GB/com_balancirk.ini</language>
     </languages>
+
+	<positions>
+		<position>balancirk-top</position>
+		<position>balancirk-bottom</position>
+		<position>balancirk-member-top</position>
+		<position>balancirk-member-bottom</position>
+		<position>balancirk-member-edit-top</position>
+		<position>balancirk-member-edit-bottom</position>
+		<position>balancirk-member-register-top</position>
+		<position>balancirk-member-register-bottom</position>
+		<position>balancirk-members-top</position>
+		<position>balancirk-members-bottom</position>
+		<position>balancirk-student-top</position>
+		<position>balancirk-student-bottom</position>
+		<position>balancirk-student-edit-top</position>
+		<position>balancirk-student-edit-bottom</position>
+		<position>balancirk-students-top</position>
+		<position>balancirk-students-bottom</position>
+		<position>balancirk-subscription-top</position>
+		<position>balancirk-subscription-bottom</position>
+		<position>balancirk-subscription-delete-top</position>
+		<position>balancirk-subscription-delete-bottom</position>
+		<position>balancirk-subscriptions-top</position>
+		<position>balancirk-subscriptions-bottom</position>
+	</positions>
 
     <administration>
         <files folder="admin/">

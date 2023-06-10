@@ -25,10 +25,12 @@ $states = array(
 );
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-subscriptions-top}'); ?>
 <div class="row">
 	<div class="col-md-12">
 		<nav aria-label="Toolbar">
-			<button class="button-new btn btn-success" type="button" onclick="location.href = 'index.php?option=com_balancirk&view=subscription';">
+			<button class="button-new btn btn-success" type="button" onclick="location.href = 'index.php?option=com_balancirk&view=subscription&id=0';">
 				<span class=" icon-new" aria-hidden="true"></span>
 				<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
 			</button>
@@ -106,3 +108,5 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 		</div>
 	</div>
 </form>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-subscriptions-bottom}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

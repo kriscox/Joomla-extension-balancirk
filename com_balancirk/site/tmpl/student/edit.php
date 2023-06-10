@@ -27,7 +27,8 @@ HTMLHelper::_('behavior.formvalidator');
 HTMLHelper::_('behavior.keepalive');
 $listDirn  = $this->escape($this->state->get('list.direction'));
 ?>
-
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-student-edit-top}'); ?>
 <form action="<?= Route::_('index.php?option=com_balancirk&view=student&layout=edit&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="student-form" class="form-validate">
 
 	<?= LayoutHelper::render('student.fullname_state', $this); ?>
@@ -98,3 +99,5 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 		</div>
 	</div>
 </form>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-student-edit-bottom}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}');
