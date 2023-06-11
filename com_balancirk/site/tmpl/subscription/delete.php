@@ -34,6 +34,8 @@ HTMLHelper::_('behavior.keepalive');
 	</div>
 
 <?php else : ?>
+	<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
+	<?php echo JHtml::_('content.prepare', '{loadposition balancirk-subscription-delete-top}'); ?>
 	<form action="<?= Route::_('index.php?option=com_balancirk&view=subscription'); ?>" method="post" id="subscription-form" name="adminForm" class="form-validate">
 		<div class="col col-md-6">
 			<?= $this->form->getInput('student'); ?>
@@ -57,4 +59,6 @@ HTMLHelper::_('behavior.keepalive');
 		</div>
 
 	</form>
+	<?php echo JHtml::_('content.prepare', '{loadposition balancirk-subscription-delete-bottom}'); ?>
+	<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
 <?php endif; ?>

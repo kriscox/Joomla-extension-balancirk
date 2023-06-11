@@ -17,6 +17,8 @@ use Joomla\CMS\Layout\LayoutHelper;
 ?>
 
 <alert>Not yet implemented</alert>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-members-top}'); ?>
 <table class="table" id="memberList">
 	<thead>
 		<tr>
@@ -102,3 +104,5 @@ use Joomla\CMS\Layout\LayoutHelper;
 		<?php endforeach; ?>
 	</tbody>
 </table>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-members-bottom}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

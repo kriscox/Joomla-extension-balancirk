@@ -28,6 +28,8 @@ HTMLHelper::_('behavior.keepalive');
 
 ?>
 
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-edit-top}'); ?>
 <form action="<?= Route::_('index.php?option=com_balancirk&view=member&layout=edit') ?>" method="post" name="adminForm" id="member-form" class="form-validate">
 	<div>
 		<div class="row registration-form">
@@ -86,3 +88,5 @@ HTMLHelper::_('behavior.keepalive');
 	<input type="hidden" name="task" />
 	<?= HTMLHelper::_('form.token'); ?>
 </form>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-edit-bottom}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

@@ -23,5 +23,6 @@
             <option value="2">JARCHIVED</option>
             <option value="-2">JTRASHED</option>
         </field>
+		<field name="vignet" type="file" label="COM_BALANCIRK_TABLE_TABLEHEAD_VIGNET" directory="vignets/students" preview="true" filter="raw" accept="image/*" size="300000"/>
     </fieldset>
 </form>
