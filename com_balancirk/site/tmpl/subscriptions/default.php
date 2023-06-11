@@ -58,19 +58,19 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 						</caption>
 						<thead>
 							<tr>
-								<th style="width:1%" class="text-center">
+								<th style="width:1%" class="d-none text-center">
 									<?= HTMLHelper::_('grid.checkall'); ?>
 								</th>
-								<th scope="col" class="text_center d-none d-md-table-cell">
+								<th scope="col" class="text_center d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_STUDENT', 'a.firstname', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col" class="text_center d-none d-md-table-cell">
+								<th scope="col" class="text_center d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_LESSON', 'a.lesson', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col" class="text_center d-none d-md-table-cell">
+								<th scope="col" class="text_center d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_YEAR', 'a.year', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col" class="text_center d-none d-md-table-cell">
+								<th scope="col" class="text_center d-md-table-cell">
 									<?= Text::_('JDELETE'); ?>
 								</th>
 							</tr>
@@ -78,19 +78,19 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 
 							foreach ($this->items as $i => $item) : ?>
 								<tr class="row<?= $i % 2; ?>">
-									<td class="text-center">
+									<td class="text-center d-none">
 										<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
 									</td>
-									<td scope="row" class="d-none d-md-table-cell">
+									<td scope="row" class="d-md-table-cell">
 										<?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
 									</td>
-									<td scope="row" class="d-none d-md-table-cell">
+									<td scope="row" class="d-md-table-cell">
 										<?= $this->escape(addslashes($item->lesson)); ?>
 									</td>
-									<td scope="row" class="d-none d-md-table-cell">
+									<td scope="row" class="d-md-table-cell">
 										<?= $this->escape(addslashes($item->year)); ?>
 									</td>
-									<td scope="row" class="d-none d-md-table-cell">
+									<td scope="row" class="d-md-table-cell">
 										<button id='<?= $item->id ?>' type='submit' name='submit' value='<?= $item->id ?>'>
 											<span class="icon-purge" />
 										</button>

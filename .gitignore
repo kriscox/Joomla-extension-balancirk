@@ -1,4 +1,4 @@
-/.DS_Store
+	/.DS_Store
 /com_helloworld
 /com_helloworld.zip
 /joomla
@@ -9,3 +9,8 @@ com_balancirk.zip
 1.2.zip
 1.2.tar.gz
 .gitignore
+.Makefile.swp
+1.2.tar.gz
+1.2.zip
+com_balancirk.zip
+.DS_Store

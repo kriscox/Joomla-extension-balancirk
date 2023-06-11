@@ -26,6 +26,8 @@ $states = array(
 
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-students-top}'); ?>
 <div class="row">
 	<div class="col-md-12">
 		<nav aria-label="Toolbar">
