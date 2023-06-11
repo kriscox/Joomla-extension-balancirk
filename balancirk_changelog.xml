@@ -6,5 +6,13 @@
         <fix>
             <item>Fixed mobile view not displaying values for members and students.</item>
         </fix>
-	</changelog>
+    </changelog>
+    <changelog>
+        <element>com_balancirk</element>
+        <type>component</type>
+        <version>1.2</version>
+        <fix>
+            <item>Fixed minor bugs.</item>
+        </fix>
+    </changelog>
 </changelogs>
