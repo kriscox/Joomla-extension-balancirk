@@ -10,6 +10,7 @@
         <downloads>
             <downloadurl type="full" format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.0/com_balancirk.zip</downloadurl>
         </downloads>
+        <sha384></shdda384>
         <maintainer>CoCoCo</maintainer>
         <maintainerurl>http://www.cococo.be</maintainerurl>
         <targetplatform name="joomla" version="4.*"/>
@@ -26,6 +27,7 @@
         <downloads>
             <downloadurl type="full" format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.2/com_balancirk.zip</downloadurl>
         </downloads>
+        <sha256>b0e80e571c4032d369e8d727b310cf8e4002fa7b8fcbea462ca8b0382e636664</sha256>
         <maintainer>CoCoCo</maintainer>
         <maintainerurl>http://www.cococo.be</maintainerurl>
         <targetplatform name="joomla" version="4.*"/>
