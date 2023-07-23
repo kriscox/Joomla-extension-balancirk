@@ -7,5 +7,8 @@
         <action name="core.delete" title="COM_BALANCIRK_JACTION_EDIT_STATE" description="COM_BALANCIRK_JACTION_EDIT_STATE_DESC" />
 		<action name="core.edit" title="JACTION_EDIT" description="JACTION_EDIT_DESC" />
         <action name="core.edit.own" title="COM_BALANCIRK_JACTION_EDIT_STATE" description="COM_BALANCIRK_JACTION_EDIT_STATE_DESC" />
+		<action name="lessons.view" title="COM_BALANCIRK_JACTION_VIEW_LESSON" description="COM_BALANCIRK_JACTION_VIEW_LESSON_DESC" />
+		<action name="lessons.register" title="COM_BALANCIRK_JACTION_REGISTER_LESSON" description="COM_BALANCIRK_JACTION_REGISTER_LESSON_DESC" />
+		<action name="lessons.admin" title="COM_BALANCIRK_JACTION_ADMIN_LESSON" description="COM_BALANCIRK_JACTION_ADMIN_LESSON_DESC" />
 	</section>
 </access>

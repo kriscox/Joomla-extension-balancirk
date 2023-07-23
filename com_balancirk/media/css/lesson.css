@@ -1,0 +1,7 @@
+#details>div.row>div:first-child {
+	border-right-style: dashed;
+}
+
+div#jform {
+	padding: 10px;
+}

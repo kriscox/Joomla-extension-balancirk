@@ -30,6 +30,7 @@
     <media folder="media/"
         destination="com_balancirk">
         <folder>js</folder>
+		<folder>css</folder>
     </media> -->
 
     <languages>
@@ -133,11 +134,11 @@
         </sql>
     </uninstall>
 	   
-    <!-- <update>
+    <update>
         <schemas>
             <schemapath type="mysql">sql/updates/mysql</schemapath>
         </schemas>
-    </update> -->
+    </update> 
 
 	<scriptfile>script.php</scriptfile>
 

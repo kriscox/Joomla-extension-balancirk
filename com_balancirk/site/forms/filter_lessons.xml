@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+
+    <fields name="filter">
+        <field name="published" type="status" label="JOPTION_SELECT_PUBLISHED" onchange="this.form.submit();">
+            <option value="">JOPTION_SELECT_PUBLISHED</option>
+        </field>
+    </fields>
+
+	
+    <fields name="list">
+        <field name="fullordering" type="list" label="JGLOBAL_SORT_BY" default="a.name ASC" onchange="this.form.submit();">
+            <option value="">JGLOBAL_SORT_BY</option>
+            <option value="a.name ASC">COM_BALANCIRK_TABLE_SORT_NAME_ASC</option>
+            <option value="a.name DESC">COM_BALANCIRK_TABLE_SORT_NAME_DESC</option>
+            <option value="a.type ASC">COM_BALANCIRK_TABLE_SORT_TYPE_ASC</option>
+            <option value="a.type DESC">COM_BALANCIRK_TABLE_SORT_TYPE_DESC</option>
+            <option value="a.fee ASC">COM_BALANCIRK_TABLE_SORT_FEE_ASC</option>
+            <option value="a.fee DESC">COM_BALANCIRK_TABLE_SORT_FEE_DESC</option>
+            <option value="a.year ASC">COM_BALANCIRK_TABLE_SORT_YEAR_ASC</option>
+            <option value="a.year DESC">COM_BALANCIRK_TABLE_SORT_YEAR_DESC</option>
+            <option value="a.numberOfStudents ASC">COM_BALANCIRK_TABLE_SORT_SUBSCRIPTIONS_ASC</option>
+            <option value="a.numberOfStudents DESC">COM_BALANCIRK_TABLE_SORT_SUBSCRIPTIONS_DESC</option>
+            <option value="a.state ASC">COM_BALANCIRK_TABLE_SORT_STATE_ASC</option>
+            <option value="a.state DESC">COM_BALANCIRK_TABLE_SORT_STATE_DESC</option>
+        </field>
+    </fields>
+</form>
