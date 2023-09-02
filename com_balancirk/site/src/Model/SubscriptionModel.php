@@ -147,7 +147,7 @@ class SubscriptionModel extends AdminModel
 	public function getLessons()
 	{
 		/** @var lessonsModel */
-		$model = $this->getMVCFactory()->createModel('Lessons', 'Site');
+		$model = $this->getMVCFactory()->createModel('Lessons', 'Site', ['OpenSubscriptions' => true]);
 
 		return $model->getItems();
 	}

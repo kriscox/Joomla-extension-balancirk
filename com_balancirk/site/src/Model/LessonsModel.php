@@ -12,8 +12,10 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\MVC\Model\ListModel;
+use DateInterval;
+use Exception;
 use Joomla\Database\ParameterType;
+use Joomla\CMS\MVC\Model\ListModel;
 
 /**
  * LessonsModel class to display the list off lessons.
@@ -22,6 +24,9 @@ use Joomla\Database\ParameterType;
  */
 class LessonsModel extends ListModel
 {
+	/** @var boolean $openSubscriptions Only return lessons open for subscription */
+	protected $openSubscriptions = null;
+
 	/**
 	 * Constructor.
 	 *
@@ -40,12 +45,16 @@ class LessonsModel extends ListModel
 			$config['filter_fields'] = array(
 				'id', 'a.id',
 				'name', 'a.name',
-				'type', 't.name',
-				'fee', 'a.fee',
+				'type', 'a.type',
 				'year', 'a.year',
-				'state', 'a.state',
-				'numberOfStudents', 'a.numberOfStudents'
+				'numberOfStudents', 'a.numberOfStudents',
+				'state', 'a.state'
 			);
+		}
+
+		if (isset($config['OpenSubscriptions']) && $config['OpenSubscriptions'])
+		{
+			$this->openSubscriptions = $config['OpenSubscriptions'];
 		}
 
 		parent::__construct($config);
@@ -54,47 +63,28 @@ class LessonsModel extends ListModel
 	/**
 	 * Method to auto-populate the model state.
 	 *
-	 * Note. Calling getState in this method will result in recursion.
-	 *
-	 * @param   string  $ordering   An optional ordering field.
-	 * @param   string  $direction  An optional direction (asc|desc).
-	 *
+	 * @param   string $ordering  The name of the ordering field.
+	 * @param   string $direction The direction of ordering (asc|desc).
 	 * @return  void
-	 *
-	 * @since   0.0.1
+	 * @throws  Exception If the state is not an object.
 	 */
-	protected function populateState($ordering = 'a.id', $direction = 'asc')
+	protected function populateState($ordering = null, $direction = null)
 	{
+		$app = \JFactory::getApplication();
+
+		// Load the filter state.
 		$search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
+
 		$this->setState('filter.search', $search);
 
-		$published = $this->getUserStateFromRequest($this->context . '.filter.published', 'filter_published', '');
-		$this->setState('filter.published', $published);
-
 		// List state information.
-		parent::populateState($ordering, $direction);
-	}
+		parent::populateState('a.name', 'asc');
 
-	/**
-	 * Method to get a store id based on model configuration state.
-	 *
-	 * This is necessary because the model is used by the component and
-	 * different modules that might need different sets of data or different
-	 * ordering requirements.
-	 *
-	 * @param   string  $id  A prefix for the store id.
-	 *
-	 * @return  string  A store id.
-	 *
-	 * @since   0.0.1
-	 */
-	protected function getStoreId($id = '')
-	{
-		// Compile the store id.
-		$id .= ':' . $this->getState('filter.search');
-		$id .= ':' . $this->getState('filter.published');
+		// Set limit
+		$this->setState('list.limit', $_REQUEST['limit'] ?? 0);
 
-		return parent::getStoreId($id);
+		// Set start (eg. what record to begin pagination at)
+		$this->setState('list.start', $_REQUEST['limitstart'] ?? 0);
 	}
 
 	/**
@@ -118,22 +108,45 @@ class LessonsModel extends ListModel
 			$db->quoteName(
 				[
 					'a.id', 'a.name', 'a.type',
-					'a.fee', 'a.year', 'a.state', 'a.start', 'a.end',
-					'a.start_registration', 'a.end_registration', 'a.numberOfStudents'
+					'a.year', 'a.state', 'a.numberOfStudents'
 				],
 				[
 					'id', 'name', 'type',
-					'fee', 'year', 'state', 'start', 'end',
-					'start_registration', 'end_registration', 'numberOfStudents'
+					'year', 'state', 'numberOfStudents'
 				]
 			)
 		)
-			->from($db->quoteName('#__balancirk_lessons_complete', 'a'))
-			->where($db->quote($today) . ' between `start_registration` and `end_registration`');
+			->from($db->quoteName('#__balancirk_lessons_complete', 'a'));
 
-		// Add the list ordering clause.
-		$orderCol  = $this->state->get('list.ordering', 'a.name');
-		$orderDirn = $this->state->get('list.direction', 'ASC');
+		// Filter by search in title.
+		$search = $this->getState('filter.search');
+
+		if ($this->openSubscriptions)
+		{
+			$query->where($db->quote($today) . ' between `start_registration` and `end_registration`');
+		}
+		elseif (empty($search))
+		{
+			$query->where($db->quote(date('Y', strtotime($today . '- 5 months'))) . ' = `year`');
+		}
+		else
+		{
+			$search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
+			$query->where('(a.name LIKE ' . $search . ')');
+		}
+
+		// If class is made for field order by name
+		if ($this->openSubscriptions)
+		{
+			$orderCol = 'a.name';
+			$orderDirn = 'ASC';
+		}
+		else
+		{
+			// Add the list ordering clause.
+			$orderCol  = $this->state->get('list.ordering', 'a.name');
+			$orderDirn = $this->state->get('list.direction', 'ASC');
+		}
 
 		$query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
 

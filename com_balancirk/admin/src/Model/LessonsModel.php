@@ -137,6 +137,7 @@ class LessonsModel extends ListModel
 		$orderDirn = $this->state->get('list.direction', 'ASC');
 
 		$query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
+
 		return $query;
 	}
 

@@ -1,4 +1,7 @@
 <?php
+//phpcs:ignore Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine
+//phpcs:ignore Squiz.Arrays.ArrayDeclaration.CloseBraceNewLine
+
 
 /**
  * @package     Joomla.Site
@@ -10,9 +13,9 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Router\Route;
 use Joomla\CMS\Layout\LayoutHelper;
 
 $listOrder = $this->escape($this->state->get('list.ordering'));
@@ -21,14 +24,16 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 ?>
 
 <alert>Not yet implemented</alert>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-lessons-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-lessons-top}'); ?>
 <form action=" <?= Route::_('index.php?option=com_balancirk&view=lessons'); ?>" method="post" name="adminForm" id="adminForm">
+	<?= LayoutHelper::render('joomla.searchtools.bar', array('view' => $this)); ?>
 	<div class="row">
 		<nav aria-label="Toolbar" style="display: flex; align-items: center;">
-			<div class="col-md-6">
-				<?= LayoutHelper::render('lessons.filter', array('view' => $this)); ?>
-			</div>
+			<?= LayoutHelper::render(
+				'joomla.searchtools.default',
+				array('view' => $this)
+			); ?>
 		</nav>
 		<div class="col-md-12">
 			<div id="j-main-container" class="j-main-container">
@@ -38,38 +43,36 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 						<?= Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?>
 					</div>
 				<?php else : ?>
-					<table class="table" id="memberList">
+					<table class="table" id="lessonsList">
+						<caption>
+							<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_LESSONS'); ?>
+							<?= $this->pagination->get ?>
+						</caption>
 						<thead>
 							<tr>
-								<th scope="col" style="width:10px" class="hidden text-center d-none d-md-table-cell">
+								<th scope="col" class="hidden d-none d-md-table-cell">
 									<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_ID'); ?>
 								</th>
-								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
+								<th scope="col" class="d-none d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_NAME', 'a.name', $listDirn,  $listOrder); ?>
 								</th>
-								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
+								<th scope="col" class="d-none d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_TYPE', 'a.type', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
-									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_FEE', 'a.fee', $listDirn, $listOrder); ?>
-								</th>
-								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
+								<th scope="col" class="d-none d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_YEAR', 'a.year', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col" style="width:1%" class="text-center d-none d-md-table-cell">
+								<th scope="col" class="d-none d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_SUBSCRIPTIONS', 'a.numberOfStudents', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col" style="width:1%" class="text-center d-none d-md-table-cell">
+								<th scope="col" class="d-none d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_STATE', 'a.state', $listDirn, $listOrder); ?>
 								</th>
 							</tr>
 						</thead>
 						<tbody>
-							<?php
-							$n = count($this->items);
-
-							foreach ($this->items as $i => $item) :
-							?>
+							<?php $n = count($this->items);
+							foreach ($this->items as $i => $item) : ?>
 								<tr class="row<?= $i % 2; ?>">
 									<td class="hidden d-none d-md-table-cell text-center">
 										<?= $item->id; ?>
@@ -89,10 +92,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 										<?= $this->escape($item->type); ?>
 									</th>
 									<th scope="row" class="has-context">
-										<?= $this->escape($item->fee); ?>
-									</th>
-									<th scope="row" class="has-context">
-										<?= $this->escape($item->year) ?>
+										<?= $this->escape($item->year); ?>
 									</th>
 									<th scope="row" class="has-context">
 										<?= $this->escape($item->numberOfStudents); ?>
@@ -112,5 +112,5 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 			</div>
 		</div>
 	</div>
-	<?php echo JHtml::_('content.prepare', '{loadposition balancirk-lessons-bottom}'); ?>
-	<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
+	<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-lessons-bottom}'); ?>
+	<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

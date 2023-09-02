@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_lessons` (
     `start_registration` date NOT NULL,
     `end_registration` date NOT NULL,
     `state` char(15) NOT NULL,
+    `ordering` int(11) NOT NULL DEFAULT 0
     CONSTRAINT `fk_lesson_types`
         FOREIGN KEY (type)
             REFERENCES `#__balancirk_types` (id)
@@ -132,7 +133,8 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_lessons` (
 
 CREATE OR REPLACE VIEW `#__balancirk_lessons_complete` 
     AS SELECT a.`id`, a.`name`, b.`name` as `type`, a.`fee`, a.`year`, a.`start`, a.`end`, 
-            a.`start_registration`, a.`end_registration`, a.`state` 
+            a.`start_registration`, a.`end_registration`, a.`state`, 
+			(SELECT COUNT(*) FROM `#__balancirk_subscriptions` WHERE `lesson` = a.`id`) AS 'numberOfStudents'
             FROM `#__balancirk_lessons` a
                 INNER JOIN `#__balancirk_types` b
                     ON a.`type` = b.`id`;

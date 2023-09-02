@@ -46,7 +46,7 @@ class LessonsField extends ListField
 		$app = Factory::getApplication();
 
 		/** @var LessonsModel */
-		$lessonModel = new LessonsModel;
+		$lessonModel = new LessonsModel(['OpenSubscriptions' => true]);
 		$lessons = $lessonModel->getItems();
 
 		if (null == $lessons)
