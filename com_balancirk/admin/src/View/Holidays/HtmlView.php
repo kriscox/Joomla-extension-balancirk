@@ -17,6 +17,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomla\CMS\Application\CMSWebApplicationInterface;
 
 /**
  * View class for a list of holidays
@@ -34,6 +35,14 @@ class HtmlView extends BaseHtmlView
 	protected $items;
 
 	/**
+	 * Form object for the view.
+	 *
+	 * @var		$form;
+	 * @since	0.0.1
+	 */
+	protected $form;
+
+	/**
 	 * Method to display the view.
 	 *
 	 * @param   string $tpl A template file to load. [optional]
@@ -48,22 +57,6 @@ class HtmlView extends BaseHtmlView
 		$this->items = $this->get('Items');
 		$this->addToolbar();
 
-		// Add calendar JS to view
-		$document = Factory::getApplication()->getDocument()
-			->addScript('/media/com_balancirk/js/jquery.simple-calendar.min.js')
-			->addStyleSheet('/media/com_balancirk/js/simple-calendar.css')
-			->addScriptDeclaration('
-				jQuery(document).ready(function() {
-					let container = $("main").find("#holidayContainer").simpleCalendar({
-      					fixedStartDay: 0, // begin weeks by sunday
-      					disableEmptyDetails: true,
-      					events: ' . json_encode($this->items) . ',
-						insertCallback : () => {window.holidays = this.events},
-    				});
-    				$calendar = container.data("plugin_simpleCalendar")
-				});
-			');
-
 		parent::display($tpl);
 	}
 
@@ -77,14 +70,14 @@ class HtmlView extends BaseHtmlView
 	protected function addToolbar()
 	{
 		Factory::getApplication()->input->set('hidemainmenu', true);
-		$toolbar = Toolbar::getInstance();
+		$toolbar = Toolbar::getInstance('toolbar');
 
 		ToolbarHelper::title(
 			Text::_('COM_BALANCIRK_HOLIDAY_TITLE')
 		);
 
+		$toolbar->addNew('holidays.new');
 		$toolbar->apply('holidays.save');
-
 		$toolbar->cancel('holidays.cancel', 'JTOOLBAR_CLOSE');
 	}
 }

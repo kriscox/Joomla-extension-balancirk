@@ -21,7 +21,7 @@ use Joomla\CMS\Form\FormFactoryAwareInterface;
  *
  * @since  0.0.1
  */
-class HolidaysModel extends ListModel implements FormFactoryAwareInterface
+class HolidaysModel extends ListModel
 {
 	/**
 	 * The holiday alias for this content holiday.

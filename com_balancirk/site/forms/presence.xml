@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fieldset>
+		<field name="id"
+			type="hidden"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_ID"
+			class="readonly"
+			readonly="true" />
+		<field name="date"
+			type="list"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_DATES"
+			required="true">
+		</field>
+		<field name="students"
+			type="checkboxes"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_STUDENT"
+			required="true" />
+	</fieldset>
+</form>

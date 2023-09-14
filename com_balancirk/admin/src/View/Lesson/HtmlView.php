@@ -14,11 +14,12 @@ namespace CoCoCo\Component\Balancirk\Administrator\View\Lesson;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
-use Joomla\CMS\MVC\View\GenericDataException;
-use Joomla\CMS\Toolbar\ToolbarHelper;
-use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Toolbar\Toolbar;
+use Joomla\CMS\Helper\ContentHelper;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\MVC\View\GenericDataException;
+use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use CoCoCo\Component\Balancirk\Administrator\Model\LessonModel;
 
 /**
  * View class for a list of member
@@ -56,6 +57,20 @@ class HtmlView extends BaseHtmlView
 	protected $canDo;
 
 	/**
+	 * The hours a lesson is given
+	 * 
+	 * @var array
+	 */
+	protected $hours;
+
+	/**
+	 * The days a lesson is given
+	 *
+	 * @var array
+	 */
+	protected $lesdays;
+
+	/**
 	 * Display the view.
 	 *
 	 * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
@@ -67,6 +82,7 @@ class HtmlView extends BaseHtmlView
 		$this->form  = $this->get('Form');
 		$this->item = $this->get('Item');
 		$this->hours = $this->get('hours');
+		$this->form->bind(["lesdays_field" => LessonModel::getLesdays($this->item->lesdays)]);
 
 		if (count($errors = $this->get('Errors')))
 		{

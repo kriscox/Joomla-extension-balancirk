@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS `#__balancirk_teachers`;
 *  SQL script to remove table PRESENCES                                                           * 
 *                                                                                                 * 
 **************************************************************************************************/
+DROP VIEW IF EXISTS `#__balancirk_presences_view`;
 DROP TABLE IF EXISTS `#__balancirk_presences`;
 
 /**************************************************************************************************
@@ -19,13 +20,6 @@ DROP TABLE IF EXISTS `#__balancirk_presences`;
 **************************************************************************************************/
 DROP VIEW IF EXISTS `#__balancirk_subscriptions_view`;
 DROP TABLE IF EXISTS `#__balancirk_subscriptions`;
-
-/**************************************************************************************************
-*                                                                                                 * 
-*  SQL script to remove table HOURS                                                               * 
-*                                                                                                 * 
-**************************************************************************************************/
-DROP TABLE IF EXISTS `#__balancirk_hours`;
 
 /**************************************************************************************************
 *                                                                                                 * 

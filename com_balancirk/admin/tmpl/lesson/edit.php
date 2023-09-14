@@ -23,6 +23,7 @@ HTMLHelper::_('behavior.keepalive');
 <form action="<?= Route::_('index.php?option=com_balancirk&view=lesson&layout=edit&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="lesson-form" class="form-validate">
 
 	<?= LayoutHelper::render('joomla.edit.title_alias', $this); ?>
+	<?= $this->form->renderField('id'); ?>
 
 	<div>
 		<?= HTMLHelper::_('uitab.startTabSet', 'myTab', array('active' => 'details')); ?>
@@ -50,7 +51,7 @@ HTMLHelper::_('behavior.keepalive');
 
 		<?= HTMLHelper::_('uitab.addTab', 'myTab', 'adress', Text::_('COM_BALANCIRK_LESSON_TAB_DATES')); ?>
 		<div class="row">
-			<div class="col-md-12">
+			<div class="col-md-6">
 				<div class="row">
 					<div class="col-md-6">
 						<?= $this->form->renderField('start'); ?>
@@ -59,6 +60,10 @@ HTMLHelper::_('behavior.keepalive');
 						<?= $this->form->renderField('end_registration'); ?>
 					</div>
 				</div>
+			</div>
+			<div class="col-md-6">
+				<?= $this->form->getLabel('lesdays_field'); ?>
+				<?= $this->form->getInput('lesdays_field'); ?>
 			</div>
 		</div>
 		<?= HTMLHelper::_('uitab.endTab'); ?>

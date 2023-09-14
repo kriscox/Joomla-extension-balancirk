@@ -24,9 +24,6 @@ use Joomla\CMS\MVC\Model\ListModel;
  */
 class LessonsModel extends ListModel
 {
-	/** @var boolean $openSubscriptions Only return lessons open for subscription */
-	protected $openSubscriptions = null;
-
 	/**
 	 * Constructor.
 	 *
@@ -50,11 +47,6 @@ class LessonsModel extends ListModel
 				'numberOfStudents', 'a.numberOfStudents',
 				'state', 'a.state'
 			);
-		}
-
-		if (isset($config['OpenSubscriptions']) && $config['OpenSubscriptions'])
-		{
-			$this->openSubscriptions = $config['OpenSubscriptions'];
 		}
 
 		parent::__construct($config);
@@ -121,11 +113,7 @@ class LessonsModel extends ListModel
 		// Filter by search in title.
 		$search = $this->getState('filter.search');
 
-		if ($this->openSubscriptions)
-		{
-			$query->where($db->quote($today) . ' between `start_registration` and `end_registration`');
-		}
-		elseif (empty($search))
+		if (empty($search))
 		{
 			$query->where($db->quote(date('Y', strtotime($today . '- 5 months'))) . ' = `year`');
 		}
@@ -135,18 +123,9 @@ class LessonsModel extends ListModel
 			$query->where('(a.name LIKE ' . $search . ')');
 		}
 
-		// If class is made for field order by name
-		if ($this->openSubscriptions)
-		{
-			$orderCol = 'a.name';
-			$orderDirn = 'ASC';
-		}
-		else
-		{
-			// Add the list ordering clause.
-			$orderCol  = $this->state->get('list.ordering', 'a.name');
-			$orderDirn = $this->state->get('list.direction', 'ASC');
-		}
+		// Add the list ordering clause.
+		$orderCol  = $this->state->get('list.ordering', 'a.name');
+		$orderDirn = $this->state->get('list.direction', 'ASC');
 
 		$query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
 
@@ -166,5 +145,83 @@ class LessonsModel extends ListModel
 		$items = parent::getItems();
 
 		return $items;
+	}
+
+	/**
+	 * Method to get list of lessons open for subscription
+	 *
+	 * Lessons open for subscription.
+	 *
+	 * @return array
+	 **/
+	public function getOpenLessons()
+	{
+		// Create a new query object.
+		$db = $this->getDbo();
+		$query = $db->getQuery(true);
+
+		// Get the current date
+		$today = date("Y-m-d");
+
+		// Select the required fields from the table.
+		$query->select(
+			$db->quoteName(
+				[
+					'id', 'name', 'type',
+					'fee', 'year', 'state'
+				]
+			)
+		)
+			->from($db->quoteName('#__balancirk_lessons', 'a'))
+			->where($db->quote($today) . ' between `start_registration` and `end_registration`')
+			->order('name');
+
+		$rows = $db->setQuery($query)->loadObjectlist();
+
+		foreach ($rows as $row)
+		{
+			$lessons[$row->id] = $row->name;
+		}
+
+		return $lessons;
+	}
+
+	/**
+	 * Method to get list of current lessons 
+	 *
+	 * Current active lessons.
+	 *
+	 * @return array
+	 **/
+	public function getCurrentLessons()
+	{
+		// Create a new query object.
+		$db = $this->getDbo();
+		$query = $db->getQuery(true);
+
+		// Get the current date
+		$today = date("Y-m-d");
+
+		// Select the required fields from the table.
+		$query->select(
+			$db->quoteName(
+				[
+					'id', 'name', 'type',
+					'fee', 'year', 'state'
+				]
+			)
+		)
+			->from($db->quoteName('#__balancirk_lessons', 'a'))
+			->where($db->quote($today) . ' between `start` and `end`')
+			->order('name');
+
+		$rows = $db->setQuery($query)->loadObjectlist();
+
+		foreach ($rows as $row)
+		{
+			$lessons[$row->id] = $row->name;
+		}
+
+		return $lessons;
 	}
 }

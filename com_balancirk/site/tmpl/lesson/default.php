@@ -14,14 +14,6 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Layout\LayoutHelper;
 
-/**
- * @package	 Joomla.Site
- * @subpackage  com_balancirk
- *
- * @copyright   Copyright (C) 2022 CoCoCo. All rights reserved.
- * @license	 GNU General Public License version 3.
- */
-
 defined('_JEXEC') or die;
 
 HTMLHelper::_('behavior.formvalidator');
@@ -93,14 +85,38 @@ $url = Route::_('index.php?option=com_balancirk&view=lesson&layout=default&id=' 
 					<div class="col-md-4" id="label"> <?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_STATE') ?> </div>
 					<div class="col-md-8" id="value"> <?= $this->item->state ?> </div>
 				</div>
+				<div class="row" id="jform">
+					<div class="col-md-4" id="label_lesdagen"> <?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_LESDAYS') ?> </div>
+					<div class="col-md-8" id="value_lesdagen">
+						<?php if ($this->lesdays['Monday'] == 1) : ?>
+							<?= Text::_('MONDAY') ?>,
+						<?php endif ?>
+						<?php if ($this->lesdays['Tuesday'] == 1) : ?>
+							<?= Text::_('TUESDAY') ?>,
+						<?php endif ?>
+						<?php if ($this->lesdays['Wednesday'] == 1) : ?>
+							<?= Text::_('WEDNESDAY') ?>,
+						<?php endif ?>
+						<?php if ($this->lesdays['Thursday'] == 1) : ?>
+							<?= Text::_('THURSDAY') ?>,
+						<?php endif ?>
+						<?php if ($this->lesdays['Friday'] == 1) : ?>
+							<?= Text::_('FRIDAY') ?>,
+						<?php endif ?>
+						<?php if ($this->lesdays['Saturday'] == 1) : ?>
+							<?= Text::_('SATURDAY') ?>,
+						<?php endif ?>
+						<?php if ($this->lesdays['Sunday'] == 1) : ?>
+							<?= Text::_('SUNDAY') ?>
+						<?php endif ?>
+					</div>
+				</div>
 			</div>
 			<?= HTMLHelper::_('uitab.endTab'); ?>
-
 			<?= HTMLHelper::_('uitab.endTabSet'); ?>
+			<input type="hidden" name="task" value="">
+			<?= HTMLHelper::_('form.token'); ?>
 		</div>
-		<input type="hidden" name="task" value="">
-		<?= HTMLHelper::_('form.token'); ?>
-	</div>
 </form>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-lesson-bottom}'); ?>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

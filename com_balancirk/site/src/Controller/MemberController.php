@@ -11,10 +11,7 @@
 namespace CoCoCo\Component\Balancirk\Site\Controller;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Uri\Uri;
-use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
-use Joomla\CMS\String\PunycodeHelper;
 use Joomla\CMS\MVC\Controller\FormController;
 use CoCoCo\Component\Balancirk\Site\Model\MemberModel;
 

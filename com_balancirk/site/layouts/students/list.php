@@ -37,6 +37,12 @@ use Joomla\CMS\HTML\HTMLHelper;
 							<th scope="col" class="text_center d-md-table-cell">
 								<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_NAME'); ?>
 							</th>
+							<th scope="col" class="text_center d-md-table-cell">
+								<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_BIRTHDATE'); ?>
+							</th>
+							<th scope="col" class="text_center d-md-table-cell">
+								<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_PRESENT'); ?> : <?= date("d M Y"); ?>
+							</th>
 						</tr>
 					</thead>
 					<tbody>

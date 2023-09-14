@@ -18,6 +18,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Form\Form;
 use Joomla\CMS\Table\Table;
 use Jooma\CMS\CMSApplicationInterface;
+use Joomla\CMS\Application\CMSApplication;
 
 /**
  * Item model for lesson.
@@ -143,6 +144,7 @@ class LessonModel extends AdminModel
 	 */
 	protected function loadFormData()
 	{
+		/** @var CMSApplication $app*/
 		$app = Factory::getApplication();
 		$data = $app->getUserState('com_balancirk.edit.lesson.data', array());
 
@@ -183,5 +185,25 @@ class LessonModel extends AdminModel
 			->where($db->quoteName('lesson') . ' = ' . $lesson);
 
 		return $db->loadRowList();
+	}
+
+	/**
+	 * Method to get lesdays of timyint as an array
+	 * 
+	 * @param int lesdays Number representing days of lesson.
+	 *
+	 * @return string	string with the values of the days
+	 **/
+	public static function getLesdays($lesdays)
+	{
+		$returnvalue = "";
+		$returnvalue .= (64 == (64 & $lesdays) ? "64, " : "");
+		$returnvalue .= (32 == (32 & $lesdays) ? "32, " : "");
+		$returnvalue .= (16 == (16 & $lesdays) ? "16, " : "");
+		$returnvalue .= (8 == (8 & $lesdays) ? "8, " : "");
+		$returnvalue .= (4 == (4 & $lesdays) ? "4, " : "");
+		$returnvalue .= (2 == (2 & $lesdays) ? "2, " : "");
+		$returnvalue .= (1 == (1 & $lesdays) ? "1" : "");
+		return $returnvalue;
 	}
 }

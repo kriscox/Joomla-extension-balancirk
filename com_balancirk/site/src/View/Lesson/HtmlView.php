@@ -12,6 +12,7 @@ namespace CoCoCo\Component\Balancirk\Site\View\Lesson;
 
 \defined('_JEXEC') or die;
 
+use CoCoCo\Component\Balancirk\site\Model\LessonModel;
 use Exception;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\Helper\ContentHelper;
@@ -45,6 +46,13 @@ class HtmlView extends BaseHtmlView
 	 * @var  array	list of students
 	 */
 	protected $students;
+
+	/**
+	 * The lesson days list
+	 * 
+	 * @var  array	list of lesson days
+	 */
+	protected $lesdays;
 
 	/**
 	 * The model state
@@ -81,6 +89,7 @@ class HtmlView extends BaseHtmlView
 		$this->item = $this->get('Item');
 		$this->students = $this->get('Students');
 		$this->state = $this->get('State');
+		$this->lesdays = LessonModel::getLesdays($this->item->lesdays);
 
 		if (count($errors = $this->get('Errors')))
 		{

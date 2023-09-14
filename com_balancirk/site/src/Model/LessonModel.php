@@ -12,9 +12,12 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 
 \defined('_JEXEC') or die;
 
+use DateTime;
+use DatePeriod;
+use DateInterval;
 use Joomla\CMS\Factory;
-use Joomla\Database\ParameterType;
 use Joomla\CMS\MVC\Model\AdminModel;
+use CoCoCo\Component\Balancirk\Administrator\Model\HolidaysModel;
 
 /**
  * LessonsModel class to display the list off lessons.
@@ -53,6 +56,29 @@ class LessonModel extends AdminModel
 	{
 		// Get the form.
 		$form = $this->loadForm($this->typeAlias, 'lesson', ['control' => 'jform', 'load_data' => $loadData]);
+
+		if (empty($form))
+		{
+			return false;
+		}
+
+		return $form;
+	}
+
+	/**
+	 * Method to get the presence row form.
+	 *
+	 * @param	array   $data	    Data from the form.
+	 * @param	boolean $loadData   True if the form is to load its own data (default case), false if not.
+	 *
+	 * @return  \JForm|boolean  A \JForm object on success, false on failure
+	 *
+	 * @since   0.0.1
+	 */
+	public function getPresenceForm($data = [], $loadData = true)
+	{
+		// Get the form.
+		$form = $this->loadForm($this->typeAlias, 'presence', ['control' => 'jform', 'load_data' => $loadData]);
 
 		if (empty($form))
 		{
@@ -132,5 +158,86 @@ class LessonModel extends AdminModel
 		$app = Factory::getApplication();
 
 		return $app->getIdentity()()->authorise('lessons.admin', $this->option);
+	}
+
+	/**
+	 * Method to get lesdays of timyint as an array
+	 * 
+	 * @param int lesdays Number representing days of lesson.
+	 *
+	 * @return array
+	 **/
+	public static function getLesdays($lesdays)
+	{
+		$returnvalue = array();
+		$returnvalue["Monday"] = (64 == (64 & $lesdays) ? 1 : 0);
+		$returnvalue["Tuesday"] = (32 == (32 & $lesdays) ? 1 : 0);
+		$returnvalue["Wednesday"] = (16 == (16 & $lesdays) ? 1 : 0);
+		$returnvalue["Thursday"] = (8 == (8 & $lesdays) ? 1 : 0);
+		$returnvalue["Friday"] = (4 == (4 & $lesdays) ? 1 : 0);
+		$returnvalue["Saturday"] = (2 == (2 & $lesdays) ? 1 : 0);
+		$returnvalue["Sunday"] = (1 == (1 & $lesdays) ? 1 : 0);
+		return $returnvalue;
+	}
+
+	/**
+	 * Method to get the dates of the lessons based on startdate, enddate, lesdays and holidays
+	 * 
+	 * @param	date	$startDate	Starting date of the lessons
+	 * @param	date	$endDate	Ending date of the lessons
+	 * @param	array	$lesdays	An array of the days of the week the lessons take place
+	 * 
+	 * @return array dates of the lessons
+	 */
+	public static function getDates($start, $end, $lesday)
+	{
+		$period = new DatePeriod(new DateTime($start), new DateInterval('P1D'), new DateTime($end));
+		$dates = array();
+
+		foreach ($period as $date)
+		{
+			// TODO: Check if the date is a holiday
+
+			// Check if date is lesday
+			if ($lesday[$date->format('l')] === 1)
+			{
+				$dates[] = $date;
+			}
+		}
+
+		return $dates;
+	}
+
+	/** 
+	 * Method to save the presence of the students
+	 * 
+	 * @param	int		$id			Id of the lesson
+	 * @param	date	$date		Date of the lesson
+	 * @param	array	$students	An array of the students present
+	 * 
+	 * @return void
+	 */
+	public function savePresence($id, $date, $students)
+	{
+		$dbo = $this->getDbo();
+		$query = $dbo->getQuery(true);
+
+		// Delete all presences for this lesson
+		$query->delete($dbo->quoteName('#__balancirk_presences'))
+			->where($dbo->quoteName('lesson') . ' = ' . $id)
+			->where($dbo->quoteName('date') . ' = ' . $dbo->quote($date));
+		$dbo->setQuery($query);
+		$dbo->execute();
+
+		// Insert the new presences
+		foreach ($students as $student)
+		{
+			$query->clear();
+			$query->insert($dbo->quoteName('#__balancirk_presences'))
+				->columns($dbo->quoteName(['lesson', 'student', 'date']))
+				->values($id . ', ' . $student . ', ' . $dbo->quote($date));
+			$dbo->setQuery($query);
+			$dbo->execute();
+		}
 	}
 }
