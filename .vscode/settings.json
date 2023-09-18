@@ -1,0 +1,21 @@
+{
+  "phpfmt.detect_indent": true,
+  "html.format.indentInnerHtml": true,
+  "prettier.useTabs": true,
+  "phpfmt.indent_with_space": 0,
+  "editor.insertSpaces": false,
+  "editor.detectIndentation": false,
+	// PHPCS
+  "phpcs.enable":   true,
+"phpcs.standard": "Joomla",
+"phpfmt.enable_auto_align": true,
+"phpfmt.psr1": false,
+"phpfmt.smart_linebreak_after_curly": true,
+"phpfmt.visibility_order": true,
+"phpfmt.yoda": true,
+"phpfmt.passes": [
+"AllmanStyleBraces"
+],
+"intelephense.format.braces": "allman",
+"zenMode.hideLineNumbers": false
+}

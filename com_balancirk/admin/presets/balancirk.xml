@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<menu
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="urn:joomla.org"
+	xsi:schemaLocation="urn:joomla.org menu.xsd"
+	>
+	<menuitem
+		title="COM_BALANCIRK_ADMIN_MENU"
+		type="heading"
+		icon="none fa-regular fa-graduation-cap"
+		>
+		<menuitem
+			title="COM_BALANCIRK_LABEL_MEMBERS_OVERVIEW"
+			type="component"
+			element="com_balancirk"
+			link="index.php?option=com_balancirk&amp;view=members"
+			quicktask="index.php?option=com_balancirk&amp;task=member.add"
+			quicktask-title="COM_BALANCIRK_MENU_ADD_MEMBER"
+		/>
+		
+		<menuitem
+			title="COM_BALANCIRK_LABEL_STUDENTS_OVERVIEW"
+			type="component"
+			element="com_balancirk"
+			link="index.php?option=com_balancirk&amp;view=students"
+			quicktask="index.php?option=com_balancirk&amp;task=student.add"
+			quicktask-title="COM_BALANCIRK_MENU_ADD_STUDENT"
+		/>
+	</menuitem>
+
+	<menuitem
+		title="COM_BALANCIRK_MENU_LESSONS"
+		type="heading"
+		icon="none fas fa-school"
+		>
+		<menuitem
+			title="COM_BALANCIRK_LESSONS_OVERVIEW"
+			type="component"
+			element="com_balancirk"
+			link="index.php?option=com_balancirk&amp;view=lessons"
+			quicktask="index.php?option=com_balancirk&amp;task=lesson.add"
+			quicktask-title="COM_BALANCIRK_MENU_ADD_LESSON"
+		/>
+		<menuitem 
+			type="component" 
+			title="COM_BALANCIRK_TYPES_OVERVIEW" 
+			element="com_balancirk" 
+			link="index.php?option=com_balancirk&amp;view=types" 
+			quicktask="index.php?option=com_balancirk&amp;task=type.add"
+			quicktask-title="COM_BALANCIRK_MENU_ADD_TYPE"
+		/>
+		<menuitem 
+			type="component" 
+			title="COM_BALANCIRK_HOLIDAYS_OVERVIEW" 
+			element="com_balancirk" 
+			link="index.php?option=com_balancirk&amp;view=holidays" 
+			quicktask="index.php?option=com_balancirk&amp;task=holiday.add"
+			quicktask-title="COM_BALANCIRK_MENU_ADD_TYPE"
+		/>
+	</menuitem>
+</menu>

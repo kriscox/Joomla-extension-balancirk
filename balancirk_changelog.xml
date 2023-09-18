@@ -1,0 +1,28 @@
+<changelogs>
+	<changelog>
+		<element>com_balancirk</element>
+		<type>component</type>
+		<version>1.1</version>
+		<fix>
+			<item>Fixed mobile view not displaying values for members and students.</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>com_balancirk</element>
+		<type>component</type>
+		<version>1.2</version>
+		<fix>
+			<item>Fixed minor bugs.</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>com_balancirk</element>
+		<type>component</type>
+		<version>1.2.5</version>
+		<fix>
+			<item>Minor bug fixes.</item>
+			<item>Added view of lessons for teachers</item>
+			<item>Added presences part 1</item>
+		</fix>
+	</changelog>
+</changelogs>

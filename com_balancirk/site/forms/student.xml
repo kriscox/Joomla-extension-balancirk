@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+    <fieldset>
+        <field name="id" type="number" label="COM_BALANCIRK_TABLE_TABLEHEAD_ID" class="hidden" readonly="true" />
+        <field name="firstname" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_FIRSTNAME" maxlength="255" required="true" />
+        <field name="name" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_NAME" maxlength="255" required="true" />
+        <field name="email" type="email" label="COM_BALANCIRK_TABLE_TABLEHEAD_EMAIL" validate="email" />
+        <field name="street" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_STREET" maxlength="255" />
+        <field name="number" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_NUMBER" maxlength="10" />
+        <field name="bus" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_BUS" maxlength="10" />
+        <field name="postcode" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_POSTCODE" maxlength="10" />
+        <field name="city" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_MUNICIPALITY" maxlength="50" />
+        <field name="phone" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_PHONE" maxlength="15" />
+        <field name="birthdate" type="calendar" label="COM_BALANCIRK_TABLE_TABLEHEAD_BIRTHDATE" readonly="false" required="true" format="%d %b %Y" translateformat="true"/>
+		<field name="uitpas" type="text" label="COM_BALANCIRK_TABLE_TABLEHEAD_UITPAS" maxlength="13" minlenght="13" />
+		<field name="allow_photo" type="list" label="COM_BALANCIRK_TABLE_TABLEHEAD_ALLOW_PHOTO" default="1">
+			<option value="1">COM_BALANCIRK_ALLOW_PHOTO</option>
+			<option value="0">COM_BALANCIRK_DISALLOW_PHOTO</option>
+		</field>"
+		<field name="state" type="list" label="JSTATUS" default="1" class="custom-select-color-state" size="1">
+            <option value="1">COM_BALANCIRK_STATUS_UNSUBSCRIBED</option>
+            <option value="0">COM_BALANCIRK_STATUS_SUBSCRIBED</option>
+            <option value="2">JARCHIVED</option>
+            <option value="-2">JTRASHED</option>
+        </field>
+		<field name="vignet" type="file" label="COM_BALANCIRK_TABLE_TABLEHEAD_VIGNET" directory="vignets/students" preview="true" filter="raw" accept="image/*" size="300000"/>
+    </fieldset>
+</form>

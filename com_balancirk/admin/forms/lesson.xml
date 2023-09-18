@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fieldset>
+		<field name="id"
+			type="hidden"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_ID"
+			class="readonly"
+			readonly="true" />
+		<field name="name"
+			type="text"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_NAME"
+			maxlength="255"
+			required="true" />
+		<field name="type"
+			type="sql"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_TYPE"
+			required="true"
+			query="SELECT id, name FROM #__balancirk_types"
+			key_field="id"
+			value_field="name" />
+		<field name="fee"
+			type="number"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_FEE"
+			required="true" />
+		<field name="year"
+			type="number"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_YEAR"
+			maxlength="4"
+			required="true" />
+		<field name="start"
+			type="calendar"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_START"
+			maxlength="10"
+			required="true" />
+		<field name="end"
+			type="calendar"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_END"
+			maxlength="10"
+			required="true" />
+		<field name="start_registration"
+			type="calendar"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_START_REGISTRATION"
+			maxlength="10"
+			required="true" />
+		<field name="end_registration"
+			type="calendar"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_END_REGISTRATION"
+			maxlength="10"
+			required="true" />
+		<field name="lesdays_field"
+			type="checkboxes"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_LESDAYS"
+			required="true">
+			<option value="64">MONDAY</option>
+			<option value="32">TUESDAY</option>
+			<option value="16">WEDNESDAY</option>
+			<option value="8">THURSDAY</option>
+			<option value="4">FRIDAY</option>
+			<option value="2">SATURDAY</option>
+			<option value="1">SUNDAY</option>
+		</field>
+		<field name="state"
+			type="list"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_STATE"
+			default="1"
+			id="published"
+			class="custom-select-color-state"
+			size="1"
+			required="true">
+			<option value="1">COM_BALANCIRK_STATUS_CURRENT</option>
+			<option value="0">COM_BALANCIRK_STATUS_PAST</option>
+			<option value="2">COM_BALANCIRK_STATUS_NEXT</option>
+			<option value="-2">TRASHED</option>
+		</field>
+	</fieldset>
+</form>
