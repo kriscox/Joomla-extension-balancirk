@@ -1,1 +1,0 @@
-# Joomla-extension-balancirk
