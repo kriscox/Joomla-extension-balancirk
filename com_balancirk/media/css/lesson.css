@@ -3,5 +3,18 @@
 }
 
 div#jform {
-	padding: 10px;
+	padding: 5px 5px 5px 30px;
+}
+
+#jform_students {
+	display: flex;
+	flex-direction: column;
+}
+
+#jform_students>div {
+	padding: 5px 5px 5px 30px;
+}
+
+.balancirk_presence_button {
+	margin: 10px;
 }

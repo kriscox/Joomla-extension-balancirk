@@ -102,6 +102,10 @@ class LessonModel extends AdminModel
 		$dbo = $this->getDbo();
 		$query = $dbo->getQuery(true);
 
+		$today = new DateTime('now');
+		$startRange = date_sub($today, date_interval_create_from_date_string('7 days'));
+		$endRange = date_sub($today, date_interval_create_from_date_string('1 days'));
+
 		// Select the required fields from the table.
 		$query->select(
 			$dbo->quoteName(
@@ -117,9 +121,12 @@ class LessonModel extends AdminModel
 				]
 			)
 		)
+			->select('MAX(p.date) as last_presence')
 			->from($dbo->quoteName('#__balancirk_students', 'a'))
 			->join('INNER', $dbo->quoteName('#__balancirk_subscriptions', 's'), 's.student = a.id')
-			->where('s.lesson = ' . $this->getState('lesson.id'));
+			->join('LEFT', $dbo->quoteName('#__balancirk_presences', 'p'), 'p.student = a.id AND p.lesson = s.lesson')
+			->where('s.lesson = ' . $this->getState('lesson.id'))
+			->group('a.id', 'a.name', 'a.firstname', 'a.phone', 'a.email', 'a.birthdate', 'a.allow_photo', 'a.state');
 
 		$dbo->setQuery($query);
 
@@ -239,5 +246,55 @@ class LessonModel extends AdminModel
 			$dbo->setQuery($query);
 			$dbo->execute();
 		}
+	}
+
+	/**
+	 * Method to send mail to the parent	
+	 * 
+	 * @param	subject	Subject of the mail to be sent to the parent
+	 * @param	text	Text to be sent to the parent
+	 * 
+	 * @since	1.2.5
+	 */
+	protected function sendMail($lessonid, $subject, $text)
+	{
+		$mailAdresses = array();
+
+		// Get the mailadresses of the parents
+		$dbo = $this->getDbo();
+		$query = $dbo->getQuery(true);
+		$query->select($dbo->quoteName('p.email'))
+			->from('#__balancirk_subscriptions', 's')
+			->join('INNER', $dbo->quoteName('#__balancirk_parents', 'p'), 'p.id = s.parent')
+			->where($dbo->quoteName('s.lesson') . ' = ' . $dbo->quote($lessonid));
+		$dbo->setQuery($query);
+		$mailAdresses[] = $dbo->loadResult();
+
+		// Get the mailadresses of the teachers
+		$query->clear();
+		$query->select($dbo->quoteName('m.email'))
+			->from($dbo->quoteName('#__balancirk_members', 'm'))
+			->join('INNER', $dbo->quoteName('#__balancirk_teachers', 't'), 't.member = m.id')
+			->where($dbo->quoteName('t.les') . ' = ' . $dbo->quote($lessonid));
+		$dbo->setQuery($query);
+		$mailAdresses[] = $dbo->loadResult();
+
+		// Get the mailadresses of the students
+		$query->clear();
+		$query->select($dbo->quoteName('s.email'))
+			->from('#__balancirk_subscriptions', 'l')
+			->join('INNER', $dbo->quoteName('#__balancirk_students', 's'), 's.id = l.student')
+			->where($dbo->quoteName('l.lesson') . ' = ' . $dbo->quote($this->getState('lesson.student')));
+		$dbo->setQuery($query);
+		$mailAdresses[] = $dbo->loadResult();
+
+		// Send mail
+		$mailer = Factory::getMailer();
+		$mailer->setSender('info@balancirk.be', 'Balancirk Lesgevers')
+			->addRecipient($mailAdresses)
+			->addCc('rudi@balancirk.be', 'kris@balancirk.be')
+			->setSubject('Balancirk - Les ' . $this->getState('lesson.name') . ':  ' . $subject)
+			->setBody($text)
+			->Send();
 	}
 }

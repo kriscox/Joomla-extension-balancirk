@@ -41,7 +41,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 								<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_BIRTHDATE'); ?>
 							</th>
 							<th scope="col" class="text_center d-md-table-cell">
-								<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_PRESENT'); ?> : <?= date("d M Y"); ?>
+								<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_LAST_PRESENT'); ?>
 							</th>
 						</tr>
 					</thead>
@@ -59,6 +59,13 @@ use Joomla\CMS\HTML\HTMLHelper;
 								</td>
 								<td scope="row" class="d-md-table-cell">
 									<?= HtmlHelper::date($student->birthdate, Text::_('DATE_FORMAT_FILTER_DATE')); ?>
+								</td>
+								<td scope="row" class="d-md-table-cell">
+									<? if ($student->last_presence === null) :
+										echo Text::_('COM_BALANCIRK_LESSON_NEVER');
+									else :
+										echo HtmlHelper::date($student->last_presence, Text::_('DATE_FORMAT_FILTER_DATE'));
+									endif; ?>
 								</td>
 							</tr>
 						<?php endforeach; ?>

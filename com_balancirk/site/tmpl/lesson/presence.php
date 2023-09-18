@@ -8,6 +8,7 @@
  * @license     GNU General Public License version 3.
  */
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -17,6 +18,13 @@ defined('_JEXEC') or die;
 
 HTMLHelper::_('behavior.formvalidator');
 HTMLHelper::_('behavior.keepalive');
+
+/** @var Joomla\CMS\Application $app */
+$app = Factory::getApplication();
+
+/** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
+$wa = $app->getDocument()->getWebAssetManager();
+$wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css');
 
 $lesdays = LessonModel::getDates($this->item->start, $this->item->end, LessonModel::getLesdays($this->item->lesdays));
 $students = $this->get('Students');
@@ -40,30 +48,30 @@ $url = Route::_('index.php?option=com_balancirk&view=lesson');
 
 <?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
 <?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-edit-top}'); ?>
-<<form action="<?= $url ?>" method="POST" name="adminForm" id="presence-form" class="form-validate">
+<form action="<?= $url ?>" method="POST" name="adminForm" id="presence-form" class="form-validate">
 	<div class="row">
 		<div class="col-md-12">
 			<h3><?= Text::_('COM_BALANCIRK_LESSONS_PRESENCES'); ?><?= $this->item->name ?></h3>
 			<?= $form->renderField('id'); ?>
 			<?= $form->renderField('date'); ?>
-			<?= $form->getInput('selected_dates'); ?>
+			<?= $form->getInput('students'); ?>
 			<input type="hidden" name="task" />
 		</div>
 		<?= HTMLHelper::_('form.token'); ?>
 
 		<div class="row title-alias form-vertical mb-3">
 			<div class="col-12 col-md-6">
-				<button type="button" class="balancirk_button" onclick="Joomla.submitbutton('lesson.presence')">
+				<button type="button" class="balancirk_button balancirk_presence_button" onclick="Joomla.submitbutton('lesson.presence')">
 					<?= Text::_('JSAVE') ?>
 				</button>
 			</div>
 			<div class="col-12 col-md-6">
-				<button type="button" class="balancirk_button" onclick="Joomla.submitbutton('lesson.cancel')">
+				<button type="button" class="balancirk_button balancirk_presence_button" onclick="Joomla.submitbutton('lesson.cancel')">
 					<span class="icon-cancel"> <?= Text::_('JCANCEL') ?></span>
 				</button>
 			</div>
 		</div>
 	</div>
-	</form>
-	<?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-edit-bottom}'); ?>
-	<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
+</form>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-edit-bottom}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
