@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component"
+	method="upgrade">
+	<!-- 'version' attribute for extension tag is no longer used -->
+
+	<name>Balancirk</name>
+	<creationDate>March 2022</creationDate>
+	<author>Kris Cox</author>
+	<authorUrl>https://cococo.be</authorUrl>
+	<copyright>CoCoCo</copyright>
+	<license>GPL v3</license>
+	<version>1.2.5</version>
+	<description>COM_BALANCIRK_MODULE_DESCRIPTION</description>
+
+	<!-- This is the PHP namespace under which the extension's
+    	code is organised. It should follow this format:
+
+        CoCoCo\Component\balancirk 
+
+		"Vendor" can be your company or your own name
+
+		The "ComponentName" section MUST match the name used 
+ 		everywhere else for your component. Whatever the name of 
+		this XML file is, the namespace must match (ignoring CamelCase). 
+   		-->
+	<namespace path="src/">CoCoCo\Component\Balancirk</namespace>
+
+	<files folder="site/">
+		<folder>language</folder>
+		<folder>src</folder>
+		<folder>tmpl</folder>
+		<folder>forms</folder>
+		<folder>layouts</folder>
+	</files>
+
+	<languages>
+		<language tag="nl-BE">site/language/nl-BE/com_balancirk.ini</language>
+		<!-- <language tag="fr-BE">site/language/fr-BE/com_balancirk.ini</language> -->
+		<language tag="en-GB">site/language/en-GB/com_balancirk.ini</language>
+	</languages>
+
+	<media folder="media/"
+		destination="com_balancirk">
+		<folder>js</folder>
+		<folder>css</folder>
+	</media> -->
+
+	<positions>
+		<position>balancirk-top</position>
+		<position>balancirk-bottom</position>
+		<position>balancirk-member-top</position>
+		<position>balancirk-member-bottom</position>
+		<position>balancirk-member-edit-top</position>
+		<position>balancirk-member-edit-bottom</position>
+		<position>balancirk-member-register-top</position>
+		<position>balancirk-member-register-bottom</position>
+		<position>balancirk-members-top</position>
+		<position>balancirk-members-bottom</position>
+		<position>balancirk-student-top</position>
+		<position>balancirk-student-bottom</position>
+		<position>balancirk-student-edit-top</position>
+		<position>balancirk-student-edit-bottom</position>
+		<position>balancirk-students-top</position>
+		<position>balancirk-students-bottom</position>
+		<position>balancirk-subscription-top</position>
+		<position>balancirk-subscription-bottom</position>
+		<position>balancirk-subscription-delete-top</position>
+		<position>balancirk-subscription-delete-bottom</position>
+		<position>balancirk-subscriptions-top</position>
+		<position>balancirk-subscriptions-bottom</position>
+	</positions>
+
+	<administration>
+		<files folder="admin/">
+			<!-- <folder>tables</folder> -->
+			<folder>language</folder>
+			<folder>services</folder>
+			<folder>src</folder>
+			<folder>tmpl</folder>
+			<folder>sql</folder>
+			<folder>forms</folder>
+			<folder>layouts</folder>
+			<folder>presets</folder>
+			<!-- <filename>..\balancirk.xml</filename> -->
+			<filename>access.xml</filename>
+			<filename>config.xml</filename>
+		</files>
+
+		<languages>
+			<language tag="en-GB">admin/language/en-GB/com_balancirk.ini</language>
+			<language tag="en-GB">admin/language/en-GB/com_balancirk.sys.ini</language>
+		</languages>
+
+		<menu img="class:comment">
+			COM_BALANCIRK_ADMIN_MENU
+			<params>
+				<dashboard>com_balancirk.dashboard</dashboard>
+			</params>
+		</menu>
+		<submenu>
+			<menu link="option=com_balancirk&amp;view=students">
+				COM_BALANCIRK_LABEL_STUDENTS_OVERVIEW
+				<params>
+					<menu-quicktask-title>COM_BALANCIRK_LABEL_STUDENTS_OVERVIEW</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_balancirk&amp;view=student&amp;layout=edit</menu-quicktask>
+				</params>
+			</menu>
+			<menu link="option=com_balancirk&amp;view=members">
+				COM_BALANCIRK_LABEL_MEMBERS_OVERVIEW
+				<params>
+					<menu-quicktask-title>COM_BALANCIRK_LABEL_MEMBERS_OVERVIEW</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_balancirk&amp;view=member&amp;layout=edit</menu-quicktask>
+				</params>
+			</menu>
+			<menu link="option=com_balancirk&amp;view=lessons">
+				COM_BALANCIRK_LABEL_LESSONS_OVERVIEW
+				<params>
+					<menu-quicktask-title>COM_BALANCIRK_LABEL_LESSONS_OVERVIEW</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_balancirk&amp;view=lesson&amp;layout=edit</menu-quicktask>
+				</params>
+			</menu>
+		</submenu>
+	</administration>
+
+	<dashboards>
+		<dashboard title="COM_BALANCIRK_DASHBOARD_TITLE"
+			icon="none fa-regular fa-graduation-cap">com_balancirk.dashboard</dashboard>
+	</dashboards>
+
+	<api>
+		<files folder="api">
+			<folder>src</folder>
+		</files>
+	</api>
+
+	<install>
+		<sql>
+			<file driver="mysql"
+				charset="utf8">sql/install.mysql.utf8.sql</file>
+		</sql>
+	</install>
+
+	<uninstall>
+		<sql>
+			<file driver="mysql"
+				charset="utf8">sql/uninstall.mysql.utf8.sql</file>
+		</sql>
+	</uninstall>
+
+	<update>
+		<schemas>
+			<schemapath type="mysql">sql/updates/mysql</schemapath>
+		</schemas>
+	</update>
+
+	<scriptfile>script.php</scriptfile>
+
+	<changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_changelog.xml</changelogurl>
+
+	<updateservers>
+		<server type="extension"
+			name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_update.xml</server>
+	</updateservers>
+
+</extension>

@@ -1,0 +1,1 @@
+all: $(shell find . -type f)

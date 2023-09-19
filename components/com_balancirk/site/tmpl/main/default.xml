@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <metadata>
+        <!-- <layout title="COM_HELLOWORLD_MENU_HELLO_WORLD_TITLE">
+            <message><![CDATA[COM_HELLOWORLD_MENU_HELLO_WORLD_DESC]]></message>
+        </layout> -->
+
+        <layout title="Menu Item for Main view">
+            <message><![CDATA[My first Joomla! page]]></message>
+        </layout> 
+    </metadata>
+    

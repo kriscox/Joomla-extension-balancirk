@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="library" method="upgrade" version="4.0">
+    <name>Joomlaology Tools Library</name>
+    <libraryname>joomlaology</libraryname>
+    <files>
+        <folder>classes</folder>
+        <folder>traits</folder>
+    </files>
+</extension>

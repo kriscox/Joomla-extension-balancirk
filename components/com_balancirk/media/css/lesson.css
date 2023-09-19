@@ -1,0 +1,20 @@
+#details>div.row>div:first-child {
+	border-right-style: dashed;
+}
+
+div#jform {
+	padding: 5px 5px 5px 30px;
+}
+
+#jform_students {
+	display: flex;
+	flex-direction: column;
+}
+
+#jform_students>div {
+	padding: 5px 5px 5px 30px;
+}
+
+.balancirk_presence_button {
+	margin: 10px;
+}
