@@ -1,35 +1,31 @@
 <?php
-    namespace CoCoCo\Component\Balancirk\Site\Controller;
-    defined('_JEXEC') or die;
 
-    use Joomla\CMS\MVC\Controller\BaseController;
-    use Joomla\CMS\Factory;
+namespace CoCoCo\Component\Balancirk\Site\Controller;
 
-    /**
-    * @package     Joomla.Site
-    * @subpackage  com_balancirk
-    *
-    * @copyright   CoCoCo
-    * @license     Copyright (C)  2022 GPL v2 All rights reserved.
-    */
+defined('_JEXEC') or die;
 
-    /**
-    * Balancirk Component Controller
-    * @since  1.2.5
-    */
-    class DisplayController extends BaseController {
+use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Factory;
 
-        public function display($cachable = false, $urlparams = array()) {
-            $document = Factory::getDocument();
-            $viewName = $this->input->getCmd('view', 'login');
-            $viewFormat = $document->getType();
+/**
+ * @package     Joomla.Site
+ * @subpackage  com_balancirk
+ *
+ * @copyright   CoCoCo
+ * @license     Copyright (C)  2022 GPL v2 All rights reserved.
+ */
 
-            $view = $this->getView($viewName, $viewFormat);
-            $view->setModel($this->getModel('Message'), true);
+/**
+ * Balancirk Component Controller
+ * @since  1.2.5
+ */
+class DisplayController extends BaseController
+{
 
-            $view->document = $document;
-            $view->display();
-        }
+    public function display($cachable = false, $urlparams = array())
+    {
+        parent::display($cachable, $urlparams);
 
+        return $this;
     }
-    
+}

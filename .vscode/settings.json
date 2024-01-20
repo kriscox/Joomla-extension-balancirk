@@ -1,0 +1,11 @@
+{
+	"makefile.buildBeforeLaunch": false,
+	"makefile.configureAfterCommand": false,
+	"makefile.configureOnEdit": false,
+	"makefile.configureOnOpen": false,
+	"makefile.dryrunSwitches": [
+		"--always-make",
+		"--print-directory"
+	],
+	"makefile.makefilePath": "Makefile"
+}

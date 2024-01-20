@@ -89,7 +89,7 @@ class LessonsModel extends ListModel
 	protected function getListQuery()
 	{
 		// Create a new query object.
-		$db = $this->getDbo();
+		$db = $this->getDatabase();
 		$query = $db->getQuery(true);
 
 		// Get the current date
@@ -157,7 +157,7 @@ class LessonsModel extends ListModel
 	public function getOpenLessons()
 	{
 		// Create a new query object.
-		$db = $this->getDbo();
+		$db = $this->getDatabase();
 		$query = $db->getQuery(true);
 
 		// Get the current date
@@ -196,7 +196,7 @@ class LessonsModel extends ListModel
 	public function getCurrentLessons()
 	{
 		// Create a new query object.
-		$db = $this->getDbo();
+		$db = $this->getDatabase();
 		$query = $db->getQuery(true);
 
 		// Get the current date

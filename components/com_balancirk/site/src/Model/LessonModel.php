@@ -17,6 +17,7 @@ use DatePeriod;
 use DateInterval;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\AdminModel;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 use CoCoCo\Component\Balancirk\Administrator\Model\HolidaysModel;
 
 /**
@@ -89,6 +90,35 @@ class LessonModel extends AdminModel
 	}
 
 	/**
+	 * Method to get the presencesList of this lesson
+	 * 
+	 * List of the presences of the students for this lesson
+	 * 
+	 * @return array 	an array of students and dates
+	 */
+	public function getPresences()
+	{
+		// Create a new query object
+		$dbo = $this->getDatabase();
+		$query = $dbo->getQuery(true);
+
+		// Select the required fields from the table
+		$query->select(
+			$dbo->quoteName(
+				[
+					'student', 'date'
+				]
+			)
+		)
+			->from($dbo->quoteName('#__balancirk_presences', 'a'))
+			->where($dbo->quoteName('lesson') . ' = ' . $dbo->quote($this->getState('lesson.id')));
+
+		$dbo->setQuery($query);
+
+		return $dbo->loadObjectList();
+	}
+
+	/**
 	 * Method to get the studentslist
 	 *
 	 * List of the students currently subscribed to the lesson
@@ -99,7 +129,7 @@ class LessonModel extends AdminModel
 	public function getStudents()
 	{
 		// Create a new query object.
-		$dbo = $this->getDbo();
+		$dbo = $this->getDatabase();
 		$query = $dbo->getQuery(true);
 
 		$today = new DateTime('now');
@@ -226,7 +256,7 @@ class LessonModel extends AdminModel
 	 */
 	public function savePresence($id, $date, $students)
 	{
-		$dbo = $this->getDbo();
+		$dbo = $this->getDatabase();
 		$query = $dbo->getQuery(true);
 
 		// Delete all presences for this lesson
@@ -261,7 +291,7 @@ class LessonModel extends AdminModel
 		$mailAdresses = array();
 
 		// Get the mailadresses of the parents
-		$dbo = $this->getDbo();
+		$dbo = $this->getDatabase();
 		$query = $dbo->getQuery(true);
 		$query->select($dbo->quoteName('p.email'))
 			->from('#__balancirk_subscriptions', 's')
@@ -289,7 +319,8 @@ class LessonModel extends AdminModel
 		$mailAdresses[] = $dbo->loadResult();
 
 		// Send mail
-		$mailer = Factory::getMailer();
+		$mailer =
+			Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
 		$mailer->setSender('info@balancirk.be', 'Balancirk Lesgevers')
 			->addRecipient($mailAdresses)
 			->addCc('rudi@balancirk.be', 'kris@balancirk.be')

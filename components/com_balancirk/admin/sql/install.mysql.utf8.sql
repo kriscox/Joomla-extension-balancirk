@@ -18,12 +18,12 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_members_additional` (
 );
 
 /* Add dummy data for tests. Must be removed afterwards */
-INSERT INTO `#__balancirk_members_additional` (
-    `id`, `firstname`, `street`, `number`, `bus`, 
-    `postcode`, `city`, `phone`
-) VALUES
-('156', 'Kris', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32478260721'),
-('157', 'Nora', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32456354336');
+-- INSERT INTO `#__balancirk_members_additional` (
+--     `id`, `firstname`, `street`, `number`, `bus`, 
+--     `postcode`, `city`, `phone`
+-- ) VALUES
+-- ('156', 'Kris', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32478260721'),
+-- ('157', 'Nora', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32456354336');
 
 CREATE OR REPLACE VIEW `#__balancirk_members` 
     AS SELECT u.* , m.firstname, m.street, m.number, m.bus, m.postcode, m.city,
@@ -57,12 +57,12 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_students` (
 );
 
 /* Add dummy data for tests. Must be removed afterwards */
-INSERT INTO `#__balancirk_students` (
-    `id`, `firstname`, `name`, `street`, `number`, `bus`, 
-    `postcode`, `city`, `phone`, `email`, `birthdate`, `state`
-) VALUES
-('1', 'Kris', 'Cox', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32478260721', 'cox.kris@gmail.com', '1973-10-09', '1'),
-('2', 'Nora', 'Cox', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32456354336', 'cox.nora@gmail.com', '2009-11-01', '1');
+-- INSERT INTO `#__balancirk_students` (
+--     `id`, `firstname`, `name`, `street`, `number`, `bus`, 
+--     `postcode`, `city`, `phone`, `email`, `birthdate`, `state`
+-- ) VALUES
+-- ('1', 'Kris', 'Cox', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32478260721', 'cox.kris@gmail.com', '1973-10-09', '1'),
+-- ('2', 'Nora', 'Cox', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32456354336', 'cox.nora@gmail.com', '2009-11-01', '1');
 
 /**************************************************************************************************
 *                                                                                                 * 
@@ -84,11 +84,11 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_parents` (
             REFERENCES `#__balancirk_students` (id)
 );
 
-INSERT INTO `#__balancirk_parents` (
-    `parent`, `child`, `primary`
-) VALUES
-    (156, 1, 1),
-    (156, 2, 0);
+-- INSERT INTO `#__balancirk_parents` (
+--     `parent`, `child`, `primary`
+-- ) VALUES
+--     (156, 1, 1),
+--     (156, 2, 0);
 
 /**************************************************************************************************
 *                                                                                                 * 
@@ -101,12 +101,12 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_types` (
     `name` varchar(40) NOT NULL
 );
 
-INSERT INTO `#__balancirk_types`(
-	`id`, `name`
-)
-	VALUES (
-		1, 'Jaarmodule'
-	);
+-- INSERT INTO `#__balancirk_types`(
+-- 	`id`, `name`
+-- )
+-- 	VALUES (
+-- 		1, 'Jaarmodule'
+-- 	);
 
 /**************************************************************************************************
 *                                                                                                 * 
@@ -126,24 +126,16 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_lessons` (
     `end_registration` date NOT NULL,
 	`lesdays` int(11) DEFAULT NULL COMMENT '64 = maandag, \n32 = dinsdag, \n16 = woensdag, \n8 = donderdag, \n4 = vrijdag, \n2 = zaterdag, \n1 = zondag',
     `state` char(15) NOT NULL,
-    `ordering` int(11) NOT NULL DEFAULT 0
+    `ordering` int(11) NOT NULL DEFAULT 0,
     CONSTRAINT `fk_lesson_types`
-        FOREIGN KEY (type)
+        FOREIGN KEY (`type`)
             REFERENCES `#__balancirk_types` (id)
 );
 
-CREATE OR REPLACE VIEW `#__balancirk_lessons_complete` 
-    AS SELECT a.`id`, a.`name`, b.`name` as `type`, a.`fee`, a.`year`, a.`start`, a.`end`, 
-            a.`start_registration`, a.`end_registration`, a.`state`, a.`lesdays`,
-			(SELECT COUNT(*) FROM `#__balancirk_subscriptions` WHERE `lesson` = a.`id`) AS 'numberOfStudents'
-            FROM `#__balancirk_lessons` a
-                INNER JOIN `#__balancirk_types` b
-                    ON a.`type` = b.`id`;
-
-INSERT INTO `#__balancirk_lessons` (
-	`id`, `name`, `type`, `fee` , `year`, `start`, `end`, `start_registration`, `end_registration`, `state`
-)
-	VALUES (1, 'Multi', 1, 210, 2022, '2022-09-15', '2023-05-29', '2022-06-01', '2022-12-31', 1);
+-- INSERT INTO `#__balancirk_lessons` (
+-- 	`id`, `name`, `type`, `fee` , `year`, `start`, `end`, `start_registration`, `end_registration`, `state`
+-- )
+-- 	VALUES (1, 'Multi', 1, 210, 2022, '2022-09-15', '2023-05-29', '2022-06-01', '2022-12-31', 1);
 
 /**************************************************************************************************
 *                                                                                                 * 
@@ -174,17 +166,25 @@ CREATE OR REPLACE VIEW `#__balancirk_subscriptions_view`
 			INNER JOIN `#__balancirk_students` as t
 				on s.`student` = t.`id`;
 
-INSERT INTO `#__balancirk_subscriptions` (
-	`id`, `lesson`, `student`
-)
-	VALUES(1, 1, 2);
+CREATE OR REPLACE VIEW `#__balancirk_lessons_complete` 
+    AS SELECT a.`id`, a.`name`, b.`name` as `type`, a.`fee`, a.`year`, a.`start`, a.`end`, 
+            a.`start_registration`, a.`end_registration`, a.`state`, a.`lesdays`,
+			(SELECT COUNT(*) FROM `#__balancirk_subscriptions` WHERE `lesson` = a.`id`) AS 'numberOfStudents'
+            FROM `#__balancirk_lessons` a
+                INNER JOIN `#__balancirk_types` b
+                    ON a.`type` = b.`id`;
+
+-- INSERT INTO `#__balancirk_subscriptions` (
+-- 	`id`, `lesson`, `student`
+-- )
+-- 	VALUES(1, 1, 2);
 /**************************************************************************************************
 *                                                                                                 * 
 *  SQL script for table presences                                                                 * 
 *                                                                                                 * 
 **************************************************************************************************/
 
-CREATE TABLE `#__balancirk_presences` (
+CREATE TABLE IF NOT EXISTS `#__balancirk_presences` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `lesson` int(11) NOT NULL,
   `student` int(11) NOT NULL,
@@ -202,7 +202,7 @@ SELECT p.`id`, s.`name` , s.`firstname` , l.`name` as `lesson`, p.`date`
 		INNER JOIN `#__balancirk_students` s
 			ON p.`student` =s.`id` 
 		INNER JOIN `#__balancirk_lessons` l
-			ON p.`lesson` = l.`id` 
+			ON p.`lesson` = l.`id`;
 
 /**************************************************************************************************
 *                                                                                                 * 
