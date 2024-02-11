@@ -19,14 +19,68 @@ defined('_JEXEC') or die;
 HTMLHelper::_('behavior.formvalidator');
 HTMLHelper::_('behavior.keepalive');
 
+JHtml::_('jquery.framework');
+
 /** @var Joomla\CMS\Application $app */
 $app = Factory::getApplication();
 
+/** create list of lesdays */
+$lessons = [];
+$lesdays = LessonModel::getDates($this->item->start, $this->item->end, LessonModel::getLesdays($this->item->lesdays));
+$firstLesDay = min($lesdays)->format('d/m/Y');
+$lastLesDay = max($lesdays)->format('d/m/Y');
+foreach ($lesdays as $lesday)
+{
+	array_push($lessons, $lesday->format('d/m/Y'));
+}
+
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $app->getDocument()->getWebAssetManager();
-$wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css');
+$wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
+	->registerAndUseScript('bootstrap-datepicker', 'https://unpkg.com/bootstrap-datepicker@latest/dist/js/bootstrap-datepicker.min.js')
+	->registerAndUseScript('bootstrap-datepicker-nl', 'https://unpkg.com/bootstrap-datepicker@latest/dist/locales/bootstrap-datepicker.nl-BE.min.js')
+	->registerAndUseScript('lesson-script', 'media/com_balancirk/js/balancirk_lesson_date.js')
+	->addInlineScript('
+	var changed = false;
+	jQuery(document).ready(function() {
+		console.log("Domain ready");
 
-$lesdays = LessonModel::getDates($this->item->start, $this->item->end, LessonModel::getLesdays($this->item->lesdays));
+		const fieldset = document.querySelectorAll(\'fieldset#jform_students\')[0]; 
+		
+		
+		jQuery("#jform_date").datepicker({
+			language: "nl-BE",
+			startDate: "' . $firstLesDay . '",
+    		endDate: "' . $lastLesDay . '",
+			todayHighlight: true,  //Do not to forget to define class today
+			todayBtn: true,
+			maxViewMode: 0,
+			weekStart: 1,
+			beforeShowDay: function(date) {
+				// Get day, month, and year components
+    			var day = date.getDate();
+    			var month = date.getMonth() + 1; // Months are zero-based
+				var year = date.getFullYear();
+
+				// Add leading zeros if necessary
+				day = (day < 10) ? "0" + day : day;
+				month = (month < 10) ? "0" + month : month;
+
+				// Create the formatted string
+				var formattedDate = day + "/" + month + "/" + year;
+
+				var lesdays = ["' . implode('","', $lessons) . '"];
+				if (jQuery.inArray(formattedDate, lesdays) > -1) {
+					return true;
+				} else {
+					return false;
+				}
+			}, // Do not forget to define class disabled
+			autoclose: true,
+		})
+	})
+	');
+
 $students = $this->get('Students');
 $data = [];
 $data['id'] = $this->item->id;
@@ -37,10 +91,6 @@ $form->bind($data);
 foreach ($students as $student)
 {
 	$form->getField('students')->addOption($student->firstname . " " . $student->name, ['value' => $student->id]);
-}
-foreach ($lesdays as $date)
-{
-	$form->getField('date')->addOption($date->format("d/m/Y"), ['value' => $date->format("Y-m-d")]);
 }
 
 $url = Route::_('index.php?option=com_balancirk&view=lesson');
@@ -54,12 +104,9 @@ $url = Route::_('index.php?option=com_balancirk&view=lesson');
 			<h3><?= Text::_('COM_BALANCIRK_LESSONS_PRESENCES'); ?><?= $this->item->name ?></h3>
 			<?= $form->renderField('id'); ?>
 			<label for="lessonDate">Select Date:</label>
-			<select id="lessonDate" name="lessonDate">
-				<?php foreach ($lesdays as $date) : ?>
-					<option value="<?php echo $date; ?>"><?php echo $date; ?></option>
-				<?php endforeach; ?>
-			</select>
-			<!-- <?= $form->renderField('date'); ?> -->
+			<input type="text" id="jform_date" class="form-control" name="jform[date]" />
+
+
 			<?= $form->getInput('students'); ?>
 			<input type="hidden" name="task" />
 		</div>

@@ -156,6 +156,7 @@ class LessonModel extends AdminModel
 			->join('INNER', $dbo->quoteName('#__balancirk_subscriptions', 's'), 's.student = a.id')
 			->join('LEFT', $dbo->quoteName('#__balancirk_presences', 'p'), 'p.student = a.id AND p.lesson = s.lesson')
 			->where('s.lesson = ' . $this->getState('lesson.id'))
+			->order(['a.name', 'a.firstname'])
 			->group('a.id', 'a.name', 'a.firstname', 'a.phone', 'a.email', 'a.birthdate', 'a.allow_photo', 'a.state');
 
 		$dbo->setQuery($query);

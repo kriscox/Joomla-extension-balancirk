@@ -38,6 +38,11 @@ $presence_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=pres
 			<h3><?= $this->item->name ?></h3>
 		</div>
 	</div>
+	<div class="balancirk_presence">
+		<button type="button" class="balancirk_presence_button" onclick="location.href='<?= $presence_url ?>'" style="width: auto;">
+			<?= Text::_('COM_BALANCIRK_LESSON_PRESENCE') ?>
+		</button>
+	</div>
 	<div>
 		<?= HTMLHelper::_('uitab.startTabSet', 'myTab', array('active' => 'students')); ?>
 
@@ -63,11 +68,6 @@ $presence_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=pres
 				<div class="row" id="jform">
 					<div class="col-md-4" id="label"> <?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_YEAR') ?> </div>
 					<div class="col-md-8" id="value"> <?= $this->item->year ?> </div>
-				</div>
-				<div class="row">
-					<button type="button" class="balancirk_button" onclick="location.href='<?= $presence_url ?>'" style="width: auto;">
-						<?= Text::_('COM_BALANCIRK_LESSON_PRESENCE') ?>
-					</button>
 				</div>
 			</div>
 			<div class=" col-md-6">

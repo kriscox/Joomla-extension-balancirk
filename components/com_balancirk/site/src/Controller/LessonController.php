@@ -71,6 +71,9 @@ class LessonController extends FormController
 		$model = $this->getModel('Lesson');
 		$form = $model->getForm($data, false);
 
+		// Convert date from nl-BE to 'Y-m-d'
+		$data['date'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['date'])));
+
 		// Set the default rediection url
 		$redirectUrl = Route::_('index.php?option=' . $this->option . '&view=lesson&id=' . $data['id'], false);
 
