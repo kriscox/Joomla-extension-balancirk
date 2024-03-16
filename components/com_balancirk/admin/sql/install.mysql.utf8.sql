@@ -124,6 +124,7 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_lessons` (
     `end` date NOT NULL,
     `start_registration` date NOT NULL,
     `end_registration` date NOT NULL,
+    `max_students` int(11) NOT NULL,
 	`lesdays` int(11) DEFAULT NULL COMMENT '64 = maandag, \n32 = dinsdag, \n16 = woensdag, \n8 = donderdag, \n4 = vrijdag, \n2 = zaterdag, \n1 = zondag',
     `state` char(15) NOT NULL,
     `ordering` int(11) NOT NULL DEFAULT 0,
@@ -147,6 +148,7 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_subscriptions`(
 	`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, 
     `lesson` int(11) NOT NULL,
     `student` int(11) NOT NULL,
+    `subscribed` TINYINT(1) NOT NULL,
     UNIQUE (`lesson`, `student`), 
     CONSTRAINT `fk_subscription_lesson`
         FOREIGN KEY (lesson)
@@ -159,7 +161,8 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_subscriptions`(
 CREATE OR REPLACE VIEW `#__balancirk_subscriptions_view`
 	AS SELECT t.`id` as 'studentid', t.`name`, t.`firstname`, 
 		l.`id` as 'lessonid', l.`name` as 'lesson', l.`type`, l.`fee`, l.`year`,
-		l.`start`, l.`end`, l.`start_registration`, l.`end_registration`, l.`state`
+		l.`start`, l.`end`, l.`start_registration`, l.`end_registration`, l.`state`,
+        s.`subscribed`
 		FROM `#__balancirk_subscriptions` as s
 			INNER JOIN `#__balancirk_lessons` as l
 				ON s.`lesson` = l.`id`
@@ -169,7 +172,8 @@ CREATE OR REPLACE VIEW `#__balancirk_subscriptions_view`
 CREATE OR REPLACE VIEW `#__balancirk_lessons_complete` 
     AS SELECT a.`id`, a.`name`, b.`name` as `type`, a.`fee`, a.`year`, a.`start`, a.`end`, 
             a.`start_registration`, a.`end_registration`, a.`state`, a.`lesdays`,
-			(SELECT COUNT(*) FROM `#__balancirk_subscriptions` WHERE `lesson` = a.`id`) AS 'numberOfStudents'
+			(SELECT COUNT(*) FROM `#__balancirk_subscriptions` WHERE `lesson` = a.`id` and `subscribed` = 0) AS 'numberOfStudents',
+            (SELECT COUNT(*) FROM `#__balancirk_subscriptions` WHERE `lesson` = a.`id` and `subscribed` = 1) AS 'numberOnWaitingList'
             FROM `#__balancirk_lessons` a
                 INNER JOIN `#__balancirk_types` b
                     ON a.`type` = b.`id`;

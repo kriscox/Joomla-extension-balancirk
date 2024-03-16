@@ -12,8 +12,8 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 
 \defined('_JEXEC') or die;
 
-use Exception;
 use JConfig;
+use Exception;
 use Joomla\CMS\Factory;
 use Joomla\CMS\User\User;
 use Joomla\CMS\Router\Route;
@@ -21,6 +21,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\User\UserHelper;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Application\SiteApplication;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\Application\ApplicationHelper;
 
 /**
@@ -213,7 +214,7 @@ class MemberModel extends AdminModel
 		$id = $user->id;
 
 		// Fill extra information in table
-		$db = $this->getDbo();
+		$db = $this->getDatabase();
 
 		// Define columns and their values
 		$columns = array('id', 'firstname', 'street', 'number', 'bus', 'postcode', 'city', 'phone');
@@ -233,7 +234,7 @@ class MemberModel extends AdminModel
 		$db->execute();
 
 		// Send activation mail
-		$mailer = Factory::getMailer();
+		$mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
 
 		// Set the sender
 		$config = new JConfig;

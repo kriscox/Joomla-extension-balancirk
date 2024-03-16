@@ -46,7 +46,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 					<table class="table" id="lessonsList">
 						<caption>
 							<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_LESSONS'); ?>
-							<?= $this->pagination->get ?>
+							<?= $this->pagination->getListFooter();  ?>
 						</caption>
 						<thead>
 							<tr>
@@ -95,7 +95,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 										<?= $this->escape($item->year); ?>
 									</th>
 									<th scope="row" class="has-context">
-										<?= $this->escape($item->numberOfStudents); ?>
+										<?= $this->escape($item->numberOfStudents); ?> &#47; <?= $this->escape($item->max_students); ?>
 									</th>
 									<th scope="row" class="has-context">
 										<?= $this->escape($item->state); ?>

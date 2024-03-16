@@ -47,6 +47,10 @@
 			label="COM_BALANCIRK_TABLE_TABLEHEAD_END_REGISTRATION"
 			maxlength="10"
 			required="true" />
+		<field name="max_students"
+			type="number"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_MAX_STUDENTS"
+			required="true" />
 		<field name="lesdays_field"
 			type="checkboxes"
 			label="COM_BALANCIRK_TABLE_TABLEHEAD_LESDAYS"

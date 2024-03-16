@@ -89,7 +89,7 @@ class SubscriptionsModel extends ListModel
 	protected function getListQuery()
 	{
 		// Create a new query object.
-		$db = $this->getDbo();
+		$db = $this->getDatabase();
 		$query = $db->getQuery(true);
 
 		// Get the current logged in user.
@@ -102,7 +102,8 @@ class SubscriptionsModel extends ListModel
 				[
 					'id', 'name', 'firstname', 'lesson',
 					'type', 'fee', 'year', 'start', 'end',
-					'start_registration', 'end_registration', 'state'
+					'start_registration', 'end_registration', 'state',
+					'subscribed'
 				]
 			)
 		);

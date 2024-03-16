@@ -33,7 +33,6 @@ class HtmlView extends BaseHtmlView
 	 */
 	protected $lessons;
 
-
 	/**
 	 * The pagination object
 	 *

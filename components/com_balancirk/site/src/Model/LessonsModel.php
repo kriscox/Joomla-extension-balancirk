@@ -100,11 +100,13 @@ class LessonsModel extends ListModel
 			$db->quoteName(
 				[
 					'a.id', 'a.name', 'a.type',
-					'a.year', 'a.state', 'a.numberOfStudents'
+					'a.year', 'a.state', 'a.numberOfStudents',
+					'a.max_students'
 				],
 				[
 					'id', 'name', 'type',
-					'year', 'state', 'numberOfStudents'
+					'year', 'state', 'numberOfStudents',
+					'max_students'
 				]
 			)
 		)

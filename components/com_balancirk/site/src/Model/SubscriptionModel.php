@@ -169,10 +169,23 @@ class SubscriptionModel extends AdminModel
 		array_push($values, $data['student']);
 		array_push($values, $data['lesson']);
 
-		$db = $this->getDbo();
+		// Check ik max numerbers of students is not reached, if not subscribed == 0 else subscribed == 1
+		/** @var numberOfStudents */
+		$model = $this->getMVCFactory()->createModel('Lesson', 'Site');
+		$lesson = $model->getItem($data['lesson'], $data['lesson']);
+		if ($lesson->subscribed < $lesson->max_students)
+		{
+			array_push($values, 1);
+		}
+		else
+		{
+			array_push($values, 0);
+		}
+
+		$db = $this->getDatabase();
 		$query = $db->getQuery(true);
 		$query->insert($db->quoteName('#__balancirk_subscriptions'))
-			->columns($db->quoteName(array('student', 'lesson')))
+			->columns($db->quoteName(array('student', 'lesson', 'subscribed')))
 			->values(implode(',', $values));
 		$db->setQuery($query)->execute();
 
@@ -192,7 +205,7 @@ class SubscriptionModel extends AdminModel
 	 **/
 	public function delete(&$pks)
 	{
-		$db = $this->getDbo();
+		$db = $this->getDatabase();
 		$query = $db->getQuery(true);
 		$query->delete($db->quoteName('#__balancirk_subscriptions'))
 			->where($db->quoteName('student') . ' = ' . $pks['student'])

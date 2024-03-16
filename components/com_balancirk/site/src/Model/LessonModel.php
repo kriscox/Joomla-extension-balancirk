@@ -153,7 +153,7 @@ class LessonModel extends AdminModel
 		)
 			->select('MAX(p.date) as last_presence')
 			->from($dbo->quoteName('#__balancirk_students', 'a'))
-			->join('INNER', $dbo->quoteName('#__balancirk_subscriptions', 's'), 's.student = a.id')
+			->join('INNER', $dbo->quoteName('#__balancirk_subscriptions', 's'), 's.student = a.id', 's.subscribed = 0')
 			->join('LEFT', $dbo->quoteName('#__balancirk_presences', 'p'), 'p.student = a.id AND p.lesson = s.lesson')
 			->where('s.lesson = ' . $this->getState('lesson.id'))
 			->order(['a.name', 'a.firstname'])
@@ -296,7 +296,7 @@ class LessonModel extends AdminModel
 		$query = $dbo->getQuery(true);
 		$query->select($dbo->quoteName('p.email'))
 			->from('#__balancirk_subscriptions', 's')
-			->join('INNER', $dbo->quoteName('#__balancirk_parents', 'p'), 'p.id = s.parent')
+			->join('INNER', $dbo->quoteName('#__balancirk_parents', 'p'), 'p.id = s.parent', 's.subscribed = 0')
 			->where($dbo->quoteName('s.lesson') . ' = ' . $dbo->quote($lessonid));
 		$dbo->setQuery($query);
 		$mailAdresses[] = $dbo->loadResult();
@@ -314,7 +314,7 @@ class LessonModel extends AdminModel
 		$query->clear();
 		$query->select($dbo->quoteName('s.email'))
 			->from('#__balancirk_subscriptions', 'l')
-			->join('INNER', $dbo->quoteName('#__balancirk_students', 's'), 's.id = l.student')
+			->join('INNER', $dbo->quoteName('#__balancirk_students', 's'), 's.id = l.student', 's.subscribed = 0')
 			->where($dbo->quoteName('l.lesson') . ' = ' . $dbo->quote($this->getState('lesson.student')));
 		$dbo->setQuery($query);
 		$mailAdresses[] = $dbo->loadResult();

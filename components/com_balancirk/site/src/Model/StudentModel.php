@@ -189,7 +189,7 @@ class StudentModel extends AdminModel
 				// Set the parent as primairy
 				array_push($values, 1);
 
-				$db = $this->getDbo();
+				$db = $this->getDatabase();
 				$query = $db->getQuery(true);
 				$query->insert($db->quoteName('#__balancirk_parents'))
 					->columns($db->quoteName($columns))
@@ -218,7 +218,7 @@ class StudentModel extends AdminModel
 	public function isPrimairyParent(int $parent = null, int $student = null)
 	{
 		// Check if the user is the primary parent of the student
-		$db 	= $this->getDbo();
+		$db 	= $this->getDatabase();
 		$query 	= $db->getQuery(true);
 		$query->select($db->quote('*'))
 			->from($db->quoteName('#__balancirk_parents'))

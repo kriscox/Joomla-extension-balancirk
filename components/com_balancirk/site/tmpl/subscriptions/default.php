@@ -10,6 +10,7 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\HTML\Helpers\Tag;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -71,7 +72,11 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_YEAR', 'a.year', $listDirn, $listOrder); ?>
 								</th>
 								<th scope="col" class="text_center d-md-table-cell">
-									<?= Text::_('JDELETE'); ?>
+									<span class="fas fa-check fa-xs"> </span><?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_SUBSCRIBED', 'a.subscribed', $listDirn, $listOrder) ?> &#47;
+									<span class="fas fa-clock fa-xs"> </span><?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_WAITINGLIST', 'a.subscribed', $listDirn, $listOrder) ?>
+								</th>
+								<th scope="col" class="text_center d-md-table-cell">
+									<a href=#> <?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_UNSUBSCRIBE'); ?> </a>
 								</th>
 							</tr>
 							<?php $n = count($this->items);
@@ -89,6 +94,13 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 									</td>
 									<td scope="row" class="d-md-table-cell">
 										<?= $this->escape(addslashes($item->year)); ?>
+									</td>
+									<td scope="row" class="d-md-table-cell">
+										<?php if ($item->subscribed == 0) : ?>
+											<span class="fas fa-check fs-lg"> </span>
+										<?php else : ?>
+											<span class="fas fa-clock fa-lg"> </span>
+										<?php endif; ?>
 									</td>
 									<td scope="row" class="d-md-table-cell">
 										<button id='<?= $item->id ?>' type='submit' name='submit' value='<?= $item->id ?>'>
