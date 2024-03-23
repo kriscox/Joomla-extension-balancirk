@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form>
-    <fieldset addfieldprefix="CoCoCo\Component\Balancirk\Site\Field">
-		<field name="student" type="students" label="COM_BALANCIRK_TABLE_TABLEHEAD_STUDENT" required="true" />
-		<field name="lesson" type="lessons" label="COM_BALANCIRK_TABLE_TABLEHEAD_LESSON" required="true" />
-    </fieldset>
+	<fieldset addfieldprefix="CoCoCo\Component\Balancirk\Site\Field">
+		<field name="student"
+			type="students"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_STUDENT"
+			required="true" />
+		<field name="lesson"
+			type="lessons"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_LESSON"
+			required="true" />
+	</fieldset>
 </form>

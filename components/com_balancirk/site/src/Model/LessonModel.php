@@ -123,10 +123,12 @@ class LessonModel extends AdminModel
 	 *
 	 * List of the students currently subscribed to the lesson
 	 *
+	 * @param int 		$lessonid  The id of the lesson
+	 *
 	 * @return array	an array of students
 	 *
 	 **/
-	public function getStudents()
+	public function getStudents($lessonid = NULL)
 	{
 		// Create a new query object.
 		$dbo = $this->getDatabase();
@@ -135,6 +137,11 @@ class LessonModel extends AdminModel
 		$today = new DateTime('now');
 		$startRange = date_sub($today, date_interval_create_from_date_string('7 days'));
 		$endRange = date_sub($today, date_interval_create_from_date_string('1 days'));
+
+		if ($lessonid == NULL)
+		{
+			$lessonid = $this->getState('lesson.id');
+		}
 
 		// Select the required fields from the table.
 		$query->select(
@@ -155,13 +162,24 @@ class LessonModel extends AdminModel
 			->from($dbo->quoteName('#__balancirk_students', 'a'))
 			->join('INNER', $dbo->quoteName('#__balancirk_subscriptions', 's'), 's.student = a.id', 's.subscribed = 0')
 			->join('LEFT', $dbo->quoteName('#__balancirk_presences', 'p'), 'p.student = a.id AND p.lesson = s.lesson')
-			->where('s.lesson = ' . $this->getState('lesson.id'))
+			->where('s.lesson = ' . $lessonid)
 			->order(['a.name', 'a.firstname'])
 			->group('a.id', 'a.name', 'a.firstname', 'a.phone', 'a.email', 'a.birthdate', 'a.allow_photo', 'a.state');
 
 		$dbo->setQuery($query);
 
 		return $dbo->loadObjectList();
+	}
+
+	/**
+	 * Method to get the number of students
+	 * 
+	 * @return int 	number of students
+	 * 
+	 */
+	public function getNumberOfStudents($lessonid)
+	{
+		return sizeof($this->getStudents($lessonid));
 	}
 
 	/**

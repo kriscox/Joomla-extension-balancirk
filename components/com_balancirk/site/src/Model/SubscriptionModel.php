@@ -169,17 +169,17 @@ class SubscriptionModel extends AdminModel
 		array_push($values, $data['student']);
 		array_push($values, $data['lesson']);
 
-		// Check ik max numerbers of students is not reached, if not subscribed == 0 else subscribed == 1
-		/** @var numberOfStudents */
+		// Check ik max numbers of students is not reached, if not subscribed == 0 else subscribed == 1
+		/** @var lessonModel*/
 		$model = $this->getMVCFactory()->createModel('Lesson', 'Site');
 		$lesson = $model->getItem($data['lesson'], $data['lesson']);
-		if ($lesson->subscribed < $lesson->max_students)
+		if ($model->getNumberOfStudents($data['lesson']) < $lesson->max_students)
 		{
-			array_push($values, 1);
+			array_push($values, 0);
 		}
 		else
 		{
-			array_push($values, 0);
+			array_push($values, 1);
 		}
 
 		$db = $this->getDatabase();

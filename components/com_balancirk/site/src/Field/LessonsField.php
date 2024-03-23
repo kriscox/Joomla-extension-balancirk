@@ -47,7 +47,7 @@ class LessonsField extends ListField
 
 		/** @var LessonsModel */
 		$lessonModel = new LessonsModel(['OpenSubscriptions' => true]);
-		$lessons = $lessonModel->getItems();
+		$lessons = $lessonModel->getOpenLessons();
 
 		if (null == $lessons)
 		{
@@ -57,11 +57,11 @@ class LessonsField extends ListField
 		{
 			$lesOption = [];
 
-			foreach ($lessons as $lesson)
+			foreach ($lessons as $id => $lesson)
 			{
 				array_push(
 					$lesOption,
-					array('value' => $lesson->id, 'text' => $lesson->name)
+					array('value' => $id, 'text' => $lesson)
 				);
 			}
 		}
