@@ -11,7 +11,7 @@
 	<authorEmail>info@cococo.be</authorEmail>
 	<copyright>CoCoCo</copyright>
 	<license>GPL v3</license>
-	<version>0.0.1</version>
+	<version>1.2.6</version>
 	<description>PKG_BALANCIRK_MODULE_DESCRIPTION</description>
 
 	<!-- on update don't forget to add also to makefile -->

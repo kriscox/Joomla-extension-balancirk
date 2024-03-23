@@ -25,4 +25,16 @@
 			<item>Added presences part 1</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>com_balancirk</element>
+		<type>package</type>
+		<version>1.2.6</version>
+		<fix>
+			<item>Changed from component to package.</item>
+			<item>Added presences with update of existing</item>
+			<item>Added presence history graph behind lesson</item>
+			<item>Added waiting lists for lessons that are full</item>
+			<item>Fixed end-date subscriptions not taken into account</item>
+		</fix>
+	</changelog>
 </changelogs>
