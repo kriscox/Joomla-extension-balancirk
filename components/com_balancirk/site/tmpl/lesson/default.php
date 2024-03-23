@@ -14,17 +14,91 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Layout\LayoutHelper;
 
+use function PHPUnit\Framework\countOf;
+
 defined('_JEXEC') or die;
 
-HTMLHelper::_('behavior.formvalidator');
-HTMLHelper::_('behavior.keepalive');
+$dates = [];
+$studentCount = [];
+foreach ($this->presences as $presence)
+{
+	array_push($dates, $presence->date);
+	array_push($studentCount, $presence->count);
+}
+$mean = round(array_sum($studentCount) / count($studentCount), 1);
 
 /** @var Joomla\CMS\Application $app */
 $app = Factory::getApplication();
 
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $app->getDocument()->getWebAssetManager();
-$wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css');
+$wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
+	->registerAndUseScript('chart.js', 'https://cdn.jsdelivr.net/npm/chart.js')
+	->registerAndUseScript('chartjs-adapter-date-fns.js', 'https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js')
+	->registerAndUseScript('chartjs-plugin-annotation.js', 'media/com_balancirk/js/chartjs-plugin-annotation.min.js')
+	->addInlineScript('
+		document.addEventListener("DOMContentLoaded", function() {
+			const ctx = document.getElementById("PresenceChart");
+
+			new Chart(ctx, {
+							type: "bar",
+							data: {
+									labels: [' . "'" . implode("','", $dates) . "'" . '],
+									datasets: [{
+													label: " ' . Text::_('COM_BALANCIRK_LESSON_TAB_PRESENCE') . '",
+													data: [' . "'" . implode("','", $studentCount) . "'" . '],
+													borderWidth: 1
+												}]
+							},
+							options: {
+								scales: {
+										x: {
+											type: "time",
+											time: {
+													unit: "week"
+											}
+										},
+										y: {
+											beginAtZero: true,
+											max : "' . sizeOf($this->students) . '",
+											ticks: {
+          											// forces step size to be 1 unit
+        											stepSize: 1,
+													format : {
+																minimumFractionDigits: 0,
+            													maximumFractionDigits: 0
+													}
+        									}
+										}
+								},
+								plugins: {
+										annotation: {
+											annotations: {
+													mean: {
+															type: "line",
+															borderDash: [15, 3, 3, 3],
+															yMin: ' . $mean . ',
+															yMax: ' . $mean . ',
+															borderColor: "red",
+															borderWidth: 2,
+															label: {
+																	display: true,
+																	yAdjust: -8,
+																	backgroundColor: "transparent",
+																	color: "red",
+																	content: "Mean: ' . $mean . '"
+															}
+													}
+											}	
+										}
+								}
+							}
+			});
+		});
+	');
+
+HTMLHelper::_('behavior.formvalidator');
+HTMLHelper::_('behavior.keepalive');
 
 $url = Route::_('index.php?option=com_balancirk&view=lesson&layout=default&id=' . (int) $this->item->id);
 $presence_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=presence&id=' . (int) $this->item->id);
@@ -118,11 +192,16 @@ $presence_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=pres
 					</div>
 				</div>
 			</div>
-			<?= HTMLHelper::_('uitab.endTab'); ?>
-			<?= HTMLHelper::_('uitab.endTabSet'); ?>
-			<input type="hidden" name="task" value="">
-			<?= HTMLHelper::_('form.token'); ?>
 		</div>
+		<?= HTMLHelper::_('uitab.endTab'); ?>
+		<?= HTMLHelper::_('uitab.addTab', 'myTab', 'presence', Text::_('COM_BALANCIRK_LESSON_TAB_PRESENCE')); ?>
+		<div class="graph" id="PresenceGraph">
+			<canvas id="PresenceChart"> </canvas>
+		</div>
+		<?= HTMLHelper::_('uitab.endTab'); ?>
+		<?= HTMLHelper::_('uitab.endTabSet'); ?>
+		<input type="hidden" name="task" value="">
+		<?= HTMLHelper::_('form.token'); ?>
 </form>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-lesson-bottom}'); ?>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

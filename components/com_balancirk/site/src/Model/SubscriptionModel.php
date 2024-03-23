@@ -189,6 +189,9 @@ class SubscriptionModel extends AdminModel
 			->values(implode(',', $values));
 		$db->setQuery($query)->execute();
 
+		// TODO: Add mail to parent
+		// $this->sendMail($data['lesson'], 'Subscription', 'You have subscribed your child to the lesson');
+
 		return true;
 	}
 

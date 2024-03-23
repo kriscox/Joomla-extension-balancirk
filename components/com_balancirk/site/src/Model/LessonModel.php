@@ -90,9 +90,9 @@ class LessonModel extends AdminModel
 	}
 
 	/**
-	 * Method to get the presencesList of this lesson
+	 * Method to get the presences of this lesson
 	 * 
-	 * List of the presences of the students for this lesson
+	 * List of the number of students present per lesday for this lesson
 	 * 
 	 * @return array 	an array of students and dates
 	 */
@@ -104,14 +104,14 @@ class LessonModel extends AdminModel
 
 		// Select the required fields from the table
 		$query->select(
-			$dbo->quoteName(
-				[
-					'student', 'date'
-				]
+			array(
+				$dbo->quoteName('date'),
+				'COUNT(' . $dbo->quoteName('student') . ') as count'
 			)
 		)
 			->from($dbo->quoteName('#__balancirk_presences', 'a'))
-			->where($dbo->quoteName('lesson') . ' = ' . $dbo->quote($this->getState('lesson.id')));
+			->where($dbo->quoteName('lesson') . ' = ' . $dbo->quote($this->getState('lesson.id')))
+			->group($dbo->quoteName('date'));
 
 		$dbo->setQuery($query);
 

@@ -78,3 +78,13 @@ div.balancirk_presence {
 .table-condensed>thead>tr>th {
 	padding: 5px;
 }
+
+/*
+ * Precense Graph 
+ */
+div#PresenceGraph {
+	position: relative;
+	height: 60vh;
+	width: 80vw;
+
+}
