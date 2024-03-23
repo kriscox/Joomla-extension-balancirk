@@ -27,7 +27,7 @@ CREATE OR REPLACE VIEW `#__balancirk_subscriptions_view`
 *                                                                                                 *
 **************************************************************************************************/
 ALTER TABLE `#__balancirk_lessons`
-	ADD COLUMN IF NOT EXISTS `max_students` INT(11) NOT NULL DEFAULT 12
+	ADD COLUMN IF NOT EXISTS `max_students` INT(11) NOT NULL DEFAULT 12;
 
 CREATE OR REPLACE VIEW `#__balancirk_lessons_complete` 
     AS SELECT a.`id`, a.`name`, b.`name` as `type`, a.`fee`, a.`year`, a.`start`, a.`end`, 
