@@ -9,9 +9,12 @@
  */
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Router\Route;
-use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\User\UserHelper;
+use Joomla\CMS\Document\Document;
+
 use CoCoCo\Component\Balancirk\Site\Model\LessonModel;
 
 defined('_JEXEC') or die;
@@ -33,9 +36,13 @@ foreach ($lesdays as $lesday)
 {
 	array_push($lessons, $lesday->format('d/m/Y'));
 }
+$userid = Factory::getApplication()->getIdentity()->id;
+$api_token = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
 
+/** @var Joomla\CMS\Document\Document  */
+$doc = $app->getDocument();
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
-$wa = $app->getDocument()->getWebAssetManager();
+$wa = $doc->getWebAssetManager();
 $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 	->registerAndUseScript('bootstrap-datepicker', 'https://unpkg.com/bootstrap-datepicker@latest/dist/js/bootstrap-datepicker.min.js')
 	->registerAndUseScript('bootstrap-datepicker-nl', 'https://unpkg.com/bootstrap-datepicker@latest/dist/locales/bootstrap-datepicker.nl-BE.min.js')
@@ -75,6 +82,7 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 		})
 	})
 	');
+$doc->addScriptOptions('lesson-script', ['token' => $api_token]);
 
 $students = $this->get('Students');
 $data = [];

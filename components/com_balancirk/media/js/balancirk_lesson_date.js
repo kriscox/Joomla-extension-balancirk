@@ -60,13 +60,14 @@ function loadStudentsData(lesson, selectedDate) {
 
 	// Make an API call using AJAX
 	var apiUrl = 'api/index.php/v1/presence/' + lesson + '/' + selectedDate;
+	var token = Joomla.getOptions('lesson-script').token;
 
 	return new Promise(function (resolve, reject) {
 		jQuery.ajax({
 			url: apiUrl,
 			method: 'GET',
 			headers: {
-				'Authorization': 'Bearer c2hhMjU2OjE1Njo0OTVkMTVlZWUzMDE4NzI3YmZkZTZkNzZmY2ZhMjY5NzA4M2RhMmRmMTVjZmQwYzlkNjVjYjViNjE2YzAyMDIy'
+				'Authorization': 'Bearer ' + token
 			},
 			success: function (response) {
 				// Assuming the response is an array of student IDs
