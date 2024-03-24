@@ -13,7 +13,6 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\User\UserHelper;
-use Joomla\CMS\Document\Document;
 
 use CoCoCo\Component\Balancirk\Site\Model\LessonModel;
 
@@ -22,7 +21,7 @@ defined('_JEXEC') or die;
 HTMLHelper::_('behavior.formvalidator');
 HTMLHelper::_('behavior.keepalive');
 
-JHtml::_('jquery.framework');
+HTMLHelper::_('jquery.framework');
 
 /** @var Joomla\CMS\Application $app */
 $app = Factory::getApplication();
@@ -149,5 +148,5 @@ $url = Route::_('index.php?option=com_balancirk&view=lesson');
 		</div>
 	</div>
 </div>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-edit-bottom}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-member-edit-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
