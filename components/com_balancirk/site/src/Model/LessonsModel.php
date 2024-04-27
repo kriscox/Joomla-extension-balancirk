@@ -180,6 +180,7 @@ class LessonsModel extends ListModel
 
 		$rows = $db->setQuery($query)->loadObjectlist();
 
+		$lessons = [];
 		foreach ($rows as $row)
 		{
 			$lessons[$row->id] = $row->name;

@@ -235,4 +235,33 @@ class StudentModel extends AdminModel
 			return false;
 		}
 	}
+
+
+	/**
+	 * Method to get the parents of a student
+	 *
+	 * @param	int	$student	Student id
+	 * @param	bool	$primary	True if only the primary parent should be returned
+	 * 
+	 * @return  array  An array with all parents
+	 *
+	 * @since   __BUMP_VERSION__
+	 */
+	public function getParents(int $student = null, bool $primary = true)
+	{
+		$db 	= $this->getDatabase();
+		$query 	= $db->getQuery(true);
+		$query->select($db->quoteName('parent'))
+			->from($db->quoteName('#__balancirk_parents'))
+			->where($db->quoteName('child') . ' = ' . $db->quote($student));
+
+		if ($primary)
+		{
+			$query->where($db->quoteName('primary') . ' = 1');
+		}
+
+		$db->setQuery($query);
+
+		return $db->loadObjectList();
+	}
 }

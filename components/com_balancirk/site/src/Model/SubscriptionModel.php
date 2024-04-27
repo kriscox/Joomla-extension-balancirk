@@ -16,6 +16,7 @@ use Exception;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 use CoCoCo\Component\Balancirk\Site\Model\StudentModel;
 use CoCoCo\Component\Balancirk\Site\Model\PresenceModel;
 
@@ -173,14 +174,8 @@ class SubscriptionModel extends AdminModel
 		/** @var lessonModel*/
 		$model = $this->getMVCFactory()->createModel('Lesson', 'Site');
 		$lesson = $model->getItem($data['lesson'], $data['lesson']);
-		if ($model->getNumberOfStudents($data['lesson']) < $lesson->max_students)
-		{
-			array_push($values, 0);
-		}
-		else
-		{
-			array_push($values, 1);
-		}
+		$waitinglist = ($model->getNumberOfStudents($data['lesson']) < $lesson->max_students) ? 0 : 1;
+		array_push($values, $waitinglist);
 
 		$db = $this->getDatabase();
 		$query = $db->getQuery(true);
@@ -189,8 +184,35 @@ class SubscriptionModel extends AdminModel
 			->values(implode(',', $values));
 		$db->setQuery($query)->execute();
 
-		// TODO: Add mail to parent
-		// $this->sendMail($data['lesson'], 'Subscription', 'You have subscribed your child to the lesson');
+		// Send mail to parent
+		/** @var MailerInterface */
+		$mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+		$mailer->setSender('info@balancirk.be', 'Circusatelier Balancirk VZW');
+		// Get the students parents
+		/** @var StudentModel */
+		$studentModel = $this->getMVCFactory()->createModel('Student', 'Site');
+		$parents = $studentModel->getParents($data['student']);
+
+		foreach ($parents as $parent)
+		{
+			// Get the parent email
+			/** @var MemberModel */
+			$memberModel = $this->getMVCFactory()->createModel('Member', 'Site');
+			$member = $memberModel->getItem($parent->parent);
+
+			// add the email to the mailAdresses array
+			$mailer->addRecipient($member->email);
+		}
+
+		if ($waitinglist == 0)
+			$mailer->setSubject(Text::_('COM_BALANCIRK_SUBJECT_SUBSCRIPTION') . ' ' . $this->getState('lesson.name'))
+				// TODO: This is a placeholder, replace this with the actual mail content
+				->setBody('Mail content to send to the parent.');
+		else
+			$mailer->setSubject(Text::_('COM_BALANCIRK_SUBJECT_SUBSCRIPTION') . ' ' . $this->getState('lesson.name'))
+				->setBody('Mail content to send to the parent.');
+
+		$mailer->Send();
 
 		return true;
 	}

@@ -27,15 +27,19 @@ HTMLHelper::_('behavior.formvalidator');
 HTMLHelper::_('behavior.keepalive');
 ?>
 
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-subscription-top}'); ?>
 <?php if (empty($this->students)) : ?>
 	<div class="alert alert-info">
 		<span class="fa fa-info-circle" aria-hidden="true"></span><span class="sr-only"><?= Text::_('INFO'); ?></span>
-		<?= Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?>
+		<?= Text::_('COM_BALANCIRK_NO_STUDENTS'); ?>
 	</div>
-
+<?php elseif (empty($this->lessons)) : ?>
+	<div class="alert alert-info">
+		<span class="fa fa-info-circle" aria-hidden="true"></span><span class="sr-only"><?= Text::_('INFO'); ?></span>
+		<?= Text::_('COM_BALANCIRK_NO_LESSONS_FOR_SUBSCRIPTION'); ?>
+	</div>
 <?php else : ?>
-	<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
-	<?php echo JHtml::_('content.prepare', '{loadposition balancirk-subscription-top}'); ?>
 	<form action="<?= Route::_('index.php?option=com_balancirk&view=subscription'); ?>" method="post" id="subscription-form" name="adminForm" class="form-validate">
 		<div class="col col-md-6">
 			<fieldset>
@@ -63,6 +67,6 @@ HTMLHelper::_('behavior.keepalive');
 		</div>
 
 	</form>
-	<?php echo JHtml::_('content.prepare', '{loadposition balancirk-subscription-bottom}'); ?>
-	<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
 <?php endif; ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-subscription-bottom}'); ?>
+<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

@@ -37,4 +37,12 @@
 			<item>Fixed end-date subscriptions not taken into account</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>com_balancirk</element>
+		<type>package</type>
+		<version>1.2.8</version>
+		<fix>
+			<item>Only technical fixes</item>
+		</fix>
+	</changelog>
 </changelogs>

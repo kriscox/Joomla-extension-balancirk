@@ -3,8 +3,8 @@ pkg_balancirk.zip: pkg_balancirk.xml packages/com_balancirk.zip packages/balanci
 	zip -r pkg_balancirk.zip $+
 
 release: pkg_balancirk.zip
-	tar czf $(version).tar.gz balancirk_changelog.xml balancirk_update.xml pkg_balancirk.zip README.md
-	zip -r $(version).zip balancirk_changelog.xml balancirk_update.xml pkg_balancirk.zip README.md
+	tar czf $(version).tar.gz balancirk.xml balancirk_changelog.xml balancirk_update.xml pkg_balancirk.zip README.md
+	zip -r $(version).zip balancirk.xml balancirk_changelog.xml balancirk_update.xml pkg_balancirk.zip README.md
 
 packages/com_balancirk.zip: components/com_balancirk
 	$(MAKE) -C components/com_balancirk

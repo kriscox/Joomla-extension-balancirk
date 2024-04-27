@@ -26,6 +26,8 @@ $states = array(
 
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-students-top}'); ?>
 <form action=" <?= Route::_('index.php?option=com_balancirk&view=students'); ?>" method="post" name="adminForm" id="adminForm">
 	<div class="row">
 		<nav aria-label="Toolbar" style="display: flex; align-items: center;">
@@ -106,5 +108,5 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 		</div>
 	</div>
 </form>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-students-bottom}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-students-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
