@@ -80,14 +80,12 @@ class HtmlView extends BaseHtmlView
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
 
-        if (!count($this->items) && $this->get('IsEmptyState'))
-        {
+        if (!count($this->items) && $this->get('IsEmptyState')) {
             $this->setLayout('emptystate');
         }
 
         // Check for errors.
-        if (count($errors = $this->get('Errors')))
-        {
+        if (count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);
         }
 
@@ -112,13 +110,11 @@ class HtmlView extends BaseHtmlView
 
         $canDo = ContentHelper::getActions('com_balancirk');
 
-        if ($canDo->get('core.create'))
-        {
+        if ($canDo->get('core.create')) {
             $toolbar->addNew('type.add');
         }
 
-        if ($this->state->get('filter.published') == -2 && $canDo->get('core.delete'))
-        {
+        if ($this->state->get('filter.published') == -2 && $canDo->get('core.delete')) {
             $toolbar->delete('holidays.delete')
                 ->text('JTOOLBAR_EMPTY_TRASH')
                 ->message('JGLOBAL_CONFIRM_DELETE')

@@ -53,8 +53,7 @@ class TypeModel extends AdminModel
      */
     protected function canDelete($record)
     {
-        if (!empty($record->id))
-        {
+        if (!empty($record->id)) {
             $app = Factory::getApplication();
 
             return $app->getIdentity()->authorise('core.delete', 'com_balancirk.type.' . (int) $record->id);
@@ -77,8 +76,7 @@ class TypeModel extends AdminModel
         $user = Factory::getApplication()->getIdentity();
 
         // Check for existing article.
-        if (!empty($record->id))
-        {
+        if (!empty($record->id)) {
             return $user->authorise('core.edit.state', 'com_balancirk.type.' . (int) $record->id);
         }
 
@@ -103,8 +101,7 @@ class TypeModel extends AdminModel
         $name = 'types';
         $prefix = 'Table';
 
-        if ($table = $this->_createTable($name, $prefix, $options))
-        {
+        if ($table = $this->_createTable($name, $prefix, $options)) {
             return $table;
         }
 
@@ -126,8 +123,7 @@ class TypeModel extends AdminModel
         // Get the form.
         $form = $this->loadForm($this->typeAlias, 'type', ['control' => 'jform', 'load_data' => $loadData]);
 
-        if (empty($form))
-        {
+        if (empty($form)) {
             return false;
         }
         return $form;
@@ -146,8 +142,7 @@ class TypeModel extends AdminModel
         $app = Factory::getApplication();
         $data = $app->getUserState('com_balancirk.edit.type.data', array());
 
-        if (empty($data))
-        {
+        if (empty($data)) {
             $data = $this->getItem();
 
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles

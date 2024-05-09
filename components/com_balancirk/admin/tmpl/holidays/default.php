@@ -60,9 +60,9 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 						</thead>
 						<tbody>
 							<?php
-							$n = count($this->items);
-							foreach ($this->items as $i => $item) :
-							?>
+                            $n = count($this->items);
+				    foreach ($this->items as $i => $item) :
+				        ?>
 								<tr class="row<?= $i % 2; ?>">
 									<td class="text-center">
 										<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>

@@ -24,7 +24,7 @@ class TypesModel extends ListModel
 {
     /**
      * The type alias for this content type.
-     * 
+     *
      * @var    string
      * @since  0.0.1
      */
@@ -41,8 +41,7 @@ class TypesModel extends ListModel
      */
     public function __construct($config = [])
     {
-        if (empty($config['filter_fields']))
-        {
+        if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
                 'id', 'a.id',
                 'name', 'a.name',
@@ -115,8 +114,7 @@ class TypesModel extends ListModel
         // Filter by search in title.
         $search = $this->getState('filter.search');
 
-        if (!empty($search))
-        {
+        if (!empty($search)) {
             $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
             $query->where('(a.name LIKE ' . $search . ')');
         }

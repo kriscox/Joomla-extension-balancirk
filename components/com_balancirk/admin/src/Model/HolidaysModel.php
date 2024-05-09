@@ -41,8 +41,7 @@ class HolidaysModel extends ListModel
      */
     public function __construct($config = [])
     {
-        if (empty($config['filter_fields']))
-        {
+        if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
                 'id', 'a.id',
                 'year', 'a.year',
@@ -84,8 +83,7 @@ class HolidaysModel extends ListModel
         // Filter by search in title.
         $search = $this->getState('filter.search');
 
-        if (!empty($search))
-        {
+        if (!empty($search)) {
             $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
             $query->where('(a.summary LIKE ' . $search . ')');
         }
@@ -129,8 +127,7 @@ class HolidaysModel extends ListModel
         // Get the form.
         $form = $this->loadForm($this->holidaysAlias, 'holidays', ['control' => 'jform', 'load_data' => $loadData]);
 
-        if (empty($form))
-        {
+        if (empty($form)) {
             return false;
         }
 
