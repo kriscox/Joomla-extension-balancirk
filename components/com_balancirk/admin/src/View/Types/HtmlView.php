@@ -12,12 +12,12 @@ namespace CoCoCo\Component\Balancirk\Administrator\View\Types;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\MVC\View\GenericDataException;
+use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
-use Joomla\CMS\Helper\ContentHelper;
 
 /**
  * View class for a list of types
@@ -26,94 +26,103 @@ use Joomla\CMS\Helper\ContentHelper;
  */
 class HtmlView extends BaseHtmlView
 {
-	/**
-	 * List of types of Balancirk.
-	 *
-	 * @var	$types;
-	 * @since  0.0.1
-	 */
-	protected $types;
+    /**
+     * List of types of Balancirk.
+     *
+     * @var	$types;
+     * @since  0.0.1
+     */
+    protected $types;
 
-	/**
-	 * The pagination object
-	 *
-	 * @var  \JPagination
-	 */
-	protected $pagination;
+    /**
+     * The pagination object
+     *
+     * @var  \JPagination
+     */
+    protected $pagination;
 
-	/**
-	 * The model state
-	 *
-	 * @var  \JObject
-	 */
-	protected $state;
+    /**
+     * The model state
+     *
+     * @var  \JObject
+     */
+    protected $state;
 
-	/**
-	 * Form object for search filters
-	 *
-	 * @var  \JForm
-	 */
-	public $filterForm;
+    /**
+     * Form object for search filters
+     *
+     * @var  \JForm
+     */
+    public $filterForm;
 
-	/**
-	 * The active search filters
-	 *
-	 * @var  array
-	 */
-	public $activeFilters;
+    /**
+     * The active search filters
+     *
+     * @var  array
+     */
+    public $activeFilters;
 
-	/**
-	 * Method to display the view.
-	 *
-	 * @param   string $tpl A template file to load. [optional]
-	 *
-	 * @return  void
-	 *
-	 * @since   0.0.1
-	 */
-	public function display($tpl = null): void
-	{
-		# TODO: adapt fields
-		$this->items       = $this->get('Items');
-		$this->pagination    = $this->get('Pagination');
-		$this->filterForm    = $this->get('FilterForm');
-		$this->activeFilters = $this->get('ActiveFilters');
+    /**
+     * Method to display the view.
+     *
+     * @param   string $tpl A template file to load. [optional]
+     *
+     * @return  void
+     *
+     * @since   0.0.1
+     */
+    public function display($tpl = null): void
+    {
+        # TODO: adapt fields
+        $this->items       = $this->get('Items');
+        $this->pagination    = $this->get('Pagination');
+        $this->state = $this->get('State');
+        $this->filterForm    = $this->get('FilterForm');
+        $this->activeFilters = $this->get('ActiveFilters');
 
-		if (!count($this->items) && $this->get('IsEmptyState'))
-		{
-			$this->setLayout('emptystate');
-		}
+        if (!count($this->items) && $this->get('IsEmptyState'))
+        {
+            $this->setLayout('emptystate');
+        }
 
-		// Check for errors.
-		if (count($errors = $this->get('Errors')))
-		{
-			throw new GenericDataException(implode("\n", $errors), 500);
-		}
+        // Check for errors.
+        if (count($errors = $this->get('Errors')))
+        {
+            throw new GenericDataException(implode("\n", $errors), 500);
+        }
 
-		$this->addToolbar();
+        $this->addToolbar();
 
-		parent::display($tpl);
-	}
+        parent::display($tpl);
+    }
 
-	/**
-	 * Add the page title and toolbar.
-	 *
-	 * @return  void
-	 *
-	 * @since   0.0.1
-	 */
-	protected function addToolbar()
-	{
-		// Get the toolbar object instance
-		$toolbar = Toolbar::getInstance('toolbar');
+    /**
+     * Add the page title and toolbar.
+     *
+     * @return  void
+     *
+     * @since   0.0.1
+     */
+    protected function addToolbar()
+    {
+        // Get the toolbar object instance
+        $toolbar = Toolbar::getInstance('toolbar');
 
-		ToolbarHelper::title(Text::_('COM_BALANCIRK_TYPES_PAGE_TITLE'), 'Types');
+        ToolbarHelper::title(Text::_('COM_BALANCIRK_TYPES_PAGE_TITLE'), 'Types');
 
-		$canDo = ContentHelper::getActions('com_balancirk');
+        $canDo = ContentHelper::getActions('com_balancirk');
 
-		if ($canDo->get('core.create'))
-		{
-			$toolbar->addNew('type.add');
-		}
-	}
+        if ($canDo->get('core.create'))
+        {
+            $toolbar->addNew('type.add');
+        }
+
+        if ($this->state->get('filter.published') == -2 && $canDo->get('core.delete'))
+        {
+            $toolbar->delete('holidays.delete')
+                ->text('JTOOLBAR_EMPTY_TRASH')
+                ->message('JGLOBAL_CONFIRM_DELETE')
+                ->listCheck(true);
+        }
+    }
 }

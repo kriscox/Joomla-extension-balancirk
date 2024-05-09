@@ -22,16 +22,16 @@ use Joomla\Database\DatabaseDriver;
  */
 class HolidaysTable extends Table
 {
-	/**
-	 * Constructor
-	 *
-	 * @param   DatabaseDriver  $db  Database connector object
-	 *
-	 * @since   __BUMP_VERSION__
-	 */
-	public function __construct(DatabaseDriver $db)
-	{
-		$this->holidayAlias = 'com_balancirk.holidays';
-		parent::__construct('#__balancirk_holidays', array('year', 'startDate'), $db);
-	}
+    /**
+     * Constructor
+     *
+     * @param   DatabaseDriver  $db  Database connector object
+     *
+     * @since   __BUMP_VERSION__
+     */
+    public function __construct(DatabaseDriver $db)
+    {
+        $this->holidayAlias = 'com_balancirk.holidays';
+        parent::__construct('#__balancirk_holidays', 'id', $db);
+    }
 }

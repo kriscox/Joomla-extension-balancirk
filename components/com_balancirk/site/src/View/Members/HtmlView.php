@@ -21,19 +21,19 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
  */
 class HtmlView extends BaseHtmlView
 {
-	/**
-	 *  Execute and display template script.
-	 *
-	 * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
-	 *
-	 * @return  mixed  A string if successful, otherwise an Error object.
-	 *
-	 * @since   0.0.1
-	 */
-	public function display($tpl = null)
-	{
-		$this->items = $this->get('Items');
+    /**
+     *  Execute and display template script.
+     *
+     * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
+     *
+     * @return  mixed  A string if successful, otherwise an Error object.
+     *
+     * @since   0.0.1
+     */
+    public function display($tpl = null)
+    {
+        $this->items = $this->get('Items');
 
-		return parent::display($tpl);
-	}
+        return parent::display($tpl);
+    }
 }

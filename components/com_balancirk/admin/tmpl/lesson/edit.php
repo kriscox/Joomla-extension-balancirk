@@ -36,6 +36,7 @@ HTMLHelper::_('behavior.keepalive');
 						<?= $this->form->renderField('type'); ?>
 						<?= $this->form->renderField('fee'); ?>
 						<?= $this->form->renderField('year'); ?>
+						<?= $this->form->renderField('max_students'); ?>
 					</div>
 				</div>
 			</div>

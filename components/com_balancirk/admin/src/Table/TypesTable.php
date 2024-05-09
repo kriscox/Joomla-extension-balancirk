@@ -22,16 +22,16 @@ use Joomla\Database\DatabaseDriver;
  */
 class TypesTable extends Table
 {
-	/**
-	 * Constructor
-	 *
-	 * @param   DatabaseDriver  $db  Database connector object
-	 *
-	 * @since   __BUMP_VERSION__
-	 */
-	public function __construct(DatabaseDriver $db)
-	{
-		$this->typeAlias = 'com_balancirk.types';
-		parent::__construct('#__balancirk_types', 'id', $db);
-	}
+    /**
+     * Constructor
+     *
+     * @param   DatabaseDriver  $db  Database connector object
+     *
+     * @since   __BUMP_VERSION__
+     */
+    public function __construct(DatabaseDriver $db)
+    {
+        $this->typeAlias = 'com_balancirk.types';
+        parent::__construct('#__balancirk_types', 'id', $db);
+    }
 }

@@ -22,201 +22,195 @@ use Joomla\CMS\Installer\InstallerAdapter;
  */
 class Com_BalancirkInstallerScript extends InstallerScript
 {
-	/**
-	 * Minimum Joomla version to check
-	 *
-	 * @var    string
-	 * @since  0.0.1
-	 */
-	private $minimumJoomlaVersion = '4.0';
+    /**
+     * Minimum Joomla version to check
+     *
+     * @var    string
+     * @since  0.0.1
+     */
+    private $minimumJoomlaVersion = '4.0';
 
-	/**
-	 * Minimum PHP version to check
-	 *
-	 * @var    string
-	 * @since  0.0.1
-	 */
-	private $minimumPHPVersion = JOOMLA_MINIMUM_PHP;
+    /**
+     * Minimum PHP version to check
+     *
+     * @var    string
+     * @since  0.0.1
+     */
+    private $minimumPHPVersion = JOOMLA_MINIMUM_PHP;
 
-	/**
-	 * Method to install the extension
-	 *
-	 * @param   InstallerAdapter  $parent  The class calling this method
-	 *
-	 * @return  boolean  True on success
-	 *
-	 * @since  0.0.1
-	 */
-	public function install($parent): bool
-	{
-		echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_INSTALL');
+    /**
+     * Method to install the extension
+     *
+     * @param   InstallerAdapter  $parent  The class calling this method
+     *
+     * @return  boolean  True on success
+     *
+     * @since  0.0.1
+     */
+    public function install($parent): bool
+    {
+        echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_INSTALL');
 
-		$this->addTeacherGroup();
+        $this->addTeacherGroup();
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * Method to uninstall the extension
-	 *
-	 * @param   InstallerAdapter  $parent  The class calling this method
-	 *
-	 * @return  boolean  True on success
-	 *
-	 * @since  0.0.1
-	 */
-	public function uninstall($parent): bool
-	{
-		echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_UNINSTALL');
+    /**
+     * Method to uninstall the extension
+     *
+     * @param   InstallerAdapter  $parent  The class calling this method
+     *
+     * @return  boolean  True on success
+     *
+     * @since  0.0.1
+     */
+    public function uninstall($parent): bool
+    {
+        echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_UNINSTALL');
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * Method to update the extension
-	 *
-	 * @param   InstallerAdapter  $parent  The class calling this method
-	 *
-	 * @return  boolean  True on success
-	 *
-	 * @since  0.0.1
-	 *
-	 */
-	public function update($parent): bool
-	{
-		echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_UPDATE');
+    /**
+     * Method to update the extension
+     *
+     * @param   InstallerAdapter  $parent  The class calling this method
+     *
+     * @return  boolean  True on success
+     *
+     * @since  0.0.1
+     *
+     */
+    public function update($parent): bool
+    {
+        echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_UPDATE');
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * Function called before extension installation/update/removal procedure commences
-	 *
-	 * @param   string            $type    The type of change (install, update or discover_install, not uninstall)
-	 * @param   InstallerAdapter  $parent  The class calling this method
-	 *
-	 * @return  boolean  True on success
-	 *
-	 * @since  0.0.1
-	 *
-	 * @throws Exception
-	 */
-	public function preflight($type, $parent): bool
-	{
-		//echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_PREFLIGHT');
+    /**
+     * Function called before extension installation/update/removal procedure commences
+     *
+     * @param   string            $type    The type of change (install, update or discover_install, not uninstall)
+     * @param   InstallerAdapter  $parent  The class calling this method
+     *
+     * @return  boolean  True on success
+     *
+     * @since  0.0.1
+     *
+     * @throws Exception
+     */
+    public function preflight($type, $parent): bool
+    {
+        //echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_PREFLIGHT');
 
-		if ($type !== 'uninstall')
-		{
-			// Check for the minimum PHP version before continuing
-			if (!empty($this->minimumPHPVersion) && version_compare(PHP_VERSION, $this->minimumPHPVersion, '<'))
-			{
-				Log::add(
-					Text::sprintf('JLIB_INSTALLER_MINIMUM_PHP', $this->minimumPHPVersion),
-					Log::WARNING,
-					'jerror'
-				);
+        if ($type !== 'uninstall') {
+            // Check for the minimum PHP version before continuing
+            if (!empty($this->minimumPHPVersion) && version_compare(PHP_VERSION, $this->minimumPHPVersion, '<')) {
+                Log::add(
+                    Text::sprintf('JLIB_INSTALLER_MINIMUM_PHP', $this->minimumPHPVersion),
+                    Log::WARNING,
+                    'jerror'
+                );
 
-				return false;
-			}
+                return false;
+            }
 
-			// Check for the minimum Joomla version before continuing
-			if (!empty($this->minimumJoomlaVersion) && version_compare(JVERSION, $this->minimumJoomlaVersion, '<'))
-			{
-				Log::add(
-					Text::sprintf('JLIB_INSTALLER_MINIMUM_JOOMLA', $this->minimumJoomlaVersion),
-					Log::WARNING,
-					'jerror'
-				);
+            // Check for the minimum Joomla version before continuing
+            if (!empty($this->minimumJoomlaVersion) && version_compare(JVERSION, $this->minimumJoomlaVersion, '<')) {
+                Log::add(
+                    Text::sprintf('JLIB_INSTALLER_MINIMUM_JOOMLA', $this->minimumJoomlaVersion),
+                    Log::WARNING,
+                    'jerror'
+                );
 
-				return false;
-			}
-		}
+                return false;
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * Function called after extension installation/update/removal procedure commences
-	 *
-	 * @param   string            $type    The type of change (install, update or discover_install, not uninstall)
-	 * @param   InstallerAdapter  $parent  The class calling this method
-	 *
-	 * @return  boolean  True on success
-	 *
-	 * @since  0.0.1
-	 *
-	 */
-	public function postflight($type, $parent)
-	{
-		//echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_POSTFLIGHT');
+    /**
+     * Function called after extension installation/update/removal procedure commences
+     *
+     * @param   string            $type    The type of change (install, update or discover_install, not uninstall)
+     * @param   InstallerAdapter  $parent  The class calling this method
+     *
+     * @return  boolean  True on success
+     *
+     * @since  0.0.1
+     *
+     */
+    public function postflight($type, $parent)
+    {
+        //echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_POSTFLIGHT');
 
-		// Do not run on uninstall.
-		if ($type !== 'uninstall')
-		{
-			$this->conditionalInstallDashboard('com-balancirk-dashboard', 'balancirk');
-		}
+        // Do not run on uninstall.
+        if ($type !== 'uninstall') {
+            $this->conditionalInstallDashboard('com-balancirk-dashboard', 'balancirk');
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * Conditional add dashboard to backend
-	 *
-	 * Add our dahsboard to the back-end and config it
-	 *
-	 * @param   string $dashboard	dashboard description
-	 * @param	string $preset		Name of the preset
-	 * @return  void
-	 * @throws  conditon
-	 **/
-	private function conditionalInstallDashboard(string $dashboard, string $preset): void
-	{
-		$position = 'cpanel-' . $dashboard;
+    /**
+     * Conditional add dashboard to backend
+     *
+     * Add our dahsboard to the back-end and config it
+     *
+     * @param   string $dashboard	dashboard description
+     * @param	string $preset		Name of the preset
+     * @return  void
+     * @throws  conditon
+     **/
+    private function conditionalInstallDashboard(string $dashboard, string $preset): void
+    {
+        $position = 'cpanel-' . $dashboard;
 
-		/** @var \Joomla\Database\DatabaseDriver $db */
-		$db = Factory::getContainer()->get('DatabaseDriver');
-		$query = $db->getQuery(true)
-			->select('COUNT(*)')
-			->from($db->quoteName('#__modules'))
-			->where(
-				[
-					$db->quoteName('module') . ' = ' . $db->quote('mod_submenu'),
-					$db->quoteName('client_id') . ' = ' . $db->quote(1),
-					$db->quoteName('position') . ' = :position',
-				]
-			)
-			->bind(':position', $position);
+        /** @var \Joomla\Database\DatabaseDriver $db */
+        $db = Factory::getContainer()->get('DatabaseDriver');
+        $query = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__modules'))
+            ->where(
+                [
+                    $db->quoteName('module') . ' = ' . $db->quote('mod_submenu'),
+                    $db->quoteName('client_id') . ' = ' . $db->quote(1),
+                    $db->quoteName('position') . ' = :position',
+                ]
+            )
+            ->bind(':position', $position);
 
-		$modules = $db->setQuery($query)->loadResult() ?: 0;
+        $modules = $db->setQuery($query)->loadResult() ?: 0;
 
-		if ($modules == 0)
-		{
-			$this->addDashboardMenu($dashboard, $preset);
-		}
-	}
+        if ($modules == 0) {
+            $this->addDashboardMenu($dashboard, $preset);
+        }
+    }
 
-	/**
-	 * Create teacher user group
-	 *
-	 * Create teacher user group to be used to identify who could be teacher
+    /**
+     * Create teacher user group
+     *
+     * Create teacher user group to be used to identify who could be teacher
 
-	 * @return boolean	True is succesfull, false otherwise
-	 * @throws conditon
-	 **/
-	public function addTeacherGroup()
-	{
-		// Parent is registered
-		$group = array('id' => 0, 'title' => 'Teachers', 'parent_id' => 2);
-		JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_user/models');
-		$groupModel = JModelLegacy::getInstance('Group', 'UsersModel');
+     * @return boolean	True is succesfull, false otherwise
+     * @throws conditon
+     **/
+    public function addTeacherGroup()
+    {
+        // Parent is registered
+        $group = array('id' => 0, 'title' => 'Teachers', 'parent_id' => 2);
+        JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_user/models');
+        $groupModel = JModelLegacy::getInstance('Group', 'UsersModel');
 
-		if (!$groupModel->save($group))
-		{
-			JFactory::getApplication()->enqueueMessage($groupModel->getError());
+        if (!$groupModel->save($group)) {
+            JFactory::getApplication()->enqueueMessage($groupModel->getError());
 
-			return false;
-		}
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

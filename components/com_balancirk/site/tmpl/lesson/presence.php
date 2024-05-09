@@ -3,7 +3,7 @@
 /**
  * @package     Joomla.Site
  * @subpackage  com_balancirk
- * 
+ *
  * @copyright   Copyright (C) 2023 CoCoCo. All rights reserved.
  * @license     GNU General Public License version 3.
  */
@@ -31,9 +31,8 @@ $lessons = [];
 $lesdays = LessonModel::getDates($this->item->start, $this->item->end, LessonModel::getLesdays($this->item->lesdays));
 $firstLesDay = min($lesdays)->format('d/m/Y');
 $lastLesDay = max($lesdays)->format('d/m/Y');
-foreach ($lesdays as $lesday)
-{
-	array_push($lessons, $lesday->format('d/m/Y'));
+foreach ($lesdays as $lesday) {
+    array_push($lessons, $lesday->format('d/m/Y'));
 }
 $userid = Factory::getApplication()->getIdentity()->id;
 $api_token = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
@@ -43,10 +42,10 @@ $doc = $app->getDocument();
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $doc->getWebAssetManager();
 $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
-	->registerAndUseScript('bootstrap-datepicker', 'https://unpkg.com/bootstrap-datepicker@latest/dist/js/bootstrap-datepicker.min.js')
-	->registerAndUseScript('bootstrap-datepicker-nl', 'https://unpkg.com/bootstrap-datepicker@latest/dist/locales/bootstrap-datepicker.nl-BE.min.js')
-	->registerAndUseScript('lesson-script', 'media/com_balancirk/js/balancirk_lesson_date.js')
-	->addInlineScript('
+    ->registerAndUseScript('bootstrap-datepicker', 'https://unpkg.com/bootstrap-datepicker@latest/dist/js/bootstrap-datepicker.min.js')
+    ->registerAndUseScript('bootstrap-datepicker-nl', 'https://unpkg.com/bootstrap-datepicker@latest/dist/locales/bootstrap-datepicker.nl-BE.min.js')
+    ->registerAndUseScript('lesson-script', 'media/com_balancirk/js/balancirk_lesson_date.js')
+    ->addInlineScript('
 	var changed = false;
 	jQuery(document).ready(function() {
 		jQuery("#jform_date").datepicker({
@@ -90,9 +89,8 @@ $data['id'] = $this->item->id;
 $form = $this->get('PresenceForm');
 $form->bind($data);
 
-foreach ($students as $student)
-{
-	$form->getField('students')->addOption($student->firstname . " " . $student->name, ['value' => $student->id]);
+foreach ($students as $student) {
+    $form->getField('students')->addOption($student->firstname . " " . $student->name, ['value' => $student->id]);
 }
 
 $url = Route::_('index.php?option=com_balancirk&view=lesson');

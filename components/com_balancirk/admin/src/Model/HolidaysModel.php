@@ -14,7 +14,6 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ListModel;
-use Joomla\CMS\Form\FormFactoryAwareInterface;
 
 /**
  * HolidaysModel class to display the list off holidays.
@@ -23,119 +22,136 @@ use Joomla\CMS\Form\FormFactoryAwareInterface;
  */
 class HolidaysModel extends ListModel
 {
-	/**
-	 * The holiday alias for this content holiday.
-	 *
-	 * @var    string
-	 * @since  0.0.1
-	 */
-	public $holidaysAlias = 'com_balancirk.holidays';
+    /**
+     * The holiday alias for this content holiday.
+     *
+     * @var    string
+     * @since  0.0.1
+     */
+    public $holidaysAlias = 'com_balancirk.holidays';
 
-	/**
-	 * Constructor.
-	 *
-	 * @param   array  $config  An optional associative array of configuration settings.
-	 *
-	 * @see     \JControllerLegacy
-	 *
-	 * @since   __BUMP_VERSION__
-	 */
-	public function __construct($config = [])
-	{
-		if (empty($config['filter_fields']))
-		{
-			$config['filter_fields'] = array(
-				'year', 'a.year',
-				'startDate', 'a.startDate',
-				'endDate', 'a.endDate',
-				'Summary', 'a.summary'
-			);
-		}
+    /**
+     * Constructor.
+     *
+     * @param   array  $config  An optional associative array of configuration settings.
+     *
+     * @see     \JControllerLegacy
+     *
+     * @since   __BUMP_VERSION__
+     */
+    public function __construct($config = [])
+    {
+        if (empty($config['filter_fields']))
+        {
+            $config['filter_fields'] = array(
+                'id', 'a.id',
+                'year', 'a.year',
+                'startDate', 'a.startDate',
+                'endDate', 'a.endDate',
+                'Summary', 'a.summary'
+            );
+        }
 
-		parent::__construct($config);
-	}
+        parent::__construct($config);
+    }
 
 
-	/**
-	 * Build an SQL query to load the list data.
-	 *
-	 * @return  \JDatabaseQuery
-	 *
-	 * @since   __BUMP_VERSION__
-	 */
-	protected function getListQuery()
-	{
-		// Create a new query object.
-		$db = $this->getDatabase();
-		$query = $db->getQuery(true);
+    /**
+     * Build an SQL query to load the list data.
+     *
+     * @return  \JDatabaseQuery
+     *
+     * @since   __BUMP_VERSION__
+     */
+    protected function getListQuery()
+    {
+        // Create a new query object.
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
 
-		// Select the required fields from the table.
-		$query->select(
-			$db->quoteName(
-				[
-					'a.year', 'a.startDate',
-					'a.endDate', 'a.summary'
-				]
-			)
-		);
-		$query->from($db->quoteName('#__balancirk_holidays', 'a'));
+        // Select the required fields from the table.
+        $query->select(
+            $db->quoteName(
+                [
+                    'a.id',
+                    'a.year', 'a.startDate',
+                    'a.endDate', 'a.summary'
+                ]
+            )
+        );
+        $query->from($db->quoteName('#__balancirk_holidays', 'a'));
 
-		return $query;
-	}
+        // Filter by search in title.
+        $search = $this->getState('filter.search');
 
-	/**
-	 * Method to get a list of holidays.
-	 * Overridden to add a check for access levels.
-	 *
-	 * @return  mixed  An array of data items on success, false on failure.
-	 *
-	 * @since   __BUMP_VERSION__
-	 */
-	public function getItems()
-	{
-		$items = parent::getItems();
+        if (!empty($search))
+        {
+            $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
+            $query->where('(a.summary LIKE ' . $search . ')');
+        }
 
-		return $items;
-	}
+        // Add the list ordering clause.
+        $orderCol  = $this->state->get('list.ordering', 'a.id');
+        $orderDirn = $this->state->get('list.direction', 'ASC');
 
-	/**
-	 * Method to get the row form.
-	 *
-	 * @param   array   $data       Data from the form.
-	 * @param   boolean $loadData   True if the form is to load its own data (default case), false if not.
-	 *
-	 * @return  \JForm|boolean  A \JForm object on success, false on failure
-	 *
-	 * @since   0.0.1
-	 */
-	public function getForm($data = [], $loadData = true)
-	{
-		// Get the form.
-		$form = $this->loadForm($this->holidaysAlias, 'holidays', ['control' => 'jform', 'load_data' => $loadData]);
+        $query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
 
-		if (empty($form))
-		{
-			return false;
-		}
+        return $query;
+    }
 
-		return $form;
-	}
+    /**
+     * Method to get a list of holidays.
+     * Overridden to add a check for access levels.
+     *
+     * @return  mixed  An array of data items on success, false on failure.
+     *
+     * @since   __BUMP_VERSION__
+     */
+    public function getItems()
+    {
+        $items = parent::getItems();
 
-	/**
-	 * Method to get the data that should be injected in the form.
-	 *
-	 * @return  mixed  The data for the form.
-	 *
-	 * @since   0.0.1
-	 */
-	protected function loadFormData()
-	{
-		$app = Factory::getApplication();
+        return $items;
+    }
 
-		$data = $this->getItems();
+    /**
+     * Method to get the row form.
+     *
+     * @param   array   $data       Data from the form.
+     * @param   boolean $loadData   True if the form is to load its own data (default case), false if not.
+     *
+     * @return  \JForm|boolean  A \JForm object on success, false on failure
+     *
+     * @since   0.0.1
+     */
+    public function getForm($data = [], $loadData = true)
+    {
+        // Get the form.
+        $form = $this->loadForm($this->holidaysAlias, 'holidays', ['control' => 'jform', 'load_data' => $loadData]);
 
-		$this->preprocessData($this->holidaysAlias, $data);
+        if (empty($form))
+        {
+            return false;
+        }
 
-		return $data;
-	}
+        return $form;
+    }
+
+    /**
+     * Method to get the data that should be injected in the form.
+     *
+     * @return  mixed  The data for the form.
+     *
+     * @since   0.0.1
+     */
+    protected function loadFormData()
+    {
+        $app = Factory::getApplication();
+
+        $data = $this->getItems();
+
+        $this->preprocessData($this->holidaysAlias, $data);
+
+        return $data;
+    }
 }

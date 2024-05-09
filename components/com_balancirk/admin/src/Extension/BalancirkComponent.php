@@ -43,8 +43,8 @@ class BalancirkComponent extends MVCComponent implements
      *
      * If required, some initial set up can be done from services of the container, eg.
      * registering HTML services.
-     * 
-     * @param ContainerInterface $container The Container 
+     *
+     * @param ContainerInterface $container The Container
      *
      * @return  void
      *
@@ -52,6 +52,6 @@ class BalancirkComponent extends MVCComponent implements
      */
     public function boot(ContainerInterface $container)
     {
-        $this->getRegistry()->register('balancirkadministrator', new AdministratorService);
+        $this->getRegistry()->register('balancirkadministrator', new AdministratorService());
     }
 }

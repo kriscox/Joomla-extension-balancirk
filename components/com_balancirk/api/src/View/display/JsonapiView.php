@@ -9,33 +9,30 @@ use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 
 class JsonapiView extends BaseApiView
 {
-  protected $fieldsToRenderItem = ['id', 'alias', 'name', 'catid'];
-  protected $fieldsToRenderList = ['id', 'alias', 'name', 'catid'];
+    protected $fieldsToRenderItem = ['id', 'alias', 'name', 'catid'];
+    protected $fieldsToRenderList = ['id', 'alias', 'name', 'catid'];
 
-  public function displayList(array $items = null)
-  {
-    foreach (FieldsHelper::getFields('com_balancirk.display') as $field)
+    public function displayList(array $items = null)
     {
-      $this->fieldsToRenderList[] = $field->id;
+        foreach (FieldsHelper::getFields('com_balancirk.display') as $field) {
+            $this->fieldsToRenderList[] = $field->id;
+        }
+        return parent::displayList();
     }
-    return parent::displayList();
-  }
 
-  public function displayItem($item = null)
-  {
-    foreach (FieldsHelper::getFields('com_balancirk.display') as $field)
+    public function displayItem($item = null)
     {
-      $this->fieldsToRenderItem[] = $field->name;
+        foreach (FieldsHelper::getFields('com_balancirk.display') as $field) {
+            $this->fieldsToRenderItem[] = $field->name;
+        }
+        return parent::displayItem();
     }
-    return parent::displayItem();
-  }
 
-  protected function prepareItem($item)
-  {
-    foreach (FieldsHelper::getFields('com_balancirk.display', $item, true) as $field)
+    protected function prepareItem($item)
     {
-      $item->{$field->name} = isset($field->apivalue) ? $field->apivalue : $field->rawvalue;
+        foreach (FieldsHelper::getFields('com_balancirk.display', $item, true) as $field) {
+            $item->{$field->name} = isset($field->apivalue) ? $field->apivalue : $field->rawvalue;
+        }
+        return parent::prepareItem($item);
     }
-    return parent::prepareItem($item);
-  }
 }

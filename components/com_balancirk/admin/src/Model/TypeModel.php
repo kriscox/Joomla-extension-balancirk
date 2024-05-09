@@ -26,134 +26,135 @@ use Jooma\CMS\CMSApplicationInterface;
  */
 class TypeModel extends AdminModel
 {
-	/**
-	 * The type alias for this content type.
-	 *
-	 * @var    string
-	 * @since  0.0.1
-	 */
-	public $typeAlias = 'com_balancirk.type';
+    /**
+     * The type alias for this content type.
+     *
+     * @var    string
+     * @since  0.0.1
+     */
+    public $typeAlias = 'com_balancirk.type';
 
-	/**
-	 * The prefix to use with controller messages.
-	 *
-	 * @var    string
-	 * @since  0.0.1
-	 */
-	protected $text_prefix = 'COM_BALANCIRK';
+    /**
+     * The prefix to use with controller messages.
+     *
+     * @var    string
+     * @since  0.0.1
+     */
+    protected $text_prefix = 'COM_BALANCIRK';
 
-	/**
-	 * Method to test whether a record can be deleted.
-	 *
-	 * @param   object  $record  A record object.
-	 *
-	 * @return  boolean  True if allowed to delete the record. Defaults to the permission set in the component.
-	 *
-	 * @since   0.0.1
-	 */
-	protected function canDelete($record)
-	{
-		if (!empty($record->id))
-		{
-			$app = Factory::getApplication();
+    /**
+     * Method to test whether a record can be deleted.
+     *
+     * @param   object  $record  A record object.
+     *
+     * @return  boolean  True if allowed to delete the record. Defaults to the permission set in the component.
+     *
+     * @since   0.0.1
+     */
+    protected function canDelete($record)
+    {
+        if (!empty($record->id))
+        {
+            $app = Factory::getApplication();
 
-			return $app->getIdentity()->authorise('core.delete', 'com_balancirk.type.' . (int) $record->id);
-		}
+            return $app->getIdentity()->authorise('core.delete', 'com_balancirk.type.' . (int) $record->id);
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Method to test whether a record can have its state edited.
-	 *
-	 * @param   object  $record  A record object.
-	 *
-	 * @return  boolean  True if allowed to change the state of the record. Defaults to the permission set in the component.
-	 *
-	 * @since   0.0.1
-	 */
-	protected function canEditState($record)
-	{
-		$user = Factory::getApplication()->getIdentity();
+    /**
+     * Method to test whether a record can have its state edited.
+     *
+     * @param   object  $record  A record object.
+     *
+     * @return  boolean  True if allowed to change the state of the record. Defaults to the permission set in the component.
+     *
+     * @since   0.0.1
+     */
+    protected function canEditState($record)
+    {
+        $user = Factory::getApplication()->getIdentity();
 
-		// Check for existing article.
-		if (!empty($record->id))
-		{
-			return $user->authorise('core.edit.state', 'com_balancirk.type.' . (int) $record->id);
-		}
+        // Check for existing article.
+        if (!empty($record->id))
+        {
+            return $user->authorise('core.edit.state', 'com_balancirk.type.' . (int) $record->id);
+        }
 
-		// Default to component settings if neither article nor category known.
-		return parent::canEditState($record);
-	}
+        // Default to component settings if neither article nor category known.
+        return parent::canEditState($record);
+    }
 
-	/**
-	 * Method to get a table object, load it if necessary.
-	 *
-	 * @param   string  $name     The table name. Optional.
-	 * @param   string  $prefix   The class prefix. Optional.
-	 * @param   array   $options  Configuration array for model. Optional.
-	 *
-	 * @return  Table  A Table object
-	 *
-	 * @since   0.0.1
-	 * @throws  \Exception
-	 */
-	public function getTable($name = '', $prefix = '', $options = array())
-	{
-		$name = 'types';
-		$prefix = 'Table';
+    /**
+     * Method to get a table object, load it if necessary.
+     *
+     * @param   string  $name     The table name. Optional.
+     * @param   string  $prefix   The class prefix. Optional.
+     * @param   array   $options  Configuration array for model. Optional.
+     *
+     * @return  Table  A Table object
+     *
+     * @since   0.0.1
+     * @throws  \Exception
+     */
+    public function getTable($name = '', $prefix = '', $options = array())
+    {
+        $name = 'types';
+        $prefix = 'Table';
 
-		if ($table = $this->_createTable($name, $prefix, $options))
-		{
-			return $table;
-		}
+        if ($table = $this->_createTable($name, $prefix, $options))
+        {
+            return $table;
+        }
 
-		throw new \Exception(Text::sprintf('JLIB_APPLICATION_ERROR_TABLE_NAME_NOT_SUPPORTED', $name), 0);
-	}
+        throw new \Exception(Text::sprintf('JLIB_APPLICATION_ERROR_TABLE_NAME_NOT_SUPPORTED', $name), 0);
+    }
 
-	/**
-	 * Method to get the row form.
-	 *
-	 * @param   array   $data       Data from the form.
-	 * @param   boolean $loadData   True if the form is to load its own data (default case), false if not.
-	 *
-	 * @return  \JForm|boolean  A \JForm object on success, false on failure
-	 *
-	 * @since   0.0.1
-	 */
-	public function getForm($data = [], $loadData = true)
-	{
-		// Get the form.
-		$form = $this->loadForm($this->typeAlias, 'type', ['control' => 'jform', 'load_data' => $loadData]);
+    /**
+     * Method to get the row form.
+     *
+     * @param   array   $data       Data from the form.
+     * @param   boolean $loadData   True if the form is to load its own data (default case), false if not.
+     *
+     * @return  \JForm|boolean  A \JForm object on success, false on failure
+     *
+     * @since   0.0.1
+     */
+    public function getForm($data = [], $loadData = true)
+    {
+        // Get the form.
+        $form = $this->loadForm($this->typeAlias, 'type', ['control' => 'jform', 'load_data' => $loadData]);
 
-		if (empty($form))
-		{
-			return false;
-		}
-		return $form;
-	}
+        if (empty($form))
+        {
+            return false;
+        }
+        return $form;
+    }
 
-	/**
-	 * Method to get the data that should be injected in the form.
-	 *
-	 * @return  mixed  The data for the form.
-	 *
-	 * @since   0.0.1
-	 */
-	protected function loadFormData()
-	{
-		$app = Factory::getApplication();
-		$data = $app->getUserState('com_balancirk.edit.type.data', array());
+    /**
+     * Method to get the data that should be injected in the form.
+     *
+     * @return  mixed  The data for the form.
+     *
+     * @since   0.0.1
+     */
+    protected function loadFormData()
+    {
+        /** @var CMSApplication */
+        $app = Factory::getApplication();
+        $data = $app->getUserState('com_balancirk.edit.type.data', array());
 
-		if (empty($data))
-		{
-			$data = $this->getItem();
+        if (empty($data))
+        {
+            $data = $this->getItem();
 
-			// Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
-		}
+            // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
+        }
 
-		$this->preprocessData($this->typeAlias, $data);
+        $this->preprocessData($this->typeAlias, $data);
 
-		return $data;
-	}
+        return $data;
+    }
 }

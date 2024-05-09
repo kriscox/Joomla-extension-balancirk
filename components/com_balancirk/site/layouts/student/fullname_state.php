@@ -14,10 +14,10 @@ use Joomla\CMS\Language\Text;
 
 $form  = $displayData->getForm();
 $states = array(
-	'0' => Text::_('COM_BALANCIRK_STATUS_SUBSCRIBED'),
-	'1' => Text::_('COM_BALANCIRK_STATUS_UNSUBSCRIBED'),
-	'2' => Text::_('JARCHIVED'),
-	'-2' => Text::_('JTRASHED')
+    '0' => Text::_('COM_BALANCIRK_STATUS_SUBSCRIBED'),
+    '1' => Text::_('COM_BALANCIRK_STATUS_UNSUBSCRIBED'),
+    '2' => Text::_('JARCHIVED'),
+    '-2' => Text::_('JTRASHED')
 );
 
 $fullname = $form->getField('firstname')->value . " " . $form->getField('name')->value;

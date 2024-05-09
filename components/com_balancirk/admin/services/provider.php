@@ -25,8 +25,7 @@ use CoCoCo\Component\Balancirk\Administrator\Extension\BalancirkComponent;
  *
  * @since  0.0.1
  */
-return new class implements ServiceProviderInterface
-{
+return new class () implements ServiceProviderInterface {
     /**
      * Registers the service provider with a DI container.
      *

@@ -14,6 +14,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Layout\LayoutHelper;
+
 ?>
 
 <alert>Not yet implemented</alert>
@@ -59,10 +60,10 @@ use Joomla\CMS\Layout\LayoutHelper;
 	</thead>
 	<tbody>
 		<?php
-		$n = count($this->items);
+        $n = count($this->items);
 
-		foreach ($this->items as $i => $item) :
-		?>
+foreach ($this->items as $i => $item) :
+    ?>
 			<tr class="row<?= $i % 2; ?>">
 				<td class="d-none d-md-table-cell text-center">
 					<?= $item->id; ?>
@@ -78,12 +79,12 @@ use Joomla\CMS\Layout\LayoutHelper;
 				</th>
 				<th scope="row" class="has-context">
 					<?= $this->escape($item->street) . " " .
-						$this->escape($item->number) . " " .
-						$this->escape($item->bus); ?>
+                    $this->escape($item->number) . " " .
+                    $this->escape($item->bus); ?>
 				</th>
 				<th scope="row" class="has-context">
 					<?= $this->escape($item->postcode) . " " .
-						$this->escape($item->city); ?>
+                    $this->escape($item->city); ?>
 				</th>
 				<th scope="row" class="has-context">
 					<?= $this->escape($item->phone); ?>

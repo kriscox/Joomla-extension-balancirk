@@ -19,6 +19,6 @@ use Joomla\CMS\MVC\Controller\FormController;
  *
  * @since  0.0.1
  */
-class HolidaysController extends FormController
+class HolidayController extends FormController
 {
 }

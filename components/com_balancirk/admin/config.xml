@@ -1,19 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
-	<fieldset
-		name="permissions"
+	<fieldset name="basic"
+		label="Basic Options"
+		description="Basic Options">
+		<field name="email_body_subscription"
+			type="emailbody"
+			label="Email Body Subscription"
+			description="Enter the body of the email" />
+		<field name="email_body_waitinglist"
+			type="emailbody"
+			label="Email Body Waiting List"
+			description="Enter the body of the email" />
+	</fieldset>
+	<fieldset name="permissions"
 		label="JCONFIG_PERMISSIONS_LABEL"
-		description="JCONFIG_PERMISSIONS_DESC"
-	>
-		<field
-			name="rules"
+		description="JCONFIG_PERMISSIONS_DESC">
+		<field name="rules"
 			type="rules"
 			label="JCONFIG_PERMISSIONS_LABEL"
 			class="inputbox"
 			validate="rules"
 			filter="rules"
 			component="com_balancirk"
-			section="component"
-		/>
+			section="component" />
 	</fieldset>
 </config>

@@ -47,9 +47,9 @@ use Joomla\CMS\HTML\HTMLHelper;
 					</thead>
 					<tbody>
 						<?php
-						$n = count($displayData);
+                        $n = count($displayData);
 
-						foreach ($displayData as $i => $student) : ?>
+			    foreach ($displayData as $i => $student) : ?>
 							<tr class="row<?= $i % 2; ?>">
 								<td class="text-center d-none">
 									<?php echo HTMLHelper::_('grid.id', $i, $student->id); ?>
@@ -61,10 +61,10 @@ use Joomla\CMS\HTML\HTMLHelper;
 									<?= HtmlHelper::date($student->birthdate, Text::_('DATE_FORMAT_FILTER_DATE')); ?>
 								</td>
 								<td scope="row" class="d-md-table-cell">
-									<? if ($student->last_presence === null) :
-										echo Text::_('COM_BALANCIRK_LESSON_NEVER');
+									<?php if ($student->last_presence === null) :
+									    echo Text::_('COM_BALANCIRK_LESSON_NEVER');
 									else :
-										echo HtmlHelper::date($student->last_presence, Text::_('DATE_FORMAT_FILTER_DATE'));
+									    echo HtmlHelper::date($student->last_presence, Text::_('DATE_FORMAT_FILTER_DATE'));
 									endif; ?>
 								</td>
 							</tr>

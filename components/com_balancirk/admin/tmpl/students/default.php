@@ -18,10 +18,10 @@ use Joomla\CMS\Layout\LayoutHelper;
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
 $states = array(
-	'0' => Text::_('COM_BALANCIRK_STATUS_SUBSCRIBED'),
-	'1' => Text::_('COM_BALANCIRK_STATUS_UNSUBSCRIBED'),
-	'2' => Text::_('JARCHIVED'),
-	'-2' => Text::_('JTRASHED')
+    '0' => Text::_('COM_BALANCIRK_STATUS_SUBSCRIBED'),
+    '1' => Text::_('COM_BALANCIRK_STATUS_UNSUBSCRIBED'),
+    '2' => Text::_('JARCHIVED'),
+    '-2' => Text::_('JTRASHED')
 );
 
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
@@ -77,9 +77,9 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 						</thead>
 						<tbody>
 							<?php
-							$n = count($this->items);
-							foreach ($this->items as $i => $item) :
-							?>
+                            $n = count($this->items);
+				    foreach ($this->items as $i => $item) :
+				        ?>
 								<tr class="row<?= $i % 2; ?>">
 									<td class="text-center">
 										<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
@@ -97,12 +97,12 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 									</td>
 									<td scope="row" class="d-none d-md-table-cell">
 										<?= $this->escape($item->street) . " " .
-											$this->escape($item->number) . " " .
-											$this->escape($item->bus); ?>
+				                        $this->escape($item->number) . " " .
+				                        $this->escape($item->bus); ?>
 									</td>
 									<td scope="row" class="d-none d-md-table-cell">
 										<?= $this->escape($item->postcode) . " " .
-											$this->escape($item->city); ?>
+				                        $this->escape($item->city); ?>
 									</td>
 									<td scope="row" class="d-none d-md-table-cell">
 										<?= $this->escape($item->phone); ?>

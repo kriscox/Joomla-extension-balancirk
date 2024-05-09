@@ -22,51 +22,50 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
  */
 class HtmlView extends BaseHtmlView
 {
-	/**
-	 * The \JForm object
-	 *
-	 * @var  \JForm
-	 */
-	protected $form;
+    /**
+     * The \JForm object
+     *
+     * @var  \JForm
+     */
+    protected $form;
 
-	/**
-	 * The active item
-	 *
-	 * @var  object
-	 */
-	protected $item;
+    /**
+     * The active item
+     *
+     * @var  object
+     */
+    protected $item;
 
-	/**
-	 * The model state
-	 *
-	 * @var  object
-	 */
-	protected $state;
+    /**
+     * The model state
+     *
+     * @var  object
+     */
+    protected $state;
 
-	/**
-	 * The actions the user is authorised to perform
-	 *
-	 * @var  \JObject
-	 */
-	protected $canDo;
+    /**
+     * The actions the user is authorised to perform
+     *
+     * @var  \JObject
+     */
+    protected $canDo;
 
-	/**
-	 * Display the view.
-	 *
-	 * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
-	 *
-	 * @return  mixed  A string if successful, otherwise an Error object.
-	 */
-	public function display($tpl = null)
-	{
-		$this->form = $this->get('Form');
-		$this->item = $this->get('Item');
+    /**
+     * Display the view.
+     *
+     * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
+     *
+     * @return  mixed  A string if successful, otherwise an Error object.
+     */
+    public function display($tpl = null)
+    {
+        $this->form = $this->get('Form');
+        $this->item = $this->get('Item');
 
-		if (count($errors = $this->get('Errors')))
-		{
-			throw new GenericDataException(implode("\n", $errors), 500);
-		}
+        if (count($errors = $this->get('Errors'))) {
+            throw new GenericDataException(implode("\n", $errors), 500);
+        }
 
-		return parent::display($tpl);
-	}
+        return parent::display($tpl);
+    }
 }

@@ -12,72 +12,118 @@ namespace CoCoCo\Component\Balancirk\Administrator\View\Holidays;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
+use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\View\GenericDataException;
+use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
-use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
-use Joomla\CMS\Application\CMSWebApplicationInterface;
 
 /**
  * View class for a list of holidays
  *
- * @since  0.0.1
+ * @since  1.2.9
  */
 class HtmlView extends BaseHtmlView
 {
-	/**
-	 * List of holidays of Balancirk.
-	 *
-	 * @var	$holidays;
-	 * @since  0.0.1
-	 */
-	protected $items;
+    /**
+     * List of holidays of Balancirk.
+     *
+     * @var	$items;
+     * @since  1.2.9
+     */
+    protected $items;
 
-	/**
-	 * Form object for the view.
-	 *
-	 * @var		$form;
-	 * @since	0.0.1
-	 */
-	protected $form;
+    /**
+     * The pagination object
+     *
+     * @var  \JPagination
+     */
+    protected $pagination;
 
-	/**
-	 * Method to display the view.
-	 *
-	 * @param   string $tpl A template file to load. [optional]
-	 *
-	 * @return  void
-	 *
-	 * @since   0.0.1
-	 */
-	public function display($tpl = null): void
-	{
-		$this->form = $this->get('form');
-		$this->items = $this->get('Items');
-		$this->addToolbar();
+    /**
+     * The model state
+     *
+     * @var  \JObject
+     */
+    protected $state;
 
-		parent::display($tpl);
-	}
+    /**
+     * Form object for search filters
+     *
+     * @var  \JForm
+     */
+    public $filterForm;
 
-	/**
-	 * Add the page title and toolbar.
-	 *
-	 * @return  void
-	 *
-	 * @since   0.0.1
-	 */
-	protected function addToolbar()
-	{
-		Factory::getApplication()->input->set('hidemainmenu', true);
-		$toolbar = Toolbar::getInstance('toolbar');
+    /**
+     * The active search filters
+     *
+     * @var  array
+     */
+    public $activeFilters;
 
-		ToolbarHelper::title(
-			Text::_('COM_BALANCIRK_HOLIDAY_TITLE')
-		);
+    /**
+     * Method to display the view.
+     *
+     * @param   string $tpl A template file to load. [optional]
+     *
+     * @return  void
+     *
+     * @since   1.2.9
+     */
+    public function display($tpl = null): void
+    {
+        /** @var array $items	List of holidays of Balancirk. */
+        $this->items = $this->get('Items');
+        $this->pagination = $this->get('Pagination');
+        $this->state = $this->get('State');
+        $this->filterForm = $this->get('FilterForm');
+        $this->activeFilters = $this->get('ActiveFilters');
 
-		$toolbar->addNew('holidays.new');
-		$toolbar->apply('holidays.save');
-		$toolbar->cancel('holidays.cancel', 'JTOOLBAR_CLOSE');
-	}
+        if (!count($this->items) && $this->get('IsEmptyState'))
+        {
+            $this->setLayout('emptystate');
+        }
+
+        // Check for errors.
+        if (count($errors = $this->get('Errors')))
+        {
+            throw new GenericDataException(implode("\n", $errors), 500);
+        }
+
+        $this->addToolbar();
+
+        parent::display($tpl);
+    }
+
+    /**
+     * Add the page title and toolbar.
+     *
+     * @return  void
+     *
+     * @since   1.2.9
+     */
+    protected function addToolbar()
+    {
+        $toolbar = Toolbar::getInstance('toolbar');
+
+        ToolbarHelper::title(
+            Text::_('COM_BALANCIRK_HOLIDAY_TITLE')
+        );
+
+        $canDo = ContentHelper::getActions('com_balancirk');
+
+        if ($canDo->get('core.create'))
+        {
+            $toolbar->addNew('holiday.add');
+        }
+
+        if ($this->state->get('filter.published') == -2 && $canDo->get('core.delete'))
+        {
+            $toolbar->delete('holidays.delete')
+                ->text('JTOOLBAR_EMPTY_TRASH')
+                ->message('JGLOBAL_CONFIRM_DELETE')
+                ->listCheck(true);
+        }
+    }
 }

@@ -24,88 +24,82 @@ use CoCoCo\Component\Balancirk\Site\Model\MemberModel;
  */
 class MemberController extends FormController
 {
-	/**
-	 * Cancel and return to homepage
-	 *
-	 * Implement the cancel button to return to the homepage on pressing the button with
-	 * task member.cancel
-	 *
-	 * @param   array	   $key	List of fields of the for
-	 *
-	 * @since   __BUMP_VERSION__
-	 **/
-	public function cancel($key = null)
-	{
-		parent::cancel($key);
+    /**
+     * Cancel and return to homepage
+     *
+     * Implement the cancel button to return to the homepage on pressing the button with
+     * task member.cancel
+     *
+     * @param   array	   $key	List of fields of the for
+     *
+     * @since   __BUMP_VERSION__
+     **/
+    public function cancel($key = null)
+    {
+        parent::cancel($key);
 
-		// Set up the redirect back to the previous page (put in the header in HtmlView.php)
-		$this->setRedirect("/");
-	}
+        // Set up the redirect back to the previous page (put in the header in HtmlView.php)
+        $this->setRedirect("/");
+    }
 
-	/**
-	 * Register user
-	 *
-	 * Register the user based on the input values in $key
-	 *
-	 * @param   array	   $key	List of fields of the form
-	 *
-	 * @return	void
-	 *
-	 * @since   __BUMP_VERSION__
-	 **/
-	public function register($key = null)
-	{
-		// Check if token is correct. Security measure
-		$this->checkToken();
+    /**
+     * Register user
+     *
+     * Register the user based on the input values in $key
+     *
+     * @param   array	   $key	List of fields of the form
+     *
+     * @return	void
+     *
+     * @since   __BUMP_VERSION__
+     **/
+    public function register($key = null)
+    {
+        // Check if token is correct. Security measure
+        $this->checkToken();
 
-		// Get the curren application
-		/** @var CMSApplication */
-		$app = Factory::getApplication();
+        // Get the curren application
+        /** @var CMSApplication */
+        $app = Factory::getApplication();
 
-		// Get data from the form
-		$data = $this->input->get('jform', array(), 'array');
+        // Get data from the form
+        $data = $this->input->get('jform', array(), 'array');
 
-		// Get the model and the form used
-		/** @var memberModel */
-		$model = $this->getModel('member');
-		$form = $model->getForm($data, false);
+        // Get the model and the form used
+        /** @var memberModel */
+        $model = $this->getModel('member');
+        $form = $model->getForm($data, false);
 
-		// Set the default redirection url
-		$redirectUrl = Route::_('index.php?option=com_balancirk&view=member&layout=register', false);
+        // Set the default redirection url
+        $redirectUrl = Route::_('index.php?option=com_balancirk&view=member&layout=register', false);
 
-		// Validate data and fill form data cache
-		$validData = $model->validate($form, $data);
-		$app->setUserState('com_balancirk.member.data', $data);
+        // Validate data and fill form data cache
+        $validData = $model->validate($form, $data);
+        $app->setUserState('com_balancirk.member.data', $data);
 
-		if ($validData === false)
-		{
-			$errors = $model->getErrors();
+        if ($validData === false) {
+            $errors = $model->getErrors();
 
-			foreach ($errors as $error)
-			{
-				if ($error instanceof \Exception)
-				{
-					$app->enqueueMessage($error->getMessage(), 'warning');
-				}
-				else
-				{
-					$app->enqueueMessage($error, 'warning');
-				}
-			}
-		}
+            foreach ($errors as $error) {
+                if ($error instanceof \Exception) {
+                    $app->enqueueMessage($error->getMessage(), 'warning');
+                } else {
+                    $app->enqueueMessage($error, 'warning');
+                }
+            }
+        }
 
 
-		// Register the user
-		if ($model->register($data))
-		{
-			// Rmove the form data in the session, using a unique identifier
-			$app->setUserState('com_balancirk.member.data', null);
+        // Register the user
+        if ($model->register($data)) {
+            // Rmove the form data in the session, using a unique identifier
+            $app->setUserState('com_balancirk.member.data', null);
 
-			// Set return to homepage
-			$redirectUrl = Route::_('/', false);
-		}
+            // Set return to homepage
+            $redirectUrl = Route::_('/', false);
+        }
 
-		// Redirect back to the form in all cases
-		$this->setRedirect($redirectUrl);
-	}
+        // Redirect back to the form in all cases
+        $this->setRedirect($redirectUrl);
+    }
 }

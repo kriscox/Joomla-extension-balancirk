@@ -31,8 +31,8 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 	<div class="row">
 		<nav aria-label="Toolbar" style="display: flex; align-items: center;">
 			<?= LayoutHelper::render(
-				'joomla.searchtools.default',
-				array('view' => $this)
+			    'joomla.searchtools.default',
+			    array('view' => $this)
 			); ?>
 		</nav>
 		<div class="col-md-12">
@@ -54,7 +54,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 									<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_ID'); ?>
 								</th>
 								<th scope="col" class="d-none d-md-table-cell">
-									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_NAME', 'a.name', $listDirn,  $listOrder); ?>
+									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_NAME', 'a.name', $listDirn, $listOrder); ?>
 								</th>
 								<th scope="col" class="d-none d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_TYPE', 'a.type', $listDirn, $listOrder); ?>
@@ -72,7 +72,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 						</thead>
 						<tbody>
 							<?php $n = count($this->items);
-							foreach ($this->items as $i => $item) : ?>
+				    foreach ($this->items as $i => $item) : ?>
 								<tr class="row<?= $i % 2; ?>">
 									<td class="hidden d-none d-md-table-cell text-center">
 										<?= $item->id; ?>

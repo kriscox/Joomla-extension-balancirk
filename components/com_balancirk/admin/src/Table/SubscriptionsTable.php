@@ -22,16 +22,16 @@ use Joomla\Database\DatabaseDriver;
  */
 class SubscriptionsTable extends Table
 {
-	/**
-	 * Constructor
-	 *
-	 * @param   DatabaseDriver  $db  Database connector object
-	 *
-	 * @since   __BUMP_VERSION__
-	 */
-	public function __construct(DatabaseDriver $db)
-	{
-		$this->typeAlias = 'com_balancirk.subscriptions';
-		parent::__construct('#__balancirk_subscriptions', array('lesson', 'student'), $db);
-	}
+    /**
+     * Constructor
+     *
+     * @param   DatabaseDriver  $db  Database connector object
+     *
+     * @since   __BUMP_VERSION__
+     */
+    public function __construct(DatabaseDriver $db)
+    {
+        $this->typeAlias = 'com_balancirk.subscriptions';
+        parent::__construct('#__balancirk_subscriptions', array('lesson', 'student'), $db);
+    }
 }

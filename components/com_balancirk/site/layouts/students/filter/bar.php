@@ -18,9 +18,8 @@ $data = $displayData;
 // Receive overridable options
 $data['options'] = !empty($data['options']) ? $data['options'] : array();
 
-if (is_array($data['options']))
-{
-	$data['options'] = new Registry($data['options']);
+if (is_array($data['options'])) {
+    $data['options'] = new Registry($data['options']);
 }
 
 // Options
@@ -29,9 +28,8 @@ $searchButton = $data['options']->get('searchButton', true);
 
 $filters = $data['view']->filterForm->getGroup('filter');
 
-if (empty($filters['filter_search']) || !$searchButton)
-{
-	return;
+if (empty($filters['filter_search']) || !$searchButton) {
+    return;
 }
 ?>
 

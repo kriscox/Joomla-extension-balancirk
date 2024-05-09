@@ -22,59 +22,58 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
  */
 class HtmlView extends BaseHtmlView
 {
-	/**
-	 * The list of students
-	 *
-	 * @var  array
-	 */
-	protected $students;
+    /**
+     * The list of students
+     *
+     * @var  array
+     */
+    protected $students;
 
-	/**
-	 * The list of lessons currently open to subscription
-	 *
-	 * @var  array
-	 */
-	protected $lessons;
+    /**
+     * The list of lessons currently open to subscription
+     *
+     * @var  array
+     */
+    protected $lessons;
 
-	/**
-	 * The model state
-	 *
-	 * @var  object
-	 */
-	protected $state;
+    /**
+     * The model state
+     *
+     * @var  object
+     */
+    protected $state;
 
-	/**
-	 * The actions the user is authorised to perform
-	 *
-	 * @var  \JObject
-	 */
-	protected $canDo;
+    /**
+     * The actions the user is authorised to perform
+     *
+     * @var  \JObject
+     */
+    protected $canDo;
 
-	/**
-	 * The \JForm object
-	 *
-	 * @var  \JForm
-	 */
-	protected $form;
+    /**
+     * The \JForm object
+     *
+     * @var  \JForm
+     */
+    protected $form;
 
-	/**
-	 * Display the view.
-	 *
-	 * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
-	 *
-	 * @return  mixed  A string if successful, otherwise an Error object.
-	 */
-	public function display($tpl = null)
-	{
-		$this->students = $this->get('Students');
-		$this->lessons = $this->get('Lessons');
-		$this->form = $this->get('Form');
+    /**
+     * Display the view.
+     *
+     * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
+     *
+     * @return  mixed  A string if successful, otherwise an Error object.
+     */
+    public function display($tpl = null)
+    {
+        $this->students = $this->get('Students');
+        $this->lessons = $this->get('Lessons');
+        $this->form = $this->get('Form');
 
-		if (count($errors = $this->get('Errors')))
-		{
-			throw new GenericDataException(implode("\n", $errors), 500);
-		}
+        if (count($errors = $this->get('Errors'))) {
+            throw new GenericDataException(implode("\n", $errors), 500);
+        }
 
-		return parent::display($tpl);
-	}
+        return parent::display($tpl);
+    }
 }

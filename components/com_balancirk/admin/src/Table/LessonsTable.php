@@ -22,16 +22,16 @@ use Joomla\Database\DatabaseDriver;
  */
 class LessonsTable extends Table
 {
-	/**
-	 * Constructor
-	 *
-	 * @param   DatabaseDriver  $db  Database connector object
-	 *
-	 * @since   __BUMP_VERSION__
-	 */
-	public function __construct(DatabaseDriver $db)
-	{
-		$this->typeAlias = 'com_balancirk.lessons';
-		parent::__construct('#__balancirk_lessons', 'id', $db);
-	}
+    /**
+     * Constructor
+     *
+     * @param   DatabaseDriver  $db  Database connector object
+     *
+     * @since   __BUMP_VERSION__
+     */
+    public function __construct(DatabaseDriver $db)
+    {
+        $this->typeAlias = 'com_balancirk.lessons';
+        parent::__construct('#__balancirk_lessons', 'id', $db);
+    }
 }

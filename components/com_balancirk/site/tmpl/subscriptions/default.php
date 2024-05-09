@@ -19,10 +19,10 @@ use Joomla\CMS\Layout\LayoutHelper;
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
 $states = array(
-	'0' => Text::_('COM_BALANCIRK_LESSON_STATUS_PAST'),
-	'1' => Text::_('COM_BALANCIRK_LESSON_STATUS_CURRENT'),
-	'2' => Text::_('COM_BALANCIRK_LESSON_STATUS_NEXT'),
-	'-2' => Text::_('JTRASHED')
+    '0' => Text::_('COM_BALANCIRK_LESSON_STATUS_PAST'),
+    '1' => Text::_('COM_BALANCIRK_LESSON_STATUS_CURRENT'),
+    '2' => Text::_('COM_BALANCIRK_LESSON_STATUS_NEXT'),
+    '-2' => Text::_('JTRASHED')
 );
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 ?>
@@ -81,7 +81,7 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 							</tr>
 							<?php $n = count($this->items);
 
-							foreach ($this->items as $i => $item) : ?>
+				    foreach ($this->items as $i => $item) : ?>
 								<tr class="row<?= $i % 2; ?>">
 									<td class="text-center d-none">
 										<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>

@@ -21,23 +21,23 @@ use Joomla\CMS\MVC\Controller\FormController;
  */
 class StudentController extends FormController
 {
-	/**
-	 * Cancel and return to the students list page.
-	 *
-	 * Implement the cancel button to return to the students list page on pressing the button with
-	 * task student.cancel
-	 *
-	 * @param   array	   $key	List of fields of the for
-	 *
-	 * @since   __BUMP_VERSION__
-	 **/
-	public function cancel($key = null)
-	{
-		parent::cancel($key);
+    /**
+     * Cancel and return to the students list page.
+     *
+     * Implement the cancel button to return to the students list page on pressing the button with
+     * task student.cancel
+     *
+     * @param   array	   $key	List of fields of the for
+     *
+     * @since   __BUMP_VERSION__
+     **/
+    public function cancel($key = null)
+    {
+        parent::cancel($key);
 
-		// Set up the redirect back to the previous page (put in the header in HtmlView.php)
-		$this->redirect(
-			'/administrator/index.php?option=' . $this->option . '&view=students'
-		);
-	}
+        // Set up the redirect back to the previous page (put in the header in HtmlView.php)
+        $this->redirect(
+            '/administrator/index.php?option=' . $this->option . '&view=students'
+        );
+    }
 }

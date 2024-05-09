@@ -21,7 +21,6 @@ use Joomla\CMS\Factory;
  */
 class DisplayController extends BaseController
 {
-
     public function display($cachable = false, $urlparams = array())
     {
         parent::display($cachable, $urlparams);

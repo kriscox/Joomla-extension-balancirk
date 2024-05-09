@@ -26,84 +26,82 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
  */
 class HtmlView extends BaseHtmlView
 {
-	/**
-	 * The \JForm object
-	 *
-	 * @var  \JForm
-	 */
-	protected $form;
+    /**
+     * The \JForm object
+     *
+     * @var  \JForm
+     */
+    protected $form;
 
-	/**
-	 * The active item
-	 *
-	 * @var  object
-	 */
-	protected $item;
+    /**
+     * The active item
+     *
+     * @var  object
+     */
+    protected $item;
 
-	/**
-	 * The students list
-	 *
-	 * @var  array	list of students
-	 */
-	protected $students;
+    /**
+     * The students list
+     *
+     * @var  array	list of students
+     */
+    protected $students;
 
-	/**
-	 * The lesson days list
-	 * 
-	 * @var  array	list of lesson days
-	 */
-	protected $lesdays;
+    /**
+     * The lesson days list
+     *
+     * @var  array	list of lesson days
+     */
+    protected $lesdays;
 
-	/**
-	 * The model state
-	 *
-	 * @var  object
-	 */
-	protected $state;
+    /**
+     * The model state
+     *
+     * @var  object
+     */
+    protected $state;
 
-	/**
-	 * The actions the user is authorised to perform
-	 *
-	 * @var  \JObject
-	 */
-	protected $canDo;
+    /**
+     * The actions the user is authorised to perform
+     *
+     * @var  \JObject
+     */
+    protected $canDo;
 
-	/**
-	 * The array of presences for this lesson
-	 * 
-	 * @var  array
-	 */
-	protected $presences;
+    /**
+     * The array of presences for this lesson
+     *
+     * @var  array
+     */
+    protected $presences;
 
-	/**
-	 * Display the view.
-	 *
-	 * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
-	 *
-	 * @return  mixed  A string if successful, otherwise an Error object.
-	 */
-	public function display($tpl = null)
-	{
-		// What Access Permissions does this user have? What can (s)he do?
-		$this->canDo = ContentHelper::getActions('com_balancirk');
+    /**
+     * Display the view.
+     *
+     * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
+     *
+     * @return  mixed  A string if successful, otherwise an Error object.
+     */
+    public function display($tpl = null)
+    {
+        // What Access Permissions does this user have? What can (s)he do?
+        $this->canDo = ContentHelper::getActions('com_balancirk');
 
-		if (!$this->canDo->get('lessons.view'))
-		{
-			throw new Exception(Text::_('JERROR_ALERTNOAUTHOR'));
-		}
+        if (!$this->canDo->get('lessons.view')) {
+            throw new Exception(Text::_('JERROR_ALERTNOAUTHOR'));
+        }
 
-		$this->form = $this->get('Form');
-		$this->item = $this->get('Item');
-		$this->students = $this->get('Students');
-		$this->state = $this->get('State');
-		$this->lesdays = LessonModel::getLesdays($this->item->lesdays);
-		$this->presences = $this->get('Presences');
+        $this->form = $this->get('Form');
+        $this->item = $this->get('Item');
+        $this->students = $this->get('Students');
+        $this->state = $this->get('State');
+        $this->lesdays = LessonModel::getLesdays($this->item->lesdays);
+        $this->presences = $this->get('Presences');
 
-		if (count($errors = $this->get('Errors')))
-		{
-			throw new GenericDataException(implode("\n", $errors), 500);
-		}
+        if (count($errors = $this->get('Errors'))) {
+            throw new GenericDataException(implode("\n", $errors), 500);
+        }
 
-		return parent::display($tpl);
-	}
+        return parent::display($tpl);
+    }
 }
