@@ -1,0 +1,19 @@
+<?php
+
+namespace CoCoCo\Component\Balancirk\Api\View\Teachers;
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\MVC\View\JsonApiView as BaseApiView;
+use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
+
+class JsonapiView extends BaseApiView
+{
+    protected $fieldsToRenderItem = [
+        'member',
+    ];
+
+    protected $fieldsToRenderList = [
+        'member',
+    ];
+}

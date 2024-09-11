@@ -52,7 +52,8 @@ class StudentModel extends AdminModel
      */
     protected function canDelete($record)
     {
-        if (!empty($record->id)) {
+        if (!empty($record->id))
+        {
             $app = Factory::getApplication();
 
             return $app->getIdentity()->authorise('core.delete', 'com_balancirk.students.' . (int) $record->id);
@@ -75,7 +76,8 @@ class StudentModel extends AdminModel
         $student = Factory::getApplication()->getIdentity();
 
         // Check for existing article.
-        if (!empty($record->id)) {
+        if (!empty($record->id))
+        {
             return $student->authorise('core.edit.state', 'com_balancirk.students.' . (int) $record->id);
         }
 
@@ -100,7 +102,8 @@ class StudentModel extends AdminModel
         $name = 'students';
         $prefix = 'Table';
 
-        if ($table = $this->_createTable($name, $prefix, $options)) {
+        if ($table = $this->_createTable($name, $prefix, $options))
+        {
             return $table;
         }
 
@@ -122,7 +125,8 @@ class StudentModel extends AdminModel
         // Get the form.
         $form = $this->loadForm($this->typeAlias, 'student', ['control' => 'jform', 'load_data' => $loadData]);
 
-        if (empty($form)) {
+        if (empty($form))
+        {
             return false;
         }
 
@@ -143,7 +147,8 @@ class StudentModel extends AdminModel
 
         $data = $app->getUserState('com_balancirk.student.data', array());
 
-        if (empty($data)) {
+        if (empty($data))
+        {
             $data = $this->getItem();
         }
 
@@ -169,8 +174,10 @@ class StudentModel extends AdminModel
         $data['state'] = 1;
 
         // If save is successfull and this is a new student than fill the user as primairy parent
-        if (parent::save($data)) {
-            if ($this->state->get("student.new")) {
+        if (parent::save($data))
+        {
+            if ($this->state->get("student.new"))
+            {
                 $columns = array('child', 'parent', 'primary');
 
                 // Get the new student.id
@@ -211,17 +218,20 @@ class StudentModel extends AdminModel
     public function isPrimairyParent(int $parent = null, int $student = null)
     {
         // Check if the user is the primary parent of the student
-        $db 	= $this->getDatabase();
-        $query 	= $db->getQuery(true);
+        $db     = $this->getDatabase();
+        $query     = $db->getQuery(true);
         $query->select($db->quote('*'))
             ->from($db->quoteName('#__balancirk_parents'))
             ->where($db->quoteName('child') . ' = ' . $db->quote($student))
             ->where($db->quoteName('parent') . ' = ' . $db->quote($parent))
             ->where($db->quoteName('primary') . ' = 1');
 
-        if ($db->setQuery($query)->execute()) {
+        if ($db->setQuery($query)->execute())
+        {
             return $db->getNumRows() >= 1;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
@@ -239,13 +249,14 @@ class StudentModel extends AdminModel
      */
     public function getParents(int $student = null, bool $primary = true)
     {
-        $db 	= $this->getDatabase();
-        $query 	= $db->getQuery(true);
+        $db     = $this->getDatabase();
+        $query     = $db->getQuery(true);
         $query->select($db->quoteName('parent'))
             ->from($db->quoteName('#__balancirk_parents'))
             ->where($db->quoteName('child') . ' = ' . $db->quote($student));
 
-        if ($primary) {
+        if ($primary)
+        {
             $query->where($db->quoteName('primary') . ' = 1');
         }
 

@@ -37,7 +37,8 @@ class LessonsModel extends ListModel
     public function __construct($config = [])
     {
 
-        if (empty($config['filter_fields'])) {
+        if (empty($config['filter_fields']))
+        {
             $config['filter_fields'] = array(
                 'id', 'a.id',
                 'name', 'a.name',
@@ -114,11 +115,22 @@ class LessonsModel extends ListModel
         // Filter by search in title.
         $search = $this->getState('filter.search');
 
-        if (empty($search)) {
-            $query->where($db->quote(date('Y', strtotime($today . '- 5 months'))) . ' = `year`');
-        } else {
+        if (!empty($search))
+        {
             $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
             $query->where('(a.name LIKE ' . $search . ')');
+        }
+
+        // Filter by selected year
+        $selectedYear = $this->getState('filter.year');
+        if (empty($selectedYear))
+        {
+            $query->where($db->quote(date('Y', strtotime($today . '- 5 months'))) . ' = `year`');
+            $this->setState('filter.year', date('Y', strtotime($today . '- 5 months')));
+        }
+        else
+        {
+            $query->where($db->quoteName('a.year') . ' = ' . $db->quote($selectedYear));
         }
 
         // Add the list ordering clause.
@@ -177,7 +189,8 @@ class LessonsModel extends ListModel
         $rows = $db->setQuery($query)->loadObjectlist();
 
         $lessons = [];
-        foreach ($rows as $row) {
+        foreach ($rows as $row)
+        {
             $lessons[$row->id] = $row->name;
         }
 
@@ -215,10 +228,30 @@ class LessonsModel extends ListModel
 
         $rows = $db->setQuery($query)->loadObjectlist();
 
-        foreach ($rows as $row) {
+        foreach ($rows as $row)
+        {
             $lessons[$row->id] = $row->name;
         }
 
         return $lessons;
+    }
+
+    /**
+     * Get the years for filtering.
+     *
+     * @return  array  The years for filtering.
+     *
+     * @since   0.0.1
+     */
+    public function getYears()
+    {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select('DISTINCT ' . $db->quoteName('year'))
+            ->from($db->quoteName('#__balancirk_lessons_complete'))
+            ->order($db->quoteName('year') . ' DESC');
+
+        $db->setQuery($query);
+        return $db->loadColumn();
     }
 }

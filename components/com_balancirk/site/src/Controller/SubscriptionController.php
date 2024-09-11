@@ -61,10 +61,10 @@ class SubscriptionController extends FormController
      */
     protected function allowAdd($data = array())
     {
-        $user 	= Factory::getApplication()->getIdentity();
+        $user     = Factory::getApplication()->getIdentity();
 
         /** @var StudentModel */
-        $model	= $this->getModel('Student');
+        $model    = $this->getModel('Student');
 
         // Check if the user is the primary parent of the student
         return $model->isPrimairyParent($user->id, $data['student']);
@@ -83,15 +83,15 @@ class SubscriptionController extends FormController
      */
     protected function allowDelete($data = array())
     {
-        $user	= Factory::getApplication()->getIdentity();
+        $user    = Factory::getApplication()->getIdentity();
 
         /** @var StudentModel */
         $studentModel = $this->getModel('Student');
         /** @var PresenceModel */
         $presenceModel = $this->getModel('Presence');
 
-        return ($studentModel->isPrimairyParent($user->id, $data['student']) &&
-            $presenceModel->numberOfPresences($data['student'], $data['lesson']) <= 2);
+        return ($studentModel->isPrimairyParent($user->id, $data['student'])); // &&
+        // $presenceModel->numberOfPresences($data['student'], $data['lesson']) <= 2);
     }
 
     /**
@@ -119,11 +119,15 @@ class SubscriptionController extends FormController
         $app = Factory::getApplication();
         $app->setUserState('com_balancirk.subscription.data', $data);
 
-        if ($this->allowAdd($data)) {
-            if ($model->add($data)) {
+        if ($this->allowAdd($data))
+        {
+            if ($model->add($data))
+            {
                 $app->setUserState('com_balancirk.subscription.data', null);
                 $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscriptions');
-            } else {
+            }
+            else
+            {
                 $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscription');
             }
         }
@@ -152,7 +156,8 @@ class SubscriptionController extends FormController
         /** @var SubscriptionModel */
         $model = $this->getModel();
 
-        if ($this->allowDelete($data)) {
+        if ($this->allowDelete($data))
+        {
             $model->delete($data);
             $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscriptions');
         }

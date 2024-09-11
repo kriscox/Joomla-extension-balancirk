@@ -16,11 +16,19 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Factory;
 use Joomla\CMS\Layout\LayoutHelper;
 
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
+$total_number_of_subscriptions = 0;
 
+/** @var Joomla\CMS\Application $app */
+$app = Factory::getApplication();
+
+/** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
+$wa = $app->getDocument()->getWebAssetManager();
+$wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 ?>
 
 <alert>Not yet implemented</alert>
@@ -28,12 +36,30 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-lessons-top}'); ?>
 <form action=" <?= Route::_('index.php?option=com_balancirk&view=lessons'); ?>" method="post" name="adminForm" id="adminForm">
 	<?= LayoutHelper::render('joomla.searchtools.bar', array('view' => $this)); ?>
+	<!-- Year Filter Dropdown -->
+
 	<div class="row">
 		<nav aria-label="Toolbar" style="display: flex; align-items: center;">
 			<?= LayoutHelper::render(
-			    'joomla.searchtools.default',
-			    array('view' => $this)
+				'joomla.searchtools.default.bar',
+				array('view' => $this),
+				'',
+				array('filtersHidden' => ['filter_published'])
 			); ?>
+			<div class="js-stools" role="search">
+				<div class="js-stools-container-bar">
+					<div class="btn-toolbar">
+						<label for="filter_year" class="filter_year"><?= Text::_('COM_BALANCIRK_FILTER_BY_YEAR'); ?></label>
+						<select name="filter[year]" id="filter_year" class="form-control" onchange="document.adminForm.submit();">
+							<?php foreach ($this->years as $year) : ?>
+								<option value="<?= $year; ?>" <?= $this->state->get('filter.year') == $year ? 'selected="selected"' : ''; ?>>
+									<?= $year; ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+				</div>
+			</div>
 		</nav>
 		<div class="col-md-12">
 			<div id="j-main-container" class="j-main-container">
@@ -72,7 +98,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 						</thead>
 						<tbody>
 							<?php $n = count($this->items);
-				    foreach ($this->items as $i => $item) : ?>
+							foreach ($this->items as $i => $item) : ?>
 								<tr class="row<?= $i % 2; ?>">
 									<td class="hidden d-none d-md-table-cell text-center">
 										<?= $item->id; ?>
@@ -95,6 +121,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 										<?= $this->escape($item->year); ?>
 									</th>
 									<th scope="row" class="has-context">
+										<?php $total_number_of_subscriptions += $item->numberOfStudents; ?>
 										<?= $this->escape($item->numberOfStudents); ?> &#47; <?= $this->escape($item->max_students); ?>
 									</th>
 									<th scope="row" class="has-context">
@@ -104,8 +131,13 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 							<?php endforeach; ?>
 						</tbody>
 					</table>
-
 				<?php endif; ?>
+				<div class="col-md-6">
+					<div class="row" id="jform">
+						<div class="col-md-4" id="label"> <?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_SUBSCRIPTIONS') ?> </div>
+						<div class="col-md-8" id="value"> <?= $total_number_of_subscriptions ?> </div>
+					</div>
+				</div>
 				<input type="hidden" name="task" value="">
 				<input type="hidden" name="boxchecked" value="0">
 				<?= HTMLHelper::_('form.token'); ?>

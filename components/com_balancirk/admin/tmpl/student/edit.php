@@ -69,6 +69,23 @@ HTMLHelper::_('behavior.keepalive');
 		</div>
 		<?= HTMLHelper::_('uitab.endTab'); ?>
 
+		<?= HTMLHelper::_('uitab.addTab', 'myTab', 'parents', Text::_('COM_BALANCIRK_STUDENT_TAB_PARENTS')); ?>
+		<div class="row">
+			<div class="col-md-12">
+				<?php foreach ($this->parents as $parent) : ?>
+					<div class="row">
+						<div class="col-md-3">
+							<a href="<?= Route::_('index.php?option=com_balancirk&view=member&layout=edit&id=' . (int) $parent->id); ?>">
+								<?= $parent->firstname; ?> <?= $parent->name; ?>
+							</a>
+						</div>
+						<div class="col-md-3">
+							<?= $parent->phone; ?>
+						</div>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
 		<?= HTMLHelper::_('uitab.endTabSet'); ?>
 	</div>
 	<input type="hidden" name="task" value="">

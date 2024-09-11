@@ -48,6 +48,15 @@ class HtmlView extends BaseHtmlView
     protected $students;
 
     /**
+     * 
+     * The teachers list
+     * 
+     * @var array list of teachers
+     * 
+     */
+    protected $teachers;
+
+    /**
      * The lesson days list
      *
      * @var  array	list of lesson days
@@ -87,7 +96,8 @@ class HtmlView extends BaseHtmlView
         // What Access Permissions does this user have? What can (s)he do?
         $this->canDo = ContentHelper::getActions('com_balancirk');
 
-        if (!$this->canDo->get('lessons.view')) {
+        if (!$this->canDo->get('lessons.view'))
+        {
             throw new Exception(Text::_('JERROR_ALERTNOAUTHOR'));
         }
 
@@ -97,8 +107,10 @@ class HtmlView extends BaseHtmlView
         $this->state = $this->get('State');
         $this->lesdays = LessonModel::getLesdays($this->item->lesdays);
         $this->presences = $this->get('Presences');
+        $this->teachers = $this->get('Teachers');
 
-        if (count($errors = $this->get('Errors'))) {
+        if (count($errors = $this->get('Errors')))
+        {
             throw new GenericDataException(implode("\n", $errors), 500);
         }
 

@@ -217,7 +217,7 @@ SELECT p.`id`, s.`name` , s.`firstname` , l.`name` as `lesson`, p.`date`
 CREATE TABLE IF NOT EXISTS `#__balancirk_teachers`(
 	`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `member` int(11) NOT NULL,
-    `les` int(11) NOT NULL,
+    `lesson` int(11) NOT NULL,
     UNIQUE (`member`, `les`)
 );
 

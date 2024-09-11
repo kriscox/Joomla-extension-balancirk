@@ -75,12 +75,19 @@ class HtmlView extends BaseHtmlView
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
 
-        if (!$this->items || (!count($this->items) && $this->get('IsEmptyState'))) {
+        // Get list of years for filtering
+        /** @var SubscriptionsModel */
+        $subscriptionsModel = $this->getModel();
+        $this->years = $subscriptionsModel->getYears();
+
+        if (!$this->items || (!count($this->items) && $this->get('IsEmptyState')))
+        {
             $this->setLayout('emptystate');
         }
 
         // Check for errors.
-        if (count($errors = $this->get('Errors'))) {
+        if (count($errors = $this->get('Errors')))
+        {
             throw new GenericDataException(implode("\n", $errors), 500);
         }
 

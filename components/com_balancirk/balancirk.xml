@@ -9,7 +9,7 @@
 	<authorUrl>https://cococo.be</authorUrl>
 	<copyright>CoCoCo</copyright>
 	<license>GPL v3</license>
-	<version>1.2.8</version>
+	<version>1.2.9</version>
 	<description>COM_BALANCIRK_MODULE_DESCRIPTION</description>
 
 	<!-- This is the PHP namespace under which the extension's

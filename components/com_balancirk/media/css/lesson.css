@@ -88,3 +88,12 @@ div#PresenceGraph {
 	width: 80vw;
 
 }
+
+#filter_year {
+	padding: 5px;
+	width: auto;
+}
+
+label.filter_year {
+	padding-top: 10px;
+}

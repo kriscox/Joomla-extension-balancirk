@@ -88,4 +88,49 @@ class LessonController extends FormController
         // Redirect to the lesson page
         $this->setRedirect($redirectUrl);
     }
+
+    /**
+     * Save the form data for teachers.
+     *
+     * @param   string  $key	The name of the key for the primary key.
+     * @param   string  $url	The URL to redirect to on success.
+     *
+     * @return  boolean  True if successful, false otherwise.
+     *
+     * @since   __BUMP_VERSION__
+     */
+    public function teacher($key = null, $url = '')
+    {
+        // Check for request forgeries.
+        $this->checkToken();
+
+        // Get the curren application
+        /** @var CMSApplication */
+        $app = Factory::getApplication();
+
+        // Get the data from the form POST
+        $data = $this->input->post->get('jform', [], 'array');
+
+        // Get the model and the form used
+        /** @var LessonModel */
+        $model = $this->getModel('Lesson');
+        $form = $model->getForm($data, false);
+
+        // Convert date from nl-BE to 'Y-m-d'
+        $data['date'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['date'])));
+
+        // Set the default rediection url
+        $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=lesson&id=' . $data['id'], false);
+
+        // Fill form data cache
+        $app->setUserState('com_balancirk.teacher.data', $data);
+
+        $model->saveTeacher($data['id'], $data['date'], $data['teachers']);
+
+        // Set success message
+        $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_TEACHER_SAVED'), 'success');
+
+        // Redirect to the lesson page
+        $this->setRedirect($redirectUrl);
+    }
 }

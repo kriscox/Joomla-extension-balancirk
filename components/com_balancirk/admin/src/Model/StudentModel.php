@@ -59,7 +59,8 @@ class StudentModel extends AdminModel
         $name = 'students';
         $prefix = 'Table';
 
-        if ($table = $this->_createTable($name, $prefix, $options)) {
+        if ($table = $this->_createTable($name, $prefix, $options))
+        {
             return $table;
         }
 
@@ -81,7 +82,8 @@ class StudentModel extends AdminModel
         // Get the form.
         $form = $this->loadForm($this->typeAlias, 'student', ['control' => 'jform', 'load_data' => $loadData]);
 
-        if (empty($form)) {
+        if (empty($form))
+        {
             return false;
         }
 
@@ -98,13 +100,14 @@ class StudentModel extends AdminModel
     protected function loadFormData()
     {
         // Check the session for previously entered form data.
-        // @var CMSApplicationInterface
+        /** @var CMSApplicationInterface */
         $app = Factory::getApplication();
         $data = $app->getUserState('com_balancirk.edit.student.data', array());
 
 
 
-        if (empty($data)) {
+        if (empty($data))
+        {
             $data = $this->getItem();
 
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
@@ -128,7 +131,7 @@ class StudentModel extends AdminModel
     public function publish(&$pks, $value = 1)
     {
         // This is a very simple method to change the state of each item selected
-        $db = $this->getDbo();
+        $db = $this->getDatabase();
 
         $query = $db->getQuery(true);
 
@@ -137,5 +140,29 @@ class StudentModel extends AdminModel
         $query->where('id IN (' . implode(',', $pks) . ')');
         $db->setQuery($query);
         $db->execute();
+    }
+
+    /**
+     * Method to get the parents name and phone number of a student
+     *
+     * @param	int	$student	student id
+     *
+     * @return  array  An array with all parents
+     *
+     * @since   __BUMP_VERSION__
+     */
+    public function getParents()
+    {
+        $db     = $this->getDatabase();
+        $query     = $db->getQuery(true);
+        $query->select($db->quoteName(['m.id', 'm.name', 'm.firstname', 'm.phone']))
+            ->from($db->quoteName('#__balancirk_parents', 'p'))
+            ->join('INNER', $db->quoteName('#__balancirk_members', 'm') .
+                ' ON ' .  $db->quoteName('p.parent') . ' = ' . $db->quoteName('m.id'))
+            ->where($db->quoteName('p.child') . ' = ' . $this->getState('student.id'));
+
+        $db->setQuery($query);
+
+        return $db->loadObjectList();
     }
 }

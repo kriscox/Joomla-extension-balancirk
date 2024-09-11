@@ -31,21 +31,28 @@ $lessons = [];
 $lesdays = LessonModel::getDates($this->item->start, $this->item->end, LessonModel::getLesdays($this->item->lesdays));
 $firstLesDay = min($lesdays)->format('d/m/Y');
 $lastLesDay = max($lesdays)->format('d/m/Y');
-foreach ($lesdays as $lesday) {
-    array_push($lessons, $lesday->format('d/m/Y'));
+foreach ($lesdays as $lesday)
+{
+	array_push($lessons, $lesday->format('d/m/Y'));
 }
 $userid = Factory::getApplication()->getIdentity()->id;
 $api_token = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
+
+$today = new DateTime("");
+if (!in_array($today, $lesdays))
+{
+	$today = null;
+}
 
 /** @var Joomla\CMS\Document\Document  */
 $doc = $app->getDocument();
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $doc->getWebAssetManager();
 $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
-    ->registerAndUseScript('bootstrap-datepicker', 'https://unpkg.com/bootstrap-datepicker@latest/dist/js/bootstrap-datepicker.min.js')
-    ->registerAndUseScript('bootstrap-datepicker-nl', 'https://unpkg.com/bootstrap-datepicker@latest/dist/locales/bootstrap-datepicker.nl-BE.min.js')
-    ->registerAndUseScript('lesson-script', 'media/com_balancirk/js/balancirk_lesson_date.js')
-    ->addInlineScript('
+	->registerAndUseScript('bootstrap-datepicker', 'https://unpkg.com/bootstrap-datepicker@latest/dist/js/bootstrap-datepicker.min.js')
+	->registerAndUseScript('bootstrap-datepicker-nl', 'https://unpkg.com/bootstrap-datepicker@latest/dist/locales/bootstrap-datepicker.nl-BE.min.js')
+	->registerAndUseScript('lesson-script', 'media/com_balancirk/js/balancirk_lesson_date.js')
+	->addInlineScript('
 	var changed = false;
 	jQuery(document).ready(function() {
 		jQuery("#jform_date").datepicker({
@@ -78,6 +85,8 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 			}, // Do not forget to define class disabled
 			autoclose: true,
 		})
+	 ' . ($today ? 'jQuery("#jform_date").datepicker("setDate", "' . $today->format('d/m/Y') . '"); 
+	 changed = true' : '') . '
 	})
 	');
 $doc->addScriptOptions('lesson-script', ['token' => $api_token]);
@@ -89,10 +98,13 @@ $data['id'] = $this->item->id;
 $form = $this->get('PresenceForm');
 $form->bind($data);
 
-foreach ($students as $student) {
-    $form->getField('students')->addOption($student->firstname . " " . $student->name, ['value' => $student->id]);
+foreach ($students as $student)
+{
+	$form->getField('students')->addOption($student->firstname . " " . $student->name, ['value' => $student->id]);
 }
 
+
+$teached_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=teacher&id=' . (int) $this->item->id);
 $url = Route::_('index.php?option=com_balancirk&view=lesson');
 ?>
 
@@ -106,6 +118,7 @@ $url = Route::_('index.php?option=com_balancirk&view=lesson');
 			<label for="lessonDate">Select Date:</label>
 			<input type="text" id="jform_date" class="form-control" name="jform[date]" />
 
+			<?= HTMLHelper::_('uitab.startTabSet', 'myTab', array('active' => 'students')); ?>
 
 			<?= $form->getInput('students'); ?>
 			<input type="hidden" name="task" />
@@ -113,18 +126,23 @@ $url = Route::_('index.php?option=com_balancirk&view=lesson');
 		<?= HTMLHelper::_('form.token'); ?>
 
 		<div class="row title-alias form-vertical mb-3">
-			<div class="col-12 col-md-6">
+			<div class="col-12 col-md-3">
 				<button type="button" class="balancirk_button balancirk_presence_button" onclick="Joomla.submitbutton('lesson.presence')">
 					<?= Text::_('JSAVE') ?>
 				</button>
 			</div>
-			<div class="col-12 col-md-6">
+			<div class="col-12 col-md-3">
 				<button type="button" class="balancirk_button balancirk_presence_button" onclick="Joomla.submitbutton('lesson.cancel')">
 					<span class="icon-cancel"> <?= Text::_('JCANCEL') ?></span>
 				</button>
 			</div>
+			<div class="col-12 col-md-3">
+				<button class="balancirk_presence_button" type="button" onclick="location.href='<?= $teached_url ?>'">
+					<?= Text::_('COM_BALANCIRK_LESSON_TEACHED') ?>
+				</button>
+
+			</div>
 		</div>
-	</div>
 </form>
 <!-- Modal alerting in case of changed values -->
 <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">

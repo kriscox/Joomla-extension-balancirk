@@ -20,11 +20,20 @@ defined('_JEXEC') or die;
 
 $dates = [];
 $studentCount = [];
-foreach ($this->presences as $presence) {
-    array_push($dates, $presence->date);
-    array_push($studentCount, $presence->count);
+foreach ($this->presences as $presence)
+{
+	array_push($dates, $presence->date);
+	array_push($studentCount, $presence->count);
 }
-$mean = round(array_sum($studentCount) / count($studentCount), 1);
+
+if (count($studentCount) == 0)
+{
+	$mean = 0;
+}
+else
+{
+	$mean = round(array_sum($studentCount) / count($studentCount), 1);
+}
 
 /** @var Joomla\CMS\Application $app */
 $app = Factory::getApplication();
@@ -32,10 +41,10 @@ $app = Factory::getApplication();
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $app->getDocument()->getWebAssetManager();
 $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
-    ->registerAndUseScript('chart.js', 'https://cdn.jsdelivr.net/npm/chart.js')
-    ->registerAndUseScript('chartjs-adapter-date-fns.js', 'https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js')
-    ->registerAndUseScript('chartjs-plugin-annotation.js', 'media/com_balancirk/js/chartjs-plugin-annotation.min.js')
-    ->addInlineScript('
+	->registerAndUseScript('chart.js', 'https://cdn.jsdelivr.net/npm/chart.js')
+	->registerAndUseScript('chartjs-adapter-date-fns.js', 'https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js')
+	->registerAndUseScript('chartjs-plugin-annotation.js', 'media/com_balancirk/js/chartjs-plugin-annotation.min.js')
+	->addInlineScript('
 		document.addEventListener("DOMContentLoaded", function() {
 			const ctx = document.getElementById("PresenceChart");
 
@@ -101,6 +110,7 @@ HTMLHelper::_('behavior.keepalive');
 
 $url = Route::_('index.php?option=com_balancirk&view=lesson&layout=default&id=' . (int) $this->item->id);
 $presence_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=presence&id=' . (int) $this->item->id);
+$teached_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=teacher&id=' . (int) $this->item->id);
 ?>
 
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
@@ -114,6 +124,9 @@ $presence_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=pres
 	<div class="balancirk_presence">
 		<button type="button" class="balancirk_presence_button" onclick="location.href='<?= $presence_url ?>'" style="width: auto;">
 			<?= Text::_('COM_BALANCIRK_LESSON_PRESENCE') ?>
+		</button>
+		<button type="button" class="balancirk_presence_button" onclick="location.href='<?= $teached_url ?>'" style="width: auto;">
+			<?= Text::_('COM_BALANCIRK_LESSON_TEACHED') ?>
 		</button>
 	</div>
 	<div>

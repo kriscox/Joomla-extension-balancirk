@@ -18,7 +18,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use CoCoCo\Component\Balancirk\Site\Model\StudentModel;
-use CoCoCo\Component\Balancirk\Site\Model\PresenceModel;
+// use CoCoCo\Component\Balancirk\Site\Model\PresenceModel;
 
 /**
  * Subscription model for the Joomla Balancirk component.
@@ -56,17 +56,18 @@ class SubscriptionModel extends AdminModel
      */
     protected function canDelete($record)
     {
-        if (!empty($record->lesson) || !empty($record->student)) {
+        if (!empty($record->lesson) || !empty($record->student))
+        {
             $app = Factory::getApplication();
             $parentid = $app->getIdentity()->id;
 
             /** @var StudentModel */
             $studentModel = $this->getMVCFactory()->createModel('Students', 'Site');
-            /** @var PresenceModel */
-            $presenceModel = $this->getMVCFactory()->createModel('Presence', 'Site');
+            // /** @var PresenceModel */
+            // $presenceModel = $this->getMVCFactory()->createModel('Presence', 'Site');
 
             return ($studentModel->isPrimairyParent($parentid, $record->student) &&
-                ($presenceModel->numberOfPresences($record->student, $record->lesson) <= 2) &&
+                // ($presenceModel->numberOfPresences($record->student, $record->lesson) <= 2) &&
                 $app->getIdentity()->authorise('core.delete', 'com_balancirk.subscription.' . (int) $record->id)
             );
         }
@@ -91,7 +92,8 @@ class SubscriptionModel extends AdminModel
         $name = 'subscriptions';
         $prefix = 'Table';
 
-        if ($table = $this->_createTable($name, $prefix, $options)) {
+        if ($table = $this->_createTable($name, $prefix, $options))
+        {
             return $table;
         }
 
@@ -113,7 +115,8 @@ class SubscriptionModel extends AdminModel
         // Get the form.
         $form = $this->loadForm($this->typeAlias, 'subscription', ['control' => 'jform', 'load_data' => $loadData]);
 
-        if (empty($form)) {
+        if (empty($form))
+        {
             return false;
         }
 
@@ -190,7 +193,8 @@ class SubscriptionModel extends AdminModel
         $studentModel = $this->getMVCFactory()->createModel('Student', 'Site');
         $parents = $studentModel->getParents($data['student']);
 
-        foreach ($parents as $parent) {
+        foreach ($parents as $parent)
+        {
             // Get the parent email
             /** @var MemberModel */
             $memberModel = $this->getMVCFactory()->createModel('Member', 'Site');
@@ -200,13 +204,37 @@ class SubscriptionModel extends AdminModel
             $mailer->addRecipient($member->email);
         }
 
-        if ($waitinglist == 0) {
-            $mailer->setSubject(Text::_('COM_BALANCIRK_SUBJECT_SUBSCRIPTION') . ' ' . $this->getState('lesson.name'))
+        if ($waitinglist == 0)
+        { // Not on waitinglist
+            $mailer->setSubject(Text::_('COM_BALANCIRK_SUBJECT_SUBSCRIPTION') . ' "' . $lesson->name . '"')
                 // TODO: This is a placeholder, replace this with the actual mail content
-                ->setBody('Mail content to send to the parent.');
-        } else {
-            $mailer->setSubject(Text::_('COM_BALANCIRK_SUBJECT_SUBSCRIPTION') . ' ' . $this->getState('lesson.name'))
-                ->setBody('Mail content to send to the parent.');
+                ->setBody('
+Hallo,
+
+Bedankt voor je inschrijving. 
+ 
+Deze is goed ontvangen voor de les "' .
+                    $lesson->name . '". De lessen starten op ' . date('d/m/Y', strtotime($lesson->start)) . '.
+  
+De betaling moet je nog niet in orde brengen. In de loop van de maand oktober ontvang je een mail met de betalingsgegevens.
+  
+Met vriendelijke groeten,
+  
+Het Balancirk team');
+        }
+        else
+        { // On wiatinglist
+            $mailer->setSubject(Text::_('COM_BALANCIRK_SUBJECT_SUBSCRIPTION') . ' ' . $lesson->name)
+                ->setBody('
+Hallo,
+
+Bedankt voor je inschrijving. De les "' . $lesson->name . '" is volzet. De inschrijving is op de wachtlijst gekomen.
+
+We houden je op de hoogte als er een plaatsje vrijkomt.
+
+Met vriendelijke groeten,
+
+Het Balancirk team');
         }
 
         $mailer->Send();

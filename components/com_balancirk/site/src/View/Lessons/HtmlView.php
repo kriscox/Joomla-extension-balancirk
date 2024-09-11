@@ -68,6 +68,13 @@ class HtmlView extends BaseHtmlView
     protected $canDo;
 
     /**
+     * The years for filtering
+     *
+     * @var  array
+     */
+    protected $years;
+
+    /**
      *  Execute and display template script.
      *
      * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
@@ -81,7 +88,8 @@ class HtmlView extends BaseHtmlView
         // What Access Permissions does this user have? What can (s)he do?
         $this->canDo = ContentHelper::getActions('com_balancirk');
 
-        if (!$this->canDo->get('lessons.view')) {
+        if (!$this->canDo->get('lessons.view'))
+        {
             throw new Exception(Text::_('JERROR_ALERTNOAUTHOR'));
         }
 
@@ -91,7 +99,13 @@ class HtmlView extends BaseHtmlView
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
 
-        if (!$this->items || (!count($this->items) && $this->get('IsEmptyState'))) {
+        // Get list of years for filtering
+        /** @var LessonsModel */
+        $lessonsModel = $this->getModel();
+        $this->years = $lessonsModel->getYears();
+
+        if (!$this->items || (!count($this->items) && $this->get('IsEmptyState')))
+        {
             $this->setLayout('emptystate');
         }
 

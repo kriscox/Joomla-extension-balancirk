@@ -4,8 +4,11 @@
 			"path": "."
 		},
 		{
-			"path": "../Joomla"
+			"path": "/Users/krisc/Documents/Joomla"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"phpcs.executablePath": "/usr/local/bin/phpcs",
+		"php.executablePath": "/usr/local/bin/php"
+	},
 }

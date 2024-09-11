@@ -63,7 +63,8 @@ class HtmlView extends BaseHtmlView
         $this->item = $this->get('Item');
         $this->state = $this->get('State');
 
-        if (count($errors = $this->get('Errors'))) {
+        if (count($errors = $this->get('Errors')))
+        {
             throw new GenericDataException(implode("\n", $errors), 500);
         }
 

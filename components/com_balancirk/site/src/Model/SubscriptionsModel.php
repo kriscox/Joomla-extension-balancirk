@@ -35,19 +35,31 @@ class SubscriptionsModel extends ListModel
     public function __construct($config = [])
     {
 
-        if (empty($config['filter_fields'])) {
+        if (empty($config['filter_fields']))
+        {
             $config['filter_fields'] = array(
-                'name', 'a.name',
-                'firstname', 'a.firstname',
-                'lesson', 'a.lesson',
-                'type', 'a.type',
-                'fee', 'a.fee',
-                'year', 'a.year',
-                'start', 'a.start',
-                'end', 'a.end',
-                'start', 'a.start_registration',
-                'end_registration', 'a.end_registration',
-                'state', 'a.state'
+                'name',
+                'a.name',
+                'firstname',
+                'a.firstname',
+                'lesson',
+                'a.lesson',
+                'type',
+                'a.type',
+                'fee',
+                'a.fee',
+                'year',
+                'a.year',
+                'start',
+                'a.start',
+                'end',
+                'a.end',
+                'start',
+                'a.start_registration',
+                'end_registration',
+                'a.end_registration',
+                'state',
+                'a.state'
             );
         }
 
@@ -66,7 +78,7 @@ class SubscriptionsModel extends ListModel
      *
      * @since   0.0.1
      */
-    protected function populateState($ordering = 'a.year', $direction = 'asc')
+    protected function populateState($ordering = 'a.year', $direction = 'desc')
     {
         $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
         $this->setState('filter.search', $search);
@@ -99,9 +111,18 @@ class SubscriptionsModel extends ListModel
         $query->select(
             $db->quoteName(
                 [
-                    'id', 'name', 'firstname', 'lesson',
-                    'type', 'fee', 'year', 'start', 'end',
-                    'start_registration', 'end_registration', 'state',
+                    'id',
+                    'name',
+                    'firstname',
+                    'lesson',
+                    'type',
+                    'fee',
+                    'year',
+                    'start',
+                    'end',
+                    'start_registration',
+                    'end_registration',
+                    'state',
                     'subscribed'
                 ]
             )
@@ -118,17 +139,36 @@ class SubscriptionsModel extends ListModel
         // Filter by current state
         $current = (string) $this->getState('filter.current');
 
-        if (is_numeric($current)) {
+        if (is_numeric($current))
+        {
             $query->where($db->quoteName('a.state') . ' = :current');
             $query->bind(':current', $current, ParameterType::INTEGER);
-        } elseif ($current === '') {
+        }
+        elseif ($current === '')
+        {
             $query->where('(' . $db->quoteName('a.state') . ' = 0 OR ' . $db->quoteName('a.state') . ' = 1)');
+        }
+
+        // Filter by selected year
+        $selectedYear = $this->getState('filter.year');
+        if (empty($selectedYear))
+        {
+            $query->where($db->quote(date(
+                'Y',
+                strtotime($today . '- 5 months')
+            )) . ' = `year`');
+            $this->setState('filter.year', date('Y', strtotime($today . '- 5 months')));
+        }
+        else
+        {
+            $query->where($db->quoteName('a.year') . ' = ' . $db->quote($selectedYear));
         }
 
         // Filter by search in title.
         $search = $this->getState('filter.search');
 
-        if (!empty($search)) {
+        if (!empty($search))
+        {
             $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
             $query->where('(a.name LIKE ' . $search . ')', 'OR');
             $query->where('(a.firstname LIKE ' . $search . ')', 'OR');
@@ -157,5 +197,36 @@ class SubscriptionsModel extends ListModel
         $items = parent::getItems();
 
         return $items;
+    }
+
+    /**
+     * Get the years for filtering.
+     *
+     * @return  array  The years for filtering.
+     *
+     * @since   0.0.1
+     */
+    public function getYears()
+    {
+        // Get the current logged in user.
+        $app = \Joomla\CMS\Factory::getApplication();
+        $user = $app->getIdentity();
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select('DISTINCT ' . $db->quoteName('year'))
+            ->from($db->quoteName('#__balancirk_subscriptions_view', 'a'))
+
+            // Filter users based on logged in user
+            ->join(
+                'INNER',
+                $db->quoteName('#__balancirk_parents', 'p'),
+                'a.studentid = p.child AND p.parent = ' . $user->id
+            )
+
+            ->order($db->quoteName('year') . ' DESC');
+
+        $db->setQuery($query);
+        return $db->loadColumn();
     }
 }

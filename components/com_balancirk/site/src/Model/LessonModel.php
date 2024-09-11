@@ -58,7 +58,8 @@ class LessonModel extends AdminModel
         // Get the form.
         $form = $this->loadForm($this->typeAlias, 'lesson', ['control' => 'jform', 'load_data' => $loadData]);
 
-        if (empty($form)) {
+        if (empty($form))
+        {
             return false;
         }
 
@@ -80,7 +81,31 @@ class LessonModel extends AdminModel
         // Get the form.
         $form = $this->loadForm($this->typeAlias, 'presence', ['control' => 'jform', 'load_data' => $loadData]);
 
-        if (empty($form)) {
+        if (empty($form))
+        {
+            return false;
+        }
+
+        return $form;
+    }
+
+    /**
+     * Method to get the teachers row form.
+     * 
+     * @param	array   $data	    Data from the form.
+     * @param	boolean $loadData   True if the form is to load its own data (default case), false if not.
+     * 
+     * @return  \JForm|boolean  A \JForm object on success, false on failure
+     * 
+     * @since   0.0.1
+     */
+    public function getTeacherForm($data = [], $loadData = true)
+    {
+        // Get the form.
+        $form = $this->loadForm($this->typeAlias, 'teacher', ['control' => 'jform', 'load_data' => $loadData]);
+
+        if (empty($form))
+        {
             return false;
         }
 
@@ -136,7 +161,8 @@ class LessonModel extends AdminModel
         $startRange = date_sub($today, date_interval_create_from_date_string('7 days'));
         $endRange = date_sub($today, date_interval_create_from_date_string('1 days'));
 
-        if ($lessonid == null) {
+        if ($lessonid == null)
+        {
             $lessonid = $this->getState('lesson.id');
         }
 
@@ -144,14 +170,24 @@ class LessonModel extends AdminModel
         $query->select(
             $dbo->quoteName(
                 [
-                    'a.id', 'a.name', 'a.firstname',
-                    'a.phone', 'a.email', 'a.birthdate',
-                    'a.allow_photo', 'a.state'
+                    'a.id',
+                    'a.name',
+                    'a.firstname',
+                    'a.phone',
+                    'a.email',
+                    'a.birthdate',
+                    'a.allow_photo',
+                    'a.state'
                 ],
                 [
-                    'id', 'name', 'firstname',
-                    'phone', 'email', 'birthdate',
-                    'allow_photo', 'state'
+                    'id',
+                    'name',
+                    'firstname',
+                    'phone',
+                    'email',
+                    'birthdate',
+                    'allow_photo',
+                    'state'
                 ]
             )
         )
@@ -177,6 +213,60 @@ class LessonModel extends AdminModel
     public function getNumberOfStudents($lessonid)
     {
         return sizeof($this->getStudents($lessonid));
+    }
+
+    /**
+     * Method to get the teacherslist
+     * 
+     * List of the teachers teaching the lesson
+     * 
+     * @param int 		$lessonid  The id of the lesson
+     * 
+     * @return array	an array of teachers
+     * 
+     */
+    public function getTeachers($lessonid = null)
+    {
+        // Create a new query object.
+        $dbo = $this->getDatabase();
+        $query = $dbo->getQuery(true);
+
+        $today = new DateTime('now');
+
+        if ($lessonid == null)
+        {
+            $lessonid = $this->getState('lesson.id');
+        }
+
+        // Select the required fields from the table.
+        $query->select(
+            $dbo->quoteName(
+                [
+                    'a.id',
+                    'a.name',
+                    'a.firstname',
+                    'a.phone',
+                    'a.email',
+                ],
+                [
+                    'id',
+                    'name',
+                    'firstname',
+                    'phone',
+                    'email',
+                ]
+            )
+        )
+            ->from($dbo->quoteName('#__balancirk_members', 'a'))
+            ->join('INNER', $dbo->quoteName('#__balancirk_teachers', 't'), 't.member = a.id', 's.subscribed = 0')
+            ->join('LEFT', $dbo->quoteName('#__balancirk_teached', 'p'), 'p.teacher = a.id AND p.lesson = t.lesson')
+            ->where('t.lesson = ' . $lessonid)
+            ->order(['a.name', 'a.firstname'])
+            ->group('a.id', 'a.name', 'a.firstname', 'a.phone', 'a.email');
+
+        $dbo->setQuery($query);
+
+        return $dbo->loadObjectList();
     }
 
     /**
@@ -247,11 +337,13 @@ class LessonModel extends AdminModel
         $period = new DatePeriod(new DateTime($start), new DateInterval('P1D'), new DateTime($end));
         $dates = array();
 
-        foreach ($period as $date) {
+        foreach ($period as $date)
+        {
             // TODO: Check if the date is a holiday
 
             // Check if date is lesday
-            if ($lesday[$date->format('l')] === 1) {
+            if ($lesday[$date->format('l')] === 1)
+            {
                 $dates[] = $date;
             }
         }
@@ -281,11 +373,44 @@ class LessonModel extends AdminModel
         $dbo->execute();
 
         // Insert the new presences
-        foreach ($students as $student) {
+        foreach ($students as $student)
+        {
             $query->clear();
             $query->insert($dbo->quoteName('#__balancirk_presences'))
                 ->columns($dbo->quoteName(['lesson', 'student', 'date']))
                 ->values($id . ', ' . $student . ', ' . $dbo->quote($date));
+            $dbo->setQuery($query);
+            $dbo->execute();
+        }
+    }
+
+    /**
+     * Method to save the teachers of the lesson
+     * 
+     * @param	int		$id			Id of the lesson
+     * @param	array	$teachers	An array of the teachers
+     * 
+     * @return void
+     */
+    public function saveTeacher($id, $teachers)
+    {
+        $dbo = $this->getDatabase();
+        $query = $dbo->getQuery(true);
+
+        // Delete all teachers for this lesson
+        $query->delete($dbo->quoteName('#__balancirk_teached'))
+            ->where($dbo->quoteName('lesson') . ' = ' . $id)
+            ->where($dbo->quoteName('date') . ' = ' . $dbo->quote($date));
+        $dbo->setQuery($query);
+        $dbo->execute();
+
+        // Insert the new teachers
+        foreach ($teachers as $teacher)
+        {
+            $query->clear();
+            $query->insert($dbo->quoteName('#__balancirk_teached'))
+                ->columns($dbo->quoteName(['lesson', 'teacher', 'date']))
+                ->values($id . ', ' . $teacher . ', ' . $dbo->quote($date));
             $dbo->setQuery($query);
             $dbo->execute();
         }

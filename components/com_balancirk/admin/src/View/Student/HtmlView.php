@@ -42,6 +42,13 @@ class HtmlView extends BaseHtmlView
     protected $item;
 
     /**
+     * The parents
+     *
+     * @var  array
+     */
+    protected $parents;
+
+    /**
      * The model state
      *
      * @var  object
@@ -67,8 +74,10 @@ class HtmlView extends BaseHtmlView
         $this->form  = $this->get('Form');
         $this->item  = $this->get('Item');
         $this->state = $this->get('State');
+        $this->parents = $this->get('Parents');
 
-        if (count($errors = $this->get('Errors'))) {
+        if (count($errors = $this->get('Errors')))
+        {
             throw new GenericDataException(implode("\n", $errors), 500);
         }
 
@@ -96,10 +105,14 @@ class HtmlView extends BaseHtmlView
             Text::_('COM_BALANCIRK_STUDENT_PAGE_TITLE_' . ($isNew ? 'ADD_STUDENT' : 'EDIT_STUDENT'))
         );
 
-        if ($canDo->get('core.create')) {
-            if ($isNew) {
+        if ($canDo->get('core.create'))
+        {
+            if ($isNew)
+            {
                 $toolbar->apply('student.save');
-            } else {
+            }
+            else
+            {
                 $toolbar->apply('student.apply');
             }
         }

@@ -20,6 +20,7 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\User\UserHelper;
 use Joomla\CMS\MVC\Model\AdminModel;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\Application\ApplicationHelper;
 
 /**
@@ -56,7 +57,8 @@ class MemberModel extends AdminModel
      */
     protected function canDelete($record)
     {
-        if (!empty($record->id)) {
+        if (!empty($record->id))
+        {
             $app = Factory::getApplication();
 
             return $app->getIdentity()->authorise('core.delete', 'com_balancirk.members.' . (int) $record->id);
@@ -79,7 +81,8 @@ class MemberModel extends AdminModel
         $user = Factory::getApplication()->getIdentity();
 
         // Check for existing article.
-        if (!empty($record->id)) {
+        if (!empty($record->id))
+        {
             return $user->authorise('core.edit.state', 'com_balancirk.members.' . (int) $record->id);
         }
 
@@ -104,7 +107,8 @@ class MemberModel extends AdminModel
         $name = 'members';
         $prefix = 'Table';
 
-        if ($table = $this->_createTable($name, $prefix, $options)) {
+        if ($table = $this->_createTable($name, $prefix, $options))
+        {
             return $table;
         }
 
@@ -126,7 +130,8 @@ class MemberModel extends AdminModel
         // Get the form.
         $form = $this->loadForm($this->typeAlias, 'member', ['control' => 'jform', 'load_data' => $loadData]);
 
-        if (empty($form)) {
+        if (empty($form))
+        {
             return false;
         }
 
@@ -142,11 +147,12 @@ class MemberModel extends AdminModel
      */
     protected function loadFormData()
     {
-        // @var WebApplication
+        /**  @var WebApplication */
         $app = Factory::getApplication();
         $data = $app->getUserState('com_balancirk.edit.student.data', array());
 
-        if (empty($data)) {
+        if (empty($data))
+        {
             $data = $this->getItem();
 
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
@@ -209,14 +215,16 @@ class MemberModel extends AdminModel
         $user = new User();
 
         // Throws \InvalidArgumentException, \UnexpectedValueException
-        if (!$user->bind($data)) {
+        if (!$user->bind($data))
+        {
             $app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError(), 'error');
 
             return false;
         }
 
         // Throws \RuntimeException
-        if (!$user->save()) {
+        if (!$user->save())
+        {
             $app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError(), 'error');
 
             return false;
@@ -229,7 +237,8 @@ class MemberModel extends AdminModel
         $this->saveToTable($id, $data, true);
 
         // Send activation mail
-        $mailer = Factory::getMailer();
+        $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+
 
         // Set the sender
         $config = new \JConfig();
@@ -271,7 +280,8 @@ class MemberModel extends AdminModel
             ->setBody($message)
             ->Send();
 
-        if ($send != true) {
+        if ($send != true)
+        {
             $app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . 'Error sending email', 'error');
 
             return false;
@@ -306,15 +316,20 @@ class MemberModel extends AdminModel
         // Create query and don't forget to quote everything
         $query = $db->getQuery(true);
 
-        if ($insert) {
+        if ($insert)
+        {
             $query->insert($db->quoteName('#__balancirk_members_additional'))
                 ->columns($db->quoteName($columns))
                 ->values(implode(',', array_map(fn ($n) => $db->quote($n), $values)));
-        } else {
+        }
+        else
+        {
             $fields = array();
 
-            foreach ($columns as $key) {
-                if ($key != 'id') {
+            foreach ($columns as $key)
+            {
+                if ($key != 'id')
+                {
                     array_push($fields, $db->quoteName($key) . " = " . $db->quote($data[$key]));
                 }
             }
@@ -328,5 +343,28 @@ class MemberModel extends AdminModel
         // Execute query
         $db->setQuery($query);
         $db->execute();
+    }
+
+    /**
+     * Method to get the students name of their students
+     *
+     * @return  array  An array with all students
+     *
+     * @since   __BUMP_VERSION__
+     */
+    public function getStudents()
+    {
+        $db     = $this->getDatabase();
+        $query     = $db->getQuery(true);
+        $query->select($db->quoteName(['s.id', 's.name', 's.firstname']))
+            ->from($db->quoteName('#__balancirk_parents', 'p'))
+            ->join('INNER', $db->quoteName('#__balancirk_students', 's') .
+                ' ON ' .  $db->quoteName('p.child') . ' = ' . $db->quoteName('s.id'))
+            // Only for the current member
+            ->where($db->quoteName('p.parent') . ' = ' . $this->getState('member.id'));
+
+        $db->setQuery($query);
+
+        return $db->loadObjectList();
     }
 }
