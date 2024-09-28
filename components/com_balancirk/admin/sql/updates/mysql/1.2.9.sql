@@ -19,6 +19,9 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_mailmessages` (
 *
 **************************************************************************************************/
 ALTER TABLE `#__balancirk_teachers` CHANGE les lesson int(11) NOT NULL;
+ALTER TABLE `#__balancirk_teachers` ADD CONSTRAINT `fk_teachers_lesson` FOREIGN KEY (`lesson`) REFERENCES `#__balancirk_lessons(id)`;
+ALTER TABLE `#__balancirk_teachers` ADD CONSTRAINT `fk_teachers_lesson` FOREIGN KEY (`member`) REFERENCES `#__balancirk_members_additional(id)`;
+
 
 /**************************************************************************************************
 *
@@ -33,5 +36,6 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_teached` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `teached` (`lesson`,`teacher`, `date`),
   CONSTRAINT `fk_teached_lesson` FOREIGN KEY (`lesson`) REFERENCES `#__balancirk_lessons` (`id`),
-  CONSTRAINT `fk_teached_teacher` FOREIGN KEY (`teacher`) REFERENCES `#__balancirk_members_additional` (`id`)
+  CONSTRAINT `fk_teached_member` FOREIGN KEY (`teacher`) REFERENCES `#__balancirk_members_additional` (`id`),
+  CONSTRAINT `fk_teached_teacher` FOREIGN KEY (`teacher`) REFERENCES `#__balancirk_teachers` (`member`)
 );

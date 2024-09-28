@@ -38,7 +38,7 @@ foreach ($lesdays as $lesday)
 $userid = Factory::getApplication()->getIdentity()->id;
 $api_token = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
 
-$today = new DateTime("");
+$today = (new DateTime())->settime(0, 0, 0);
 if (!in_array($today, $lesdays))
 {
 	$today = null;

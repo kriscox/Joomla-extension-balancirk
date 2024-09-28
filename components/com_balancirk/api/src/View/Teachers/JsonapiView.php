@@ -10,10 +10,10 @@ use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 class JsonapiView extends BaseApiView
 {
     protected $fieldsToRenderItem = [
-        'member',
+        'teacher',
     ];
 
     protected $fieldsToRenderList = [
-        'member',
+        'teacher',
     ];
 }

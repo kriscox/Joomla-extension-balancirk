@@ -392,7 +392,7 @@ class LessonModel extends AdminModel
      * 
      * @return void
      */
-    public function saveTeacher($id, $teachers)
+    public function saveTeacher($id, $date, $teachers)
     {
         $dbo = $this->getDatabase();
         $query = $dbo->getQuery(true);
