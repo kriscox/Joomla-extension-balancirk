@@ -111,19 +111,19 @@ class SubscriptionsModel extends ListModel
         $query->select(
             $db->quoteName(
                 [
-                    'id',
-                    'name',
-                    'firstname',
-                    'lesson',
-                    'type',
-                    'fee',
-                    'year',
-                    'start',
-                    'end',
-                    'start_registration',
-                    'end_registration',
-                    'state',
-                    'subscribed'
+                    'a.id',
+                    'a.name',
+                    'a.firstname',
+                    'a.lesson',
+                    'a.type',
+                    'a.fee',
+                    'a.year',
+                    'a.start',
+                    'a.end',
+                    'a.start_registration',
+                    'a.end_registration',
+                    'a.state',
+                    'a.subscribed'
                 ]
             )
         );
@@ -151,6 +151,7 @@ class SubscriptionsModel extends ListModel
 
         // Filter by selected year
         $selectedYear = $this->getState('filter.year');
+        $today = date('Y-m-d');
         if (empty($selectedYear))
         {
             $query->where($db->quote(date(

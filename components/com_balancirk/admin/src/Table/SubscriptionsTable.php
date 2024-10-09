@@ -32,6 +32,6 @@ class SubscriptionsTable extends Table
     public function __construct(DatabaseDriver $db)
     {
         $this->typeAlias = 'com_balancirk.subscriptions';
-        parent::__construct('#__balancirk_subscriptions', array('lesson', 'student'), $db);
+        parent::__construct('#__balancirk_subscriptions', 'id', $db);
     }
 }

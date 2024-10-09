@@ -165,4 +165,37 @@ class StudentModel extends AdminModel
 
         return $db->loadObjectList();
     }
+
+    /**
+     * Check if parent is primairy
+     *
+     * Check if the given parent id is the primairy parent of the student.
+     *
+     * @param	int	$parent		Parent id
+     * @param	int	$student	Student id
+     *
+     * @return	boolean	true if it is the primary parent id in other cases false
+     *
+     * @since __BUMP_VERSION__
+     */
+    public function isPrimairyParent(int $parent = null, int $student = null)
+    {
+        // Check if the user is the primary parent of the student
+        $db     = $this->getDatabase();
+        $query     = $db->getQuery(true);
+        $query->select($db->quote('*'))
+            ->from($db->quoteName('#__balancirk_parents'))
+            ->where($db->quoteName('child') . ' = ' . $db->quote($student))
+            ->where($db->quoteName('parent') . ' = ' . $db->quote($parent))
+            ->where($db->quoteName('primary') . ' = 1');
+
+        if ($db->setQuery($query)->execute())
+        {
+            return $db->getNumRows() >= 1;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

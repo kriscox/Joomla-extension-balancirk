@@ -23,7 +23,8 @@ class PlgWebservicesBalancirk extends CMSPlugin
       new Route(['POST'], 'v1/presence/:lesson', 'presences.setpresence', ['lesson' => '(d+)'], $defaults),
       new Route(['GET'], 'v1/teacher/:lesson', 'teachers.getteacher', ['lesson' => '\d+'], $defaults),
       new Route(['GET'], 'v1/teacher/:lesson/:date', 'teachers.getteacher', ['lesson' => '\d+', 'date' => '\d{4}-\d{2}-\d{2}'], $defaults),
-      new Route(['POST'], 'v1/teacher/:lesson', 'teachers.setteacher', ['lesson' => '(d+)'], $defaults)
+      new Route(['POST'], 'v1/teacher/:lesson', 'teachers.setteacher', ['lesson' => '(d+)'], $defaults),
+      new Route(['DELETE'], 'v1/subscription/:id', 'subscription.delete', ['recordkey' => '\d+'], $defaults)
     ];
 
     // Finally, register all specified routes with Joomla's webservices router.

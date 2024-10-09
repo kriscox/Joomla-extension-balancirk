@@ -25,6 +25,7 @@ class PresencesModel extends ListModel
 {
     protected $date;
     protected $lesson;
+    protected $student;
 
     /**
      * Constructor.
@@ -37,12 +38,17 @@ class PresencesModel extends ListModel
      */
     public function __construct($config = [])
     {
-        if (empty($config['filter_fields'])) {
+        if (empty($config['filter_fields']))
+        {
             $config['filter_fields'] = array(
-                'id', 'a.id',
-                'lesson', 'a.lesson',
-                'student', 'a.student',
-                'date', 'a.date'
+                'id',
+                'a.id',
+                'lesson',
+                'a.lesson',
+                'student',
+                'a.student',
+                'date',
+                'a.date'
             );
         }
 
@@ -66,7 +72,10 @@ class PresencesModel extends ListModel
         $query->select(
             $db->quoteName(
                 [
-                    'a.id', 'a.lesson', 'a.student', 'a.date'
+                    'a.id',
+                    'a.lesson',
+                    'a.student',
+                    'a.date'
                 ]
             )
         );
@@ -95,7 +104,8 @@ class PresencesModel extends ListModel
         $query = $db->getQuery(true);
 
         // if date = null then take date of today
-        if ($this->date == null) {
+        if ($this->date == null)
+        {
             $this->date = date("Y-m-d");
         }
 
@@ -113,7 +123,8 @@ class PresencesModel extends ListModel
 
         $rows = $db->setQuery($query)->loadObjectlist();
 
-        foreach ($rows as $row) {
+        foreach ($rows as $row)
+        {
             $students[] = $row->student;
         }
 
@@ -134,7 +145,8 @@ class PresencesModel extends ListModel
         $query = $db->getQuery(true);
 
         // if date = null then take date of today
-        if ($this->date == null) {
+        if ($this->date == null)
+        {
             $this->date = date("Y-m-d");
         }
 
@@ -150,17 +162,65 @@ class PresencesModel extends ListModel
     }
 
     /**
-     * Method to get list of presences for a specific lesson on a spefic date
+     * Method to get list of presences for a specific studen in a specific lesson
      *
-     * Presences of a lesson on a day.
+     * Presences of a student in a lesson 
+     * 
      *
+     * @param   int     $student The student id.
      * @param   int     $lesson  The lesson id.
-     * @param   string  $date    The date.
+     *
+     **/
+    public function numberOfPresences($student = null, $lesson = null)
+    {
+        $this->lesson = $lesson;
+        $this->student = $student;
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+
+        // check the number of presences of a student in a lesson
+        $query->select('COUNT(*)')
+            ->from($db->quoteName('#__balancirk_presences', 'a'))
+            ->where($db->quote($this->lesson) . ' = `lesson`')
+            ->where($db->quote($this->student) . ' = `student`');
+
+        $total = $db->setQuery($query)->loadResult();
+
+        return $total;
+    }
+
+    /**
+     * Method to get list of presences for a specific lesson at a specific date
+     *
+     * Presences of a student in a lesson 
+     * 
+     *
+     * @param   int     $lesson The lesson id.
+     * @param   int     $date  The date.
      *
      **/
     public function getPresences($lesson = null, $date = null)
     {
         $this->lesson = $lesson;
         $this->date = $date;
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+
+        // check the number of presences of a student in a lesson
+        $query->select('date')
+            ->from($db->quoteName('#__balancirk_presences', 'a'))
+            ->where('`date` = ' . $db->quote($this->date))
+            ->where('`lesson` = ' . $db->quote($this->lesson));
+
+        $rows = $db->setQuery($query)->loadObjectlist();
+
+        foreach ($rows as $row)
+        {
+            $students[] = $row->date;
+        }
+
+        return $students;
     }
 }
