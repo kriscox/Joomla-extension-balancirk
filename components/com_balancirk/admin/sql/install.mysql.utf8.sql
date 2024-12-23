@@ -17,14 +17,6 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_members_additional` (
     `ordering` int(11) NOT NULL DEFAULT 0
 );
 
-/* Add dummy data for tests. Must be removed afterwards */
--- INSERT INTO `#__balancirk_members_additional` (
---     `id`, `firstname`, `street`, `number`, `bus`, 
---     `postcode`, `city`, `phone`
--- ) VALUES
--- ('156', 'Kris', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32478260721'),
--- ('157', 'Nora', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32456354336');
-
 CREATE OR REPLACE VIEW `#__balancirk_members` 
     AS SELECT u.* , m.firstname, m.street, m.number, m.bus, m.postcode, m.city,
             m.phone, m.ordering
@@ -56,14 +48,6 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_students` (
     `ordering` int(11) NOT NULL DEFAULT 0
 );
 
-/* Add dummy data for tests. Must be removed afterwards */
--- INSERT INTO `#__balancirk_students` (
---     `id`, `firstname`, `name`, `street`, `number`, `bus`, 
---     `postcode`, `city`, `phone`, `email`, `birthdate`, `state`
--- ) VALUES
--- ('1', 'Kris', 'Cox', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32478260721', 'cox.kris@gmail.com', '1973-10-09', '1'),
--- ('2', 'Nora', 'Cox', 'Alverbergstraat', '63', NULL, '3500', 'Hasselt', '+32456354336', 'cox.nora@gmail.com', '2009-11-01', '1');
-
 /**************************************************************************************************
 *                                                                                                 * 
 *  SQL script for table Parent                                                                  * 
@@ -84,12 +68,6 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_parents` (
             REFERENCES `#__balancirk_students` (id)
 );
 
--- INSERT INTO `#__balancirk_parents` (
---     `parent`, `child`, `primary`
--- ) VALUES
---     (156, 1, 1),
---     (156, 2, 0);
-
 /**************************************************************************************************
 *                                                                                                 * 
 *  SQL script for table types                                                                     * 
@@ -100,13 +78,6 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_types` (
     `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `name` varchar(40) NOT NULL
 );
-
--- INSERT INTO `#__balancirk_types`(
--- 	`id`, `name`
--- )
--- 	VALUES (
--- 		1, 'Jaarmodule'
--- 	);
 
 /**************************************************************************************************
 *                                                                                                 * 
@@ -133,11 +104,6 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_lessons` (
             REFERENCES `#__balancirk_types` (id)
 );
 
--- INSERT INTO `#__balancirk_lessons` (
--- 	`id`, `name`, `type`, `fee` , `year`, `start`, `end`, `start_registration`, `end_registration`, `state`
--- )
--- 	VALUES (1, 'Multi', 1, 210, 2022, '2022-09-15', '2023-05-29', '2022-06-01', '2022-12-31', 1);
-
 /**************************************************************************************************
 *                                                                                                 * 
 *  SQL script for table subscriptions                                                             * 
@@ -159,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_subscriptions`(
 );
 
 CREATE OR REPLACE VIEW `#__balancirk_subscriptions_view`
-	AS SELECT t.`id` as 'studentid', t.`name`, t.`firstname`, 
+	AS SELECT `s`.`id` as id, t.`id` as 'studentid', t.`name`, t.`firstname`, 
 		l.`id` as 'lessonid', l.`name` as 'lesson', l.`type`, l.`fee`, l.`year`,
 		l.`start`, l.`end`, l.`start_registration`, l.`end_registration`, l.`state`,
         s.`subscribed`
@@ -178,10 +144,6 @@ CREATE OR REPLACE VIEW `#__balancirk_lessons_complete`
                 INNER JOIN `#__balancirk_types` b
                     ON a.`type` = b.`id`;
 
--- INSERT INTO `#__balancirk_subscriptions` (
--- 	`id`, `lesson`, `student`
--- )
--- 	VALUES(1, 1, 2);
 /**************************************************************************************************
 *                                                                                                 * 
 *  SQL script for table presences                                                                 * 
@@ -250,3 +212,19 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_mailmessages`(
     `state` char(15) NOT NULL,
     `ordering` int(11) NOT NULL DEFAULT 0
 );
+
+/***********************************************************************************************
+*                                                                                              *
+*  SQL script for view subscriptions for comptable                                             *
+*                                                                                              *
+***********************************************************************************************/
+CREATE OR REPLACE VIEW `#__balancirk_subscriptions_comptable` 
+    AS SELECT `m`.`firstname` AS `firstname`, `m`.`name` AS `name`,
+    concat(`m`.`street`, ' ', `m`.`number`) AS `adres`, `m`.`bus` AS `bus`, 
+    `m`.`postcode` AS `postcode`, `m`.`city` AS `city`, `m`.`email` AS `email`, 
+    `s`.`lesson` AS `lesson`, `s`.`firstname` AS `voornaam kind`, `s`.`name` AS `naam kind`,
+    `st`.`uitpas` AS `uitpas`
+FROM `tc_balancirk_subscriptions_view` `s`
+    JOIN `tc_balancirk_students` `st` ON `s`.`studentid` = `st`.`id`
+    JOIN `tc_balancirk_parents` `p` ON `p`.`child` = `s`.`studentid` AND `p`.`primary` = 1
+    JOIN `tc_balancirk_members` `m` ON `m`.`id` = `p`.`parent`;
