@@ -212,8 +212,14 @@ class MemberModel extends AdminModel
         // Define columns and their values
         $columns = array('id', 'firstname', 'street', 'number', 'bus', 'postcode', 'city', 'phone');
         $values = array(
-            $id, $data['firstname'], $data['street'], $data['number'], $data['bus'],
-            $data['postcode'], $data['city'], $data['phone']
+            $id,
+            $data['firstname'],
+            $data['street'],
+            $data['number'],
+            $data['bus'],
+            $data['postcode'],
+            $data['city'],
+            $data['phone']
         );
 
         // Create query and don't forget to quote everything
@@ -230,10 +236,10 @@ class MemberModel extends AdminModel
         $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
 
         // Set the sender
-        $config = new JConfig();
+        $config = Factory::getApplication()->get('config');
         $sender = array(
-            $config->mailfrom,
-            $config->fromname
+            $config->get('mailfrom'),
+            $config->get('fromname')
         );
 
         // Get the activation url

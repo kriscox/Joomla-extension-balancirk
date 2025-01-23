@@ -18,6 +18,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use CoCoCo\Component\Balancirk\Site\Model\StudentModel;
+
 // use CoCoCo\Component\Balancirk\Site\Model\PresenceModel;
 
 /**
@@ -56,8 +57,7 @@ class SubscriptionModel extends AdminModel
      */
     protected function canDelete($record)
     {
-        if (!empty($record->lesson) || !empty($record->student))
-        {
+        if (!empty($record->lesson) || !empty($record->student)) {
             $app = Factory::getApplication();
             $parentid = $app->getIdentity()->id;
 
@@ -92,8 +92,7 @@ class SubscriptionModel extends AdminModel
         $name = 'subscriptions';
         $prefix = 'Table';
 
-        if ($table = $this->_createTable($name, $prefix, $options))
-        {
+        if ($table = $this->_createTable($name, $prefix, $options)) {
             return $table;
         }
 
@@ -115,8 +114,7 @@ class SubscriptionModel extends AdminModel
         // Get the form.
         $form = $this->loadForm($this->typeAlias, 'subscription', ['control' => 'jform', 'load_data' => $loadData]);
 
-        if (empty($form))
-        {
+        if (empty($form)) {
             return false;
         }
 
@@ -193,8 +191,7 @@ class SubscriptionModel extends AdminModel
         $studentModel = $this->getMVCFactory()->createModel('Student', 'Site');
         $parents = $studentModel->getParents($data['student']);
 
-        foreach ($parents as $parent)
-        {
+        foreach ($parents as $parent) {
             // Get the parent email
             /** @var MemberModel */
             $memberModel = $this->getMVCFactory()->createModel('Member', 'Site');
@@ -204,8 +201,7 @@ class SubscriptionModel extends AdminModel
             $mailer->addRecipient($member->email);
         }
 
-        if ($waitinglist == 0)
-        { // Not on waitinglist
+        if ($waitinglist == 0) { // Not on waitinglist
             $mailer->setSubject(Text::_('COM_BALANCIRK_SUBJECT_SUBSCRIPTION') . ' "' . $lesson->name . '"')
                 // TODO: This is a placeholder, replace this with the actual mail content
                 ->setBody('
@@ -221,9 +217,7 @@ De betaling moet je nog niet in orde brengen. In de loop van de maand oktober on
 Met vriendelijke groeten,
   
 Het Balancirk team');
-        }
-        else
-        { // On wiatinglist
+        } else { // On wiatinglist
             $mailer->setSubject(Text::_('COM_BALANCIRK_SUBJECT_SUBSCRIPTION') . ' ' . $lesson->name)
                 ->setBody('
 Hallo,
