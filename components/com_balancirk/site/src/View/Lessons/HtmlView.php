@@ -88,8 +88,7 @@ class HtmlView extends BaseHtmlView
         // What Access Permissions does this user have? What can (s)he do?
         $this->canDo = ContentHelper::getActions('com_balancirk');
 
-        if (!$this->canDo->get('lessons.view'))
-        {
+        if (!$this->canDo->get('lessons.view')) {
             throw new Exception(Text::_('JERROR_ALERTNOAUTHOR'));
         }
 
@@ -104,8 +103,7 @@ class HtmlView extends BaseHtmlView
         $lessonsModel = $this->getModel();
         $this->years = $lessonsModel->getYears();
 
-        if (!$this->items || (!count($this->items) && $this->get('IsEmptyState')))
-        {
+        if (!$this->items || (!count($this->items) && $this->get('IsEmptyState'))) {
             $this->setLayout('emptystate');
         }
 

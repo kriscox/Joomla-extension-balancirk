@@ -20,19 +20,15 @@ defined('_JEXEC') or die;
 
 $dates = [];
 $studentCount = [];
-foreach ($this->presences as $presence)
-{
-	array_push($dates, $presence->date);
-	array_push($studentCount, $presence->count);
+foreach ($this->presences as $presence) {
+    array_push($dates, $presence->date);
+    array_push($studentCount, $presence->count);
 }
 
-if (count($studentCount) == 0)
-{
-	$mean = 0;
-}
-else
-{
-	$mean = round(array_sum($studentCount) / count($studentCount), 1);
+if (count($studentCount) == 0) {
+    $mean = 0;
+} else {
+    $mean = round(array_sum($studentCount) / count($studentCount), 1);
 }
 
 /** @var Joomla\CMS\Application $app */
@@ -41,10 +37,10 @@ $app = Factory::getApplication();
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $app->getDocument()->getWebAssetManager();
 $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
-	->registerAndUseScript('chart.js', 'https://cdn.jsdelivr.net/npm/chart.js')
-	->registerAndUseScript('chartjs-adapter-date-fns.js', 'https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js')
-	->registerAndUseScript('chartjs-plugin-annotation.js', 'media/com_balancirk/js/chartjs-plugin-annotation.min.js')
-	->addInlineScript('
+    ->registerAndUseScript('chart.js', 'https://cdn.jsdelivr.net/npm/chart.js')
+    ->registerAndUseScript('chartjs-adapter-date-fns.js', 'https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js')
+    ->registerAndUseScript('chartjs-plugin-annotation.js', 'media/com_balancirk/js/chartjs-plugin-annotation.min.js')
+    ->addInlineScript('
 		document.addEventListener("DOMContentLoaded", function() {
 			const ctx = document.getElementById("PresenceChart");
 

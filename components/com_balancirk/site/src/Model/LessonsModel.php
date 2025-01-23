@@ -16,6 +16,7 @@ use DateInterval;
 use Exception;
 use Joomla\Database\ParameterType;
 use Joomla\CMS\MVC\Model\ListModel;
+use Joomla\CMS\Factory;
 
 /**
  * LessonsModel class to display the list off lessons.
@@ -40,12 +41,18 @@ class LessonsModel extends ListModel
         if (empty($config['filter_fields']))
         {
             $config['filter_fields'] = array(
-                'id', 'a.id',
-                'name', 'a.name',
-                'type', 'a.type',
-                'year', 'a.year',
-                'numberOfStudents', 'a.numberOfStudents',
-                'state', 'a.state'
+                'id',
+                'a.id',
+                'name',
+                'a.name',
+                'type',
+                'a.type',
+                'year',
+                'a.year',
+                'numberOfStudents',
+                'a.numberOfStudents',
+                'state',
+                'a.state'
             );
         }
 
@@ -59,11 +66,12 @@ class LessonsModel extends ListModel
      * @param   string $direction The direction of ordering (asc|desc).
      * @return  void
      * @throws  Exception If the state is not an object.
-     */
+     **/
     protected function populateState($ordering = null, $direction = null)
     {
-        $app = \JFactory::getApplication();
+        $app = Factory::getApplication();
 
+        // Load the filter state.
         // Load the filter state.
         $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
 
@@ -99,13 +107,21 @@ class LessonsModel extends ListModel
         $query->select(
             $db->quoteName(
                 [
-                    'a.id', 'a.name', 'a.type',
-                    'a.year', 'a.state', 'a.numberOfStudents',
+                    'a.id',
+                    'a.name',
+                    'a.type',
+                    'a.year',
+                    'a.state',
+                    'a.numberOfStudents',
                     'a.max_students'
                 ],
                 [
-                    'id', 'name', 'type',
-                    'year', 'state', 'numberOfStudents',
+                    'id',
+                    'name',
+                    'type',
+                    'year',
+                    'state',
+                    'numberOfStudents',
                     'max_students'
                 ]
             )
@@ -177,8 +193,12 @@ class LessonsModel extends ListModel
         $query->select(
             $db->quoteName(
                 [
-                    'id', 'name', 'type',
-                    'fee', 'year', 'state'
+                    'id',
+                    'name',
+                    'type',
+                    'fee',
+                    'year',
+                    'state'
                 ]
             )
         )
@@ -217,8 +237,12 @@ class LessonsModel extends ListModel
         $query->select(
             $db->quoteName(
                 [
-                    'id', 'name', 'type',
-                    'fee', 'year', 'state'
+                    'id',
+                    'name',
+                    'type',
+                    'fee',
+                    'year',
+                    'state'
                 ]
             )
         )

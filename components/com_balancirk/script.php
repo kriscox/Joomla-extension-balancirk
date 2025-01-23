@@ -210,9 +210,12 @@ class Com_BalancirkInstallerScript extends InstallerScript
         $group = array('id' => 0, 'title' => 'Teachers', 'parent_id' => 2);
         ModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_user/models');
 
+<<<<<<< HEAD
         /** @var \Joomla\Component\Users\Administrator\Model\GroupModel $groupModel */
         $groupModel = ModelLegacy::getInstance('Group', 'UsersModel');
 
+=======
+>>>>>>> add4bde (tussentijds)
         if (!$groupModel->save($group))
         {
             Factory::getApplication()->enqueueMessage($groupModel->getError());

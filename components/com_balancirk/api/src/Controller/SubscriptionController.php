@@ -19,10 +19,8 @@ class SubscriptionController extends ApiController
     protected function save($recordKey = null)
     {
         $data = (array) json_decode($this->input->json->getRaw(), true);
-        foreach (FieldsHelper::getFields('com_balancirk.subscription') as $field)
-        { // This probably looks for a model of the same name
-            if (isset($data[$field->name]))
-            {
+        foreach (FieldsHelper::getFields('com_balancirk.subscription') as $field) { // This probably looks for a model of the same name
+            if (isset($data[$field->name])) {
                 !isset($data['com_fields']) && $data['com_fields'] = [];
                 $data['com_fields'][$field->name] = $data[$field->name];
                 unset($data[$field->name]);
@@ -41,13 +39,13 @@ class SubscriptionController extends ApiController
         /** @var \Joomla\CMS\MVC\Model\AdminModel $model */
         $model = $this->getModel($modelName, '', ['ignore_request' => true]);
 
-        if (!$model)
-        {
+        if (!$model) {
             throw new \RuntimeException(Text::_('JLIB_APPLICATION_ERROR_MODEL_CREATE'));
         }
 
-        if (!$model->getItem($recordKey))
-            throw new ResourceNotFound;
+        if (!$model->getItem($recordKey)) {
+            throw new ResourceNotFound();
+        }
 
         return $model->delete($recordKey);
     }

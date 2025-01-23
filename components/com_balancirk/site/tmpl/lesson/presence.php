@@ -13,7 +13,6 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\User\UserHelper;
-
 use CoCoCo\Component\Balancirk\Site\Model\LessonModel;
 
 defined('_JEXEC') or die;
@@ -108,8 +107,8 @@ $teached_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=teach
 $url = Route::_('index.php?option=com_balancirk&view=lesson');
 ?>
 
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-edit-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-member-edit-top}'); ?>
 <form action="<?= $url ?>" method="POST" name="adminForm" id="presence-form" class="form-validate">
 	<div class="row">
 		<div class="col-md-12">

@@ -13,7 +13,6 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\User\UserHelper;
-
 use CoCoCo\Component\Balancirk\Site\Model\LessonModel;
 
 defined('_JEXEC') or die;
@@ -31,17 +30,15 @@ $lessons = [];
 $lesdays = LessonModel::getDates($this->item->start, $this->item->end, LessonModel::getLesdays($this->item->lesdays));
 $firstLesDay = min($lesdays)->format('d/m/Y');
 $lastLesDay = max($lesdays)->format('d/m/Y');
-foreach ($lesdays as $lesday)
-{
-	array_push($lessons, $lesday->format('d/m/Y'));
+foreach ($lesdays as $lesday) {
+    array_push($lessons, $lesday->format('d/m/Y'));
 }
 $userid = Factory::getApplication()->getIdentity()->id;
 $api_token = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
 
 $today = (new DateTime())->settime(0, 0, 0);
-if (!in_array($today, $lesdays))
-{
-	$today = null;
+if (!in_array($today, $lesdays)) {
+    $today = null;
 }
 
 /** @var Joomla\CMS\Document\Document  */
@@ -49,11 +46,11 @@ $doc = $app->getDocument();
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $doc->getWebAssetManager();
 $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
-	->registerAndUseScript('bootstrap-datepicker', 'https://unpkg.com/bootstrap-datepicker@latest/dist/js/bootstrap-datepicker.min.js')
-	->registerAndUseScript('bootstrap-datepicker-nl', 'https://unpkg.com/bootstrap-datepicker@latest/dist/locales/bootstrap-datepicker.nl-BE.min.js')
-	->registerAndUseScript('teacher-script', 'media/com_balancirk/js/balancirk_teacher_date.js')
-	->addInlineScript(
-		'
+    ->registerAndUseScript('bootstrap-datepicker', 'https://unpkg.com/bootstrap-datepicker@latest/dist/js/bootstrap-datepicker.min.js')
+    ->registerAndUseScript('bootstrap-datepicker-nl', 'https://unpkg.com/bootstrap-datepicker@latest/dist/locales/bootstrap-datepicker.nl-BE.min.js')
+    ->registerAndUseScript('teacher-script', 'media/com_balancirk/js/balancirk_teacher_date.js')
+    ->addInlineScript(
+        '
 	var changed = false;
 	jQuery(document).ready(function() {
 		jQuery("#jform_date").datepicker({
@@ -90,7 +87,7 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 	 changed = true' : '') . '
 	}); //ready
 	'
-	);
+    );
 $doc->addScriptOptions('teacher-script', ['token' => $api_token]);
 
 $teachers = $this->get('Teachers');
@@ -100,9 +97,8 @@ $data['id'] = $this->item->id;
 $form = $this->get('teacherForm');
 $form->bind($data);
 
-foreach ($teachers as $teacher)
-{
-	$form->getField('teachers')->addOption($teacher->firstname . " " . $teacher->name, ['value' => $teacher->id]);
+foreach ($teachers as $teacher) {
+    $form->getField('teachers')->addOption($teacher->firstname . " " . $teacher->name, ['value' => $teacher->id]);
 }
 
 $presence_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=presence&id=' . (int) $this->item->id);

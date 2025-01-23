@@ -75,8 +75,7 @@ class HtmlView extends BaseHtmlView
         $this->item = $this->get('Item');
         $this->students = $this->get('Students');
 
-        if (count($errors = $this->get('Errors')))
-        {
+        if (count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);
         }
 
@@ -104,14 +103,10 @@ class HtmlView extends BaseHtmlView
             Text::_('COM_BALANCIRK_MEMBER_PAGE_TITLE_' . ($isNew ? 'ADD_MEMBER' : 'EDIT_MEMBER'))
         );
 
-        if ($canDo->get('core.create'))
-        {
-            if ($isNew)
-            {
+        if ($canDo->get('core.create')) {
+            if ($isNew) {
                 $toolbar->apply('member.register');
-            }
-            else
-            {
+            } else {
                 $toolbar->apply('member.apply');
             }
         }

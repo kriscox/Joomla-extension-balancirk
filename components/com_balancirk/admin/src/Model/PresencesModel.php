@@ -38,8 +38,7 @@ class PresencesModel extends ListModel
      */
     public function __construct($config = [])
     {
-        if (empty($config['filter_fields']))
-        {
+        if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
                 'id',
                 'a.id',
@@ -104,8 +103,7 @@ class PresencesModel extends ListModel
         $query = $db->getQuery(true);
 
         // if date = null then take date of today
-        if ($this->date == null)
-        {
+        if ($this->date == null) {
             $this->date = date("Y-m-d");
         }
 
@@ -123,8 +121,7 @@ class PresencesModel extends ListModel
 
         $rows = $db->setQuery($query)->loadObjectlist();
 
-        foreach ($rows as $row)
-        {
+        foreach ($rows as $row) {
             $students[] = $row->student;
         }
 
@@ -145,8 +142,7 @@ class PresencesModel extends ListModel
         $query = $db->getQuery(true);
 
         // if date = null then take date of today
-        if ($this->date == null)
-        {
+        if ($this->date == null) {
             $this->date = date("Y-m-d");
         }
 
@@ -164,8 +160,8 @@ class PresencesModel extends ListModel
     /**
      * Method to get list of presences for a specific studen in a specific lesson
      *
-     * Presences of a student in a lesson 
-     * 
+     * Presences of a student in a lesson
+     *
      *
      * @param   int     $student The student id.
      * @param   int     $lesson  The lesson id.
@@ -193,8 +189,8 @@ class PresencesModel extends ListModel
     /**
      * Method to get list of presences for a specific lesson at a specific date
      *
-     * Presences of a student in a lesson 
-     * 
+     * Presences of a student in a lesson
+     *
      *
      * @param   int     $lesson The lesson id.
      * @param   int     $date  The date.
@@ -216,8 +212,7 @@ class PresencesModel extends ListModel
 
         $rows = $db->setQuery($query)->loadObjectlist();
 
-        foreach ($rows as $row)
-        {
+        foreach ($rows as $row) {
             $students[] = $row->date;
         }
 

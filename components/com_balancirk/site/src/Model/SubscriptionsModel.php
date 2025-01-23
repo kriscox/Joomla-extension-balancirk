@@ -35,8 +35,7 @@ class SubscriptionsModel extends ListModel
     public function __construct($config = [])
     {
 
-        if (empty($config['filter_fields']))
-        {
+        if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
                 'name',
                 'a.name',
@@ -139,37 +138,30 @@ class SubscriptionsModel extends ListModel
         // Filter by current state
         $current = (string) $this->getState('filter.current');
 
-        if (is_numeric($current))
-        {
+        if (is_numeric($current)) {
             $query->where($db->quoteName('a.state') . ' = :current');
             $query->bind(':current', $current, ParameterType::INTEGER);
-        }
-        elseif ($current === '')
-        {
+        } elseif ($current === '') {
             $query->where('(' . $db->quoteName('a.state') . ' = 0 OR ' . $db->quoteName('a.state') . ' = 1)');
         }
 
         // Filter by selected year
         $selectedYear = $this->getState('filter.year');
         $today = date('Y-m-d');
-        if (empty($selectedYear))
-        {
+        if (empty($selectedYear)) {
             $query->where($db->quote(date(
                 'Y',
                 strtotime($today . '- 5 months')
             )) . ' = `year`');
             $this->setState('filter.year', date('Y', strtotime($today . '- 5 months')));
-        }
-        else
-        {
+        } else {
             $query->where($db->quoteName('a.year') . ' = ' . $db->quote($selectedYear));
         }
 
         // Filter by search in title.
         $search = $this->getState('filter.search');
 
-        if (!empty($search))
-        {
+        if (!empty($search)) {
             $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
             $query->where('(a.name LIKE ' . $search . ')', 'OR');
             $query->where('(a.firstname LIKE ' . $search . ')', 'OR');

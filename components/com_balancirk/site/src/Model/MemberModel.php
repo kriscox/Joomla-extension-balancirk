@@ -244,9 +244,10 @@ class MemberModel extends AdminModel
         $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
 
         // Set the sender
+        $config = Factory::getApplication()->get('config');
         $sender = array(
-            'info@balancirk.be',
-            'Circusatelier Balancirk VZW'
+            $config->get('mailfrom'),
+            $config->get('fromname')
         );
 
         // Get the activation url

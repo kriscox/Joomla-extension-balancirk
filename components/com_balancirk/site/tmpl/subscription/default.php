@@ -8,27 +8,19 @@
  * @license     GNU General Public License version 3.
  */
 
+defined('_JEXEC') or die;
+
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Layout\LayoutHelper;
 
-/**
- * @package	 Joomla.Site
- * @subpackage  com_balancirk
- *
- * @copyright   Copyright (C) 2022 CoCoCo. All rights reserved.
- * @license	 GNU General Public License version 3.
- */
-
-defined('_JEXEC') or die;
-
 HTMLHelper::_('behavior.formvalidator');
 HTMLHelper::_('behavior.keepalive');
 ?>
 
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-subscription-top}'); ?>
+<?php echo HtmlHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo HtmlHelper::_('content.prepare', '{loadposition balancirk-subscription-top}'); ?>
 <?php if (empty($this->students)) : ?>
 	<div class="alert alert-info">
 		<span class="fa fa-info-circle" aria-hidden="true"></span><span class="sr-only"><?= Text::_('INFO'); ?></span>
@@ -68,5 +60,5 @@ HTMLHelper::_('behavior.keepalive');
 
 	</form>
 <?php endif; ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-subscription-bottom}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
+<?php echo HtmlHelper::_('content.prepare', '{loadposition balancirk-subscription-bottom}'); ?>
+<?php echo HtmlHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
