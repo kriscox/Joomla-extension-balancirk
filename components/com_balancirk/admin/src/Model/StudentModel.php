@@ -59,8 +59,7 @@ class StudentModel extends AdminModel
         $name = 'students';
         $prefix = 'Table';
 
-        if ($table = $this->_createTable($name, $prefix, $options))
-        {
+        if ($table = $this->_createTable($name, $prefix, $options)) {
             return $table;
         }
 
@@ -82,8 +81,7 @@ class StudentModel extends AdminModel
         // Get the form.
         $form = $this->loadForm($this->typeAlias, 'student', ['control' => 'jform', 'load_data' => $loadData]);
 
-        if (empty($form))
-        {
+        if (empty($form)) {
             return false;
         }
 
@@ -106,8 +104,7 @@ class StudentModel extends AdminModel
 
 
 
-        if (empty($data))
-        {
+        if (empty($data)) {
             $data = $this->getItem();
 
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
@@ -189,12 +186,9 @@ class StudentModel extends AdminModel
             ->where($db->quoteName('parent') . ' = ' . $db->quote($parent))
             ->where($db->quoteName('primary') . ' = 1');
 
-        if ($db->setQuery($query)->execute())
-        {
+        if ($db->setQuery($query)->execute()) {
             return $db->getNumRows() >= 1;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
