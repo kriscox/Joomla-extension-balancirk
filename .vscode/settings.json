@@ -8,5 +8,6 @@
 		"--print-directory"
 	],
 	"makefile.makefilePath": "Makefile",
-	"phpcs.lintOnlyOpened": false
+	"phpcs.lintOnlyOpened": false,
+	"phpcs.standard": ""
 }
