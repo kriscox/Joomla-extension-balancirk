@@ -13,6 +13,8 @@ namespace CoCoCo\Component\Balancirk\Api\Controller;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\MVC\Controller\ApiController;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Exception;
 
 /**
  * undocumented class
@@ -48,12 +50,14 @@ class TeachersController extends ApiController
         $limit          = null;
         $offset         = null;
 
-        if (\array_key_exists('offset', $paginationInfo)) {
+        if (\array_key_exists('offset', $paginationInfo))
+        {
             $offset = $paginationInfo['offset'];
             $this->modelState->set($this->context . '.limitstart', $offset);
         }
 
-        if (\array_key_exists('limit', $paginationInfo)) {
+        if (\array_key_exists('limit', $paginationInfo))
+        {
             $limit = $paginationInfo['limit'];
             $this->modelState->set($this->context . '.list.limit', $limit);
         }
@@ -62,7 +66,8 @@ class TeachersController extends ApiController
         $viewName   = $this->input->get('view', $this->default_view);
         $viewLayout = $this->input->get('layout', 'default', 'string');
 
-        try {
+        try
+        {
             /** @var JsonApiView $view */
             $view = $this->getView(
                 $viewName,
@@ -70,18 +75,22 @@ class TeachersController extends ApiController
                 '',
                 ['base_path' => $this->basePath, 'layout' => $viewLayout, 'contentType' => $this->contentType]
             );
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e)
+        {
             throw new \RuntimeException($e->getMessage());
         }
 
-        if (!$model) {
+        if (!$model)
+        {
             throw new \RuntimeException(Text::_('JLIB_APPLICATION_ERROR_MODEL_CREATE'));
         }
 
         // Push the model into the view (as default)
         $view->setModel($model, true);
 
-        if ($offset) {
+        if ($offset)
+        {
             $model->setState('list.start', $offset);
         }
 
@@ -89,13 +98,17 @@ class TeachersController extends ApiController
          * Sanity check we don't have too much data being requested as regularly in html we automatically set it back to
          * the last page of data. If there isn't a limit start then set
          */
-        if ($limit) {
+        if ($limit)
+        {
             $model->setState('list.limit', $limit);
-        } else {
+        }
+        else
+        {
             $model->setState('list.limit', $this->itemsPerPage);
         }
 
-        if (!\is_null($offset) && $offset > $model->getTotal()) {
+        if (!\is_null($offset) && $offset > $model->getTotal())
+        {
             throw new Exception\ResourceNotFound();
         }
 
