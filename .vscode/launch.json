@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Listen for XDebug component",
+            "type": "php",
+            "request": "launch",
+            "port": 9003,
+            "pathMappings": {
+                "/var/www/html/administrator/components/com_balancirk": "${workspaceRoot}/components/com_balancirk/admin",
+                "/var/www/html/media/com_balancirk": "${workspaceRoot}/components/com_balancirk/media",
+                "/var/www/html/components/com_balancirk": "${workspaceRoot}/components/com_balancirk/site",
+                "/var/www/html/api/components/com_balancirk": "${workspaceRoot}/components/com_balancirk/api",
+                "/var/www/html/plugins/webservices/balancirk": "${workspaceRoot}/plugins/balancirk"
+            }
+        }
+    ]
+}
