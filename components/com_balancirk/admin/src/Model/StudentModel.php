@@ -126,8 +126,6 @@ class StudentModel extends AdminModel
         $app = Factory::getApplication();
         $data = $app->getUserState('com_balancirk.edit.student.data', array());
 
-
-
         if (empty($data))
         {
             $data = $this->getItem();
