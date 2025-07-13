@@ -33,7 +33,7 @@ class MembersTable extends Table
      */
     public function __construct(DatabaseDriver $db)
     {
-        $this->typeAlias = 'com_balancirk.member';
+        $this->typeAlias = 'com_balancirk.members';
         parent::__construct('#__balancirk_members', 'id', $db);
     }
 
@@ -47,13 +47,15 @@ class MembersTable extends Table
      */
     public function generateAlias()
     {
-        if (empty($this->alias)) {
+        if (empty($this->alias))
+        {
             $this->alias = $this->username;
         }
 
         $this->alias = ApplicationHelper::stringURLSafe($this->alias, $this->language);
 
-        if (trim(str_replace('-', '', $this->alias)) == '') {
+        if (trim(str_replace('-', '', $this->alias)) == '')
+        {
             $this->alias = Factory::getDate()->format('Y-m-d-H-i-s');
         }
 

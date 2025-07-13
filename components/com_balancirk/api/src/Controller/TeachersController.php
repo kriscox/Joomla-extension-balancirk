@@ -15,6 +15,7 @@ namespace CoCoCo\Component\Balancirk\Api\Controller;
 use Joomla\CMS\MVC\Controller\ApiController;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Exception;
+use Joomla\CMS\MVC\Controller\Exception\ResourceNotFound;
 
 /**
  * undocumented class
@@ -109,7 +110,7 @@ class TeachersController extends ApiController
 
         if (!\is_null($offset) && $offset > $model->getTotal())
         {
-            throw new Exception\ResourceNotFound();
+            throw new ResourceNotFound();
         }
 
         $view->document = $this->app->getDocument();

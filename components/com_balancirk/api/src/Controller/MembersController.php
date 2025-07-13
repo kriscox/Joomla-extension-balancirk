@@ -4,21 +4,20 @@ namespace CoCoCo\Component\Balancirk\Api\Controller;
 
 defined('_JEXEC') or die;
 
-use Exception;
+use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Controller\ApiController;
 use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
-use Joomla\CMS\Factory;
 
 // {controllerName} here is merely a placeholder for the shared classnaming system across controllers, view folders (and possibly models)
-class LessonController extends ApiController
+class MembersController extends ApiController
 {
-    protected $contentType = 'lesson'; /* My understanding is that this maps to the desired model name */
-    protected $default_view = 'lesson'; /* This maps to the folder name containing the JSON API view */
+    protected $contentType = 'members'; /* My understanding is that this maps to the desired model name */
+    protected $default_view = 'members'; /* This maps to the folder name containing the JSON API view */
 
     protected function save($recordKey = null)
     {
         $data = (array) json_decode($this->input->json->getRaw(), true);
-        foreach (FieldsHelper::getFields('com_balancirk.lesson') as $field)
+        foreach (FieldsHelper::getFields('com_balancirk.members') as $field)
         { // This probably looks for a model of the same name
             if (isset($data[$field->name]))
             {
@@ -31,25 +30,15 @@ class LessonController extends ApiController
         return parent::save($recordKey);
     }
 
-    protected function authorizeRequest($task)
+    /**
+     * Method to get the current user data.
+     *
+     * @return  \Joomla\CMS\Webservice\Response\ResponseInterface
+     */
+    public function getCurrentUser()
     {
         $user = Factory::getApplication()->getIdentity();
 
-        // Block unauthenticated users
-        if ($user->guest)
-        {
-            throw new Exception('Access denied', 401);
-        }
-
-        // Role-based permission checks
-        switch ($task)
-        {
-            case 'getLesson':
-                if (!$user->authorise('lessons.view', 'com_balancirk'))
-                {
-                    throw new Exception('Insufficient privileges', 403);
-                }
-                break;
-        }
+        return $this->displayItem($id = $user->id);
     }
 }
