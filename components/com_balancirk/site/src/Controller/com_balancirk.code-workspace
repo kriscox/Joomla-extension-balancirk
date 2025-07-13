@@ -1,0 +1,31 @@
+{
+	"folders": [
+		{
+			"path": "../../../../.."
+		},
+		{
+			"path": "../../../../../../Joomla"
+		},
+		{
+			"path": "../../../../../../Development/joomla-xdebug"
+		}
+	],
+	"settings": {
+		"mayank1513.trello-kanban.Workspace.filePath": ".tkb",
+		"phpcs.composerJsonPath": "/Users/krisc/Documents/com_balancirk/composer.json",
+		"phpcs.standard": ""
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [],
+		"compounds": [
+			{
+				"name": "Launch All",
+				"configurations": [
+					"Listen for XDebug component",
+					"Listen for XDebug website"
+				]
+			}
+		]
+	}
+}

@@ -1,0 +1,1201 @@
+openapi: 3.0.1
+info:
+  version: 1.0.0
+  description: |
+    This is the OpenAPI specification for the Balancirk API, which provides access to the members module of the Balancirk website.
+    It allows users to manage and retrieve information about students and members.
+  # termsOfService: https://balancir.be/terms
+  title: Blancirk API
+  contact:
+    name: CoCoCo
+    email: kris.cox@cococo.be
+    url: https://cococo.be
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: https://test.cococo.be/api/index.php
+    description: development server
+  - url: https://balancir.be/api/index.php
+    description: production server
+
+security:
+  - BalancirkToken: []
+
+tags:
+  - name: Lessons
+    description: Operations about lessons
+  - name: Members
+    description: Operations about members
+  - name: Presence
+    description: Operations about presence records
+  - name: Students
+    description: Operations about students
+  - name: Subscriptions
+    description: Operations about subscriptions
+  - name: Teacher
+    description: Operations about teachers
+
+paths:
+  /v1/lessons:
+    get:
+      summary: Get all lessons
+      description: Retrieves a list of all lesson records.
+      operationId: getAllLessons
+      tags:
+        - Lessons
+      responses:
+        "200":
+          description: Successful operation. Returns an array of lesson objects.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lesson"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      summary: Create a new lesson
+      description: Adds a new lesson record to the system.
+      operationId: createLesson
+      tags:
+        - Lessons
+      requestBody:
+        description: Lesson object to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LessonInput"
+      responses:
+        "201":
+          description: Lesson created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lesson"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/lessons/{id}:
+    get:
+      summary: Get a lesson by ID
+      description: Retrieves a single lesson record by its unique identifier.
+      operationId: getLessonById
+      tags:
+        - Lessons
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the lesson.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful operation. Returns a single lesson object.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lesson"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    put:
+      summary: Update a lesson by ID
+      description: Updates an existing lesson record identified by its unique ID.
+      operationId: updateLessonById
+      tags:
+        - Lessons
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the lesson to update.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Lesson object with updated fields.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LessonInput"
+      responses:
+        "200":
+          description: Lesson updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lesson"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    delete:
+      summary: Delete a lesson by ID
+      description: Deletes a specific lesson record identified by its unique ID.
+      operationId: deleteLessonById
+      tags:
+        - Lessons
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the lesson to delete.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Lesson deleted successfully (No Content).
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/members:
+    get:
+      summary: Get all members
+      description: Retrieves a list of all member records.
+      operationId: getAllMembers
+      tags:
+        - Members
+      responses:
+        "200":
+          description: Successful operation. Returns an array of member objects.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Member"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      summary: Create a new member
+      description: Adds a new member record to the system.
+      operationId: createMember
+      tags:
+        - Members
+      requestBody:
+        description: Member object to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemberInput"
+      responses:
+        "201":
+          description: Member created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/members/me:
+    get:
+      summary: Retrieve current authenticated user's details
+      description: Fetches the details of the currently authenticated member.
+      operationId: getCurrentMember
+      tags:
+        - Members
+      responses:
+        "200":
+          description: Successful operation. Returns the current member's details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/members/{id}:
+    get:
+      summary: Get a member by ID
+      description: Retrieves a single member record by its unique identifier.
+      operationId: getMemberById
+      tags:
+        - Members
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the member.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful operation. Returns a single member object.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    put:
+      summary: Update a member by ID
+      description: Updates an existing member record identified by its unique ID.
+      operationId: updateMemberById
+      tags:
+        - Members
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the member to update.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Member object with updated fields.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemberInput"
+      responses:
+        "200":
+          description: Member updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    delete:
+      summary: Delete a member by ID
+      description: Deletes a specific member record identified by its unique ID.
+      operationId: deleteMemberById
+      tags:
+        - Members
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the member to delete.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Member deleted successfully (No Content).
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/presence/{lesson}:
+    get:
+      summary: Retrieve presence records for a specific lesson
+      description: Fetches all presence records associated with a given lesson ID.
+      operationId: getPresenceByLesson
+      tags:
+        - Presence
+      parameters:
+        - name: lesson
+          in: path
+          description: The unique identifier of the lesson.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful operation. Returns an array of presence records.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Presence"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      summary: Set or update presence for a specific lesson
+      description: Creates a new presence record or updates an existing one for a given lesson.
+      operationId: setPresenceForLesson
+      tags:
+        - Presence
+      parameters:
+        - name: lesson
+          in: path
+          description: The unique identifier of the lesson.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Presence object to be created or updated.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PresenceInput"
+      responses:
+        "201":
+          description: Presence record created or updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Presence"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/presence/{lesson}/{date}:
+    get:
+      summary: Retrieve presence record for a specific lesson on a specific date
+      description: Fetches a single presence record for a given lesson ID and date.
+      operationId: getPresenceByLessonAndDate
+      tags:
+        - Presence
+      parameters:
+        - name: lesson
+          in: path
+          description: The unique identifier of the lesson.
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: date
+          in: path
+          description: The date for which to retrieve presence (YYYY-MM-DD).
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Successful operation. Returns a single presence record.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Presence"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/students:
+    get:
+      summary: Get all students
+      description: Retrieves a list of all student records.
+      operationId: getAllStudents
+      tags:
+        - Students
+      responses:
+        "200":
+          description: Successful operation. Returns an array of student objects.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Student"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      summary: Create a new student
+      description: Adds a new student record to the system.
+      operationId: createStudent
+      tags:
+        - Students
+      requestBody:
+        description: Student object to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentInput"
+      responses:
+        "201":
+          description: Student created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/students/{id}:
+    get:
+      summary: Get a student by ID
+      description: Retrieves a single student record by its unique identifier.
+      operationId: getStudentById
+      tags:
+        - Students
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the student.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful operation. Returns a single student object.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    put:
+      summary: Update a student by ID
+      description: Updates an existing student record identified by its unique ID.
+      operationId: updateStudentById
+      tags:
+        - Students
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the student to update.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Student object with updated fields.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentInput"
+      responses:
+        "200":
+          description: Student updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    delete:
+      summary: Delete a student by ID
+      description: Deletes a specific student record identified by its unique ID.
+      operationId: deleteStudentById
+      tags:
+        - Students
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the student to delete.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Student deleted successfully (No Content).
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/subscriptions:
+    get:
+      summary: Get all subscriptions
+      description: Retrieves a list of all subscription records.
+      operationId: getAllSubscriptions
+      tags:
+        - Subscriptions
+      responses:
+        "200":
+          description: Successful operation. Returns an array of subscription objects.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Subscription"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      summary: Create a new subscription
+      description: Adds a new subscription record to the system.
+      operationId: createSubscription
+      tags:
+        - Subscriptions
+      requestBody:
+        description: Subscription object to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscriptionInput"
+      responses:
+        "201":
+          description: Subscription created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/subscriptions/{id}:
+    get:
+      summary: Get a subscription by ID
+      description: Retrieves a single subscription record by its unique identifier.
+      operationId: getSubscriptionById
+      tags:
+        - Subscriptions
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the subscription.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful operation. Returns a single subscription object.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    put:
+      summary: Update a subscription by ID
+      description: Updates an existing subscription record identified by its unique ID.
+      operationId: updateSubscriptionById
+      tags:
+        - Subscriptions
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the subscription to update.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Subscription object with updated fields.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscriptionInput"
+      responses:
+        "200":
+          description: Subscription updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    delete:
+      summary: Delete a subscription by ID
+      description: Deletes a specific subscription record identified by its unique ID.
+      operationId: deleteSubscriptionById
+      tags:
+        - Subscriptions
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the subscription to delete.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Subscription deleted successfully (No Content).
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/teacher/{lesson}:
+    get:
+      summary: Retrieve teacher information for a specific lesson
+      description: Fetches teacher details associated with a given lesson ID.
+      operationId: getTeacherByLesson
+      tags:
+        - Teacher
+      parameters:
+        - name: lesson
+          in: path
+          description: The unique identifier of the lesson.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful operation. Returns teacher information.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Teacher"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      summary: Set or update teacher for a specific lesson
+      description: Creates a new teacher record or updates an existing one for a given lesson.
+      operationId: setTeacherForLesson
+      tags:
+        - Teacher
+      parameters:
+        - name: lesson
+          in: path
+          description: The unique identifier of the lesson.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Teacher object to be created or updated.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeacherInput"
+      responses:
+        "201":
+          description: Teacher record created or updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Teacher"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/teacher/{lesson}/{date}:
+    get:
+      summary: Retrieve teacher information for a specific lesson on a specific date
+      description: Fetches teacher details for a given lesson ID and date.
+      operationId: getTeacherByLessonAndDate
+      tags:
+        - Teacher
+      parameters:
+        - name: lesson
+          in: path
+          description: The unique identifier of the lesson.
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: date
+          in: path
+          description: The date for which to retrieve teacher information (YYYY-MM-DD).
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Successful operation. Returns teacher information.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Teacher"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+components:
+  schemas:
+    Lesson:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the lesson.
+        title:
+          type: string
+          description: Title of the lesson.
+        description:
+          type: string
+          description: Detailed description of the lesson.
+        teacherId:
+          type: integer
+          format: int64
+          description: ID of the teacher conducting the lesson.
+        scheduledDate:
+          type: string
+          format: date-time
+          description: Date and time when the lesson is scheduled.
+        durationMinutes:
+          type: integer
+          description: Duration of the lesson in minutes.
+      required:
+        - title
+        - teacherId
+        - scheduledDate
+        - durationMinutes
+    LessonInput:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the lesson.
+        description:
+          type: string
+          description: Detailed description of the lesson.
+        teacherId:
+          type: integer
+          format: int64
+          description: ID of the teacher conducting the lesson.
+        scheduledDate:
+          type: string
+          format: date-time
+          description: Date and time when the lesson is scheduled.
+        durationMinutes:
+          type: integer
+          description: Duration of the lesson in minutes.
+      required:
+        - title
+        - teacherId
+        - scheduledDate
+        - durationMinutes
+
+    Member:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique identifier for the member
+        name:
+          type: string
+          description: The name of the member
+        username:
+          type: string
+          description: The username of the member
+        email:
+          type: string
+          description: The email of the member
+        block:
+          type: number
+          enum: [0, 1]
+          description: Indicates if the member is blocked
+        sendEmail:
+          type: number
+          enum: [0, 1]
+          description: Indicates if the member has opted to receive emails
+        registerDate:
+          type: string
+          format: date-time
+          description: The date when the member registered
+        lastvisitDate:
+          type: string
+          format: date-time
+          description: The date of the last visit of the member
+        activation:
+          type: string
+          format: date-time
+          description: The activation date of the member
+        firstname:
+          type: string
+          description: The firstname of the member
+        street:
+          type: string
+          description: The street address of the member
+        number:
+          type: string
+          description: The house number of the member
+        bus:
+          type: string
+          description: The bus number of the member
+        postcode:
+          type: string
+          description: The postcode of the member
+        city:
+          type: string
+          description: The city of the member
+        phone:
+          type: string
+          description: The phone number of the member
+    MemberInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the member
+        username:
+          type: string
+          description: The username of the member
+        email:
+          type: string
+          description: The email of the member
+        block:
+          type: number
+          enum: [0, 1]
+          description: Indicates if the member is blocked
+        sendEmail:
+          type: number
+          enum: [0, 1]
+          description: Indicates if the member has opted to receive emails
+        registerDate:
+          type: string
+          format: date-time
+          description: The date when the member registered
+        lastvisitDate:
+          type: string
+          format: date-time
+          description: The date of the last visit of the member
+        activation:
+          type: string
+          format: date-time
+          description: The activation date of the member
+        firstname:
+          type: string
+          description: The firstname of the member
+        street:
+          type: string
+          description: The street address of the member
+        number:
+          type: string
+          description: The house number of the member
+        bus:
+          type: string
+          description: The bus number of the member
+        postcode:
+          type: string
+          description: The postcode of the member
+        city:
+          type: string
+          description: The city of the member
+        phone:
+          type: string
+          description: The phone number of the member
+
+    Presence:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the presence record.
+        lessonId:
+          type: integer
+          format: int64
+          description: ID of the associated lesson.
+        date:
+          type: string
+          format: date
+          description: Date of the presence record (YYYY-MM-DD).
+        status:
+          type: string
+          description: Presence status (e.g., 'present', 'absent', 'late').
+        studentId:
+          type: integer
+          format: int64
+          description: ID of the associated student.
+      required:
+        - lessonId
+        - date
+        - status
+        - studentId
+    PresenceInput:
+      type: object
+      properties:
+        lessonId:
+          type: integer
+          format: int64
+          description: ID of the associated lesson.
+        date:
+          type: string
+          format: date
+          description: Date of the presence record (YYYY-MM-DD).
+        status:
+          type: string
+          description: Presence status (e.g., 'present', 'absent', 'late').
+        studentId:
+          type: integer
+          format: int64
+          description: ID of the associated student.
+      required:
+        - lessonId
+        - date
+        - status
+        - studentId
+
+    Student:
+      type: object
+      required:
+        - id
+        - name
+        - firstname
+      properties:
+        id:
+          type: number
+          description: The unique identifier for the student
+        name:
+          type: string
+          description: The name of the student
+        firstname:
+          type: string
+          description: The firstname of the student
+        email:
+          type: string
+          description: The email of the student
+        phone:
+          type: string
+          description: The phonenumber of the student
+    StudentInput:
+      type: object
+      required:
+        - name
+        - firstname
+      properties:
+        name:
+          type: string
+          description: The name of the student
+        firstname:
+          type: string
+          description: The firstname of the student
+        email:
+          type: string
+          description: The email of the student
+        phone:
+          type: string
+          description: The phonenumber of the student
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the subscription.
+        memberId:
+          type: integer
+          format: int64
+          description: ID of the member holding the subscription.
+        type:
+          type: string
+          description: Type of subscription (e.g., 'monthly', 'annual').
+        startDate:
+          type: string
+          format: date
+          description: Start date of the subscription.
+        endDate:
+          type: string
+          format: date
+          description: End date of the subscription.
+        status:
+          type: string
+          description: Current status of the subscription (e.g., 'active', 'expired', 'cancelled').
+      required:
+        - memberId
+        - type
+        - startDate
+        - endDate
+        - status
+    SubscriptionInput:
+      type: object
+      properties:
+        memberId:
+          type: integer
+          format: int64
+          description: ID of the member holding the subscription.
+        type:
+          type: string
+          description: Type of subscription (e.g., 'monthly', 'annual').
+        startDate:
+          type: string
+          format: date
+          description: Start date of the subscription.
+        endDate:
+          type: string
+          format: date
+          description: End date of the subscription.
+        status:
+          type: string
+          description: Current status of the subscription (e.g., 'active', 'expired', 'cancelled').
+      required:
+        - memberId
+        - type
+        - startDate
+        - endDate
+        - status
+
+    Teacher:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the teacher.
+        name:
+          type: string
+          description: Full name of the teacher.
+        email:
+          type: string
+          format: email
+          description: Email address of the teacher.
+        phone:
+          type: string
+          description: Phone number of the teacher.
+      required:
+        - name
+        - email
+    TeacherInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Full name of the teacher.
+        email:
+          type: string
+          format: email
+          description: Email address of the teacher.
+        phone:
+          type: string
+          description: Phone number of the teacher.
+      required:
+        - name
+        - email
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Application-specific error code.
+        message:
+          type: string
+          description: A human-readable error message.
+      required:
+        - code
+        - message
+
+  responses:
+    BadRequestError:
+      description: Bad Request - Invalid input data.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFoundError:
+      description: Not Found - The specified resource could not be found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ServerError:
+      description: Internal Server Error - Unexpected server-side issue.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    UnauthorizedError:
+      description: Unauthorized - Authentication required or failed.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  securitySchemes:
+    BalancirkToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        the security token found in the user profile, used to authenticate the user.
+        To use this token, include it in the Authorization header of your requests as follows:

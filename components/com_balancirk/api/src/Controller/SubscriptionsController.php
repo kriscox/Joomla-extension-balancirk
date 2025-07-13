@@ -9,7 +9,7 @@ use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 
 // {controllerName} here is merely a placeholder for the shared classnaming system across controllers, view folders (and possibly models)
 /** @package CoCoCo\Component\Balancirk\Api\Controller */
-class StudentsController extends ApiController
+class SubscriptionsController extends ApiController
 {
     /**
      * The content type of the item.
@@ -17,14 +17,14 @@ class StudentsController extends ApiController
      * @var    string
      * @since  __BUMPER_VERSION__
      */
-    protected $contentType = 'students'; /* My understanding is that this maps to the desired model name */
+    protected $contentType = 'subscriptions'; /* My understanding is that this maps to the desired model name */
     /**
      * The default view for the display method.
      *
      * @var    string
      * @since  __BUMPER_VERSION__
      */
-    protected $default_view = 'students'; /* This maps to the folder name containing the JSON API view */
+    protected $default_view = 'subscriptions'; /* This maps to the folder name containing the JSON API view */
 
     protected function save($recordKey = null)
     {

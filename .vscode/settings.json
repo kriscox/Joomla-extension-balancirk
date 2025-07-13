@@ -9,5 +9,8 @@
 	],
 	"makefile.makefilePath": "Makefile",
 	"phpcs.lintOnlyOpened": false,
-	"phpcs.standard": ""
+	"phpcs.standard": "",
+	"yaml.schemas": {
+		"openapi:v3": "file:///Users/krisc/Documents/com_balancirk/components/com_balancirk/api/src/Balancirk.yml"
+	}
 }

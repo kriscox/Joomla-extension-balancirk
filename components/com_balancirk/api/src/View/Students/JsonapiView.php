@@ -17,8 +17,16 @@ class JsonapiView extends BaseApiView
      */
     protected $fieldsToRenderItem = [
         'id',
+        'name',
         'firstname',
-        'name'
+        'email',
+        'street',
+        'number',
+        'bus',
+        'postcode',
+        'city',
+        'phone',
+        'birthdate',
     ];
 
     /**
@@ -29,7 +37,9 @@ class JsonapiView extends BaseApiView
      */
     protected $fieldsToRenderList = [
         'id',
+        'name',
         'firstname',
-        'name'
+        'email',
+        'phone'
     ];
 }
