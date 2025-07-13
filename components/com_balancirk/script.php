@@ -11,9 +11,10 @@
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Log\Log;
+use Joomla\CMS\Table\Table;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Installer\InstallerScript;
-use Joomla\CMS\Installer\InstallerAdapter;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel as ModelLegacy;
 
 /**
  * Script file of Balancirk Component
@@ -105,9 +106,11 @@ class Com_BalancirkInstallerScript extends InstallerScript
     {
         //echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_PREFLIGHT');
 
-        if ($type !== 'uninstall') {
+        if ($type !== 'uninstall')
+        {
             // Check for the minimum PHP version before continuing
-            if (!empty($this->minimumPHPVersion) && version_compare(PHP_VERSION, $this->minimumPHPVersion, '<')) {
+            if (!empty($this->minimumPHPVersion) && version_compare(PHP_VERSION, $this->minimumPHPVersion, '<'))
+            {
                 Log::add(
                     Text::sprintf('JLIB_INSTALLER_MINIMUM_PHP', $this->minimumPHPVersion),
                     Log::WARNING,
@@ -118,7 +121,8 @@ class Com_BalancirkInstallerScript extends InstallerScript
             }
 
             // Check for the minimum Joomla version before continuing
-            if (!empty($this->minimumJoomlaVersion) && version_compare(JVERSION, $this->minimumJoomlaVersion, '<')) {
+            if (!empty($this->minimumJoomlaVersion) && version_compare(JVERSION, $this->minimumJoomlaVersion, '<'))
+            {
                 Log::add(
                     Text::sprintf('JLIB_INSTALLER_MINIMUM_JOOMLA', $this->minimumJoomlaVersion),
                     Log::WARNING,
@@ -148,7 +152,8 @@ class Com_BalancirkInstallerScript extends InstallerScript
         //echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_POSTFLIGHT');
 
         // Do not run on uninstall.
-        if ($type !== 'uninstall') {
+        if ($type !== 'uninstall')
+        {
             $this->conditionalInstallDashboard('com-balancirk-dashboard', 'balancirk');
         }
 
@@ -185,7 +190,8 @@ class Com_BalancirkInstallerScript extends InstallerScript
 
         $modules = $db->setQuery($query)->loadResult() ?: 0;
 
-        if ($modules == 0) {
+        if ($modules == 0)
+        {
             $this->addDashboardMenu($dashboard, $preset);
         }
     }
@@ -202,15 +208,53 @@ class Com_BalancirkInstallerScript extends InstallerScript
     {
         // Parent is registered
         $group = array('id' => 0, 'title' => 'Teachers', 'parent_id' => 2);
-        JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_user/models');
-        $groupModel = JModelLegacy::getInstance('Group', 'UsersModel');
+        ModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_user/models');
 
-        if (!$groupModel->save($group)) {
-            JFactory::getApplication()->enqueueMessage($groupModel->getError());
+        /** @var \Joomla\Component\Users\Administrator\Model\GroupModel $groupModel */
+        $groupModel = ModelLegacy::getInstance('Group', 'UsersModel');
+
+        if (!$groupModel->save($group))
+        {
+            Factory::getApplication()->enqueueMessage($groupModel->getError());
 
             return false;
         }
 
         return true;
+    }
+
+    public function addHiddenMenu()
+    {
+
+        /** @var \Joomla\Database\DatabaseDriver $db */
+        $db = Factory::getContainer()->get('DatabaseDriver');
+
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('id'))
+            ->from($db->quoteName('#__menu_types'))
+            ->where($db->quoteName('menutype') . ' = ' . $db->quote('hiddenmenu'));
+
+        $db->setQuery($query);
+        $existing = $db->loadResult();
+
+        if ($existing)
+        {
+            return; // Already exists
+        }
+
+        //Load the menu type table
+        Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_menus/tables');
+        $menuType = Table::getInstance('MenuType', 'MenusTable');
+
+        $menuType->menutype = 'hiddenmenu';
+        $menuType->title = 'Hidden Menu';
+        $menuType->description = 'A menu that is hidden from the frontend view and used for selecting pages in the backend.';
+        $menuType->client_id = 0;
+
+        if (!$menuType->store())
+        {
+            Log::add(Text::_('COM_BALANCIRK_INSTALLERSCRIPT_ADD_HIDDEN_MENU_ERROR'), Log::ERROR, 'jerror');
+            return;
+        }
     }
 }

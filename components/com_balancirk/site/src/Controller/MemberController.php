@@ -14,6 +14,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\MVC\Controller\FormController;
 use CoCoCo\Component\Balancirk\Site\Model\MemberModel;
+use Joomla\CMS\Component\ComponentHelper;
 
 \defined('_JEXEC') or die;
 
@@ -77,13 +78,18 @@ class MemberController extends FormController
         $validData = $model->validate($form, $data);
         $app->setUserState('com_balancirk.member.data', $data);
 
-        if ($validData === false) {
+        if ($validData === false)
+        {
             $errors = $model->getErrors();
 
-            foreach ($errors as $error) {
-                if ($error instanceof \Exception) {
+            foreach ($errors as $error)
+            {
+                if ($error instanceof \Exception)
+                {
                     $app->enqueueMessage($error->getMessage(), 'warning');
-                } else {
+                }
+                else
+                {
                     $app->enqueueMessage($error, 'warning');
                 }
             }
@@ -91,12 +97,24 @@ class MemberController extends FormController
 
 
         // Register the user
-        if ($model->register($data)) {
+        if ($model->register($data))
+        {
             // Rmove the form data in the session, using a unique identifier
             $app->setUserState('com_balancirk.member.data', null);
 
-            // Set return to homepage
-            $redirectUrl = Route::_('/', false);
+            // Get the redirect URL from the configuration
+            $menuItemId = ComponentHelper::getParams('com_balancirk')->get('redirect_url', false);
+
+            if ($menuItemId)
+            {
+                // If the redirect URL is set, use it
+                $redirectUrl = Route::_('index.php?Itemid=' . (int) $menuItemId, false);
+            }
+            else
+            {
+                // Otherwise, redirect to the homepage
+                $redirectUrl = Route::_('/', false);
+            }
         }
 
         // Redirect back to the form in all cases
