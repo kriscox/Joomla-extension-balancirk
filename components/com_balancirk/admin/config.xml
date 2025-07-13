@@ -24,4 +24,14 @@
 			component="com_balancirk"
 			section="component" />
 	</fieldset>
+	<fieldset name="advanced"
+		label="Advanced Options"
+		description="Advanced Options">
+		<field name="redirect_url"
+			type="menuitem"
+			label="COM_BALANCIRK_REGISTRATION_REDIRECT_URL_LABEL"
+			description="COM_BALANCIRK_REGISTRATION_REDIRECT_URL_DESCRIPTION"
+			required="false"
+			menu_type="hiddenMenu" />
+	</fieldset>
 </config>
