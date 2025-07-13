@@ -45,4 +45,15 @@
 			<item>Only technical fixes</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>com_balancirk</element>
+		<type>package</type>
+		<version>1.2.9</version>
+		<fix>
+			<item>fixed: Error in case of no lessons to subscribe to </item>
+			<item>Holidays added</item>
+			<item>Joomla-builder2 used</item>
+			<item>Added to lessons search for lessons in the past years</item>
+		</fix>
+	</changelog>
 </changelogs>

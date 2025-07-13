@@ -93,4 +93,23 @@
 			version="4.*" />
 		<php_minimum>8.0</php_minimum>
 	</update>
+	<update>
+		<name>com_balancirk</name>
+		<description>This is the balancirk plugin</description>
+		<element>com_balancirk</element>
+		<type>package</type>
+		<version>1.2.9</version>
+		<changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_changelog.xml</changelogurl>
+		<infourl title="agosms">https://github.com/kriscox/Joomla-extension-balancirk/blob/master/README.md</infourl>
+		<downloads>
+			<downloadurl type="full"
+				format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.2.9/pkg_balancirk.zip</downloadurl>
+		</downloads>
+		<sha256>816c70e4896cdccd86cea12294cacbc2d0e26e6c8c60acf8cb96c1ed5bf463c6</sha256>
+		<maintainer>CoCoCo</maintainer>
+		<maintainerurl>http://www.cococo.be</maintainerurl>
+		<targetplatform name="joomla"
+			version="4.*" />
+		<php_minimum>8.1</php_minimum>
+	</update>
 </updates>
