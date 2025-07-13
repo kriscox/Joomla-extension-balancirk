@@ -9,13 +9,13 @@
             "type": "php",
             "request": "launch",
             "port": 9003,
-            "pathMappings": {
-                "/var/www/html/administrator/components/com_balancirk": "${workspaceRoot}/components/com_balancirk/admin",
-                "/var/www/html/media/com_balancirk": "${workspaceRoot}/components/com_balancirk/media",
-                "/var/www/html/components/com_balancirk": "${workspaceRoot}/components/com_balancirk/site",
-                "/var/www/html/api/components/com_balancirk": "${workspaceRoot}/components/com_balancirk/api",
-                "/var/www/html/plugins/webservices/balancirk": "${workspaceRoot}/plugins/balancirk"
-            }
+            // "pathMappings": {
+            //     "/var/www/html/administrator/components/com_balancirk": "${workspaceRoot}/components/com_balancirk/admin",
+            //     "/var/www/html/media/com_balancirk": "${workspaceRoot}/components/com_balancirk/media",
+            //     "/var/www/html/components/com_balancirk": "${workspaceRoot}/components/com_balancirk/site",
+            //     "/var/www/html/api/components/com_balancirk": "${workspaceRoot}/components/com_balancirk/api",
+            //     "/var/www/html/plugins/webservices/balancirk": "${workspaceRoot}/plugins/balancirk"
+            // }
         }
     ]
 }

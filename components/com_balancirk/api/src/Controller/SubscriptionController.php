@@ -5,10 +5,10 @@ namespace CoCoCo\Component\Balancirk\Api\Controller;
 defined('_JEXEC') or die;
 
 use Joomla\String\Inflector;
-use PHP_CodeSniffer\Generators\Text;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\ApiController;
-use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 use Joomla\CMS\MVC\Controller\Exception\ResourceNotFound;
+use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 
 // {controllerName} here is merely a placeholder for the shared classnaming system across controllers, view folders (and possibly models)
 class SubscriptionController extends ApiController
@@ -19,8 +19,10 @@ class SubscriptionController extends ApiController
     protected function save($recordKey = null)
     {
         $data = (array) json_decode($this->input->json->getRaw(), true);
-        foreach (FieldsHelper::getFields('com_balancirk.subscription') as $field) { // This probably looks for a model of the same name
-            if (isset($data[$field->name])) {
+        foreach (FieldsHelper::getFields('com_balancirk.subscription') as $field)
+        { // This probably looks for a model of the same name
+            if (isset($data[$field->name]))
+            {
                 !isset($data['com_fields']) && $data['com_fields'] = [];
                 $data['com_fields'][$field->name] = $data[$field->name];
                 unset($data[$field->name]);
@@ -39,11 +41,13 @@ class SubscriptionController extends ApiController
         /** @var \Joomla\CMS\MVC\Model\AdminModel $model */
         $model = $this->getModel($modelName, '', ['ignore_request' => true]);
 
-        if (!$model) {
+        if (!$model)
+        {
             throw new \RuntimeException(Text::_('JLIB_APPLICATION_ERROR_MODEL_CREATE'));
         }
 
-        if (!$model->getItem($recordKey)) {
+        if (!$model->getItem($recordKey))
+        {
             throw new ResourceNotFound();
         }
 
