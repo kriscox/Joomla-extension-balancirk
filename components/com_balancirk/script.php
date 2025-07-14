@@ -215,7 +215,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
 
         if (!$groupModel->save($group))
         {
-            Factory::getApplication()->enqueueMessage($groupModel->getError());
+            JFactory::getApplication()->enqueueMessage($groupModel->getError());
 
             return false;
         }

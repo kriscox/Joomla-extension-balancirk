@@ -5,10 +5,10 @@ namespace CoCoCo\Component\Balancirk\Api\Controller;
 defined('_JEXEC') or die;
 
 use Joomla\String\Inflector;
-use PHP_CodeSniffer\Generators\Text;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\ApiController;
-use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 use Joomla\CMS\MVC\Controller\Exception\ResourceNotFound;
+use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 
 // {controllerName} here is merely a placeholder for the shared classnaming system across controllers, view folders (and possibly models)
 class SubscriptionController extends ApiController
@@ -47,7 +47,9 @@ class SubscriptionController extends ApiController
         }
 
         if (!$model->getItem($recordKey))
-            throw new ResourceNotFound;
+        {
+            throw new ResourceNotFound();
+        }
 
         return $model->delete($recordKey);
     }

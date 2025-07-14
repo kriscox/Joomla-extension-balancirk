@@ -18,6 +18,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use CoCoCo\Component\Balancirk\Site\Model\StudentModel;
+
 // use CoCoCo\Component\Balancirk\Site\Model\PresenceModel;
 
 /**
@@ -230,7 +231,7 @@ Hallo,
 
 Bedankt voor je inschrijving. De les "' . $lesson->name . '" is volzet. De inschrijving is op de wachtlijst gekomen.
 
-We houden je op de hoogte als er een plaatsje vrijkomt.
+Kom zeker in september naar de eerste lessen, zodat we je kunnen leren kennen en je kind kan kennismaken met de les. We zullen je op de hoogte houden van de inschrijvingen.
 
 Met vriendelijke groeten,
 

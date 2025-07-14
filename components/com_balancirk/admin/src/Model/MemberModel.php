@@ -57,8 +57,7 @@ class MemberModel extends AdminModel
      */
     protected function canDelete($record)
     {
-        if (!empty($record->id))
-        {
+        if (!empty($record->id)) {
             $app = Factory::getApplication();
 
             return $app->getIdentity()->authorise('core.delete', 'com_balancirk.members.' . (int) $record->id);
@@ -81,8 +80,7 @@ class MemberModel extends AdminModel
         $user = Factory::getApplication()->getIdentity();
 
         // Check for existing article.
-        if (!empty($record->id))
-        {
+        if (!empty($record->id)) {
             return $user->authorise('core.edit.state', 'com_balancirk.members.' . (int) $record->id);
         }
 
@@ -107,8 +105,7 @@ class MemberModel extends AdminModel
         $name = 'members';
         $prefix = 'Table';
 
-        if ($table = $this->_createTable($name, $prefix, $options))
-        {
+        if ($table = $this->_createTable($name, $prefix, $options)) {
             return $table;
         }
 
@@ -130,8 +127,7 @@ class MemberModel extends AdminModel
         // Get the form.
         $form = $this->loadForm($this->typeAlias, 'member', ['control' => 'jform', 'load_data' => $loadData]);
 
-        if (empty($form))
-        {
+        if (empty($form)) {
             return false;
         }
 
@@ -151,8 +147,7 @@ class MemberModel extends AdminModel
         $app = Factory::getApplication();
         $data = $app->getUserState('com_balancirk.edit.student.data', array());
 
-        if (empty($data))
-        {
+        if (empty($data)) {
             $data = $this->getItem();
 
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
@@ -215,16 +210,14 @@ class MemberModel extends AdminModel
         $user = new User();
 
         // Throws \InvalidArgumentException, \UnexpectedValueException
-        if (!$user->bind($data))
-        {
+        if (!$user->bind($data)) {
             $app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError(), 'error');
 
             return false;
         }
 
         // Throws \RuntimeException
-        if (!$user->save())
-        {
+        if (!$user->save()) {
             $app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError(), 'error');
 
             return false;
@@ -280,8 +273,7 @@ class MemberModel extends AdminModel
             ->setBody($message)
             ->Send();
 
-        if ($send != true)
-        {
+        if ($send != true) {
             $app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . 'Error sending email', 'error');
 
             return false;
@@ -316,20 +308,15 @@ class MemberModel extends AdminModel
         // Create query and don't forget to quote everything
         $query = $db->getQuery(true);
 
-        if ($insert)
-        {
+        if ($insert) {
             $query->insert($db->quoteName('#__balancirk_members_additional'))
                 ->columns($db->quoteName($columns))
                 ->values(implode(',', array_map(fn ($n) => $db->quote($n), $values)));
-        }
-        else
-        {
+        } else {
             $fields = array();
 
-            foreach ($columns as $key)
-            {
-                if ($key != 'id')
-                {
+            foreach ($columns as $key) {
+                if ($key != 'id') {
                     array_push($fields, $db->quoteName($key) . " = " . $db->quote($data[$key]));
                 }
             }

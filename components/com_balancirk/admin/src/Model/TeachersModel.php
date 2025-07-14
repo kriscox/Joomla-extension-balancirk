@@ -37,8 +37,7 @@ class TeachersModel extends ListModel
      */
     public function __construct($config = [])
     {
-        if (empty($config['filter_fields']))
-        {
+        if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
                 'id',
                 'a.id',
@@ -103,8 +102,7 @@ class TeachersModel extends ListModel
         $query = $db->getQuery(true);
 
         // if date = null then take date of today
-        if ($this->date == null)
-        {
+        if ($this->date == null) {
             $this->date = date("Y-m-d");
         }
 
@@ -122,8 +120,7 @@ class TeachersModel extends ListModel
 
         $rows = $db->setQuery($query)->loadObjectlist();
 
-        foreach ($rows as $row)
-        {
+        foreach ($rows as $row) {
             $teachers[] = $row->teacher;
         }
 
@@ -144,8 +141,7 @@ class TeachersModel extends ListModel
         $query = $db->getQuery(true);
 
         // if date = null then take date of today
-        if ($this->date == null)
-        {
+        if ($this->date == null) {
             $this->date = date("Y-m-d");
         }
 

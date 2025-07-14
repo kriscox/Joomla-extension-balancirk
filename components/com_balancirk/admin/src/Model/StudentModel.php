@@ -13,11 +13,12 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\AdminModel;
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\Form\Form;
 use Joomla\CMS\Table\Table;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Helper\ContentHelper;
+use Joomla\CMS\MVC\Model\AdminModel;
 use Jooma\CMS\CMSApplicationInterface;
+use SpomkyLabs\Pki\ASN1\Type\Primitive\Boolean;
 
 /**
  * Item model for student.
@@ -68,6 +69,27 @@ class StudentModel extends AdminModel
     }
 
     /**
+     * Method to get one item
+     * 
+     * @param   integer  $pk  The id of the item.
+     * 
+     * @return  CMSObject|boolean  Object on success, false on failure.
+     * 
+     * @since   __BUMP_VERSION__
+     */
+    public function getItem($pk = null)
+    {
+        // check if the user is allowed to see all students or is the parent of the student
+        $this->canDo = ContentHelper::getActions('com_balancirk');
+        if (! ($this->canDo->get('students.viewall') or $this->isParent()))
+        {
+            return false;
+        }
+
+        return parent::getItem($pk);
+    }
+
+    /**
      * Method to get the row form.
      *
      * @param   array   $data       Data from the form.
@@ -103,8 +125,6 @@ class StudentModel extends AdminModel
         /** @var CMSApplicationInterface */
         $app = Factory::getApplication();
         $data = $app->getUserState('com_balancirk.edit.student.data', array());
-
-
 
         if (empty($data))
         {
@@ -145,25 +165,53 @@ class StudentModel extends AdminModel
     /**
      * Method to get the parents name and phone number of a student
      *
-     * @param	int	$student	student id
+     * @param	int	$pks	student id
      *
      * @return  array  An array with all parents
      *
      * @since   __BUMP_VERSION__
      */
-    public function getParents()
+    public function getParents($pks = null)
     {
+        if ($pks === null)
+        {
+            $pks = $this->getState('student.id');
+        }
         $db     = $this->getDatabase();
         $query     = $db->getQuery(true);
         $query->select($db->quoteName(['m.id', 'm.name', 'm.firstname', 'm.phone']))
             ->from($db->quoteName('#__balancirk_parents', 'p'))
             ->join('INNER', $db->quoteName('#__balancirk_members', 'm') .
                 ' ON ' .  $db->quoteName('p.parent') . ' = ' . $db->quoteName('m.id'))
-            ->where($db->quoteName('p.child') . ' = ' . $this->getState('student.id'));
+            ->where($db->quoteName('p.child') . ' = ' . $db->quote($pks));
 
         $db->setQuery($query);
 
         return $db->loadObjectList();
+    }
+
+    /** 
+     * Check if current user is a parent 
+     * 
+     * Check if the current user is a parent of the student.
+     * 
+     * @param   int  $pks  student id
+     * 
+     * @return boolean  true if the user is a parent of the student, false otherwise
+     * 
+     * @since __BUMP_VERSION__
+     */
+    public function isParent($pks = null)
+    {
+        foreach ($this->getParents($pks) as $parent)
+        {
+            if ($parent->id === Factory::getApplication()->getIdentity()->id)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

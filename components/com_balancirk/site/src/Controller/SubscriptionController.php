@@ -95,6 +95,25 @@ class SubscriptionController extends FormController
     }
 
     /**
+     * Method to check if you can export a list of subscriptions for accounting.
+     *
+     * Export the list of subscriptions for accounting if the user is an accountant
+     *
+     * @param   array  $data  An array of input data.
+     *
+     * @return  boolean
+     *
+     * @since   __BUMP_VERSION__
+     */
+    protected function allowedExport($data = array())
+    {
+        $user = Factory::getApplication()->getIdentity();
+
+        //return $user->isAccountant();
+        return true;
+    }
+
+    /**
      * Add subscription
      *
      * Add the subscription for the lesson and the students chosen
@@ -119,15 +138,11 @@ class SubscriptionController extends FormController
         $app = Factory::getApplication();
         $app->setUserState('com_balancirk.subscription.data', $data);
 
-        if ($this->allowAdd($data))
-        {
-            if ($model->add($data))
-            {
+        if ($this->allowAdd($data)) {
+            if ($model->add($data)) {
                 $app->setUserState('com_balancirk.subscription.data', null);
                 $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscriptions');
-            }
-            else
-            {
+            } else {
                 $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscription');
             }
         }
@@ -156,10 +171,37 @@ class SubscriptionController extends FormController
         /** @var SubscriptionModel */
         $model = $this->getModel();
 
-        if ($this->allowDelete($data))
-        {
+        if ($this->allowDelete($data)) {
             $model->delete($data);
             $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscriptions');
+        }
+
+        $this->setRedirect($redirectUrl);
+    }
+
+    /**
+     * Export Subscriptions
+     *
+     * Method to export a list of subscriptions for accounting
+     *
+     * @param   int $year  The year to export
+     *
+     * @return  void
+     *
+     * @since   __BUMP_VERSION__
+     **/
+    public function export(int $year)
+    {
+        // Check if token is correct. Security measure
+        $this->checkToken();
+
+        /** @var SubscriptionModel */
+        $model = $this->getModel();
+
+        if ($this->allowedExport($data)) {
+            $model->exportForAccounting($year);
+
+            $this->setRedirect(Route::_('index.php?option=' . $this->option . '&view=subscriptions'));
         }
 
         $this->setRedirect($redirectUrl);

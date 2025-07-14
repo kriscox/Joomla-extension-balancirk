@@ -12,8 +12,10 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\MVC\Model\ListModel;
+use Joomla\CMS\Factory;
 use Joomla\Database\ParameterType;
+use Joomla\CMS\MVC\Model\ListModel;
+use Joomla\CMS\Helper\ContentHelper;
 
 /**
  * StudentsModel class to display the list off students.
@@ -35,20 +37,33 @@ class StudentsModel extends ListModel
     public function __construct($config = [])
     {
 
-        if (empty($config['filter_fields'])) {
+        if (empty($config['filter_fields']))
+        {
             $config['filter_fields'] = array(
-                'id', 'a.id',
-                'name', 'a.name',
-                'firstname', 'a.firstname',
-                'email', 'a.email',
-                'street', 'a.street',
-                'number', 'a.number',
-                'bus', 'a.bus',
-                'postcode', 'a.postcode',
-                'city', 'a.city',
-                'phone', 'a.phone',
-                'birthdate', 'a.birthdate',
-                'state', 'a.state'
+                'id',
+                'a.id',
+                'name',
+                'a.name',
+                'firstname',
+                'a.firstname',
+                'email',
+                'a.email',
+                'street',
+                'a.street',
+                'number',
+                'a.number',
+                'bus',
+                'a.bus',
+                'postcode',
+                'a.postcode',
+                'city',
+                'a.city',
+                'phone',
+                'a.phone',
+                'birthdate',
+                'a.birthdate',
+                'state',
+                'a.state'
             );
         }
 
@@ -111,35 +126,71 @@ class StudentsModel extends ListModel
     protected function getListQuery()
     {
         // Create a new query object.
-        $db = $this->getDbo();
+        $db = $this->getDatabase();
         $query = $db->getQuery(true);
 
         // Select the required fields from the table.
         $query->select(
             $db->quoteName(
                 [
-                    'id', 'name', 'firstname',
-                    'email', 'street', 'number', 'bus', 'postcode',
-                    'city', 'phone', 'birthdate', 'state'
+                    'a.id',
+                    'a.name',
+                    'a.firstname',
+                    'a.email',
+                    'a.street',
+                    'a.number',
+                    'a.bus',
+                    'a.postcode',
+                    'a.city',
+                    'a.phone',
+                    'a.birthdate',
+                    'a.state'
+                ],
+                [
+                    'id',
+                    'name',
+                    'firstname',
+                    'email',
+                    'street',
+                    'number',
+                    'bus',
+                    'postcode',
+                    'city',
+                    'phone',
+                    'birthdate',
+                    'state'
                 ]
             )
         );
         $query->from($db->quoteName('#__balancirk_students', 'a'));
 
+        // Based on the user access level, we need to filter the results.
+        // What Access Permissions does this user have? What can (s)he do?
+        $this->canDo = ContentHelper::getActions('com_balancirk');
+        if (!$this->canDo->get('students.viewall'))
+        {
+            $query->join('INNER', $db->quoteName('#__balancirk_parents', 'p'), 'a.id = p.child AND p.parent = ' . Factory::getApplication()->getIdentity()->id);
+        }
+
+
         // Filter by published state
         $published = (string) $this->getState('filter.published');
 
-        if (is_numeric($published)) {
+        if (is_numeric($published))
+        {
             $query->where($db->quoteName('a.state') . ' = :published');
             $query->bind(':published', $published, ParameterType::INTEGER);
-        } elseif ($published === '') {
+        }
+        elseif ($published === '')
+        {
             $query->where('(' . $db->quoteName('a.state') . ' = 0 OR ' . $db->quoteName('a.state') . ' = 1)');
         }
 
         // Filter by search in title.
         $search = $this->getState('filter.search');
 
-        if (!empty($search)) {
+        if (!empty($search))
+        {
             $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
             $query->where('(a.name LIKE ' . $search . ' OR a.firstname LIKE ' . $search . ')');
         }
