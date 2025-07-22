@@ -23,6 +23,7 @@ use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Application\SiteApplication;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\Application\ApplicationHelper;
+use Joomla\CMS\Component\ComponentHelper;
 
 /**
  * Member model for the Joomla Balancirk component.
@@ -60,7 +61,8 @@ class MemberModel extends AdminModel
      */
     protected function canDelete($record)
     {
-        if (!empty($record->id)) {
+        if (!empty($record->id))
+        {
             $app = Factory::getApplication();
 
             return $app->getIdentity()->authorise('core.delete', 'com_balancirk.members.' . (int) $record->id);
@@ -83,7 +85,8 @@ class MemberModel extends AdminModel
         $user = Factory::getApplication()->getIdentity();
 
         // Check for existing article.
-        if (!empty($record->id)) {
+        if (!empty($record->id))
+        {
             return $user->authorise('core.edit.state', 'com_balancirk.members.' . (int) $record->id);
         }
 
@@ -108,7 +111,8 @@ class MemberModel extends AdminModel
         $name = 'members';
         $prefix = 'Table';
 
-        if ($table = $this->_createTable($name, $prefix, $options)) {
+        if ($table = $this->_createTable($name, $prefix, $options))
+        {
             return $table;
         }
 
@@ -130,7 +134,8 @@ class MemberModel extends AdminModel
         // Get the form.
         $form = $this->loadForm($this->typeAlias, 'member', ['control' => 'jform', 'load_data' => $loadData]);
 
-        if (empty($form)) {
+        if (empty($form))
+        {
             return false;
         }
 
@@ -150,7 +155,8 @@ class MemberModel extends AdminModel
         $app = Factory::getApplication();
         $data = $app->getUserState('com_balancirk.member.data', array());
 
-        if (empty($data)) {
+        if (empty($data))
+        {
             $data = $this->getItem($app->getIdentity()->id);
 
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
@@ -190,14 +196,16 @@ class MemberModel extends AdminModel
         $user = new User();
 
         // Throws \InvalidArgumentException, \UnexpectedValueException
-        if (!$user->bind($data)) {
+        if (!$user->bind($data))
+        {
             $app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError(), 'error');
 
             return false;
         }
 
         // Throws \RuntimeException
-        if (!$user->save()) {
+        if (!$user->save())
+        {
             $app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError(), 'error');
 
             return false;
@@ -212,15 +220,21 @@ class MemberModel extends AdminModel
         // Define columns and their values
         $columns = array('id', 'firstname', 'street', 'number', 'bus', 'postcode', 'city', 'phone');
         $values = array(
-            $id, $data['firstname'], $data['street'], $data['number'], $data['bus'],
-            $data['postcode'], $data['city'], $data['phone']
+            $id,
+            $data['firstname'],
+            $data['street'],
+            $data['number'],
+            $data['bus'],
+            $data['postcode'],
+            $data['city'],
+            $data['phone']
         );
 
         // Create query and don't forget to quote everything
         $query = $db->getQuery(true)
             ->insert($db->quoteName('#__balancirk_members_additional'))
             ->columns($db->quoteName($columns))
-            ->values(implode(',', array_map(fn ($n) => $db->quote($n), $values)));
+            ->values(implode(',', array_map(fn($n) => $db->quote($n), $values)));
 
         // Execute query
         $db->setQuery($query);
@@ -230,10 +244,9 @@ class MemberModel extends AdminModel
         $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
 
         // Set the sender
-        $config = new JConfig();
         $sender = array(
-            $config->mailfrom,
-            $config->fromname
+            'info@balancirk.be',
+            'Circusatelier Balancirk VZW'
         );
 
         // Get the activation url
@@ -267,7 +280,8 @@ class MemberModel extends AdminModel
             ->setBody($message)
             ->Send();
 
-        if ($send != true) {
+        if ($send != true)
+        {
             $app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . 'Error sending email', 'error');
 
             return false;
