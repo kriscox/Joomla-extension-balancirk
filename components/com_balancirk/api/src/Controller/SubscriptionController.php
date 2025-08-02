@@ -5,7 +5,7 @@ namespace CoCoCo\Component\Balancirk\Api\Controller;
 defined('_JEXEC') or die;
 
 use Joomla\String\Inflector;
-use PHP_CodeSniffer\Generators\Text;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\ApiController;
 use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 use Joomla\CMS\MVC\Controller\Exception\ResourceNotFound;
