@@ -34,7 +34,6 @@ class PlgWebservicesBalancirk extends CMSPlugin
     $router->createCRUDRoutes('v1/lessons', 'lessons', ['component' => 'com_balancirk']);
     $router->createCRUDRoutes('v1/students', 'students', ['component' => 'com_balancirk']);
     $router->createCRUDRoutes('v1/subscriptions', 'subscriptions', ['component' => 'com_balancirk']);
-    $router->createCRUDRoutes('v1/student', 'student', ['component' => 'com_balancirk']);
 
     // Finally, register all specified routes with Joomla's webservices router.
     $router->addRoutes($routes);

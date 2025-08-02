@@ -9,17 +9,10 @@ use Joomla\CMS\MVC\Controller\ApiController;
 use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 
 // {controllerName} here is merely a placeholder for the shared classnaming system across controllers, view folders (and possibly models)
-<<<<<<<< HEAD:components/com_balancirk/api/src/Controller/MembersController.php
 class MembersController extends ApiController
 {
     protected $contentType = 'members'; /* My understanding is that this maps to the desired model name */
     protected $default_view = 'members'; /* This maps to the folder name containing the JSON API view */
-========
-class LessonsController extends ApiController
-{
-    protected $contentType = 'lessons'; /* My understanding is that this maps to the desired model name */
-    protected $default_view = 'lessons'; /* This maps to the folder name containing the JSON API view */
->>>>>>>> 12115b7 (Refactor and extend subscriptions and members management):components/com_balancirk/api/src/Controller/LessonsController.php
 
     protected function save($recordKey = null)
     {
