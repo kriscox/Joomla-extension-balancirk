@@ -62,6 +62,8 @@
 		<position>balancirk-student-edit-bottom</position>
 		<position>balancirk-students-top</position>
 		<position>balancirk-students-bottom</position>
+		<position>balancirk-lessons-top</position>
+		<position>balancirk-lessons-bottom</position>
 		<position>balancirk-subscription-top</position>
 		<position>balancirk-subscription-bottom</position>
 		<position>balancirk-subscription-delete-top</position>
