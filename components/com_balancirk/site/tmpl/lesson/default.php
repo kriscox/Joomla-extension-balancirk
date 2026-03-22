@@ -151,6 +151,14 @@ $teached_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=teach
 					<div class="col-md-4" id="label"> <?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_YEAR') ?> </div>
 					<div class="col-md-8" id="value"> <?= $this->item->year ?> </div>
 				</div>
+				<div class="row" id="jform">
+					<div class="col-md-4" id="label"> <?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_MIN_AGE') ?> </div>
+					<div class="col-md-8" id="value"> <?= $this->item->min_age !== null && $this->item->min_age !== '' ? (int) $this->item->min_age : '-' ?> </div>
+				</div>
+				<div class="row" id="jform">
+					<div class="col-md-4" id="label"> <?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_MAX_AGE') ?> </div>
+					<div class="col-md-8" id="value"> <?= $this->item->max_age !== null && $this->item->max_age !== '' ? (int) $this->item->max_age : '-' ?> </div>
+				</div>
 			</div>
 			<div class=" col-md-6">
 				<div class="row" id="jform">

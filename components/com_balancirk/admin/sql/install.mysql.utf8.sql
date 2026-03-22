@@ -97,6 +97,8 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_lessons` (
     `start_registration` date NOT NULL,
     `end_registration` date NOT NULL,
     `max_students` int(11) NOT NULL,
+    `min_age` int(11) DEFAULT NULL,
+    `max_age` int(11) DEFAULT NULL,
 	`lesdays` int(11) DEFAULT NULL COMMENT '64 = maandag, \n32 = dinsdag, \n16 = woensdag, \n8 = donderdag, \n4 = vrijdag, \n2 = zaterdag, \n1 = zondag',
     `state` char(15) NOT NULL,
     `ordering` int(11) NOT NULL DEFAULT 0,
@@ -138,7 +140,8 @@ CREATE OR REPLACE VIEW `#__balancirk_subscriptions_view`
 
 CREATE OR REPLACE VIEW `#__balancirk_lessons_complete` 
     AS SELECT a.`id`, a.`name`, b.`name` as `type`, a.`fee`, a.`year`, a.`start`, a.`end`, 
-            a.`start_registration`, a.`end_registration`, a.`state`, a.`lesdays`,
+            a.`start_registration`, a.`end_registration`, a.`state`, a.`lesdays`, a.`max_students`,
+            a.`min_age`, a.`max_age`,
 			(SELECT COUNT(*) FROM `#__balancirk_subscriptions` WHERE `lesson` = a.`id` and `subscribed` = 0) AS 'numberOfStudents',
             (SELECT COUNT(*) FROM `#__balancirk_subscriptions` WHERE `lesson` = a.`id` and `subscribed` = 1) AS 'numberOnWaitingList'
             FROM `#__balancirk_lessons` a

@@ -51,6 +51,16 @@
 			type="number"
 			label="COM_BALANCIRK_TABLE_TABLEHEAD_MAX_STUDENTS"
 			required="true" />
+		<field name="min_age"
+			type="number"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_MIN_AGE"
+			min="0"
+			step="1" />
+		<field name="max_age"
+			type="number"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_MAX_AGE"
+			min="0"
+			step="1" />
 		<field name="lesdays_field"
 			type="checkboxes"
 			label="COM_BALANCIRK_TABLE_TABLEHEAD_LESDAYS"

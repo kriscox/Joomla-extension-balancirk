@@ -13,6 +13,7 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 \defined('_JEXEC') or die;
 
 use Exception;
+use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
@@ -150,8 +151,50 @@ class SubscriptionModel extends AdminModel
     {
         /** @var lessonsModel */
         $model = $this->getMVCFactory()->createModel('Lessons', 'Site');
+        $data = $this->loadFormData();
+        $studentId = (int) ($data['student'] ?? 0);
 
-        return $model->getOpenLessons();
+        if ($studentId <= 0) {
+            return [];
+        }
+
+        return $model->getOpenLessons($studentId);
+    }
+
+    /**
+     * Check whether there are lessons with an open registration period.
+     *
+     * @return  bool
+     *
+     * @since   1.2.12
+     */
+    public function getHasOpenLessons(): bool
+    {
+        /** @var lessonsModel */
+        $model = $this->getMVCFactory()->createModel('Lessons', 'Site');
+
+        return count($model->getOpenLessons()) > 0;
+    }
+
+    /**
+     * Method to get the data that should be injected in the form.
+     *
+     * @return  array
+     *
+     * @since   1.2.12
+     */
+    protected function loadFormData()
+    {
+        $app = Factory::getApplication();
+        $data = (array) $app->getUserState('com_balancirk.subscription.data', array());
+        $selectedStudent = $app->input->getInt('student_id');
+
+        if ($selectedStudent > 0) {
+            $data['student'] = $selectedStudent;
+            unset($data['lesson']);
+        }
+
+        return $data;
     }
 
     /**
@@ -165,7 +208,7 @@ class SubscriptionModel extends AdminModel
      *
      * @version	__BUMP_VERSION__
      **/
-    public function add(array $data = null)
+    public function add(?array $data = null)
     {
         $values = array();
         array_push($values, $data['student']);
@@ -175,6 +218,13 @@ class SubscriptionModel extends AdminModel
         /** @var lessonModel*/
         $model = $this->getMVCFactory()->createModel('Lesson', 'Site');
         $lesson = $model->getItem($data['lesson'], $data['lesson']);
+
+        if (!$lesson || !$this->isStudentEligibleForLesson((int) $data['student'], $lesson)) {
+            $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_AGE_MISMATCH'));
+
+            return false;
+        }
+
         $waitinglist = ($model->getNumberOfStudents($data['lesson']) < $lesson->max_students) ? 0 : 1;
         array_push($values, $waitinglist);
 
@@ -264,5 +314,28 @@ Het Balancirk team');
         $db->setQuery($query)->execute();
 
         return true;
+    }
+
+    /**
+     * Check if a student fits the lesson age category.
+     *
+     * @param   int     $studentId  Student id.
+     * @param   object  $lesson     Lesson record.
+     *
+     * @return  bool
+     *
+     * @since   1.2.12
+     */
+    private function isStudentEligibleForLesson(int $studentId, object $lesson): bool
+    {
+        /** @var StudentModel */
+        $studentModel = $this->getMVCFactory()->createModel('Student', 'Site');
+        $student = $studentModel->getItem($studentId);
+
+        if (!$student) {
+            return false;
+        }
+
+        return LessonAgeHelper::matchesLesson($student->birthdate ?? null, $lesson);
     }
 }

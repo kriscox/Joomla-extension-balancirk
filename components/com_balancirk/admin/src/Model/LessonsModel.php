@@ -41,6 +41,8 @@ class LessonsModel extends ListModel
                 'type', 'a.type',
                 'fee', 'a.fee',
                 'year', 'a.year',
+                'min_age', 'a.min_age',
+                'max_age', 'a.max_age',
                 'start', 'a.start',
                 'end', 'a.end',
                 'start_registration', 'a.start_registration',
@@ -115,7 +117,7 @@ class LessonsModel extends ListModel
             $db->quoteName(
                 [
                     'a.id', 'a.name', 'a.type', 'a.fee', 'a.year',
-                    'a.start', 'a.end', 'a.start_registration',
+                    'a.min_age', 'a.max_age', 'a.start', 'a.end', 'a.start_registration',
                     'a.end_registration'
                 ]
             )

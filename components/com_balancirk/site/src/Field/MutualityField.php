@@ -15,6 +15,7 @@ namespace CoCoCo\Component\Balancirk\Site\Field;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Form\Field\ListField;
 use Joomla\CMS\HTML\HTMLHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\MutualityOptionsHelper;
 
 /**
  * Mutuality chooser.
@@ -68,20 +69,7 @@ class MutualityField extends ListField
     private function getMutualities(): array
     {
         $configured = (string) ComponentHelper::getParams('com_balancirk')->get('mutuality_options', '');
-        $source = trim($configured) !== '' ? $configured : "CM\nSolidaris\nHelan\nVNZ";
-        $entries = preg_split('/[\r\n,;]+/', $source) ?: [];
-        $mutualities = [];
 
-        foreach ($entries as $entry) {
-            $entry = trim((string) $entry);
-
-            if ($entry === '' || in_array($entry, $mutualities, true)) {
-                continue;
-            }
-
-            $mutualities[] = $entry;
-        }
-
-        return $mutualities;
+        return MutualityOptionsHelper::getOptions($configured);
     }
 }

@@ -11,11 +11,14 @@
 namespace CoCoCo\Component\Balancirk\Site\Controller;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\MVC\Controller\FormController;
+use Joomla\CMS\Response\JsonResponse;
 use CoCoCo\Component\Balancirk\Site\Model\StudentModel;
 use CoCoCo\Component\Balancirk\Site\Model\PresenceModel;
 use CoCoCo\Component\Balancirk\Site\Model\SubscriptionModel;
+use CoCoCo\Component\Balancirk\Site\Model\LessonsModel;
 
 \defined('_JEXEC') or die;
 
@@ -124,7 +127,7 @@ class SubscriptionController extends FormController
      *
      * @version __BUMP_VERSION__
      **/
-    public function add(array $key = null)
+    public function add(?array $key = null)
     {
         // Check if token is correct. Security measure
         $this->checkToken();
@@ -137,17 +140,71 @@ class SubscriptionController extends FormController
         /** @var CMSApplication */
         $app = Factory::getApplication();
         $app->setUserState('com_balancirk.subscription.data', $data);
+        $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscription&student_id=' . (int) ($data['student'] ?? 0));
 
         if ($this->allowAdd($data)) {
             if ($model->add($data)) {
                 $app->setUserState('com_balancirk.subscription.data', null);
                 $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscriptions');
             } else {
-                $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscription');
+                if ($model->getError()) {
+                    $app->enqueueMessage($model->getError(), 'warning');
+                }
             }
+        } else {
+            $app->enqueueMessage(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'), 'warning');
         }
 
         $this->setRedirect($redirectUrl);
+    }
+
+    /**
+     * Return lessons for the selected student as JSON without a page reload.
+     *
+     * @return  void
+     *
+     * @since   1.2.12
+     */
+    public function lessons(): void
+    {
+        /** @var \Joomla\CMS\Application\CMSApplicationInterface $app */
+        $app = Factory::getApplication();
+        $studentId = $this->input->getInt('student_id');
+
+        if ($studentId > 0 && !$this->allowAdd(['student' => $studentId])) {
+            echo new JsonResponse(null, Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'), true);
+            $app->close();
+        }
+
+        /** @var LessonsModel $lessonsModel */
+        $lessonsModel = $this->getModel('Lessons');
+        $hasOpenLessons = count($lessonsModel->getOpenLessons()) > 0;
+        $lessons = $studentId > 0 ? $lessonsModel->getOpenLessons($studentId) : [];
+        $data = [];
+
+        foreach ($lessons as $id => $lesson) {
+            $data[] = [
+                'value' => (int) $id,
+                'text' => $lesson,
+            ];
+        }
+
+        $message = '';
+
+        if (!$hasOpenLessons) {
+            $message = Text::_('COM_BALANCIRK_NO_LESSONS_FOR_SUBSCRIPTION');
+        } elseif ($studentId <= 0) {
+            $message = Text::_('COM_BALANCIRK_SELECT_STUDENT_FOR_LESSONS');
+        } elseif (empty($data)) {
+            $message = Text::_('COM_BALANCIRK_NO_LESSONS_FOR_SELECTED_STUDENT');
+        }
+
+        echo new JsonResponse([
+            'lessons' => $data,
+            'message' => $message,
+            'hasOpenLessons' => $hasOpenLessons,
+        ]);
+        $app->close();
     }
 
     /**
@@ -161,7 +218,7 @@ class SubscriptionController extends FormController
      *
      * @version __BUMP_VERSION__
      **/
-    public function delete(array $key = null)
+    public function delete(?array $key = null)
     {
         // Check if token is correct. Security measure
         $this->checkToken();

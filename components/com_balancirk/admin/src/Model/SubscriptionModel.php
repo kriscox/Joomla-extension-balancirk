@@ -13,6 +13,7 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 \defined('_JEXEC') or die;
 
 use Exception;
+use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Object\CMSObject;
@@ -137,7 +138,7 @@ class SubscriptionModel extends AdminModel
      *
      * @version	__BUMP_VERSION__
      **/
-    public function add(array $data = null)
+    public function add(?array $data = null)
     {
         $values = array();
         array_push($values, $data['student']);
@@ -147,6 +148,13 @@ class SubscriptionModel extends AdminModel
         /** @var lessonModel*/
         $model = $this->getMVCFactory()->createModel('Lesson', 'Site');
         $lesson = $model->getItem($data['lesson'], $data['lesson']);
+
+        if (!$lesson || !$this->isStudentEligibleForLesson((int) $data['student'], $lesson)) {
+            $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_AGE_MISMATCH'));
+
+            return false;
+        }
+
         $waitinglist = ($model->getNumberOfStudents($data['lesson']) < $lesson->max_students) ? 0 : 1;
         array_push($values, $waitinglist);
 
@@ -213,6 +221,29 @@ Het Balancirk team');
         $mailer->Send();
 
         return true;
+    }
+
+    /**
+     * Check if a student fits the lesson age category.
+     *
+     * @param   int     $studentId  Student id.
+     * @param   object  $lesson     Lesson record.
+     *
+     * @return  bool
+     *
+     * @since   1.2.12
+     */
+    private function isStudentEligibleForLesson(int $studentId, object $lesson): bool
+    {
+        /** @var StudentModel */
+        $studentModel = $this->getMVCFactory()->createModel('Student', 'Admin');
+        $student = $studentModel->getItem($studentId);
+
+        if (!$student) {
+            return false;
+        }
+
+        return LessonAgeHelper::matchesLesson($student->birthdate ?? null, $lesson);
     }
 
     /**
