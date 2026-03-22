@@ -40,17 +40,18 @@ class MutualityField extends ListField
      */
     protected function getOptions()
     {
+        $mutualities = $this->getMutualities();
         $options = [
             HTMLHelper::_('select.option', '', '-'),
         ];
 
-        foreach ($this->getMutualities() as $mutuality) {
+        foreach ($mutualities as $mutuality) {
             $options[] = HTMLHelper::_('select.option', $mutuality, $mutuality);
         }
 
         $currentValue = trim((string) $this->value);
 
-        if ($currentValue !== '' && !in_array($currentValue, $this->getMutualities(), true)) {
+        if ($currentValue !== '' && !in_array($currentValue, $mutualities, true)) {
             $options[] = HTMLHelper::_('select.option', $currentValue, $currentValue);
         }
 
@@ -66,12 +67,12 @@ class MutualityField extends ListField
      */
     private function getMutualities(): array
     {
-        $defaults = ['CM', 'Solidaris', 'Helan', 'VNZ'];
         $configured = (string) ComponentHelper::getParams('com_balancirk')->get('mutuality_options', '');
-        $entries = preg_split('/[\r\n,;]+/', $configured) ?: [];
+        $source = trim($configured) !== '' ? $configured : "CM\nSolidaris\nHelan\nVNZ";
+        $entries = preg_split('/[\r\n,;]+/', $source) ?: [];
         $mutualities = [];
 
-        foreach (array_merge($defaults, $entries) as $entry) {
+        foreach ($entries as $entry) {
             $entry = trim((string) $entry);
 
             if ($entry === '' || in_array($entry, $mutualities, true)) {

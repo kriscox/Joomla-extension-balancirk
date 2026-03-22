@@ -37,6 +37,7 @@
 			type="textarea"
 			label="COM_BALANCIRK_MUTUALITY_OPTIONS_LABEL"
 			description="COM_BALANCIRK_MUTUALITY_OPTIONS_DESCRIPTION"
+			default="CM&#10;Solidaris&#10;Helan&#10;VNZ"
 			rows="6"
 			filter="raw" />
 	</fieldset>
