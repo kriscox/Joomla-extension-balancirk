@@ -12,6 +12,7 @@ namespace CoCoCo\Component\Balancirk\Site\Controller;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\FormController;
 use CoCoCo\Component\Balancirk\Site\Model\MemberModel;
 use Joomla\CMS\Component\ComponentHelper;
@@ -119,5 +120,60 @@ class MemberController extends FormController
 
         // Redirect back to the form in all cases
         $this->setRedirect($redirectUrl);
+    }
+
+    /**
+     * Save member profile changes for the logged in user.
+     *
+     * @param   string  $key     The name of the primary key of the URL variable.
+     * @param   string  $urlVar  The name of the URL variable if different from the primary key.
+     *
+     * @return  boolean
+     *
+     * @since   1.2.12
+     */
+    public function save($key = null, $urlVar = null)
+    {
+        $this->checkToken();
+
+        $app = Factory::getApplication();
+        $data = $this->input->post->get('jform', [], 'array');
+        $memberId = (int) ($data['id'] ?? 0);
+        $currentUserId = (int) $app->getIdentity()->id;
+
+        if ($memberId <= 0 || $memberId !== $currentUserId) {
+            $app->enqueueMessage(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'), 'warning');
+            $this->setRedirect(Route::_('index.php?option=com_balancirk&view=member&layout=edit', false));
+
+            return false;
+        }
+
+        /** @var MemberModel $model */
+        $model = $this->getModel('member');
+        $form = $model->getForm($data, false);
+        $redirectUrl = Route::_('index.php?option=com_balancirk&view=member&layout=edit', false);
+        $validData = $model->validate($form, $data);
+        $app->setUserState('com_balancirk.member.data', $data);
+
+        if ($validData === false) {
+            foreach ($model->getErrors() as $error) {
+                $app->enqueueMessage($error instanceof \Exception ? $error->getMessage() : $error, 'warning');
+            }
+
+            $this->setRedirect($redirectUrl);
+
+            return false;
+        }
+
+        if ($model->edit($validData)) {
+            $app->setUserState('com_balancirk.member.data', null);
+            $app->enqueueMessage(Text::_('JSAVE'));
+        } elseif ($model->getError()) {
+            $app->enqueueMessage($model->getError(), 'warning');
+        }
+
+        $this->setRedirect($redirectUrl);
+
+        return true;
     }
 }
