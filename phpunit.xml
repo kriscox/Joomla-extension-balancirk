@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         verbose="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false">
+    <testsuites>
+        <testsuite name="Unit">
+            <directory suffix="Test.php">tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory suffix="Test.php">tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+    
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">components/com_balancirk/api/src</directory>
+            <directory suffix=".php">components/com_balancirk/admin/src</directory>
+        </include>
+        <exclude>
+            <directory>tests</directory>
+            <directory>vendor</directory>
+        </exclude>
+    </coverage>
+    
+    <php>
+        <ini name="memory_limit" value="1G" />
+        <ini name="error_reporting" value="-1" />
+        <env name="APP_ENV" value="testing"/>
+    </php>
+    
+    <logging>
+        <log type="coverage-html" target="tests/reports/coverage"/>
+        <log type="coverage-xml" target="tests/reports/coverage/coverage.xml"/>
+        <log type="junit" target="tests/reports/junit.xml"/>
+    </logging>
+</phpunit>

@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_students` (
     `phone` char(15),
     `email` varchar(100),
     `birthdate` date NOT NULL,
+    `mutuality` varchar(100),
 	`uitpas` varchar(13),
 	`photo` varchar(255),
 	`allow_photo` boolean NOT NULL DEFAULT 0,

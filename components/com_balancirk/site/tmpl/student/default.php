@@ -50,6 +50,9 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 			<?= $this->item->birthdate ?>
 		</div>
 		<div class="row">
+			<?= $this->item->mutuality ?>
+		</div>
+		<div class="row">
 			<?= $this->item->uitpas ?>
 		</div>
 		<div class="row">

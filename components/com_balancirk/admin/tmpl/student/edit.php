@@ -38,6 +38,7 @@ HTMLHelper::_('behavior.keepalive');
 						<?= $this->form->renderField('email'); ?>
 						<?= $this->form->renderField('phone'); ?>
 						<?= $this->form->renderField('birthdate'); ?>
+						<?= $this->form->renderField('mutuality'); ?>
 						<?= $this->form->renderField('uitpas'); ?>
 						<?= $this->form->renderField('allow_photo'); ?>
 					</div>

@@ -1,0 +1,1151 @@
+openapi: 3.0.3
+info:
+  title: Balancirk API
+  description: |
+    REST API for the Balancirk Joomla component - A comprehensive management system for lessons, students, members, and subscriptions.
+    
+    ## Authentication
+    This API requires Joomla authentication. Most endpoints require appropriate permissions in the Balancirk component.
+    
+    ## Base URL
+    The API base URL follows the Joomla API structure: `/api/index.php/v1/balancirk`
+    
+  version: 1.0.0
+  contact:
+    name: CoCoCo
+    email: info@cococo.be
+  license:
+    name: GNU General Public License version 3
+    url: https://www.gnu.org/licenses/gpl-3.0.html
+
+servers:
+  - url: /api/index.php/v1/balancirk
+    description: Balancirk API Server
+
+security:
+  - joomlaAuth: []
+
+components:
+  securitySchemes:
+    joomlaAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Joomla JWT token authentication
+
+  schemas:
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        firstname:
+          type: string
+          maxLength: 255
+        street:
+          type: string
+          maxLength: 255
+        number:
+          type: string
+          maxLength: 10
+        bus:
+          type: string
+          maxLength: 10
+        postcode:
+          type: string
+          maxLength: 10
+        city:
+          type: string
+          maxLength: 50
+        phone:
+          type: string
+          maxLength: 15
+        email:
+          type: string
+          format: email
+          maxLength: 100
+        birthdate:
+          type: string
+          format: date
+        mutuality:
+          type: string
+          maxLength: 100
+        uitpas:
+          type: string
+          maxLength: 13
+        photo:
+          type: string
+          maxLength: 255
+        allow_photo:
+          type: boolean
+          default: false
+        state:
+          type: string
+          maxLength: 15
+        ordering:
+          type: integer
+          default: 0
+      required:
+        - name
+        - firstname
+        - birthdate
+
+    Member:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        firstname:
+          type: string
+          maxLength: 255
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        street:
+          type: string
+          maxLength: 255
+        number:
+          type: string
+          maxLength: 10
+        bus:
+          type: string
+          maxLength: 10
+        postcode:
+          type: string
+          maxLength: 10
+        city:
+          type: string
+          maxLength: 50
+        phone:
+          type: string
+          maxLength: 15
+        block:
+          type: boolean
+        sendEmail:
+          type: boolean
+        registerDate:
+          type: string
+          format: date-time
+        lastvisitDate:
+          type: string
+          format: date-time
+        activation:
+          type: string
+        ordering:
+          type: integer
+          default: 0
+
+    Lesson:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 40
+        type:
+          type: integer
+          description: Reference to lesson type ID
+        fee:
+          type: number
+          format: float
+        year:
+          type: integer
+        start:
+          type: string
+          format: date
+        end:
+          type: string
+          format: date
+        start_registration:
+          type: string
+          format: date
+        end_registration:
+          type: string
+          format: date
+        max_students:
+          type: integer
+        lesdays:
+          type: integer
+          description: Bitmask for lesson days (64=Monday, 32=Tuesday, etc.)
+        state:
+          type: string
+          maxLength: 15
+        ordering:
+          type: integer
+          default: 0
+        catid:
+          type: integer
+          description: Category ID
+        alias:
+          type: string
+      required:
+        - name
+        - type
+        - fee
+        - year
+        - start
+        - end
+        - start_registration
+        - end_registration
+        - max_students
+        - state
+
+    LessonType:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 40
+      required:
+        - name
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        lesson:
+          type: integer
+          description: Lesson ID
+        student:
+          type: integer
+          description: Student ID
+        subscribed:
+          type: boolean
+        # Extended fields from view
+        studentid:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        firstname:
+          type: string
+          readOnly: true
+        lessonid:
+          type: integer
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        fee:
+          type: number
+          readOnly: true
+        year:
+          type: integer
+          readOnly: true
+        start:
+          type: string
+          format: date
+          readOnly: true
+        end:
+          type: string
+          format: date
+          readOnly: true
+        start_registration:
+          type: string
+          format: date
+          readOnly: true
+        end_registration:
+          type: string
+          format: date
+          readOnly: true
+        state:
+          type: string
+          readOnly: true
+      required:
+        - lesson
+        - student
+        - subscribed
+
+    Presence:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        lesson:
+          type: integer
+          description: Lesson ID
+        student:
+          type: integer
+          description: Student ID
+        date:
+          type: string
+          format: date
+      required:
+        - lesson
+        - student
+        - date
+
+    Teacher:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        member:
+          type: integer
+          description: Member ID
+        lesson:
+          type: integer
+          description: Lesson ID
+      required:
+        - member
+        - lesson
+
+    Holiday:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        summary:
+          type: string
+          maxLength: 100
+      required:
+        - year
+        - startDate
+        - endDate
+        - summary
+
+    MailMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        subject:
+          type: string
+          maxLength: 255
+        message:
+          type: string
+        date:
+          type: string
+          format: date-time
+        state:
+          type: string
+          maxLength: 15
+        ordering:
+          type: integer
+          default: 0
+      required:
+        - name
+        - subject
+        - message
+        - state
+
+    ApiResponse:
+      type: object
+      properties:
+        data:
+          oneOf:
+            - type: object
+            - type: array
+              items:
+                type: object
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+            first:
+              type: string
+            prev:
+              type: string
+            next:
+              type: string
+            last:
+              type: string
+        meta:
+          type: object
+          properties:
+            total:
+              type: integer
+            per_page:
+              type: integer
+            current_page:
+              type: integer
+            last_page:
+              type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+              title:
+                type: string
+              detail:
+                type: string
+              source:
+                type: object
+
+paths:
+  # Students endpoints
+  /students:
+    get:
+      summary: List all students
+      operationId: getStudents
+      tags:
+        - Students
+      parameters:
+        - name: page[offset]
+          in: query
+          description: Pagination offset
+          schema:
+            type: integer
+            minimum: 0
+        - name: page[limit]
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: filter[search]
+          in: query
+          description: Search term
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of students
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Create a new student
+      operationId: createStudent
+      tags:
+        - Students
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: [students]
+                    attributes:
+                      $ref: '#/components/schemas/Student'
+      responses:
+        '201':
+          description: Student created successfully
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Bad request
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /students/{id}:
+    get:
+      summary: Get a specific student
+      operationId: getStudent
+      tags:
+        - Students
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Student ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Student details
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: Student not found
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update a specific student
+      operationId: updateStudent
+      tags:
+        - Students
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Student ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: [students]
+                    id:
+                      type: string
+                    attributes:
+                      $ref: '#/components/schemas/Student'
+      responses:
+        '200':
+          description: Student updated successfully
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: Student not found
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Delete a specific student
+      operationId: deleteStudent
+      tags:
+        - Students
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Student ID
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Student deleted successfully
+        '404':
+          description: Student not found
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # Members endpoints
+  /members:
+    get:
+      summary: List all members
+      operationId: getMembers
+      tags:
+        - Members
+      parameters:
+        - name: page[offset]
+          in: query
+          description: Pagination offset
+          schema:
+            type: integer
+            minimum: 0
+        - name: page[limit]
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: List of members
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+    post:
+      summary: Create a new member
+      operationId: createMember
+      tags:
+        - Members
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: [members]
+                    attributes:
+                      $ref: '#/components/schemas/Member'
+      responses:
+        '201':
+          description: Member created successfully
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /members/{id}:
+    get:
+      summary: Get a specific member
+      operationId: getMember
+      tags:
+        - Members
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Member ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Member details
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+    put:
+      summary: Update a specific member
+      operationId: updateMember
+      tags:
+        - Members
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Member ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: [members]
+                    id:
+                      type: string
+                    attributes:
+                      $ref: '#/components/schemas/Member'
+      responses:
+        '200':
+          description: Member updated successfully
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+    delete:
+      summary: Delete a specific member
+      operationId: deleteMember
+      tags:
+        - Members
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Member ID
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Member deleted successfully
+
+  /members/current:
+    get:
+      summary: Get current logged-in member
+      operationId: getCurrentMember
+      tags:
+        - Members
+      responses:
+        '200':
+          description: Current member details
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # Lessons endpoints
+  /lessons:
+    get:
+      summary: List all lessons
+      operationId: getLessons
+      tags:
+        - Lessons
+      parameters:
+        - name: page[offset]
+          in: query
+          description: Pagination offset
+          schema:
+            type: integer
+            minimum: 0
+        - name: page[limit]
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: filter[year]
+          in: query
+          description: Filter by year
+          schema:
+            type: integer
+        - name: filter[type]
+          in: query
+          description: Filter by lesson type
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of lessons
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+    post:
+      summary: Create a new lesson
+      operationId: createLesson
+      tags:
+        - Lessons
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: [lessons]
+                    attributes:
+                      $ref: '#/components/schemas/Lesson'
+      responses:
+        '201':
+          description: Lesson created successfully
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /lessons/{id}:
+    get:
+      summary: Get a specific lesson
+      operationId: getLesson
+      tags:
+        - Lessons
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Lesson ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lesson details
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+    put:
+      summary: Update a specific lesson
+      operationId: updateLesson
+      tags:
+        - Lessons
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Lesson ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: [lessons]
+                    id:
+                      type: string
+                    attributes:
+                      $ref: '#/components/schemas/Lesson'
+      responses:
+        '200':
+          description: Lesson updated successfully
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+    delete:
+      summary: Delete a specific lesson
+      operationId: deleteLesson
+      tags:
+        - Lessons
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Lesson ID
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Lesson deleted successfully
+
+  # Subscriptions endpoints
+  /subscriptions:
+    get:
+      summary: List all subscriptions
+      operationId: getSubscriptions
+      tags:
+        - Subscriptions
+      parameters:
+        - name: page[offset]
+          in: query
+          description: Pagination offset
+          schema:
+            type: integer
+            minimum: 0
+        - name: page[limit]
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: filter[lesson]
+          in: query
+          description: Filter by lesson ID
+          schema:
+            type: integer
+        - name: filter[student]
+          in: query
+          description: Filter by student ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of subscriptions
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+    post:
+      summary: Create a new subscription
+      operationId: createSubscription
+      tags:
+        - Subscriptions
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: [subscriptions]
+                    attributes:
+                      $ref: '#/components/schemas/Subscription'
+      responses:
+        '201':
+          description: Subscription created successfully
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /subscriptions/{id}:
+    get:
+      summary: Get a specific subscription
+      operationId: getSubscription
+      tags:
+        - Subscriptions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Subscription ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Subscription details
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+    put:
+      summary: Update a specific subscription
+      operationId: updateSubscription
+      tags:
+        - Subscriptions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Subscription ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: [subscriptions]
+                    id:
+                      type: string
+                    attributes:
+                      $ref: '#/components/schemas/Subscription'
+      responses:
+        '200':
+          description: Subscription updated successfully
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+    delete:
+      summary: Delete a specific subscription
+      operationId: deleteSubscription
+      tags:
+        - Subscriptions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Subscription ID
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Subscription deleted successfully
+
+  # Presences endpoints
+  /presences:
+    get:
+      summary: List presences
+      operationId: getPresences
+      tags:
+        - Presences
+      parameters:
+        - name: lesson
+          in: query
+          description: Lesson ID
+          schema:
+            type: integer
+        - name: date
+          in: query
+          description: Date
+          schema:
+            type: string
+            format: date
+        - name: page[offset]
+          in: query
+          description: Pagination offset
+          schema:
+            type: integer
+            minimum: 0
+        - name: page[limit]
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: List of presences
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /presences/presence:
+    get:
+      summary: Get presence for specific lesson and date
+      operationId: getPresence
+      tags:
+        - Presences
+      parameters:
+        - name: lesson
+          in: query
+          required: true
+          description: Lesson ID
+          schema:
+            type: integer
+        - name: date
+          in: query
+          required: true
+          description: Date
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Presence data
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # Teachers endpoints
+  /teachers:
+    get:
+      summary: List teachers
+      operationId: getTeachers
+      tags:
+        - Teachers
+      parameters:
+        - name: lesson
+          in: query
+          description: Lesson ID
+          schema:
+            type: integer
+        - name: date
+          in: query
+          description: Date
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of teachers
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /teachers/teacher:
+    get:
+      summary: Get teacher for specific lesson and date
+      operationId: getTeacher
+      tags:
+        - Teachers
+      parameters:
+        - name: lesson
+          in: query
+          required: true
+          description: Lesson ID
+          schema:
+            type: integer
+        - name: date
+          in: query
+          required: true
+          description: Date
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Teacher data
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+tags:
+  - name: Students
+    description: Student management operations
+  - name: Members
+    description: Member management operations
+  - name: Lessons
+    description: Lesson management operations
+  - name: Subscriptions
+    description: Subscription management operations
+  - name: Presences
+    description: Attendance tracking operations
+  - name: Teachers
+    description: Teacher management operations

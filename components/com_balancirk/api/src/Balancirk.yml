@@ -1037,6 +1037,9 @@ components:
         phone:
           type: string
           description: The phonenumber of the student
+        mutuality:
+          type: string
+          description: The mutuality of the student
     StudentInput:
       type: object
       required:
@@ -1055,6 +1058,9 @@ components:
         phone:
           type: string
           description: The phonenumber of the student
+        mutuality:
+          type: string
+          description: The mutuality of the student
 
     Subscription:
       type: object

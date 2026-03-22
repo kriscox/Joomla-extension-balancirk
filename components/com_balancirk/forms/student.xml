@@ -50,6 +50,10 @@
             readonly="false"
             format="%d %b %Y"
             translateformat="true" />
+        <field name="mutuality"
+            type="text"
+            label="COM_BALANCIRK_TABLE_TABLEHEAD_MUTUALITY"
+            maxlength="100" />
         <field name="uitpas"
             type="text"
             label="COM_BALANCIRK_TABLE_TABLEHEAD_UITPAS"

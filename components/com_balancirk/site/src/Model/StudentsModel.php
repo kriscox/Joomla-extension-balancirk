@@ -48,6 +48,7 @@ class StudentsModel extends ListModel
                 'city', 'a.city',
                 'phone', 'a.phone',
                 'birthdate', 'a.birthdate',
+                'mutuality', 'a.mutuality',
                 'state', 'a.state'
             );
         }
@@ -124,7 +125,7 @@ class StudentsModel extends ListModel
                 [
                     'a.id', 'name', 'firstname',
                     'email', 'street', 'number', 'bus', 'postcode',
-                    'city', 'phone', 'birthdate', 'state', 'primary'
+                    'city', 'phone', 'birthdate', 'mutuality', 'state', 'primary'
                 ]
             )
         );

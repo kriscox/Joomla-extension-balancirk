@@ -62,6 +62,8 @@ class StudentsModel extends ListModel
                 'a.phone',
                 'birthdate',
                 'a.birthdate',
+                'mutuality',
+                'a.mutuality',
                 'state',
                 'a.state'
             );
@@ -144,6 +146,7 @@ class StudentsModel extends ListModel
                     'a.city',
                     'a.phone',
                     'a.birthdate',
+                    'a.mutuality',
                     'a.state'
                 ],
                 [
@@ -158,6 +161,7 @@ class StudentsModel extends ListModel
                     'city',
                     'phone',
                     'birthdate',
+                    'mutuality',
                     'state'
                 ]
             )
