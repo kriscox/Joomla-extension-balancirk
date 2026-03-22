@@ -57,7 +57,7 @@ class MembersControllerTest extends TestCase
         $this->mockApp = $this->createMock(CMSApplication::class);
         $this->mockInput = $this->createMock(Input::class);
         $this->mockUser = $this->createMock(User::class);
-        
+
         $this->controller = new MembersController([], $this->mockApp, $this->mockInput);
     }
 
@@ -71,7 +71,7 @@ class MembersControllerTest extends TestCase
         $reflection = new \ReflectionClass($this->controller);
         $property = $reflection->getProperty('contentType');
         $property->setAccessible(true);
-        
+
         $this->assertEquals('members', $property->getValue($this->controller));
     }
 
@@ -85,7 +85,7 @@ class MembersControllerTest extends TestCase
         $reflection = new \ReflectionClass($this->controller);
         $property = $reflection->getProperty('default_view');
         $property->setAccessible(true);
-        
+
         $this->assertEquals('members', $property->getValue($this->controller));
     }
 

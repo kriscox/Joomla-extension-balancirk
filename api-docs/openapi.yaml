@@ -3,13 +3,13 @@ info:
   title: Balancirk API
   description: |
     REST API for the Balancirk Joomla component - A comprehensive management system for lessons, students, members, and subscriptions.
-    
+
     ## Authentication
     This API requires Joomla authentication. Most endpoints require appropriate permissions in the Balancirk component.
-    
+
     ## Base URL
     The API base URL follows the Joomla API structure: `/api/index.php/v1/balancirk`
-    
+
   version: 1.0.0
   contact:
     name: CoCoCo
@@ -441,18 +441,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: List of students
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '401':
+                $ref: "#/components/schemas/ApiResponse"
+        "401":
           description: Unauthorized
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
     post:
       summary: Create a new student
@@ -473,26 +473,26 @@ paths:
                       type: string
                       enum: [students]
                     attributes:
-                      $ref: '#/components/schemas/Student'
+                      $ref: "#/components/schemas/Student"
       responses:
-        '201':
+        "201":
           description: Student created successfully
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
+                $ref: "#/components/schemas/ApiResponse"
+        "400":
           description: Bad request
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /students/{id}:
     get:
@@ -508,18 +508,18 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Student details
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '404':
+                $ref: "#/components/schemas/ApiResponse"
+        "404":
           description: Student not found
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
     put:
       summary: Update a specific student
@@ -549,20 +549,20 @@ paths:
                     id:
                       type: string
                     attributes:
-                      $ref: '#/components/schemas/Student'
+                      $ref: "#/components/schemas/Student"
       responses:
-        '200':
+        "200":
           description: Student updated successfully
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '404':
+                $ref: "#/components/schemas/ApiResponse"
+        "404":
           description: Student not found
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
     delete:
       summary: Delete a specific student
@@ -577,14 +577,14 @@ paths:
           schema:
             type: integer
       responses:
-        '204':
+        "204":
           description: Student deleted successfully
-        '404':
+        "404":
           description: Student not found
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   # Members endpoints
   /members:
@@ -608,12 +608,12 @@ paths:
             minimum: 1
             maximum: 100
       responses:
-        '200':
+        "200":
           description: List of members
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
     post:
       summary: Create a new member
@@ -634,14 +634,14 @@ paths:
                       type: string
                       enum: [members]
                     attributes:
-                      $ref: '#/components/schemas/Member'
+                      $ref: "#/components/schemas/Member"
       responses:
-        '201':
+        "201":
           description: Member created successfully
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
   /members/{id}:
     get:
@@ -657,12 +657,12 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Member details
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
     put:
       summary: Update a specific member
@@ -692,14 +692,14 @@ paths:
                     id:
                       type: string
                     attributes:
-                      $ref: '#/components/schemas/Member'
+                      $ref: "#/components/schemas/Member"
       responses:
-        '200':
+        "200":
           description: Member updated successfully
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
     delete:
       summary: Delete a specific member
@@ -714,7 +714,7 @@ paths:
           schema:
             type: integer
       responses:
-        '204':
+        "204":
           description: Member deleted successfully
 
   /members/current:
@@ -724,12 +724,12 @@ paths:
       tags:
         - Members
       responses:
-        '200':
+        "200":
           description: Current member details
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
   # Lessons endpoints
   /lessons:
@@ -763,12 +763,12 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: List of lessons
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
     post:
       summary: Create a new lesson
@@ -789,14 +789,14 @@ paths:
                       type: string
                       enum: [lessons]
                     attributes:
-                      $ref: '#/components/schemas/Lesson'
+                      $ref: "#/components/schemas/Lesson"
       responses:
-        '201':
+        "201":
           description: Lesson created successfully
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
   /lessons/{id}:
     get:
@@ -812,12 +812,12 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Lesson details
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
     put:
       summary: Update a specific lesson
@@ -847,14 +847,14 @@ paths:
                     id:
                       type: string
                     attributes:
-                      $ref: '#/components/schemas/Lesson'
+                      $ref: "#/components/schemas/Lesson"
       responses:
-        '200':
+        "200":
           description: Lesson updated successfully
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
     delete:
       summary: Delete a specific lesson
@@ -869,7 +869,7 @@ paths:
           schema:
             type: integer
       responses:
-        '204':
+        "204":
           description: Lesson deleted successfully
 
   # Subscriptions endpoints
@@ -904,12 +904,12 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: List of subscriptions
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
     post:
       summary: Create a new subscription
@@ -930,14 +930,14 @@ paths:
                       type: string
                       enum: [subscriptions]
                     attributes:
-                      $ref: '#/components/schemas/Subscription'
+                      $ref: "#/components/schemas/Subscription"
       responses:
-        '201':
+        "201":
           description: Subscription created successfully
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
   /subscriptions/{id}:
     get:
@@ -953,12 +953,12 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Subscription details
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
     put:
       summary: Update a specific subscription
@@ -988,14 +988,14 @@ paths:
                     id:
                       type: string
                     attributes:
-                      $ref: '#/components/schemas/Subscription'
+                      $ref: "#/components/schemas/Subscription"
       responses:
-        '200':
+        "200":
           description: Subscription updated successfully
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
     delete:
       summary: Delete a specific subscription
@@ -1010,7 +1010,7 @@ paths:
           schema:
             type: integer
       responses:
-        '204':
+        "204":
           description: Subscription deleted successfully
 
   # Presences endpoints
@@ -1046,12 +1046,12 @@ paths:
             minimum: 1
             maximum: 100
       responses:
-        '200':
+        "200":
           description: List of presences
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
   /presences/presence:
     get:
@@ -1074,12 +1074,12 @@ paths:
             type: string
             format: date
       responses:
-        '200':
+        "200":
           description: Presence data
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
   # Teachers endpoints
   /teachers:
@@ -1101,12 +1101,12 @@ paths:
             type: string
             format: date
       responses:
-        '200':
+        "200":
           description: List of teachers
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
   /teachers/teacher:
     get:
@@ -1129,12 +1129,12 @@ paths:
             type: string
             format: date
       responses:
-        '200':
+        "200":
           description: Teacher data
           content:
             application/vnd.api+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: "#/components/schemas/ApiResponse"
 
 tags:
   - name: Students

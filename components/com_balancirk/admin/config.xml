@@ -33,5 +33,11 @@
 			description="COM_BALANCIRK_REGISTRATION_REDIRECT_URL_DESCRIPTION"
 			required="false"
 			menu_type="hiddenMenu" />
+		<field name="mutuality_options"
+			type="textarea"
+			label="COM_BALANCIRK_MUTUALITY_OPTIONS_LABEL"
+			description="COM_BALANCIRK_MUTUALITY_OPTIONS_DESCRIPTION"
+			rows="6"
+			filter="raw" />
 	</fieldset>
 </config>

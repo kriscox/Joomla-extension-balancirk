@@ -50,10 +50,10 @@ class StudentsControllerTest extends TestCase
 
         // Mock the application
         $this->mockApp = $this->createMock(CMSApplication::class);
-        
+
         // Mock the input
         $this->mockInput = $this->createMock(Input::class);
-        
+
         // Set up the controller
         $this->controller = new StudentsController([], $this->mockApp, $this->mockInput);
     }
@@ -68,7 +68,7 @@ class StudentsControllerTest extends TestCase
         $reflection = new \ReflectionClass($this->controller);
         $property = $reflection->getProperty('contentType');
         $property->setAccessible(true);
-        
+
         $this->assertEquals('students', $property->getValue($this->controller));
     }
 
@@ -82,7 +82,7 @@ class StudentsControllerTest extends TestCase
         $reflection = new \ReflectionClass($this->controller);
         $property = $reflection->getProperty('default_view');
         $property->setAccessible(true);
-        
+
         $this->assertEquals('students', $property->getValue($this->controller));
     }
 

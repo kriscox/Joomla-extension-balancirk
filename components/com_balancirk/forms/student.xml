@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form>
-    <fieldset>
+    <fieldset addfieldprefix="CoCoCo\Component\Balancirk\Site\Field">
         <field name="id"
             type="number"
             label="COM_BALANCIRK_TABLE_TABLEHEAD_ID"
@@ -51,9 +51,8 @@
             format="%d %b %Y"
             translateformat="true" />
         <field name="mutuality"
-            type="text"
-            label="COM_BALANCIRK_TABLE_TABLEHEAD_MUTUALITY"
-            maxlength="100" />
+            type="mutuality"
+            label="COM_BALANCIRK_TABLE_TABLEHEAD_MUTUALITY" />
         <field name="uitpas"
             type="text"
             label="COM_BALANCIRK_TABLE_TABLEHEAD_UITPAS"

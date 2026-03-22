@@ -81,8 +81,16 @@
             },
             "url": {
               "raw": "{{base_url}}/api/index.php/v1/users/token",
-              "host": ["{{base_url}}"],
-              "path": ["api", "index.php", "v1", "users", "token"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "index.php",
+                "v1",
+                "users",
+                "token"
+              ]
             }
           }
         }
@@ -125,8 +133,12 @@
             ],
             "url": {
               "raw": "{{base_url}}/students",
-              "host": ["{{base_url}}"],
-              "path": ["students"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students"
+              ]
             }
           }
         },
@@ -178,8 +190,12 @@
             },
             "url": {
               "raw": "{{base_url}}/students",
-              "host": ["{{base_url}}"],
-              "path": ["students"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students"
+              ]
             }
           }
         },
@@ -214,8 +230,13 @@
             ],
             "url": {
               "raw": "{{base_url}}/students/{{test_student_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["students", "{{test_student_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "{{test_student_id}}"
+              ]
             }
           }
         },
@@ -257,8 +278,13 @@
             },
             "url": {
               "raw": "{{base_url}}/students/{{test_student_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["students", "{{test_student_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "{{test_student_id}}"
+              ]
             }
           }
         }
@@ -297,8 +323,12 @@
             ],
             "url": {
               "raw": "{{base_url}}/members",
-              "host": ["{{base_url}}"],
-              "path": ["members"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "members"
+              ]
             }
           }
         },
@@ -334,8 +364,13 @@
             ],
             "url": {
               "raw": "{{base_url}}/members/current",
-              "host": ["{{base_url}}"],
-              "path": ["members", "current"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "members",
+                "current"
+              ]
             }
           }
         }
@@ -377,8 +412,12 @@
             ],
             "url": {
               "raw": "{{base_url}}/lessons",
-              "host": ["{{base_url}}"],
-              "path": ["lessons"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lessons"
+              ]
             }
           }
         },
@@ -412,8 +451,12 @@
             ],
             "url": {
               "raw": "{{base_url}}/lessons?filter[year]=2024&page[limit]=10",
-              "host": ["{{base_url}}"],
-              "path": ["lessons"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lessons"
+              ],
               "query": [
                 {
                   "key": "filter[year]",
@@ -462,8 +505,12 @@
             ],
             "url": {
               "raw": "{{base_url}}/subscriptions",
-              "host": ["{{base_url}}"],
-              "path": ["subscriptions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subscriptions"
+              ]
             }
           }
         },
@@ -505,8 +552,12 @@
             },
             "url": {
               "raw": "{{base_url}}/subscriptions",
-              "host": ["{{base_url}}"],
-              "path": ["subscriptions"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subscriptions"
+              ]
             }
           }
         }
@@ -545,8 +596,12 @@
             ],
             "url": {
               "raw": "{{base_url}}/presences",
-              "host": ["{{base_url}}"],
-              "path": ["presences"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "presences"
+              ]
             }
           }
         },
@@ -580,8 +635,13 @@
             ],
             "url": {
               "raw": "{{base_url}}/presences/presence?lesson={{test_lesson_id}}&date=2024-03-18",
-              "host": ["{{base_url}}"],
-              "path": ["presences", "presence"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "presences",
+                "presence"
+              ],
               "query": [
                 {
                   "key": "lesson",
@@ -630,8 +690,13 @@
             ],
             "url": {
               "raw": "{{base_url}}/students/99999",
-              "host": ["{{base_url}}"],
-              "path": ["students", "99999"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "99999"
+              ]
             }
           }
         },
@@ -673,8 +738,12 @@
             },
             "url": {
               "raw": "{{base_url}}/students",
-              "host": ["{{base_url}}"],
-              "path": ["students"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students"
+              ]
             }
           }
         }
@@ -708,8 +777,13 @@
             ],
             "url": {
               "raw": "{{base_url}}/students/{{test_student_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["students", "{{test_student_id}}"]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "{{test_student_id}}"
+              ]
             }
           }
         }
