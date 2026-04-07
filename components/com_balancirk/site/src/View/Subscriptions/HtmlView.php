@@ -12,6 +12,7 @@ namespace CoCoCo\Component\Balancirk\Site\View\Subscriptions;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 
@@ -59,6 +60,13 @@ class HtmlView extends BaseHtmlView
     public $activeFilters;
 
     /**
+     * Whether the current user may export accounting data.
+     *
+     * @var  bool
+     */
+    public $canExportAccounting = false;
+
+    /**
      * Method to display the view.
      *
      * @param   string $tpl A template file to load. [optional]
@@ -74,6 +82,7 @@ class HtmlView extends BaseHtmlView
         $this->state         = $this->get('State');
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
+        $this->canExportAccounting = Factory::getApplication()->getIdentity()->authorise('accounting.export', 'com_balancirk');
 
         // Get list of years for filtering
         /** @var SubscriptionsModel */

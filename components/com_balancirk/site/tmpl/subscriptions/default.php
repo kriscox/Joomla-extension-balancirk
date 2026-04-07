@@ -17,6 +17,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\User\UserHelper;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Session\Session;
 
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
@@ -36,13 +37,24 @@ $bearertoken = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
 <div class="row">
 	<div class="col-md-12">
 		<nav aria-label="Toolbar">
-			<button class="button-new btn btn-success" type="button" onclick="location.href = 'index.php?option=com_balancirk&view=subscription&id=0';">
-				<span class=" icon-new" aria-hidden="true"></span>
-				<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
-			</button>
-			<a href="<?= Route::_('index.php?option=com_balancirk&view=students', false); ?>">
-				<button class="btn btn-primary" type="button"><?= TEXT::_('COM_BALANCIRK_STUDENTS_LINK') ?></button>
-			</a>
+			<?php if (!$this->canExportAccounting) : ?>
+				<button class="button-new btn btn-success" type="button" onclick="location.href = 'index.php?option=com_balancirk&view=subscription&id=0';">
+					<span class=" icon-new" aria-hidden="true"></span>
+					<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
+				</button>
+				<a href="<?= Route::_('index.php?option=com_balancirk&view=students', false); ?>">
+					<button class="btn btn-primary" type="button"><?= TEXT::_('COM_BALANCIRK_STUDENTS_LINK') ?></button>
+				</a>
+			<?php else : ?>
+				<?php
+				$selectedYear = (string) $this->state->get('filter.year');
+				$token = Session::getFormToken() . '=1';
+				$csvUrl = Route::_('index.php?option=com_balancirk&task=subscription.export&format=csv&year=' . urlencode($selectedYear) . '&' . $token, false);
+				$xlsUrl = Route::_('index.php?option=com_balancirk&task=subscription.export&format=xls&year=' . urlencode($selectedYear) . '&' . $token, false);
+				?>
+				<a class="btn btn-primary" href="<?= $csvUrl; ?>"><?= Text::_('COM_BALANCIRK_SUBSCRIPTIONS_EXPORT_CSV'); ?></a>
+				<a class="btn btn-secondary" href="<?= $xlsUrl; ?>"><?= Text::_('COM_BALANCIRK_SUBSCRIPTIONS_EXPORT_XLS'); ?></a>
+			<?php endif; ?>
 		</nav>
 	</div>
 </div>

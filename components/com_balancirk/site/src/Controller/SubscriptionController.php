@@ -13,6 +13,7 @@ namespace CoCoCo\Component\Balancirk\Site\Controller;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Session\Session;
 use Joomla\CMS\MVC\Controller\FormController;
 use Joomla\CMS\Response\JsonResponse;
 use CoCoCo\Component\Balancirk\Site\Model\StudentModel;
@@ -112,8 +113,7 @@ class SubscriptionController extends FormController
     {
         $user = Factory::getApplication()->getIdentity();
 
-        //return $user->isAccountant();
-        return true;
+        return $user->authorise('accounting.export', 'com_balancirk');
     }
 
     /**
@@ -241,26 +241,39 @@ class SubscriptionController extends FormController
      *
      * Method to export a list of subscriptions for accounting
      *
-     * @param   int $year  The year to export
-     *
      * @return  void
      *
      * @since   __BUMP_VERSION__
      **/
-    public function export(int $year)
+    public function export(): void
     {
-        // Check if token is correct. Security measure
-        $this->checkToken();
+        Session::checkToken('get');
+
+        $app = Factory::getApplication();
+        $year = $this->input->getString('year');
+        $format = $this->input->getCmd('format', 'csv');
 
         /** @var SubscriptionModel */
         $model = $this->getModel();
 
-        if ($this->allowedExport($data)) {
-            $model->exportForAccounting($year);
+        if (!$this->allowedExport()) {
+            $this->setRedirect(
+                Route::_('index.php?option=' . $this->option . '&view=subscriptions', false),
+                Text::_('JLIB_APPLICATION_ERROR_ACCESS_FORBIDDEN'),
+                'warning'
+            );
 
-            $this->setRedirect(Route::_('index.php?option=' . $this->option . '&view=subscriptions'));
+            return;
         }
 
-        $this->setRedirect($redirectUrl);
+        $export = $model->exportForAccounting($year, $format);
+
+        $app->setHeader('Content-Type', $export['mimeType'], true);
+        $app->setHeader('Content-Disposition', 'attachment; filename="' . $export['filename'] . '"', true);
+        $app->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate', true);
+        $app->sendHeaders();
+
+        echo $export['content'];
+        $app->close();
     }
 }

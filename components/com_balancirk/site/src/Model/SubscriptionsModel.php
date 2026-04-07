@@ -12,6 +12,7 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
 
@@ -103,7 +104,7 @@ class SubscriptionsModel extends ListModel
         $query = $db->getQuery(true);
 
         // Get the current logged in user.
-        $app = \Joomla\CMS\Factory::getApplication();
+        $app = Factory::getApplication();
         $user = $app->getIdentity();
 
         // Select the required fields from the table.
@@ -129,11 +130,13 @@ class SubscriptionsModel extends ListModel
         $query->from($db->quoteName('#__balancirk_subscriptions_view', 'a'));
 
         // Filter users based on logged in user
-        $query->join(
-            'INNER',
-            $db->quoteName('#__balancirk_parents', 'p'),
-            'a.studentid = p.child AND p.parent = ' . $user->id
-        );
+        if (!$this->canExportAccounting()) {
+            $query->join(
+                'INNER',
+                $db->quoteName('#__balancirk_parents', 'p'),
+                'a.studentid = p.child AND p.parent = ' . $user->id
+            );
+        }
 
         // Filter by current state
         $current = (string) $this->getState('filter.current');
@@ -202,24 +205,37 @@ class SubscriptionsModel extends ListModel
     public function getYears()
     {
         // Get the current logged in user.
-        $app = \Joomla\CMS\Factory::getApplication();
+        $app = Factory::getApplication();
         $user = $app->getIdentity();
 
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
         $query->select('DISTINCT ' . $db->quoteName('year'))
-            ->from($db->quoteName('#__balancirk_subscriptions_view', 'a'))
+            ->from($db->quoteName('#__balancirk_subscriptions_view', 'a'));
 
-            // Filter users based on logged in user
-            ->join(
+        if (!$this->canExportAccounting()) {
+            $query->join(
                 'INNER',
                 $db->quoteName('#__balancirk_parents', 'p'),
                 'a.studentid = p.child AND p.parent = ' . $user->id
-            )
+            );
+        }
 
-            ->order($db->quoteName('year') . ' DESC');
+        $query->order($db->quoteName('year') . ' DESC');
 
         $db->setQuery($query);
         return $db->loadColumn();
+    }
+
+    /**
+     * Check whether the current user may export accounting data.
+     *
+     * @return  bool
+     *
+     * @since   1.2.22
+     */
+    private function canExportAccounting(): bool
+    {
+        return Factory::getApplication()->getIdentity()->authorise('accounting.export', 'com_balancirk');
     }
 }

@@ -62,6 +62,20 @@ class HtmlView extends BaseHtmlView
     public $activeFilters;
 
     /**
+     * Whether the user may consult parent-child relations.
+     *
+     * @var  bool
+     */
+    public $canViewRelations = false;
+
+    /**
+     * Whether the user may edit student records.
+     *
+     * @var  bool
+     */
+    public $canEdit = false;
+
+    /**
      * Method to display the view.
      *
      * @param   string $tpl A template file to load. [optional]
@@ -77,6 +91,9 @@ class HtmlView extends BaseHtmlView
         $this->state         = $this->get('State');
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
+        $actions = ContentHelper::getActions('com_balancirk');
+        $this->canViewRelations = $actions->get('students.viewall') || $actions->get('accounting.viewrelations');
+        $this->canEdit = $actions->get('core.edit');
 
         if (!count($this->items) && $this->get('IsEmptyState')) {
             $this->setLayout('emptystate');

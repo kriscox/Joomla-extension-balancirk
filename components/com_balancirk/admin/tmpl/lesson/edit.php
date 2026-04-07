@@ -71,6 +71,17 @@ HTMLHelper::_('behavior.keepalive');
 		</div>
 		<?= HTMLHelper::_('uitab.endTab'); ?>
 
+		<?= HTMLHelper::_('uitab.addTab', 'myTab', 'emails', Text::_('COM_BALANCIRK_LESSON_TAB_EMAILS')); ?>
+		<div class="row">
+			<div class="col-md-12">
+				<?= $this->form->renderField('subscription_email_subject'); ?>
+				<?= $this->form->renderField('subscription_email_body'); ?>
+				<?= $this->form->renderField('waitinglist_email_subject'); ?>
+				<?= $this->form->renderField('waitinglist_email_body'); ?>
+			</div>
+		</div>
+		<?= HTMLHelper::_('uitab.endTab'); ?>
+
 		<?= HTMLHelper::_('uitab.endTabSet'); ?>
 	</div>
 	<input type="hidden" name="task" value="">

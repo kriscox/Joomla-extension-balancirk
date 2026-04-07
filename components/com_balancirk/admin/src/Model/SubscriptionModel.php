@@ -14,7 +14,9 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 
 use Exception;
 use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\SubscriptionMailHelper;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Object\CMSObject;
 use Joomla\CMS\Helper\ContentHelper;
@@ -165,60 +167,38 @@ class SubscriptionModel extends AdminModel
             ->values(implode(',', $values));
         $db->setQuery($query)->execute();
 
-        // Send mail to parent
-        /** @var MailerInterface */
-        $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
-        $mailer->setSender('info@balancirk.be', 'Circusatelier Balancirk VZW');
-        // Get the students parents
         /** @var StudentModel */
         $studentModel = $this->getMVCFactory()->createModel('Student', 'Site');
+        $student = $studentModel->getItem((int) $data['student']);
         $parents = $studentModel->getParents($data['student']);
+        /** @var MemberModel */
+        $memberModel = $this->getMVCFactory()->createModel('Member', 'Site');
+        $mailDefaults = $this->getSubscriptionMailDefaults();
+        $subscriptionDate = date('Y-m-d');
 
         foreach ($parents as $parent)
         {
-            // Get the parent email
-            /** @var MemberModel */
-            $memberModel = $this->getMVCFactory()->createModel('Member', 'Site');
             $member = $memberModel->getItem($parent->parent);
 
-            // add the email to the mailAdresses array
-            $mailer->addRecipient($member->email);
+            if (!$student || !$member || empty($member->email)) {
+                continue;
+            }
+
+            $message = SubscriptionMailHelper::buildMailMessage(
+                $lesson,
+                $student,
+                $member,
+                $subscriptionDate,
+                (bool) $waitinglist,
+                $mailDefaults
+            );
+            $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+            $mailer->setSender('info@balancirk.be', 'Circusatelier Balancirk VZW')
+                ->addRecipient($member->email)
+                ->setSubject($message['subject'])
+                ->setBody($message['body'])
+                ->Send();
         }
-
-        if ($waitinglist == 0)
-        { // Not on waitinglist
-            $mailer->setSubject(Text::_('COM_BALANCIRK_SUBJECT_SUBSCRIPTION') . ' "' . $lesson->name . '"')
-                // TODO: This is a placeholder, replace this with the actual mail content
-                ->setBody('
-Hallo,
-
-Bedankt voor je inschrijving. 
- 
-Deze is goed ontvangen voor de les "' .
-                    $lesson->name . '". De lessen starten op ' . date('d/m/Y', strtotime($lesson->start)) . '.
-  
-De betaling moet je nog niet in orde brengen. In de loop van de maand oktober ontvang je een mail met de betalingsgegevens.
-  
-Met vriendelijke groeten,
-  
-Het Balancirk team');
-        }
-        else
-        { // On wiatinglist
-            $mailer->setSubject(Text::_('COM_BALANCIRK_SUBJECT_SUBSCRIPTION') . ' ' . $lesson->name)
-                ->setBody('
-Hallo,
-
-Bedankt voor je inschrijving. De les "' . $lesson->name . '" is volzet. De inschrijving is op de wachtlijst gekomen.
-
-We houden je op de hoogte als er een plaatsje vrijkomt.
-
-Met vriendelijke groeten,
-
-Het Balancirk team');
-        }
-
-        $mailer->Send();
 
         return true;
     }
@@ -244,6 +224,25 @@ Het Balancirk team');
         }
 
         return LessonAgeHelper::matchesLesson($student->birthdate ?? null, $lesson);
+    }
+
+    /**
+     * Get the configured default mail templates for subscriptions.
+     *
+     * @return  array<string, string>
+     *
+     * @since   1.2.20
+     */
+    private function getSubscriptionMailDefaults(): array
+    {
+        $params = ComponentHelper::getParams('com_balancirk');
+
+        return [
+            'subscription_subject' => (string) $params->get('email_subject_subscription', ''),
+            'subscription_body' => (string) $params->get('email_body_subscription', ''),
+            'waitinglist_subject' => (string) $params->get('email_subject_waitinglist', ''),
+            'waitinglist_body' => (string) $params->get('email_body_waitinglist', ''),
+        ];
     }
 
     /**

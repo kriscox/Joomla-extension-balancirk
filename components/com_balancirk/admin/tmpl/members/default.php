@@ -74,6 +74,11 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 								<th scope="col" style="width:1%" class="text-center d-none d-md-table-cell">
 									<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_REGISTERDATE'); ?>
 								</th>
+								<?php if ($this->canViewRelations) : ?>
+									<th scope="col" style="width:20px" class="text-center d-none d-md-table-cell">
+										<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_STUDENTS'); ?>
+									</th>
+								<?php endif; ?>
 								<th scope="col" style="width:1%" class="text-center d-none d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_LASTLOGINDATE', 'a.lastlogindate', $listDirn, $listOrder); ?>
 								</th>
@@ -92,9 +97,13 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 										<?= $item->id; ?>
 									</td>
 									<td scope="row" class="has-context">
-										<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&task=member.edit&id=' . $item->id); ?>">
-											<?= $editIcon; ?> <?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
-										</a>
+										<?php if ($this->canEdit) : ?>
+											<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&task=member.edit&id=' . $item->id); ?>">
+												<?= $editIcon; ?> <?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
+											</a>
+										<?php else : ?>
+											<?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
+										<?php endif; ?>
 									</td>
 									<td scope="row" class="has-context">
 										<?= $this->escape($item->email); ?>
@@ -120,6 +129,11 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 									<td scope="row" class="has-context">
 										<?= $this->escape($item->registerDate); ?>
 									</td>
+									<?php if ($this->canViewRelations) : ?>
+										<td scope="row" class="has-context">
+											<?= $this->escape($item->students ?? ''); ?>
+										</td>
+									<?php endif; ?>
 									<td scope="row" class="has-context">
 										<?= $this->escape($item->lastvisitDate); ?>
 									</td>
