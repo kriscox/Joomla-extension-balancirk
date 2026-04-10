@@ -6,9 +6,10 @@
  *                                                                                                 *
  **************************************************************************************************/
 ALTER TABLE `#__balancirk_lessons`
-    ADD COLUMN `min_age` int(11) DEFAULT NULL AFTER `max_students`,
-    ADD COLUMN `max_age` int(11) DEFAULT NULL AFTER `min_age`;
-
+ADD COLUMN `min_age` int(11) DEFAULT NULL
+AFTER `max_students`,
+    ADD COLUMN `max_age` int(11) DEFAULT NULL
+AFTER `min_age`;
 CREATE OR REPLACE VIEW `#__balancirk_lessons_complete` AS
 SELECT a.`id`,
     a.`name`,

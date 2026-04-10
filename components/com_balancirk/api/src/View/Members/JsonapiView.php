@@ -46,7 +46,7 @@ class JsonapiView extends BaseApiView
         'lastvisitDate'
     ];
 
-    public function displayList(array $items = null)
+    public function displayList(?array $items = null)
     {
         foreach (FieldsHelper::getFields('com_balancirk.members') as $field)
         {

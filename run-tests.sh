@@ -18,13 +18,16 @@ echo ""
 # Configuration
 COMPOSER_BIN="./vendor/bin"
 PHPUNIT_BIN="$COMPOSER_BIN/phpunit"
-NEWMAN_BIN="newman"
-REPORTS_DIR="tests/reports"
-POSTMAN_COLLECTION="tests/postman/balancirk-api-tests.postman_collection.json"
-POSTMAN_ENVIRONMENT="tests/postman/balancirk-environment.postman_environment.json"
+NEWMAN_BIN="${NEWMAN_BIN:-newman}"
+REPORTS_DIR="${REPORTS_DIR:-tests/reports}"
+POSTMAN_COLLECTION="${POSTMAN_COLLECTION:-tests/postman/balancirk-api-tests.postman_collection.json}"
+POSTMAN_ENVIRONMENT="${POSTMAN_ENVIRONMENT:-tests/postman/balancirk-environment.postman_environment.json}"
+PHPUNIT_SUITE="${PHPUNIT_SUITE:-Unit}"
+PHPUNIT_EXTRA_ARGS="${PHPUNIT_EXTRA_ARGS:-}"
+ENABLE_COVERAGE="${ENABLE_COVERAGE:-0}"
 
 # Create reports directory if it doesn't exist
-mkdir -p $REPORTS_DIR
+mkdir -p "$REPORTS_DIR"
 
 # Function to check if command exists
 command_exists () {
@@ -44,7 +47,7 @@ if [ ! -f "$PHPUNIT_BIN" ]; then
     composer install --dev
 fi
 
-if ! command_exists newman; then
+if ! command_exists "$NEWMAN_BIN"; then
     echo -e "${YELLOW}Newman not found. Please install it globally: npm install -g newman${NC}"
     echo -e "${YELLOW}Skipping API integration tests...${NC}"
     NEWMAN_AVAILABLE=false
@@ -57,7 +60,13 @@ echo ""
 # Run PHPUnit tests
 echo -e "${BLUE}Running PHPUnit tests...${NC}"
 if [ -f "$PHPUNIT_BIN" ]; then
-    $PHPUNIT_BIN --configuration phpunit.xml --coverage-text --colors=always
+    COVERAGE_ARGS=""
+    if [ "$ENABLE_COVERAGE" = "1" ]; then
+        COVERAGE_ARGS="--coverage-text"
+    fi
+
+    # shellcheck disable=SC2086
+    $PHPUNIT_BIN --configuration phpunit.xml --testsuite "$PHPUNIT_SUITE" --colors=always $COVERAGE_ARGS $PHPUNIT_EXTRA_ARGS
     PHPUNIT_EXIT_CODE=$?
     
     if [ $PHPUNIT_EXIT_CODE -eq 0 ]; then
@@ -81,13 +90,13 @@ if [ "$NEWMAN_AVAILABLE" = true ]; then
         NEWMAN_EXIT_CODE=1
     else
         # Check if environment file exists
-        NEWMAN_ARGS=""
+        NEWMAN_ARGS=()
         if [ -f "$POSTMAN_ENVIRONMENT" ]; then
-            NEWMAN_ARGS="-e $POSTMAN_ENVIRONMENT"
+            NEWMAN_ARGS=(-e "$POSTMAN_ENVIRONMENT")
         fi
         
         # Run Newman with HTML and JUnit reporters
-        newman run $POSTMAN_COLLECTION $NEWMAN_ARGS \
+        "$NEWMAN_BIN" run "$POSTMAN_COLLECTION" "${NEWMAN_ARGS[@]}" \
             --reporters cli,html,junit \
             --reporter-html-export "$REPORTS_DIR/newman-report.html" \
             --reporter-junit-export "$REPORTS_DIR/newman-junit.xml" \

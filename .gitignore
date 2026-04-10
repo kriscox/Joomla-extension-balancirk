@@ -11,3 +11,5 @@ __pycache__/
 builds/
 joomla-builder/
 vendor/
+.env.test
+tests/reports/

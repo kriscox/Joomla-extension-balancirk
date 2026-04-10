@@ -31,8 +31,8 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 $userid = Factory::getApplication()->getIdentity()->id;
 $bearertoken = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
 ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-subscriptions-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-subscriptions-top}'); ?>
 <div class="row">
 	<div class="col-md-12">
 		<nav aria-label="Toolbar">
@@ -142,8 +142,8 @@ $bearertoken = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
 	</div>
 </div>
 
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-subscriptions-bottom}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-subscriptions-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
 
 <!-- JavaScript for handling delete logic -->
 <script>

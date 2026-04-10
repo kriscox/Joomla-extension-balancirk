@@ -9,6 +9,8 @@
  */
 
 defined('_JEXEC') or die;
+
+use Joomla\CMS\HTML\HTMLHelper;
 ?>
 
 <div class="page-header">
@@ -17,10 +19,10 @@ defined('_JEXEC') or die;
 	</h1>
 </div>
 
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-member-top}'); ?>
 
 Hello <?php echo $this->member; ?>
 
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-bottom}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-member-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

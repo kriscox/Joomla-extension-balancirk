@@ -96,4 +96,26 @@ class AccountingExportHelperTest extends TestCase
         $this->assertStringContainsString('&lt;Anna&gt;', $xls);
         $this->assertStringContainsString('<th>student_firstname</th>', $xls);
     }
+
+    public function testRenderCsvEscapesDoubleQuotesInsideValues(): void
+    {
+        $csv = AccountingExportHelper::renderCsv([
+            [
+                'firstname' => 'Ann "A"',
+                'name' => 'Janssens',
+                'address' => '',
+                'bus' => '',
+                'postcode' => '',
+                'city' => '',
+                'email' => '',
+                'lesson' => '',
+                'student_firstname' => '',
+                'student_name' => '',
+                'uitpas' => '',
+                'mutuality' => '',
+            ],
+        ]);
+
+        $this->assertStringContainsString('"Ann ""A"""', $csv);
+    }
 }

@@ -65,4 +65,48 @@ final class SubscriptionMailHelperTest extends TestCase
 
         $this->assertSame('Hallo Els, Lena komt naar Acro.', $rendered);
     }
+
+    public function testResolveTemplateFallsBackToDefaultThenFallback(): void
+    {
+        $fromDefault = SubscriptionMailHelper::resolveTemplate('', 'Global template', 'Fallback template');
+        $fromFallback = SubscriptionMailHelper::resolveTemplate('', '', 'Fallback template');
+
+        $this->assertSame('Global template', $fromDefault);
+        $this->assertSame('Fallback template', $fromFallback);
+    }
+
+    public function testGetInvoiceHintFallsBackWhenDatesInvalid(): void
+    {
+        $hint = SubscriptionMailHelper::getInvoiceHint('not-a-date', 'also-invalid', false);
+
+        $this->assertStringContainsString('betalingsgegevens', $hint);
+    }
+
+    public function testBuildMailMessageUsesLessonSpecificTemplates(): void
+    {
+        $lesson = (object) [
+            'name' => 'Acro',
+            'start' => '2026-09-10',
+            'end' => '2027-05-20',
+            'subscription_email_subject' => 'Custom subject {lesson_name}',
+            'subscription_email_body' => 'Hi {member_firstname}, {student_firstname} => {lesson_name}',
+        ];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $mail = SubscriptionMailHelper::buildMailMessage($lesson, $student, $member, '2026-08-20', false, []);
+
+        $this->assertSame('Custom subject Acro', $mail['subject']);
+        $this->assertSame('Hi Els, Lena => Acro', $mail['body']);
+    }
+
+    public function testRenderTemplateCollapsesExcessiveBlankLines(): void
+    {
+        $rendered = SubscriptionMailHelper::renderTemplate(
+            "A\n\n\n\nB",
+            []
+        );
+
+        $this->assertSame("A\n\nB", $rendered);
+    }
 }

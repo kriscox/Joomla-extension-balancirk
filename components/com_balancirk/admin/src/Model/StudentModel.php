@@ -226,7 +226,7 @@ class StudentModel extends AdminModel
      *
      * @since __BUMP_VERSION__
      */
-    public function isPrimairyParent(int $parent = null, int $student = null)
+    public function isPrimairyParent(?int $parent = null, ?int $student = null)
     {
         // Check if the user is the primary parent of the student
         $db     = $this->getDatabase();

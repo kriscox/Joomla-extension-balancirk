@@ -70,4 +70,29 @@ class LessonAgeHelperTest extends TestCase
 
         $this->assertTrue(LessonAgeHelper::matchesLesson('2010-01-01', $lesson));
     }
+
+    public function testMatchesLessonReturnsFalseWhenBirthdateMissingAndRangeConfigured(): void
+    {
+        $lesson = (object) [
+            'start' => '2025-09-01',
+            'min_age' => 8,
+            'max_age' => 10,
+        ];
+
+        $this->assertFalse(LessonAgeHelper::matchesLesson(null, $lesson));
+    }
+
+    public function testGetAgeOnDateReturnsNullForInvalidDates(): void
+    {
+        $this->assertNull(LessonAgeHelper::getAgeOnDate('not-a-date', '2025-09-01'));
+        $this->assertNull(LessonAgeHelper::getAgeOnDate('2015-01-01', 'invalid-reference'));
+    }
+
+    public function testNormalizeNullableIntCastsAndHandlesEmptyValues(): void
+    {
+        $this->assertNull(LessonAgeHelper::normalizeNullableInt(null));
+        $this->assertNull(LessonAgeHelper::normalizeNullableInt(''));
+        $this->assertSame(0, LessonAgeHelper::normalizeNullableInt('0'));
+        $this->assertSame(12, LessonAgeHelper::normalizeNullableInt('12'));
+    }
 }

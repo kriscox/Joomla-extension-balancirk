@@ -1,0 +1,85 @@
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${JOOMLA_DB_NAME:-joomla}
+      MARIADB_USER: ${JOOMLA_DB_USER:-joomla}
+      MARIADB_PASSWORD: ${JOOMLA_DB_PASSWORD:-joomla}
+      MARIADB_ROOT_PASSWORD: ${JOOMLA_DB_ROOT_PASSWORD:-root}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  joomla:
+    image: ${JOOMLA_IMAGE:-joomla:latest}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      JOOMLA_DB_HOST: db
+      JOOMLA_DB_USER: ${JOOMLA_DB_USER:-joomla}
+      JOOMLA_DB_PASSWORD: ${JOOMLA_DB_PASSWORD:-joomla}
+      JOOMLA_DB_NAME: ${JOOMLA_DB_NAME:-joomla}
+      JOOMLA_SITE_NAME: ${JOOMLA_SITE_NAME:-Balancirk Test}
+      JOOMLA_ADMIN_USER: ${JOOMLA_ADMIN_USERNAME:-admin}
+      JOOMLA_ADMIN_USERNAME: ${JOOMLA_ADMIN_USERNAME:-admin}
+      JOOMLA_ADMIN_PASSWORD: ${JOOMLA_ADMIN_PASSWORD:-changeMe123!}
+      JOOMLA_ADMIN_EMAIL: ${JOOMLA_ADMIN_EMAIL:-admin@example.com}
+    ports:
+      - "${JOOMLA_HTTP_PORT:-8080}:80"
+    volumes:
+      - joomla_data:/var/www/html
+      - ./:/workspace
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ${JOOMLA_DB_ROOT_PASSWORD:-root}
+    ports:
+      - "${PHPMYADMIN_HTTP_PORT:-8081}:80"
+
+  tester:
+    build:
+      context: .
+      dockerfile: docker/tester/Dockerfile
+    depends_on:
+      joomla:
+        condition: service_healthy
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    environment:
+      COMPOSER_ALLOW_SUPERUSER: "1"
+      POSTMAN_ENVIRONMENT: /tmp/balancirk-postman-env.json
+      TEST_BASE_URL: http://joomla
+      TEST_USERNAME: ${JOOMLA_ADMIN_USERNAME:-admin}
+      TEST_PASSWORD: ${JOOMLA_ADMIN_PASSWORD:-changeMe123!}
+    entrypoint: ["sleep", "infinity"]
+    tty: true
+
+volumes:
+  db_data:
+  joomla_data:

@@ -105,8 +105,8 @@ $presence_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=pres
 $url = Route::_('index.php?option=com_balancirk&view=lesson');
 ?>
 
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-edit-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-member-edit-top}'); ?>
 <form action="<?= $url ?>" method="POST" name="adminForm" id="teacher-form" class="form-validate">
 	<div class="row">
 		<div class="col-md-12">
