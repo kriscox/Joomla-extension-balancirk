@@ -36,7 +36,8 @@ class SubscriptionsModel extends ListModel
     public function __construct($config = [])
     {
 
-        if (empty($config['filter_fields'])) {
+        if (empty($config['filter_fields']))
+        {
             $config['filter_fields'] = array(
                 'name',
                 'a.name',
@@ -129,42 +130,47 @@ class SubscriptionsModel extends ListModel
         );
         $query->from($db->quoteName('#__balancirk_subscriptions_view', 'a'));
 
-        // Filter users based on logged in user
-        if (!$this->canExportAccounting()) {
-            $query->join(
-                'INNER',
-                $db->quoteName('#__balancirk_parents', 'p'),
-                'a.studentid = p.child AND p.parent = ' . $user->id
-            );
-        }
+        // Filter users based on logged in user - always show only own subscriptions
+        $query->join(
+            'INNER',
+            $db->quoteName('#__balancirk_parents', 'p'),
+            'a.studentid = p.child AND p.parent = ' . $user->id
+        );
 
         // Filter by current state
         $current = (string) $this->getState('filter.current');
 
-        if (is_numeric($current)) {
+        if (is_numeric($current))
+        {
             $query->where($db->quoteName('a.state') . ' = :current');
             $query->bind(':current', $current, ParameterType::INTEGER);
-        } elseif ($current === '') {
+        }
+        elseif ($current === '')
+        {
             $query->where('(' . $db->quoteName('a.state') . ' = 0 OR ' . $db->quoteName('a.state') . ' = 1)');
         }
 
         // Filter by selected year
         $selectedYear = $this->getState('filter.year');
         $today = date('Y-m-d');
-        if (empty($selectedYear)) {
+        if (empty($selectedYear))
+        {
             $query->where($db->quote(date(
                 'Y',
                 strtotime($today . '- 5 months')
             )) . ' = `year`');
             $this->setState('filter.year', date('Y', strtotime($today . '- 5 months')));
-        } else {
+        }
+        else
+        {
             $query->where($db->quoteName('a.year') . ' = ' . $db->quote($selectedYear));
         }
 
         // Filter by search in title.
         $search = $this->getState('filter.search');
 
-        if (!empty($search)) {
+        if (!empty($search))
+        {
             $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
             $query->where('(a.name LIKE ' . $search . ')', 'OR');
             $query->where('(a.firstname LIKE ' . $search . ')', 'OR');
@@ -213,29 +219,16 @@ class SubscriptionsModel extends ListModel
         $query->select('DISTINCT ' . $db->quoteName('year'))
             ->from($db->quoteName('#__balancirk_subscriptions_view', 'a'));
 
-        if (!$this->canExportAccounting()) {
-            $query->join(
-                'INNER',
-                $db->quoteName('#__balancirk_parents', 'p'),
-                'a.studentid = p.child AND p.parent = ' . $user->id
-            );
-        }
+        // Filter users based on logged in user - always show only own years  
+        $query->join(
+            'INNER',
+            $db->quoteName('#__balancirk_parents', 'p'),
+            'a.studentid = p.child AND p.parent = ' . $user->id
+        );
 
         $query->order($db->quoteName('year') . ' DESC');
 
         $db->setQuery($query);
         return $db->loadColumn();
-    }
-
-    /**
-     * Check whether the current user may export accounting data.
-     *
-     * @return  bool
-     *
-     * @since   1.2.22
-     */
-    private function canExportAccounting(): bool
-    {
-        return Factory::getApplication()->getIdentity()->authorise('accounting.export', 'com_balancirk');
     }
 }

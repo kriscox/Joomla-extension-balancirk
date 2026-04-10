@@ -60,11 +60,11 @@ class HtmlView extends BaseHtmlView
     public $activeFilters;
 
     /**
-     * Whether the current user may export accounting data.
+     * The years for filtering
      *
-     * @var  bool
+     * @var  array
      */
-    public $canExportAccounting = false;
+    protected $years;
 
     /**
      * Method to display the view.
@@ -82,7 +82,6 @@ class HtmlView extends BaseHtmlView
         $this->state         = $this->get('State');
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
-        $this->canExportAccounting = Factory::getApplication()->getIdentity()->authorise('accounting.export', 'com_balancirk');
 
         // Get list of years for filtering
         /** @var SubscriptionsModel */

@@ -50,10 +50,6 @@ class LessonsModel extends ListModel
                 'a.type',
                 'year',
                 'a.year',
-                'min_age',
-                'a.min_age',
-                'max_age',
-                'a.max_age',
                 'numberOfStudents',
                 'a.numberOfStudents',
                 'state',
@@ -116,8 +112,6 @@ class LessonsModel extends ListModel
                     'a.name',
                     'a.type',
                     'a.year',
-                    'a.min_age',
-                    'a.max_age',
                     'a.state',
                     'a.numberOfStudents',
                     'a.max_students'
@@ -249,7 +243,8 @@ class LessonsModel extends ListModel
             ->where($db->quote($today) . ' between `start_registration` and `end_registration`')
             ->order('name');
 
-        if ($studentId !== null && $studentId > 0) {
+        if ($studentId !== null && $studentId > 0)
+        {
             $subscriptionQuery = $db->getQuery(true)
                 ->select('1')
                 ->from($db->quoteName('#__balancirk_subscriptions', 's'))
@@ -265,7 +260,8 @@ class LessonsModel extends ListModel
 
         foreach ($rows as $row)
         {
-            if ($studentBirthdate !== null && !LessonAgeHelper::matchesLesson($studentBirthdate, $row)) {
+            if ($studentBirthdate !== null && !LessonAgeHelper::matchesLesson($studentBirthdate, $row))
+            {
                 continue;
             }
 
@@ -349,7 +345,8 @@ class LessonsModel extends ListModel
      */
     private function getStudentBirthdate(int $studentId): ?string
     {
-        if ($studentId <= 0) {
+        if ($studentId <= 0)
+        {
             return null;
         }
 

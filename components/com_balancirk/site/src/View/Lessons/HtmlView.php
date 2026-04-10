@@ -16,6 +16,7 @@ use Exception;
 use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Language\Text as Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomla\CMS\Factory;
 
 /**
  * HTML Lessons view class for the balancirk component.
@@ -75,6 +76,13 @@ class HtmlView extends BaseHtmlView
     protected $years;
 
     /**
+     * Whether the current user can export accounting data.
+     *
+     * @var  bool
+     */
+    public $canExportAccounting = false;
+
+    /**
      *  Execute and display template script.
      *
      * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
@@ -88,8 +96,10 @@ class HtmlView extends BaseHtmlView
         // What Access Permissions does this user have? What can (s)he do?
         $this->canDo = ContentHelper::getActions('com_balancirk');
 
-        if (!$this->canDo->get('lessons.view')) {
-            throw new Exception(Text::_('JERROR_ALERTNOAUTHOR'));
+        // Only teachers with lessons.view permission can see lessons
+        if (!$this->canDo->get('lessons.view'))
+        {
+            throw new Exception(Text::_('COM_BALANCIRK_ERROR_TEACHERS_ONLY'));
         }
 
         $this->items         = $this->get('Items');
@@ -98,12 +108,16 @@ class HtmlView extends BaseHtmlView
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
 
+        // Check if user can export accounting data
+        $this->canExportAccounting = Factory::getApplication()->getIdentity()->authorise('accounting.export', 'com_balancirk');
+
         // Get list of years for filtering
         /** @var LessonsModel */
         $lessonsModel = $this->getModel();
         $this->years = $lessonsModel->getYears();
 
-        if (!$this->items || (!count($this->items) && $this->get('IsEmptyState'))) {
+        if (!$this->items || (!count($this->items) && $this->get('IsEmptyState')))
+        {
             $this->setLayout('emptystate');
         }
 
