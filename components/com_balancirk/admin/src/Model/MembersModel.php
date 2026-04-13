@@ -131,6 +131,18 @@ class MembersModel extends ListModel
         $query->join('LEFT', $db->quoteName('#__balancirk_parents', 'p') . ' ON ' . $db->quoteName('p.parent') . ' = ' . $db->quoteName('a.id'));
         $query->join('LEFT', $db->quoteName('#__balancirk_students', 's') . ' ON ' . $db->quoteName('s.id') . ' = ' . $db->quoteName('p.child'));
 
+        // For API consumers without global rights, only expose the current member.
+        $app = Factory::getApplication();
+        $user = $app->getIdentity();
+        $canViewAll = $user->authorise('students.viewall', 'com_balancirk')
+            || $user->authorise('accounting.viewrelations', 'com_balancirk')
+            || $user->authorise('core.admin', 'com_balancirk');
+
+        if ($app->isClient('api') && !$canViewAll)
+        {
+            $query->where($db->quoteName('a.id') . ' = ' . (int) $user->id);
+        }
+
         // Filter by search in title.
         $search = $this->getState('filter.search');
 

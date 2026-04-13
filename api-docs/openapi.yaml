@@ -717,7 +717,7 @@ paths:
         "204":
           description: Member deleted successfully
 
-  /members/current:
+  /members/me:
     get:
       summary: Get current logged-in member
       operationId: getCurrentMember
@@ -730,6 +730,145 @@ paths:
             application/vnd.api+json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
+    put:
+      summary: Update current logged-in member profile
+      operationId: updateCurrentMember
+      tags:
+        - Members
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: [members]
+                    attributes:
+                      $ref: "#/components/schemas/Member"
+      responses:
+        "200":
+          description: Current member updated successfully
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+
+  /members/register:
+    post:
+      summary: Public member registration
+      operationId: registerMember
+      tags:
+        - Members
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Member"
+      responses:
+        "200":
+          description: Registration request handled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      registered:
+                        type: boolean
+                      message:
+                        type: string
+
+  /settings/public:
+    get:
+      summary: Get public component settings for frontend forms
+      operationId: getPublicSettings
+      tags:
+        - Members
+      security: []
+      responses:
+        "200":
+          description: Public settings payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      mutuality_options:
+                        type: string
+                      mutuality_list:
+                        type: array
+                        items:
+                          type: string
+
+  /settings:
+    get:
+      summary: Get editable component settings
+      operationId: getSettings
+      tags:
+        - Members
+      responses:
+        "200":
+          description: Current component settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+    post:
+      summary: Update editable component settings
+      operationId: saveSettings
+      tags:
+        - Members
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mutuality_options:
+                  type: string
+                mutuality_list:
+                  type: array
+                  items:
+                    type: string
+                email_subject_subscription:
+                  type: string
+                email_body_subscription:
+                  type: string
+                email_subject_waitinglist:
+                  type: string
+                email_body_waitinglist:
+                  type: string
+                redirect_url:
+                  type: integer
+      responses:
+        "200":
+          description: Updated component settings
+          content:
+            application/json:
+              schema:
+                type: object
 
   # Lessons endpoints
   /lessons:

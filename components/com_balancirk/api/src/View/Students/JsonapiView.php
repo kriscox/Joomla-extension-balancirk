@@ -28,6 +28,7 @@ class JsonapiView extends BaseApiView
                 'phone',
                 'birthdate',
                 'mutuality',
+                'parents',
         ];
 
         /**
@@ -42,6 +43,7 @@ class JsonapiView extends BaseApiView
                 'firstname',
                 'email',
                 'phone',
-                'mutuality'
+                'mutuality',
+                'parents'
         ];
 }

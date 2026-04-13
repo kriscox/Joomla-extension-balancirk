@@ -25,7 +25,8 @@ class JsonapiView extends BaseApiView
         'sendEmail',
         'registerDate',
         'lastvisitDate',
-        'activation'
+        'activation',
+        'students'
     ];
 
     protected $fieldsToRenderList = [
@@ -43,7 +44,8 @@ class JsonapiView extends BaseApiView
         'block',
         'sendEmail',
         'registerDate',
-        'lastvisitDate'
+        'lastvisitDate',
+        'students'
     ];
 
     public function displayList(?array $items = null)

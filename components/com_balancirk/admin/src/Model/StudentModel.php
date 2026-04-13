@@ -81,7 +81,7 @@ class StudentModel extends AdminModel
     {
         // check if the user is allowed to see all students or is the parent of the student
         $this->canDo = ContentHelper::getActions('com_balancirk');
-        if (! ($this->canDo->get('students.viewall') or $this->isParent()))
+        if (! ($this->canDo->get('students.viewall') or $this->isParent($pk)))
         {
             return false;
         }
