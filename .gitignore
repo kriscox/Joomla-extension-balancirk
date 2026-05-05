@@ -10,3 +10,9 @@ __pycache__/
 # JBuilder specific
 builds/
 joomla-builder/
+
+# Build/release artifacts (binary)
+*.zip
+*.tar.gz
+pkg_balancirk.zip
+packages/*.zip

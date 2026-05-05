@@ -12,6 +12,7 @@ namespace CoCoCo\Component\Balancirk\Site\View\Member;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 
@@ -50,6 +51,14 @@ class HtmlView extends BaseHtmlView
      */
     protected $canDo;
 
+    protected $students;
+
+    protected $subscriptions;
+
+    protected $years;
+
+    protected $selectedYear;
+
     /**
      * Display the view.
      *
@@ -61,6 +70,20 @@ class HtmlView extends BaseHtmlView
     {
         $this->form = $this->get('Form');
         $this->item = $this->get('Item');
+
+                $studentsModel = $this->getModel()->getMVCFactory()->createModel('Students', 'Site');
+        $subscriptionsModel = $this->getModel()->getMVCFactory()->createModel('Subscriptions', 'Site');
+
+        $app = Factory::getApplication();
+        $selectedYear = $app->input->getString('filter_year', '');
+        if ($selectedYear !== '') {
+            $subscriptionsModel->setState('filter.year', $selectedYear);
+        }
+
+        $this->students = $studentsModel->getItems();
+        $this->subscriptions = $subscriptionsModel->getItems();
+        $this->years = $subscriptionsModel->getYears();
+        $this->selectedYear = $subscriptionsModel->getState('filter.year');
 
         if (count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);

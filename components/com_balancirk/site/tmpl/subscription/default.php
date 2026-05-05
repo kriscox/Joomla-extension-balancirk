@@ -42,6 +42,7 @@ HTMLHelper::_('behavior.keepalive');
 			<fieldset addfieldpath="com_balancirk/src/Field/">
 				<?= $this->form->renderField('lesson'); ?>
 			</fieldset>
+			<script type="application/json" id="lessons-by-student"><?= json_encode($this->lessonsByStudent, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?></script>
 		</div>
 		<input type="hidden" class="hidden" name="task" value="">
 		<?= HTMLHelper::_('form.token'); ?>
@@ -62,3 +63,39 @@ HTMLHelper::_('behavior.keepalive');
 <?php endif; ?>
 <?php echo HtmlHelper::_('content.prepare', '{loadposition balancirk-subscription-bottom}'); ?>
 <?php echo HtmlHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
+<script>
+(function () {
+	var studentField = document.getElementById('jform_student');
+	var lessonField = document.getElementById('jform_lesson');
+	var lessonsByStudentEl = document.getElementById('lessons-by-student');
+
+	if (!studentField || !lessonField || !lessonsByStudentEl) {
+		return;
+	}
+
+	var lessonsByStudent = JSON.parse(lessonsByStudentEl.textContent || '{}');
+	var defaultOption = lessonField.options.length > 0 ? lessonField.options[0].cloneNode(true) : null;
+
+	function updateLessons() {
+		var studentId = studentField.value;
+		var lessons = lessonsByStudent[studentId] || {};
+
+		lessonField.innerHTML = '';
+		if (defaultOption) {
+			lessonField.appendChild(defaultOption.cloneNode(true));
+		}
+
+		Object.keys(lessons).forEach(function (lessonId) {
+			var option = document.createElement('option');
+			option.value = lessonId;
+			option.textContent = lessons[lessonId];
+			lessonField.appendChild(option);
+		});
+
+		lessonField.disabled = Object.keys(lessons).length === 0;
+	}
+
+	studentField.addEventListener('change', updateLessons);
+	updateLessons();
+})();
+</script>

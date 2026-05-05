@@ -25,6 +25,7 @@ $states = array(
 );
 
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
+HTMLHelper::_('script', 'com_balancirk/balancirk_spa_navigation.js', ['version' => 'auto', 'relative' => true]);
 ?>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-students-top}'); ?>
@@ -32,11 +33,11 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 	<div class="row">
 		<nav aria-label="Toolbar" style="display: flex; align-items: center;">
 			<div class="col-md-6">
-				<button class="button-new btn btn-success" type="button" onclick="location.href='index.php?option=com_balancirk&view=student&layout=edit&id=0'">
+				<button class="button-new btn btn-success" type="button" onclick="BalancirkSpaNavigation.navigate('index.php?option=com_balancirk&view=student&layout=edit&id=0')">
 					<span class=" icon-new" aria-hidden="true"></span>
 					<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
 				</button>
-				<a href="<?= Route::_('index.php?option=com_balancirk&view=subscriptions', false); ?>">
+				<a data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&view=subscriptions', false); ?>">
 					<button class="btn btn-primary" type="button"><?= TEXT::_('COM_BALANCIRK_SUBSCRIPTIONS_LINK') ?></button>
 				</a>
 			</div>
@@ -82,11 +83,11 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 									</td>
 									<td scope="row" class="d-md-table-cell">
 										<?php if ($item->primary == 1) : ?>
-											<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&task=student.edit&id=' . $item->id); ?>">
+											<a class="hasTooltip" data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&task=student.edit&id=' . $item->id); ?>">
 												<?= $editIcon; ?><?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
 											</a>
 										<?php else : ?>
-											<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&view=student&layout=default&id=' . $item->id); ?>">
+											<a class="hasTooltip" data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&view=student&layout=default&id=' . $item->id); ?>">
 												<?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
 											</a>
 										<?php endif; ?>
