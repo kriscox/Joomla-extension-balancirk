@@ -6,8 +6,10 @@ ENV_FILE ?= .env.test
 COMPOSE := docker compose --env-file $(ENV_FILE) -f $(COMPOSE_FILE)
 REMOTE_HOST ?= cococo.be
 UNITE_PROFILE ?= balancirk_test
+MEMBER_SPA_DIR ?= frontend/member-spa
+MEMBER_SPA_NPM_FLAGS ?= --cache .npm-cache --no-audit --no-fund
 
-.PHONY: all release test-env container-up container-down container-reset container-logs container-shell container-test container-install snapshot-refresh snapshot-refresh-download snapshot-refresh-cococo003 snapshot-restore remote-docker-check remote-docker-install
+.PHONY: all release member-spa-install member-spa-ensure-deps member-spa-build member-spa-deploy test-env container-up container-down container-reset container-logs container-shell container-test container-install snapshot-refresh snapshot-refresh-download snapshot-refresh-cococo003 snapshot-restore remote-docker-check remote-docker-install packages/com_balancirk.zip packages/balancirk.zip
 
 all:
 	@new_version=`$(VERSION_SCRIPT) bump patch`; \
@@ -31,6 +33,21 @@ release:
 	git tag "$$new_version"; \
 	git push origin HEAD; \
 	git push origin "$$new_version"
+
+member-spa-install:
+	@cd $(MEMBER_SPA_DIR) && npm install $(MEMBER_SPA_NPM_FLAGS)
+
+member-spa-ensure-deps:
+	@if [ ! -d "$(MEMBER_SPA_DIR)/node_modules/@angular-devkit/build-angular" ]; then \
+		echo "Angular dependencies not found, running npm install..."; \
+		cd $(MEMBER_SPA_DIR) && npm install $(MEMBER_SPA_NPM_FLAGS); \
+	fi
+
+member-spa-build: member-spa-ensure-deps
+	@cd $(MEMBER_SPA_DIR) && npm run build:prod
+
+member-spa-deploy: member-spa-ensure-deps
+	@cd $(MEMBER_SPA_DIR) && npm run build:deploy
 
 packages/com_balancirk.zip: components/com_balancirk
 	$(MAKE) -C components/com_balancirk

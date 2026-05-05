@@ -135,6 +135,12 @@ class SubscriptionsController extends ApiController
     public function accountexport(): void
     {
         $app = Factory::getApplication();
+
+        if (!$this->canExportAccounting()) {
+            echo new JsonResponse(null, Text::_('JLIB_APPLICATION_ERROR_ACCESS_FORBIDDEN'), true);
+            $app->close();
+        }
+
         $year = $this->input->getString('year');
         $yearFilter = $year !== '' ? $year : null;
         $format = strtolower($this->input->getCmd('format', 'json'));
@@ -366,6 +372,23 @@ class SubscriptionsController extends ApiController
         }
 
         return $this->canManageAllStudents();
+    }
+
+    /**
+     * Whether the current user may export accounting data.
+     *
+     * @return  bool
+     *
+     * @since   1.2.33
+     */
+    private function canExportAccounting(): bool
+    {
+        $user = Factory::getApplication()->getIdentity();
+
+        return !$user->guest && (
+            $user->authorise('accounting.export', 'com_balancirk')
+            || $user->authorise('core.admin', 'com_balancirk')
+        );
     }
 
     /**

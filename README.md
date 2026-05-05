@@ -71,3 +71,18 @@ make remote-docker-install REMOTE_HOST=cococo003
 - `scripts/container/run-tests.sh`: container test runner
 - `scripts/container/restore-from-snapshot.sh`: DB/files restore in container
 - `scripts/container/refresh-unite-remote.sh`: remote unite refresh helper
+
+## Angular ledenmodule (one-page)
+
+Er is nu een aparte Angular SPA voorzien in `frontend/member-spa` voor de ledenmodule (`profiel + kinderen`, mobile-first, PWA-ready).
+
+Belangrijkste commando's:
+```bash
+make member-spa-install
+make member-spa-build
+make member-spa-deploy
+```
+
+Na deploy wordt de build geplaatst in `components/com_balancirk/media/member-spa/browser` en kan je in Joomla een menu-item maken naar:
+
+`index.php?option=com_balancirk&view=member&layout=spa`

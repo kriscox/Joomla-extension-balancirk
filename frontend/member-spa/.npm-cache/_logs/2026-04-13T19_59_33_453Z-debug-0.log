@@ -1,0 +1,92 @@
+0 verbose cli /usr/local/bin/node /usr/local/bin/npm
+1 info using npm@10.9.2
+2 info using node@v22.14.0
+3 silly config load:file:/usr/local/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/krisc/Documents/com_balancirk/frontend/member-spa/.npmrc
+5 silly config load:file:/Users/krisc/.npmrc
+6 silly config load:file:/usr/local/etc/npmrc
+7 verbose title npm install
+8 verbose argv "install" "--cache" ".npm-cache" "--no-audit" "--no-fund" "--loglevel" "verbose" "--fetch-retries" "0" "--fetch-timeout" "10000"
+9 verbose logfile logs-max:10 dir:/Users/krisc/Documents/com_balancirk/frontend/member-spa/.npm-cache/_logs/2026-04-13T19_59_33_453Z-
+10 verbose logfile /Users/krisc/Documents/com_balancirk/frontend/member-spa/.npm-cache/_logs/2026-04-13T19_59_33_453Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+13 silly idealTree buildDeps
+14 silly fetch manifest @angular/common@^19.2.0
+15 silly packumentCache full:https://registry.npmjs.org/@angular%2fcommon cache-miss
+16 http fetch GET https://registry.npmjs.org/@angular%2fcommon attempt 1 failed with ENOTFOUND
+17 silly fetch manifest @angular/compiler@^19.2.0
+18 silly packumentCache full:https://registry.npmjs.org/@angular%2fcompiler cache-miss
+19 http fetch GET https://registry.npmjs.org/@angular%2fcompiler attempt 1 failed with ENOTFOUND
+20 silly fetch manifest @angular/core@^19.2.0
+21 silly packumentCache full:https://registry.npmjs.org/@angular%2fcore cache-miss
+22 http fetch GET https://registry.npmjs.org/@angular%2fcore attempt 1 failed with ENOTFOUND
+23 silly fetch manifest @angular/forms@^19.2.0
+24 silly packumentCache full:https://registry.npmjs.org/@angular%2fforms cache-miss
+25 http fetch GET https://registry.npmjs.org/@angular%2fforms attempt 1 failed with ENOTFOUND
+26 silly fetch manifest @angular/platform-browser@^19.2.0
+27 silly packumentCache full:https://registry.npmjs.org/@angular%2fplatform-browser cache-miss
+28 http fetch GET https://registry.npmjs.org/@angular%2fplatform-browser attempt 1 failed with ENOTFOUND
+29 silly fetch manifest @angular/service-worker@^19.2.0
+30 silly packumentCache full:https://registry.npmjs.org/@angular%2fservice-worker cache-miss
+31 http fetch GET https://registry.npmjs.org/@angular%2fservice-worker attempt 1 failed with ENOTFOUND
+32 silly fetch manifest rxjs@^7.8.0
+33 silly packumentCache full:https://registry.npmjs.org/rxjs cache-miss
+34 http fetch GET https://registry.npmjs.org/rxjs attempt 1 failed with ENOTFOUND
+35 silly fetch manifest tslib@^2.6.0
+36 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+37 http fetch GET https://registry.npmjs.org/tslib attempt 1 failed with ENOTFOUND
+38 silly fetch manifest zone.js@^0.15.0
+39 silly packumentCache full:https://registry.npmjs.org/zone.js cache-miss
+40 http fetch GET https://registry.npmjs.org/zone.js attempt 1 failed with ENOTFOUND
+41 silly fetch manifest @angular-devkit/build-angular@^19.2.0
+42 silly packumentCache full:https://registry.npmjs.org/@angular-devkit%2fbuild-angular cache-miss
+43 http fetch GET https://registry.npmjs.org/@angular-devkit%2fbuild-angular attempt 1 failed with ENOTFOUND
+44 silly fetch manifest @angular/cli@^19.2.0
+45 silly packumentCache full:https://registry.npmjs.org/@angular%2fcli cache-miss
+46 http fetch GET https://registry.npmjs.org/@angular%2fcli attempt 1 failed with ENOTFOUND
+47 silly fetch manifest @angular/compiler-cli@^19.2.0
+48 silly packumentCache full:https://registry.npmjs.org/@angular%2fcompiler-cli cache-miss
+49 http fetch GET https://registry.npmjs.org/@angular%2fcompiler-cli attempt 1 failed with ENOTFOUND
+50 silly fetch manifest typescript@~5.7.2
+51 silly packumentCache full:https://registry.npmjs.org/typescript cache-miss
+52 http fetch GET https://registry.npmjs.org/typescript attempt 1 failed with ENOTFOUND
+53 silly placeDep ROOT @angular-devkit/build-angular@ OK for: balancirk-member-spa@0.1.0 want: ^19.2.0
+54 silly placeDep ROOT @angular/cli@ OK for: balancirk-member-spa@0.1.0 want: ^19.2.0
+55 silly placeDep ROOT @angular/common@ OK for: balancirk-member-spa@0.1.0 want: ^19.2.0
+56 silly placeDep ROOT @angular/compiler@ OK for: balancirk-member-spa@0.1.0 want: ^19.2.0
+57 silly placeDep ROOT @angular/compiler-cli@ OK for: balancirk-member-spa@0.1.0 want: ^19.2.0
+58 silly placeDep ROOT @angular/core@ OK for: balancirk-member-spa@0.1.0 want: ^19.2.0
+59 silly placeDep ROOT @angular/forms@ OK for: balancirk-member-spa@0.1.0 want: ^19.2.0
+60 silly placeDep ROOT @angular/platform-browser@ OK for: balancirk-member-spa@0.1.0 want: ^19.2.0
+61 silly placeDep ROOT @angular/service-worker@ OK for: balancirk-member-spa@0.1.0 want: ^19.2.0
+62 silly placeDep ROOT rxjs@ OK for: balancirk-member-spa@0.1.0 want: ^7.8.0
+63 silly placeDep ROOT tslib@ OK for: balancirk-member-spa@0.1.0 want: ^2.6.0
+64 silly placeDep ROOT typescript@ OK for: balancirk-member-spa@0.1.0 want: ~5.7.2
+65 silly placeDep ROOT zone.js@ OK for: balancirk-member-spa@0.1.0 want: ^0.15.0
+66 verbose type system
+67 verbose stack FetchError: request to https://registry.npmjs.org/@angular-devkit%2fbuild-angular failed, reason: getaddrinfo ENOTFOUND registry.npmjs.org
+67 verbose stack     at ClientRequest.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/minipass-fetch/lib/index.js:130:14)
+67 verbose stack     at ClientRequest.emit (node:events:518:28)
+67 verbose stack     at emitErrorEvent (node:_http_client:104:11)
+67 verbose stack     at _destroy (node:_http_client:898:9)
+67 verbose stack     at onSocketNT (node:_http_client:918:5)
+67 verbose stack     at process.processTicksAndRejections (node:internal/process/task_queues:91:21)
+68 error code ENOTFOUND
+69 error syscall getaddrinfo
+70 error errno ENOTFOUND
+71 error network request to https://registry.npmjs.org/@angular-devkit%2fbuild-angular failed, reason: getaddrinfo ENOTFOUND registry.npmjs.org
+72 error network This is a problem related to network connectivity.
+72 error network In most cases you are behind a proxy or have bad network settings.
+72 error network
+72 error network If you are behind a proxy, please make sure that the
+72 error network 'proxy' config is set properly.  See: 'npm help config'
+73 silly unfinished npm timer reify 1776110373777
+74 silly unfinished npm timer reify:loadTrees 1776110373780
+75 verbose cwd /Users/krisc/Documents/com_balancirk/frontend/member-spa
+76 verbose os Darwin 25.3.0
+77 verbose node v22.14.0
+78 verbose npm  v10.9.2
+79 verbose exit 1
+80 verbose code 1
+81 error A complete log of this run can be found in: /Users/krisc/Documents/com_balancirk/frontend/member-spa/.npm-cache/_logs/2026-04-13T19_59_33_453Z-debug-0.log

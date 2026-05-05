@@ -9,7 +9,7 @@
 	<authorUrl>https://cococo.be</authorUrl>
 	<copyright>CoCoCo</copyright>
 	<license>GPL v3</license>
-	<version>1.2.28</version>
+	<version>1.2.35</version>
 	<description>COM_BALANCIRK_MODULE_DESCRIPTION</description>
 
 	<!-- This is the PHP namespace under which the extension's
@@ -43,6 +43,7 @@
 		destination="com_balancirk">
 		<folder>js</folder>
 		<folder>css</folder>
+		<folder>member-spa</folder>
 	</media>
 
 	<positions>

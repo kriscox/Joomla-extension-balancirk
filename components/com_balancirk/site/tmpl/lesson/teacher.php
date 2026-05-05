@@ -45,6 +45,7 @@ if (!in_array($today, $lesdays)) {
 $doc = $app->getDocument();
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $doc->getWebAssetManager();
+$wa->registerAndUseScript('balancirk-spa-navigation', 'media/com_balancirk/js/balancirk_spa_navigation.js');
 $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
     ->registerAndUseScript('bootstrap-datepicker', 'https://unpkg.com/bootstrap-datepicker@latest/dist/js/bootstrap-datepicker.min.js')
     ->registerAndUseScript('bootstrap-datepicker-nl', 'https://unpkg.com/bootstrap-datepicker@latest/dist/locales/bootstrap-datepicker.nl-BE.min.js')
@@ -134,7 +135,7 @@ $url = Route::_('index.php?option=com_balancirk&view=lesson');
 				</button>
 			</div>
 			<div class="col-12 col-md-3">
-				<button class="balancirk_presence_button" type="button" onclick="location.href='<?= $presence_url ?>'">
+				<button class="balancirk_presence_button" type="button" onclick="BalancirkSpaNavigation.navigate('<?= $presence_url ?>')">
 					<?= Text::_('COM_BALANCIRK_LESSON_PRESENCE') ?>
 				</button>
 			</div>

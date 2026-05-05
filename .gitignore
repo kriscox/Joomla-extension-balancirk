@@ -13,3 +13,5 @@ joomla-builder/
 vendor/
 .env.test
 tests/reports/
+frontend/member-spa/node_modules/
+frontend/member-spa/dist/

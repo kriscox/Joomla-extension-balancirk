@@ -31,6 +31,8 @@ class PlgWebservicesBalancirk extends CMSPlugin
       # Double, next lines is integrated with the createCRUDRoutes method. Check if it can be removed. The class subscriptioncontroller can afterwards also be removed.
       new Route(['DELETE'], 'v1/subscription/:id', 'subscription.delete', ['id' => '\d+'], $defaults),
       new Route(['GET'], 'v1/members/me', 'members.getCurrentUser', ['recordkey' => '\d+'], $defaults),
+      new Route(['GET'], 'v1/members/me/students', 'members.getmystudents', [], $defaults),
+      new Route(['GET'], 'v1/members/relations', 'members.getrelations', [], $defaults),
       new Route(['PUT', 'PATCH'], 'v1/members/me', 'members.updateme', [], $defaults),
       new Route(['POST'], 'v1/members/register', 'members.register', [], $publicDefaults),
       new Route(['GET'], 'v1/settings', 'settings.getsettings', [], $defaults),
