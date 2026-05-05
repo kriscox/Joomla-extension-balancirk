@@ -112,18 +112,28 @@
       <section class="card">
         <div class="card-title-row">
           <h2>Mijn inschrijvingen</h2>
-          <span class="muted">{{ subscriptions().length }} item(s)</span>
+          <span class="muted">{{ filteredSubscriptions().length }} item(s)</span>
         </div>
 
         <div class="actions">
           <a class="link-button" [href]="subscriptionCreateUrl">Nieuwe inschrijving</a>
+          @if (subscriptionYears().length > 1) {
+            <select class="year-filter" [value]="selectedSubscriptionYear()" (change)="selectedSubscriptionYear.set($any($event.target).value)" aria-label="Filter op schooljaar">
+              <option value="">Alle schooljaren</option>
+              @for (year of subscriptionYears(); track year) {
+                <option [value]="year">{{ year }}</option>
+              }
+            </select>
+          }
         </div>
 
         @if (subscriptions().length === 0) {
           <p class="muted">Nog geen inschrijvingen gevonden.</p>
+        } @else if (filteredSubscriptions().length === 0) {
+          <p class="muted">Geen inschrijvingen voor dit schooljaar.</p>
         } @else {
           <ul class="students">
-            @for (subscription of subscriptions(); track subscription.id) {
+            @for (subscription of filteredSubscriptions(); track subscription.id) {
               <li>
                 <strong>{{ subscription.lesson }}</strong>
                 <span class="meta">Schooljaar: {{ subscription.year || 'onbekend' }}</span>
