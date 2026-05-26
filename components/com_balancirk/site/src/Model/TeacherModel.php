@@ -66,17 +66,17 @@ class TeacherModel extends BaseDatabaseModel
 					'lesson'
 				]
 			))
-			->from($this->db->quoteName('#__balancirk_teached', 't'))
+			->from($db->quoteName('#__balancirk_teached', 't'))
 			->join(
 				'INNER',
-				$this->db->quoteName('#__balancirk_lessons', 'l'),
-				$this->db->quoteName('t.lesson') . ' = ' . $this->db->quoteName('l.id')
+				$db->quoteName('#__balancirk_lessons', 'l'),
+				$db->quoteName('t.lesson') . ' = ' . $db->quoteName('l.id')
 			)
-			->where($this->db->quoteName('teacher') . ' = ' . (int) $teacherId)
-			->where($this->db->quoteName('date') . ' BETWEEN ' . $this->db->quote($startDate) . ' AND ' . $this->db->quote($endDate));
+			->where($db->quoteName('teacher') . ' = ' . (int) $teacherId)
+			->where($db->quoteName('date') . ' BETWEEN ' . $db->quote($startDate) . ' AND ' . $db->quote($endDate));
 
-		$this->db->setQuery($query);
-		return $this->db->loadObjectList();
+		$db->setQuery($query);
+		return $db->loadObjectList();
 	}
 
 	/**

@@ -181,7 +181,7 @@ class MembersModel extends ListModel
             }
 
             // remove addition information from user
-            $dbo = $this->getDbo();
+            $dbo = $this->getDatabase();
             $query = $dbo->getQuery(true)->delete($dbo->quoteName('#__balancirk_members_additional'));
 
             $conditions = array(

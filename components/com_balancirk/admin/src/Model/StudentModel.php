@@ -73,7 +73,7 @@ class StudentModel extends AdminModel
      * 
      * @param   integer  $pk  The id of the item.
      * 
-     * @return  CMSObject|boolean  Object on success, false on failure.
+     * @return  \stdClass|boolean  Object on success, false on failure.
      * 
      * @since   __BUMP_VERSION__
      */

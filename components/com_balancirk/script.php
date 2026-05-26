@@ -225,7 +225,6 @@ class Com_BalancirkInstallerScript extends InstallerScript
 
     public function addHiddenMenu()
     {
-
         /** @var \Joomla\Database\DatabaseDriver $db */
         $db = Factory::getContainer()->get('DatabaseDriver');
 
@@ -239,12 +238,10 @@ class Com_BalancirkInstallerScript extends InstallerScript
 
         if ($existing)
         {
-            return; // Already exists
+            return;
         }
 
-        //Load the menu type table
-        Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_menus/tables');
-        $menuType = Table::getInstance('MenuType', 'MenusTable');
+        $menuType = new \Joomla\Component\Menus\Administrator\Table\MenuTypeTable($db);
 
         $menuType->menutype = 'hiddenmenu';
         $menuType->title = 'Hidden Menu';
