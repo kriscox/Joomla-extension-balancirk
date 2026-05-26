@@ -122,7 +122,7 @@ trait ApiTools
      */
     protected function prepareSqlFieldsArray($data)
     {
-        $db = $this->getDbo();
+        $db = $this->getDatabase();
         $fields = array();
 
         if (gettype($data) == 'object') {

@@ -246,7 +246,7 @@ Het Balancirk team');
      *
      * @param   integer  $pk  The id of the primary key.
      *
-     * @return  CMSObject|boolean  Object on success, false on failure.
+     * @return  \stdClass|boolean  Object on success, false on failure.
      *
      * @since   __BUMP_VERIONS__
      */
