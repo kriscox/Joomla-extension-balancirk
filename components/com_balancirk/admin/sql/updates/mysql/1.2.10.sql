@@ -21,9 +21,9 @@ SELECT
     `l`.`state` AS `state`,
     `s`.`subscribed` AS `subscribed`
 FROM
-    `tc_balancirk_subscriptions` `s`
-    JOIN `tc_balancirk_lessons` `l` ON `s`.`lesson` = `l`.`id`
-    JOIN `tc_balancirk_students` `t` ON `s`.`student` = `t`.`id`;
+    `#__balancirk_subscriptions` `s`
+    JOIN `#__balancirk_lessons` `l` ON `s`.`lesson` = `l`.`id`
+    JOIN `#__balancirk_students` `t` ON `s`.`student` = `t`.`id`;
 
 /***********************************************************************************************
 *                                                                                              *
@@ -44,8 +44,8 @@ SELECT
     `s`.`name` AS `naam kind`,
     `st`.`uitpas` AS `uitpas`
 FROM
-    `tc_balancirk_subscriptions_view` `s`
-    JOIN `tc_balancirk_students` `st` ON `s`.`studentid` = `st`.`id`
-    JOIN `tc_balancirk_parents` `p` ON `p`.`child` = `s`.`studentid`
+    `#__balancirk_subscriptions_view` `s`
+    JOIN `#__balancirk_students` `st` ON `s`.`studentid` = `st`.`id`
+    JOIN `#__balancirk_parents` `p` ON `p`.`child` = `s`.`studentid`
     AND `p`.`primary` = 1
-    JOIN `tc_balancirk_members` `m` ON `m`.`id` = `p`.`parent`;
+    JOIN `#__balancirk_members` `m` ON `m`.`id` = `p`.`parent`;

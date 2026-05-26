@@ -169,6 +169,8 @@ SELECT a.`id`,
     a.`state`,
     a.`lesdays`,
     a.`max_students`,
+    a.`min_age`,
+    a.`max_age`,
     (
         SELECT COUNT(*)
         FROM `#__balancirk_subscriptions`
@@ -223,7 +225,9 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_teachers`(
     `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `member` int(11) NOT NULL,
     `lesson` int(11) NOT NULL,
-    UNIQUE (`member`, `les`)
+    UNIQUE (`member`, `lesson`),
+    CONSTRAINT `fk_teachers_lesson` FOREIGN KEY (`lesson`) REFERENCES `#__balancirk_lessons` (`id`),
+    CONSTRAINT `fk_teachers_member` FOREIGN KEY (`member`) REFERENCES `#__balancirk_members_additional` (`id`)
 );
 /**************************************************************************************************
  *                                                                                                 * 
