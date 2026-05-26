@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
 import { MemberApiService } from './core/api/member-api.service';
@@ -35,6 +35,20 @@ export class AppComponent implements OnInit {
   protected readonly adminError = signal<string | null>(null);
   protected readonly adminSection = signal<AdminSection>('overview');
   protected readonly exportYear = signal<string>(`${new Date().getFullYear()}`);
+  protected readonly selectedSubscriptionYear = signal<string>('');
+  protected readonly subscriptionYears = computed(() => {
+    const years = [...new Set(this.subscriptions().map((s) => String(s.year ?? '')).filter(Boolean))].sort((a, b) =>
+      b.localeCompare(a)
+    );
+    return years;
+  });
+  protected readonly filteredSubscriptions = computed(() => {
+    const year = this.selectedSubscriptionYear();
+    if (!year) {
+      return this.subscriptions();
+    }
+    return this.subscriptions().filter((s) => String(s.year) === year);
+  });
   protected readonly exportingFormat = signal<'csv' | 'xls' | null>(null);
   protected readonly now = new Date();
   protected readonly adminVariant = this.getOptionBoolean('adminVariant', false);
@@ -178,6 +192,11 @@ export class AppComponent implements OnInit {
           this.member.set(member);
           this.students.set(students);
           this.subscriptions.set(subscriptions);
+          const currentYear = `${new Date().getFullYear()}`;
+          const years = [...new Set(subscriptions.map((s) => String(s.year ?? '')).filter(Boolean))].sort((a, b) =>
+            b.localeCompare(a)
+          );
+          this.selectedSubscriptionYear.set(years.includes(currentYear) ? currentYear : (years[0] ?? ''));
           this.profileForm.patchValue({
             firstname: member.firstname ?? '',
             name: member.name ?? '',
