@@ -11,7 +11,6 @@
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Log\Log;
-use Joomla\CMS\Table\Table;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Installer\InstallerScript;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel as ModelLegacy;
@@ -368,7 +367,6 @@ class Com_BalancirkInstallerScript extends InstallerScript
 
     public function addHiddenMenu()
     {
-
         /** @var \Joomla\Database\DatabaseDriver $db */
         $db = Factory::getContainer()->get('DatabaseDriver');
 
@@ -382,12 +380,12 @@ class Com_BalancirkInstallerScript extends InstallerScript
 
         if ($existing)
         {
-            return; // Already exists
+            return;
         }
 
-        //Load the menu type table
-        Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_menus/tables');
-        $menuType = Table::getInstance('MenuType', 'MenusTable');
+        $menuType = Factory::getApplication()->bootComponent('menus')
+            ->getMVCFactory()
+            ->createTable('MenuType', 'Administrator');
 
         $menuType->menutype = 'hiddenmenu';
         $menuType->title = 'Hidden Menu';

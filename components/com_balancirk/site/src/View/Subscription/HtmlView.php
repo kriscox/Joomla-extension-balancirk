@@ -65,6 +65,13 @@ class HtmlView extends BaseHtmlView
     protected $form;
 
     /**
+     * Open lessons keyed by student id.
+     *
+     * @var  array
+     */
+    protected $lessonsByStudent;
+
+    /**
      * Display the view.
      *
      * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
@@ -77,6 +84,12 @@ class HtmlView extends BaseHtmlView
         $this->lessons = $this->get('Lessons');
         $this->hasOpenLessons = (bool) $this->get('HasOpenLessons');
         $this->form = $this->get('Form');
+
+        $this->lessonsByStudent = [];
+        $subscriptionModel = $this->getModel();
+        foreach ($this->students as $student) {
+            $this->lessonsByStudent[(int) $student->id] = $subscriptionModel->getLessonsForStudent((int) $student->id);
+        }
 
         if (count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);

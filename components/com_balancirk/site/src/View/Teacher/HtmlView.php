@@ -53,7 +53,7 @@ class HtmlView extends BaseHtmlView
 		{
 			/** @var TeacherModel */
 			$model = $this->getModel();
-			$this->lessons = $model->getLessonTeached($teacherId, $startDate, $endDate);
+			$this->lessons = $model->getLessonsTeached($teacherId, $startDate, $endDate);
 		}
 
 		// Display the template

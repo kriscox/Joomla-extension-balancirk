@@ -193,7 +193,7 @@ class SubscriptionModel extends AdminModel
         $query = $db->getQuery(true);
         $query->insert($db->quoteName('#__balancirk_subscriptions'))
             ->columns($db->quoteName(array('student', 'lesson', 'subscribed')))
-            ->values(implode(',', $values));
+            ->values($studentId . ',' . $lessonId . ',' . (int) $waitinglist);
         $db->setQuery($query)->execute();
         $this->lastInsertedId = (int) $db->insertid();
 

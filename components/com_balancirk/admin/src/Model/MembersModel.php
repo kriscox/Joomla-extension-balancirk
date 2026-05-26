@@ -237,7 +237,7 @@ class MembersModel extends ListModel
             }
 
             // Remove system user
-            $user = Factory::getApplication()->getIdentity($id);
+            $user = Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($id);
 
             if (!$user->delete()) {
                 $return = false;

@@ -157,7 +157,7 @@ class StudentModel extends AdminModel
 
         $query->update('`#__balancirk_students`');
         $query->set('state = ' . $value);
-        $query->where('id IN (' . implode(',', $pks) . ')');
+        $query->where('id IN (' . implode(',', array_map('intval', $pks)) . ')');
         $db->setQuery($query);
         $db->execute();
     }

@@ -166,6 +166,27 @@ class SubscriptionModel extends AdminModel
     }
 
     /**
+     * Method to get lessons open for a specific student.
+     *
+     * @param   int  $studentId  Student id.
+     *
+     * @return  array
+     *
+     * @since   1.2.30
+     */
+    public function getLessonsForStudent(int $studentId): array
+    {
+        if ($studentId <= 0) {
+            return [];
+        }
+
+        /** @var lessonsModel */
+        $model = $this->getMVCFactory()->createModel('Lessons', 'Site');
+
+        return $model->getOpenLessons($studentId);
+    }
+
+    /**
      * Check whether there are lessons with an open registration period.
      *
      * @return  bool
@@ -214,9 +235,8 @@ class SubscriptionModel extends AdminModel
      **/
     public function add(?array $data = null)
     {
-        $values = array();
-        array_push($values, $data['student']);
-        array_push($values, $data['lesson']);
+        $studentId = (int) $data['student'];
+        $lessonId = (int) $data['lesson'];
 
         // Check ik max numbers of students is not reached, if not subscribed == 0 else subscribed == 1
         /** @var lessonModel*/
@@ -236,7 +256,7 @@ class SubscriptionModel extends AdminModel
         $query = $db->getQuery(true);
         $query->insert($db->quoteName('#__balancirk_subscriptions'))
             ->columns($db->quoteName(array('student', 'lesson', 'subscribed')))
-            ->values(implode(',', $values));
+            ->values($studentId . ',' . $lessonId . ',' . (int) $waitinglist);
         $db->setQuery($query)->execute();
 
         /** @var StudentModel */

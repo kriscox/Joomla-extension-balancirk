@@ -107,10 +107,10 @@ $bearertoken = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
 									<?php endif; ?>
 								</td>
 								<td scope="row" class="d-md-table-cell">
-									<button class="btn btn-danger btn-sm"
-										onclick="showDeleteModal(<?= $item->id; ?>, '<?= $item->firstname; ?> <?= $item->name; ?>', '<?= $item->lesson; ?>')">
-										<span class="icon-purge" />
-									</button>
+								<button class="btn btn-danger btn-sm"
+									onclick="showDeleteModal(<?= (int) $item->id; ?>, '<?= htmlspecialchars($item->firstname, ENT_QUOTES, 'UTF-8'); ?> <?= htmlspecialchars($item->name, ENT_QUOTES, 'UTF-8'); ?>', '<?= htmlspecialchars($item->lesson, ENT_QUOTES, 'UTF-8'); ?>')">
+									<span class="icon-purge" />
+								</button>
 								</td>
 							</tr>
 						<?php endforeach; ?>
