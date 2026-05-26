@@ -177,7 +177,6 @@ class SubscriptionModel extends AdminModel
         }
 
         $waitinglist = ($model->getNumberOfStudents($lessonId) < $lesson->max_students) ? 0 : 1;
-        array_push($values, $waitinglist);
 
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
