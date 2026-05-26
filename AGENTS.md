@@ -17,6 +17,7 @@ This is NOT a standalone application. It requires installation into a Joomla 4 C
 - PHP 8.3+ with extensions: cli, xml, mbstring, tokenizer, zip
 - Composer (for phpcs dev dependency)
 - GNU Make + zip (for building packages)
+- Node.js 22+ / npm (for Angular member-spa frontend)
 
 ### Lint
 
@@ -29,10 +30,18 @@ Note: The `composer.json` `cs-check` script targets `src/` which does not exist 
 ### Build
 
 ```bash
-make -B
+make -B pkg_balancirk.zip
 ```
 
 This forces a full rebuild of the installable Joomla package zip (including sub-packages for the component and plugin). The `-B` flag unconditionally rebuilds all targets.
+
+To build the Angular member-spa frontend:
+
+```bash
+make member-spa-build
+```
+
+The update script pre-installs `frontend/member-spa/node_modules` so this target runs without network access.
 
 ### Testing
 
