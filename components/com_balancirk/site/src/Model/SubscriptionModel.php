@@ -166,6 +166,27 @@ class SubscriptionModel extends AdminModel
     }
 
     /**
+     * Method to get lessons open for a specific student.
+     *
+     * @param   int  $studentId  Student id.
+     *
+     * @return  array
+     *
+     * @since   1.2.30
+     */
+    public function getLessonsForStudent(int $studentId): array
+    {
+        if ($studentId <= 0) {
+            return [];
+        }
+
+        /** @var lessonsModel */
+        $model = $this->getMVCFactory()->createModel('Lessons', 'Site');
+
+        return $model->getOpenLessons($studentId);
+    }
+
+    /**
      * Check whether there are lessons with an open registration period.
      *
      * @return  bool
