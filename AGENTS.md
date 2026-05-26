@@ -29,10 +29,10 @@ Note: The `composer.json` `cs-check` script targets `src/` which does not exist 
 ### Build
 
 ```bash
-make pkg_balancirk.zip
+make -B
 ```
 
-This builds the full installable Joomla package zip (including sub-packages for the component and plugin).
+This forces a full rebuild of the installable Joomla package zip (including sub-packages for the component and plugin). The `-B` flag unconditionally rebuilds all targets.
 
 ### Testing
 
