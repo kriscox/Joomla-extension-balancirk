@@ -162,18 +162,8 @@ class SubscriptionModel extends AdminModel
      **/
     public function add(?array $data = null)
     {
-        $studentId = (int) ($data['student'] ?? 0);
-        $lessonId = (int) ($data['lesson'] ?? 0);
-
-        if ($studentId <= 0 || $lessonId <= 0) {
-            $this->setError(Text::_('JLIB_APPLICATION_ERROR_SAVE_FAILED'));
-
-            return false;
-        }
-
-        $values = array();
-        array_push($values, $studentId);
-        array_push($values, $lessonId);
+        $studentId = (int) $data['student'];
+        $lessonId = (int) $data['lesson'];
 
         // Check ik max numbers of students is not reached, if not subscribed == 0 else subscribed == 1
         /** @var lessonModel*/
@@ -193,7 +183,7 @@ class SubscriptionModel extends AdminModel
         $query = $db->getQuery(true);
         $query->insert($db->quoteName('#__balancirk_subscriptions'))
             ->columns($db->quoteName(array('student', 'lesson', 'subscribed')))
-            ->values(implode(',', $values));
+            ->values($studentId . ',' . $lessonId . ',' . (int) $waitinglist);
         $db->setQuery($query)->execute();
         $this->lastInsertedId = (int) $db->insertid();
 
@@ -325,7 +315,7 @@ class SubscriptionModel extends AdminModel
      *
      * @param   integer  $pk  The id of the primary key.
      *
-     * @return  \stdClass|boolean  Object on success, false on failure.
+     * @return  CMSObject|boolean  Object on success, false on failure.
      *
      * @since   __BUMP_VERIONS__
      */

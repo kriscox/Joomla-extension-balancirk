@@ -202,38 +202,6 @@ class SubscriptionModel extends AdminModel
     }
 
     /**
-     * Method to get open lessons for a specific student, excluding existing subscriptions.
-     *
-     * @param   int  $studentId  Student id.
-     *
-     * @return  array
-     */
-    public function getLessonsForStudent(int $studentId): array
-    {
-        /** @var lessonsModel */
-        $model = $this->getMVCFactory()->createModel('Lessons', 'Site');
-        $openLessons = $model->getOpenLessons();
-
-        if ($studentId <= 0 || empty($openLessons)) {
-            return $openLessons;
-        }
-
-        $db = $this->getDatabase();
-        $query = $db->getQuery(true)
-            ->select($db->quoteName('lesson'))
-            ->from($db->quoteName('#__balancirk_subscriptions'))
-            ->where($db->quoteName('student') . ' = ' . (int) $studentId);
-
-        $subscribedLessonIds = array_map('intval', $db->setQuery($query)->loadColumn());
-
-        foreach ($subscribedLessonIds as $lessonId) {
-            unset($openLessons[$lessonId]);
-        }
-
-        return $openLessons;
-    }
-
-    /**
      * Add subscription to the database
      *
      * Add if not exists the subscription to the database
@@ -246,9 +214,8 @@ class SubscriptionModel extends AdminModel
      **/
     public function add(?array $data = null)
     {
-        $values = array();
-        array_push($values, $data['student']);
-        array_push($values, $data['lesson']);
+        $studentId = (int) $data['student'];
+        $lessonId = (int) $data['lesson'];
 
         // Check ik max numbers of students is not reached, if not subscribed == 0 else subscribed == 1
         /** @var lessonModel*/
@@ -268,7 +235,7 @@ class SubscriptionModel extends AdminModel
         $query = $db->getQuery(true);
         $query->insert($db->quoteName('#__balancirk_subscriptions'))
             ->columns($db->quoteName(array('student', 'lesson', 'subscribed')))
-            ->values(implode(',', $values));
+            ->values($studentId . ',' . $lessonId . ',' . (int) $waitinglist);
         $db->setQuery($query)->execute();
 
         /** @var StudentModel */

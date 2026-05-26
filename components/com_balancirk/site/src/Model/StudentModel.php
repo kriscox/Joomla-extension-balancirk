@@ -15,6 +15,7 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 use Exception;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Application\CMSApplicationInterface;
 
@@ -81,6 +82,51 @@ class StudentModel extends AdminModel
 
         // Default to component settings if neither article nor category known.
         return parent::canEditState($record);
+    }
+
+    /**
+     * Method to get one item
+     *
+     * @param   integer  $pk  The id of the item.
+     *
+     * @return  object|boolean  Object on success, false on failure.
+     *
+     * @since   __BUMP_VERSION__
+     */
+    public function getItem($pk = null)
+    {
+        $canDo = ContentHelper::getActions('com_balancirk');
+        if (!($canDo->get('students.viewall') || $this->isParent($pk))) {
+            return false;
+        }
+
+        return parent::getItem($pk);
+    }
+
+    /**
+     * Check if current user is a parent
+     *
+     * Check if the current user is a parent of the student.
+     *
+     * @param   int  $pks  student id
+     *
+     * @return boolean  true if the user is a parent of the student, false otherwise
+     *
+     * @since __BUMP_VERSION__
+     */
+    public function isParent($pks = null)
+    {
+        if ($pks === null) {
+            $pks = (int) $this->getState('student.id');
+        }
+
+        foreach ($this->getParents((int) $pks, false) as $parent) {
+            if ($parent->parent == Factory::getApplication()->getIdentity()->id) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -73,18 +73,18 @@ HTMLHelper::_('behavior.keepalive');
 		<?= HTMLHelper::_('uitab.addTab', 'myTab', 'parents', Text::_('COM_BALANCIRK_STUDENT_TAB_PARENTS')); ?>
 		<div class="row">
 			<div class="col-md-12">
-				<?php foreach ($this->parents as $parent) : ?>
-					<div class="row">
-						<div class="col-md-3">
-							<a href="<?= Route::_('index.php?option=com_balancirk&view=member&layout=edit&id=' . (int) $parent->id); ?>">
-								<?= $parent->firstname; ?> <?= $parent->name; ?>
-							</a>
-						</div>
-						<div class="col-md-3">
-							<?= $parent->phone; ?>
-						</div>
+			<?php foreach ($this->parents as $parent) : ?>
+				<div class="row">
+					<div class="col-md-3">
+						<a href="<?= Route::_('index.php?option=com_balancirk&view=member&layout=edit&id=' . (int) $parent->id); ?>">
+							<?= $this->escape($parent->firstname); ?> <?= $this->escape($parent->name); ?>
+						</a>
 					</div>
-				<?php endforeach; ?>
+					<div class="col-md-3">
+						<?= $this->escape($parent->phone); ?>
+					</div>
+				</div>
+			<?php endforeach; ?>
 			</div>
 		</div>
 		<?= HTMLHelper::_('uitab.endTabSet'); ?>

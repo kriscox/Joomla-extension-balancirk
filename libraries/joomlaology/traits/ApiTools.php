@@ -122,7 +122,7 @@ trait ApiTools
      */
     protected function prepareSqlFieldsArray($data)
     {
-        $db = $this->getDatabase();
+        $db = $this->getDbo();
         $fields = array();
 
         if (gettype($data) == 'object') {
@@ -149,11 +149,11 @@ trait ApiTools
                 foreach ($data as $key => $value) {
                     if (gettype($value) == 'boolean') {
                         $valAsBool = ((bool) $value == true) ? 1 : 0;
-                        array_push($fields, $db->quoteName($key) . " = '{$valAsBool}'");
+                        array_push($fields, $db->quoteName($key) . ' = ' . $db->quote($valAsBool));
 
                         // Log::add("File: " . __FILE__ . "\n\n" . $db->quoteName($key) . " = '{$valAsBool}'" . " \n", Log::INFO);
                     } else {
-                        array_push($fields, $db->quoteName($key) . " = '{$value}'");
+                        array_push($fields, $db->quoteName($key) . ' = ' . $db->quote($value));
 
                         // Log::add("File: " . __FILE__ . "\n\n" . $db->quoteName($key) . " = '{$value}'" . " \n", Log::INFO);
                     }

@@ -220,7 +220,7 @@ class MembersModel extends ListModel
             }
 
             // remove addition information from user
-            $dbo = $this->getDatabase();
+            $dbo = $this->getDbo();
             $query = $dbo->getQuery(true)->delete($dbo->quoteName('#__balancirk_members_additional'));
 
             $conditions = array(
@@ -237,7 +237,7 @@ class MembersModel extends ListModel
             }
 
             // Remove system user
-            $user = Factory::getApplication()->getIdentity($id);
+            $user = Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($id);
 
             if (!$user->delete()) {
                 $return = false;

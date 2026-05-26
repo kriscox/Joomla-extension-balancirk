@@ -34,26 +34,24 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 <form action="<?= Route::_('index.php?option=com_balancirk&view=student&layout=default&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="student-form" class="form-validate">
 	<div class="balancirk_student" style="margin:30px">
 		<div class="row">
-			<?= $this->item->street ?>
-			<?= $this->item->number ?>
-			<?= $this->item->bus ?>
+			<?= $this->escape($this->item->street) ?>
+			<?= $this->escape($this->item->number) ?>
+			<?= $this->escape($this->item->bus) ?>
 		</div>
 		<div class="row">
-			<?= $this->item->postcode ?>
-			<?= $this->item->city ?>
+			<?= $this->escape($this->item->postcode) ?>
+			<?= $this->escape($this->item->city) ?>
 		</div>
 		<div class="row">
-			<?= $this->item->email ?>
-			<?= $this->item->phone ?>
+			<?= $this->escape($this->item->email) ?>
+			<?= $this->escape($this->item->phone) ?>
 		</div>
 		<div class="row">
-			<?= $this->item->birthdate ?>
+			<?= $this->escape($this->item->birthdate) ?>
 		</div>
 		<div class="row">
+			<?= $this->escape($this->item->uitpas) ?>
 			<?= $this->item->mutuality ?>
-		</div>
-		<div class="row">
-			<?= $this->item->uitpas ?>
 		</div>
 		<div class="row">
 			<?php if ($this->item->allow_photo) {
