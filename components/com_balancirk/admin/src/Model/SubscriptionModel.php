@@ -162,8 +162,18 @@ class SubscriptionModel extends AdminModel
      **/
     public function add(?array $data = null)
     {
-        $studentId = (int) $data['student'];
-        $lessonId = (int) $data['lesson'];
+        $studentId = (int) ($data['student'] ?? 0);
+        $lessonId = (int) ($data['lesson'] ?? 0);
+
+        if ($studentId <= 0 || $lessonId <= 0) {
+            $this->setError(Text::_('JLIB_APPLICATION_ERROR_SAVE_FAILED'));
+
+            return false;
+        }
+
+        $values = array();
+        array_push($values, $studentId);
+        array_push($values, $lessonId);
 
         // Check ik max numbers of students is not reached, if not subscribed == 0 else subscribed == 1
         /** @var lessonModel*/
@@ -177,7 +187,6 @@ class SubscriptionModel extends AdminModel
         }
 
         $waitinglist = ($model->getNumberOfStudents($lessonId) < $lesson->max_students) ? 0 : 1;
-        array_push($values, $waitinglist);
 
         $db = $this->getDatabase();
         $query = $db->getQuery(true);

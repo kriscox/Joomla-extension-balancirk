@@ -5,7 +5,6 @@ namespace CoCoCo\Component\Balancirk\Api\Controller;
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\String\Inflector;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\ApiController;
 use Joomla\CMS\MVC\Controller\Exception\ResourceNotFound;
@@ -46,14 +45,7 @@ class SubscriptionController extends ApiController
 
     public function delete($recordKey = null)
     {
-        $recordKey = $this->input->get('id');
-
-        $user = Factory::getApplication()->getIdentity();
-        if (!$user->authorise('core.delete', 'com_balancirk')) {
-            throw new \Joomla\CMS\Access\Exception\NotAllowed(Text::_('JLIB_APPLICATION_ERROR_DELETE_NOT_PERMITTED'), 403);
-        }
-
-        $modelName = $this->input->get('model', Inflector::singularize($this->contentType));
+        $recordKey = (int) ($recordKey ?? $this->input->getInt('id'));
 
         /** @var \Joomla\CMS\MVC\Model\AdminModel $model */
         $model = $this->getModel('Subscription', '', ['ignore_request' => true]);

@@ -1,323 +1,207 @@
 <main class="page">
   <header class="hero">
-    <p class="eyebrow">Balancirk ledenportaal</p>
-    <h1>Welkom in je ledenomgeving</h1>
-    <p class="subtitle">
-      Mobile-first en overzichtelijk, met duidelijke menu’s per onderwerp.
-    </p>
+    <p class="eyebrow">Balancirk backend</p>
+    <h1>
+      @if (member()) {
+      Dag {{ member()?.firstname || member()?.name }}, welkom.
+      } @else {
+      Welkom in je Balancirk backend.
+      }
+    </h1>
+    <p class="subtitle">Een pagina met modules op basis van je rechten.</p>
   </header>
 
   @if (loading()) {
-    <section class="card">
-      <p class="status">Bezig met laden...</p>
-    </section>
+  <section class="card"><p class="status">Bezig met laden...</p></section>
   } @else {
-    @if (error()) {
-      <section class="card card-error">
-        <p>{{ error() }}</p>
-      </section>
-    }
+  @if (error()) { <section class="card card-error"><p>{{ error() }}</p></section> }
+  @if (success()) { <section class="card card-success"><p>{{ success() }}</p></section> }
 
-    @if (success()) {
-      <section class="card card-success">
-        <p>{{ success() }}</p>
-      </section>
+  <nav class="menu-grid" aria-label="Backend menu">
+    <button type="button" class="menu-button" [class.active]="activeSection() === 'dashboard'" (click)="goToSection('dashboard')">Dashboard</button>
+    <button type="button" class="menu-button" [class.active]="activeSection() === 'students'" (click)="goToSection('students')">Leerlingen</button>
+    <button type="button" class="menu-button" [class.active]="activeSection() === 'subscriptions'" (click)="goToSection('subscriptions')">Inschrijvingen</button>
+    <button type="button" class="menu-button" [class.active]="activeSection() === 'profile'" (click)="goToSection('profile')">Profiel</button>
+    @if (showAdminEntry) {
+    <button type="button" class="menu-button menu-button-admin" [class.active]="activeSection() === 'staff'" (click)="goToSection('staff')">Lesgevers / Admin</button>
     }
+  </nav>
 
-    <nav class="menu-grid" aria-label="Ledenmenu">
-      <button type="button" class="menu-button" [class.active]="activeSection() === 'home'" (click)="goToSection('home')">Je komt aan</button>
-      <button type="button" class="menu-button" [class.active]="activeSection() === 'notices'" (click)="goToSection('notices')">Mededelingen</button>
-      <button type="button" class="menu-button" [class.active]="activeSection() === 'students'" (click)="goToSection('students')">Leerlingen</button>
-      <button type="button" class="menu-button" [class.active]="activeSection() === 'subscriptions'" (click)="goToSection('subscriptions')">Inschrijvingen</button>
-      <button type="button" class="menu-button" [class.active]="activeSection() === 'profile'" (click)="goToSection('profile')">Profiel</button>
-      @if (canAdminPortal) {
-        <button type="button" class="menu-button menu-button-admin" [class.active]="activeSection() === 'admin'" (click)="goToSection('admin')">Admin</button>
+  @if (activeSection() === 'dashboard') {
+  <section class="card">
+    <div class="card-title-row"><h2>Overzicht</h2><span class="muted">{{ now | date: 'dd/MM HH:mm' }}</span></div>
+    <div class="admin-stats">
+      <article><strong>{{ students().length }}</strong><span>Leerlingen</span></article>
+      <article><strong>{{ subscriptions().length }}</strong><span>Inschrijvingen</span></article>
+      <article><strong>{{ showAdminEntry ? 'Ja' : 'Nee' }}</strong><span>Uitgebreide rechten</span></article>
+    </div>
+  </section>
+  }
+
+  @if (activeSection() === 'students') {
+  <section class="card">
+    <div class="card-title-row"><h2>Leerlingen</h2><span class="muted">{{ students().length }} gevonden</span></div>
+    @if (students().length === 0) { <p class="muted">Nog geen leerlingen gevonden.</p> } @else {
+    <ul class="students">
+      @for (student of students(); track student.id) {
+      <li>
+        <strong>{{ student.firstname }} {{ student.name }}</strong>
+        <span class="meta">Mutualiteit: {{ student.mutuality || 'niet ingevuld' }}</span>
+        <span class="meta">UiTPAS: {{ student.uitpas || 'niet ingevuld' }}</span>
+      </li>
       }
+    </ul>
+    }
+  </section>
+  }
+
+  @if (activeSection() === 'subscriptions') {
+  <section class="card">
+    <div class="card-title-row"><h2>Inschrijvingen</h2><span class="muted">{{ filteredSubscriptions().length }} resultaat(en)</span></div>
+    <div class="actions">
+      <a class="link-button" [href]="subscriptionCreateUrl">Nieuwe inschrijving</a>
+      @if (subscriptionYears().length >= 1) {
+      <select class="year-filter" [value]="selectedSubscriptionYear()" (change)="selectedSubscriptionYear.set($any($event.target).value)">
+        <option value="">Alle schooljaren</option>
+        @for (year of subscriptionYears(); track year) { <option [value]="year">{{ year }}</option> }
+      </select>
+      }
+    </div>
+    @if (filteredSubscriptions().length === 0) { <p class="muted">Geen inschrijvingen gevonden.</p> } @else {
+    <ul class="students">
+      @for (subscription of filteredSubscriptions(); track subscription.id) {
+      <li>
+        <strong>{{ subscription.lesson }}</strong>
+        <span class="meta">Schooljaar: {{ subscription.year || 'onbekend' }}</span>
+        <span class="meta">Status: {{ getSubscriptionStateLabel(subscription.subscribed) }}</span>
+      </li>
+      }
+    </ul>
+    }
+  </section>
+  }
+
+  @if (activeSection() === 'profile') {
+  <section class="card">
+    <div class="card-title-row"><h2>Profiel</h2><span class="muted">Persoonsgegevens</span></div>
+    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate>
+      <div class="grid">
+        <label>Voornaam <input formControlName="firstname" /></label>
+        <label>Naam <input formControlName="name" /></label>
+        <label class="full">E-mail <input formControlName="email" /></label>
+        <label>Telefoon <input formControlName="phone" /></label>
+        <label>Straat <input formControlName="street" /></label>
+        <label>Nummer <input formControlName="number" /></label>
+        <label>Bus <input formControlName="bus" /></label>
+        <label>Postcode <input formControlName="postcode" /></label>
+        <label class="full">Gemeente <input formControlName="city" /></label>
+        <label>Nieuw wachtwoord <input type="password" formControlName="password" /></label>
+        <label>Herhaal wachtwoord <input type="password" formControlName="password2" /></label>
+      </div>
+      <div class="actions"><button type="submit" [disabled]="saving()">@if (saving()) { Opslaan... } @else { Profiel opslaan }</button></div>
+    </form>
+  </section>
+  }
+
+  @if (activeSection() === 'staff') {
+  <section class="card card-admin">
+    <div class="card-title-row"><h2>Lesgevers / Admin</h2><span class="muted">Modules voor uitgebreide rechten</span></div>
+    <nav class="sub-menu" aria-label="Staff menu">
+      <button type="button" class="sub-menu-button" [class.active]="staffSection() === 'overview'" (click)="goToStaffSection('overview')">Overzicht</button>
+      <button type="button" class="sub-menu-button" [class.active]="staffSection() === 'lessons'" (click)="goToStaffSection('lessons')">Lessen</button>
+      <button type="button" class="sub-menu-button" [class.active]="staffSection() === 'presence'" (click)="goToStaffSection('presence')">Aanwezigheden</button>
+      <button type="button" class="sub-menu-button" [class.active]="staffSection() === 'analytics'" (click)="goToStaffSection('analytics')">Grafieken</button>
+      <button type="button" class="sub-menu-button" [class.active]="staffSection() === 'relations'" [disabled]="!canViewRelations" (click)="goToStaffSection('relations')">Relaties</button>
+      <button type="button" class="sub-menu-button" [class.active]="staffSection() === 'exports'" [disabled]="!canExportAccounting" (click)="goToStaffSection('exports')">Boekhouding</button>
     </nav>
 
-    @if (activeSection() === 'home') {
-      <section class="card">
-        <div class="card-title-row">
-          <h2>Je komt aan</h2>
-          <span class="muted">{{ now | date: 'dd/MM HH:mm' }}</span>
-        </div>
-        <p class="lead">
-          @if (member()) {
-            Dag {{ member()?.firstname || member()?.name }}, kies hieronder waar je naartoe wil.
-          } @else {
-            Kies hieronder waar je naartoe wil.
+    @if (staffNotice()) { <div class="inline-success">{{ staffNotice() }}</div> }
+    @if (staffError()) { <div class="inline-error">{{ staffError() }}</div> }
+    @if (staffLoading()) { <p class="status">Gegevens laden...</p> }
+
+    @if (staffSection() === 'overview') {
+    <div class="admin-stats">
+      <article><strong>{{ lessons().length }}</strong><span>Lessen</span></article>
+      <article><strong>{{ relations().length }}</strong><span>Relaties</span></article>
+      <article><strong>{{ canExportAccounting ? 'Ja' : 'Nee' }}</strong><span>Boekhouding export</span></article>
+    </div>
+    }
+
+    @if (staffSection() === 'lessons') {
+    @if (lessons().length === 0) { <p class="muted">Geen lessen beschikbaar of geen rechten.</p> } @else {
+    <ul class="students">
+      @for (lesson of lessons(); track lesson.id) {
+      <li>
+        <strong>{{ lesson.name }}</strong>
+        <span class="meta">Schooljaar: {{ lesson.year || 'onbekend' }}</span>
+      </li>
+      }
+    </ul>
+    }
+    }
+
+    @if (staffSection() === 'presence') {
+    <div class="admin-export-controls">
+      <label>Les
+        <select [value]="selectedLessonId()" (change)="selectLesson(+$any($event.target).value)">
+          <option value="0">Kies een les</option>
+          @for (lesson of lessons(); track lesson.id) {
+          <option [value]="lesson.id">{{ lesson.name }}</option>
           }
-        </p>
-        <div class="quick-grid">
-          <button type="button" class="quick-action" (click)="goToSection('notices')">Algemene mededelingen</button>
-          <button type="button" class="quick-action" (click)="goToSection('students')">Overzicht leerlingen</button>
-          <button type="button" class="quick-action" (click)="goToSection('subscriptions')">Mijn inschrijvingen</button>
-          <button type="button" class="quick-action" (click)="goToSection('profile')">Profiel aanpassen</button>
-          @if (canAdminPortal) {
-            <button type="button" class="quick-action quick-action-admin" (click)="goToSection('admin')">Adminzone openen</button>
-          }
-        </div>
-      </section>
+        </select>
+      </label>
+      <label>Datum
+        <input type="date" [value]="presenceDate()" (change)="setPresenceDate($any($event.target).value)" />
+      </label>
+    </div>
+    <ul class="students">
+      @for (student of students(); track student.id) {
+      <li>
+        <label class="presence-row">
+          <input type="checkbox" [checked]="isPresent(student.id)" (change)="togglePresence(student.id)" />
+          <span>{{ student.firstname }} {{ student.name }}</span>
+        </label>
+      </li>
+      }
+    </ul>
     }
 
-    @if (activeSection() === 'notices') {
-      <section class="card">
-        <div class="card-title-row">
-          <h2>Algemene mededelingen</h2>
-          <span class="muted">Laatste update {{ now | date: 'HH:mm' }}</span>
-        </div>
-        <div class="notice">
-          <h3>Welkom</h3>
-          <p>Gebruik het menu om snel naar leerlingen, inschrijvingen of profiel te gaan.</p>
-        </div>
-        <div class="notice">
-          <h3>Inschrijvingen</h3>
-          <p>Controleer regelmatig dit scherm voor updates over wachtlijsten en lesreeksen.</p>
-        </div>
-      </section>
+    @if (staffSection() === 'analytics') {
+    <div class="chart-list">
+      @for (row of subscriptionsByYear(); track row.year) {
+      <article>
+        <div class="chart-head"><strong>{{ row.year }}</strong><span>{{ row.count }} inschrijvingen</span></div>
+        <div class="bar-wrap"><div class="bar" [style.width.%]="(row.count / maxYearSubscriptionCount()) * 100"></div></div>
+      </article>
+      }
+    </div>
     }
 
-    @if (activeSection() === 'students') {
-      <section class="card">
-        <div class="card-title-row">
-          <h2>Mijn leerlingen</h2>
-          <span class="muted">{{ students().length }} leerling(en)</span>
-        </div>
-
-        @if (students().length === 0) {
-          <p class="muted">Er zijn nog geen gekoppelde leerlingen gevonden.</p>
-        } @else {
-          <ul class="students">
-            @for (student of students(); track student.id) {
-              <li>
-                <strong>{{ student.firstname }} {{ student.name }}</strong>
-                <span class="meta">
-                  @if (student.birthdate) {
-                    Geboortedatum: {{ student.birthdate | date: 'dd/MM/yyyy' }}
-                  } @else {
-                    Geboortedatum niet ingevuld
-                  }
-                </span>
-                <span class="meta">
-                  Mutualiteit: {{ student.mutuality || 'niet ingevuld' }} · UiTPAS: {{ student.uitpas || 'niet ingevuld' }}
-                </span>
-              </li>
-            }
-          </ul>
-        }
-      </section>
+    @if (staffSection() === 'relations') {
+    @if (!canViewRelations) { <p class="muted">Geen rechten voor relaties.</p> } @else if (relationsLoading()) { <p class="status">Relaties laden...</p> } @else {
+    <ul class="relations">
+      @for (relation of relations(); track relation.id) {
+      <li>
+        <strong>{{ relation.parentFirstname }} {{ relation.parentName }}</strong>
+        <span class="meta">{{ relation.studentFirstname }} {{ relation.studentName }}</span>
+      </li>
+      }
+    </ul>
+    }
     }
 
-    @if (activeSection() === 'subscriptions') {
-      <section class="card">
-        <div class="card-title-row">
-          <h2>Mijn inschrijvingen</h2>
-          <span class="muted">{{ filteredSubscriptions().length }} item(s)</span>
-        </div>
-
-        <div class="actions">
-          <a class="link-button" [href]="subscriptionCreateUrl">Nieuwe inschrijving</a>
-          @if (subscriptionYears().length > 1) {
-            <select class="year-filter" [value]="selectedSubscriptionYear()" (change)="selectedSubscriptionYear.set($any($event.target).value)" aria-label="Filter op schooljaar">
-              <option value="">Alle schooljaren</option>
-              @for (year of subscriptionYears(); track year) {
-                <option [value]="year">{{ year }}</option>
-              }
-            </select>
-          }
-        </div>
-
-        @if (subscriptions().length === 0) {
-          <p class="muted">Nog geen inschrijvingen gevonden.</p>
-        } @else if (filteredSubscriptions().length === 0) {
-          <p class="muted">Geen inschrijvingen voor dit schooljaar.</p>
-        } @else {
-          <ul class="students">
-            @for (subscription of filteredSubscriptions(); track subscription.id) {
-              <li>
-                <strong>{{ subscription.lesson }}</strong>
-                <span class="meta">Schooljaar: {{ subscription.year || 'onbekend' }}</span>
-                <span class="meta">Status: {{ getSubscriptionStateLabel(subscription.subscribed) }}</span>
-              </li>
-            }
-          </ul>
-        }
-      </section>
+    @if (staffSection() === 'exports' && canExportAccounting) {
+    <div class="admin-export-controls">
+      <label>Schooljaar
+        <input #yearInput type="text" [value]="exportYear()" (input)="setExportYear(yearInput.value)" placeholder="bv. 2025-2026" />
+      </label>
+      <div class="actions actions-inline">
+        <button type="button" [disabled]="exportingFormat() !== null" (click)="downloadAccountingExport('csv')">CSV</button>
+        <button type="button" [disabled]="exportingFormat() !== null" (click)="downloadAccountingExport('xls')">XLS</button>
+      </div>
+    </div>
     }
-
-    @if (activeSection() === 'profile') {
-      <section class="card">
-        <div class="card-title-row">
-          <h2>Profiel aanpassen</h2>
-          <span class="muted">Laatste update {{ now | date: 'HH:mm' }}</span>
-        </div>
-
-        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate>
-          <div class="grid">
-            <label>
-              Voornaam
-              <input formControlName="firstname" autocomplete="given-name" />
-            </label>
-
-            <label>
-              Naam
-              <input formControlName="name" autocomplete="family-name" />
-            </label>
-
-            <label class="full">
-              E-mail
-              <input formControlName="email" autocomplete="email" />
-            </label>
-
-            <label>
-              Telefoon
-              <input formControlName="phone" autocomplete="tel" />
-            </label>
-
-            <label>
-              Straat
-              <input formControlName="street" autocomplete="address-line1" />
-            </label>
-
-            <label>
-              Nummer
-              <input formControlName="number" autocomplete="address-line2" />
-            </label>
-
-            <label>
-              Bus
-              <input formControlName="bus" />
-            </label>
-
-            <label>
-              Postcode
-              <input formControlName="postcode" autocomplete="postal-code" />
-            </label>
-
-            <label class="full">
-              Gemeente
-              <input formControlName="city" autocomplete="address-level2" />
-            </label>
-
-            <label>
-              Nieuw wachtwoord
-              <input type="password" formControlName="password" autocomplete="new-password" />
-            </label>
-
-            <label>
-              Herhaal wachtwoord
-              <input type="password" formControlName="password2" autocomplete="new-password" />
-            </label>
-          </div>
-
-          <div class="actions">
-            <button type="submit" [disabled]="saving()">
-              @if (saving()) { Opslaan... } @else { Profiel opslaan }
-            </button>
-          </div>
-        </form>
-      </section>
-    }
-
-    @if (activeSection() === 'admin') {
-      <section class="card card-admin">
-        <div class="card-title-row">
-          <h2>Adminzone</h2>
-          <span class="muted">Extra beheerfuncties</span>
-        </div>
-
-        <nav class="sub-menu" aria-label="Adminmenu">
-          <button type="button" class="sub-menu-button" [class.active]="adminSection() === 'overview'" (click)="goToAdminSection('overview')">Overzicht</button>
-          <button type="button" class="sub-menu-button" [class.active]="adminSection() === 'relations'" [disabled]="!canViewRelations" (click)="goToAdminSection('relations')">Relaties</button>
-          <button type="button" class="sub-menu-button" [class.active]="adminSection() === 'exports'" [disabled]="!canExportAccounting" (click)="goToAdminSection('exports')">Boekhouding</button>
-        </nav>
-
-        @if (adminNotice()) {
-          <div class="inline-success">{{ adminNotice() }}</div>
-        }
-
-        @if (adminError()) {
-          <div class="inline-error">{{ adminError() }}</div>
-        }
-
-        @if (adminSection() === 'overview') {
-          <div class="admin-stats">
-            <article>
-              <strong>{{ students().length }}</strong>
-              <span>Leerlingen</span>
-            </article>
-            <article>
-              <strong>{{ subscriptions().length }}</strong>
-              <span>Inschrijvingen</span>
-            </article>
-            <article>
-              <strong>{{ canViewRelations ? 'Ja' : 'Nee' }}</strong>
-              <span>Relaties raadpleegbaar</span>
-            </article>
-          </div>
-          <div class="quick-grid">
-            <button type="button" class="quick-action" (click)="goToSection('students')">Leerlingenmodule openen</button>
-            <button type="button" class="quick-action" (click)="goToSection('subscriptions')">Inschrijvingen bekijken</button>
-            @if (canViewRelations) {
-              <button type="button" class="quick-action quick-action-admin" (click)="goToAdminSection('relations')">Ouder-kindrelaties</button>
-            }
-            @if (canExportAccounting) {
-              <button type="button" class="quick-action quick-action-admin" (click)="goToAdminSection('exports')">Boekhouding exports</button>
-            }
-          </div>
-        }
-
-        @if (adminSection() === 'relations') {
-          @if (!canViewRelations) {
-            <p class="muted">Je hebt geen rechten om relaties te bekijken.</p>
-          } @else if (relationsLoading()) {
-            <p class="status">Relaties laden...</p>
-          } @else if (relationsError()) {
-            <div class="inline-error">{{ relationsError() }}</div>
-          } @else if (relations().length === 0) {
-            <p class="muted">Geen ouder-kindrelaties gevonden.</p>
-          } @else {
-            <ul class="relations">
-              @for (relation of relations(); track relation.id) {
-                <li>
-                  <strong>{{ relation.parentFirstname }} {{ relation.parentName }}</strong>
-                  <span class="meta">{{ relation.parentEmail || 'Geen e-mail' }}</span>
-                  <span class="meta">Kind: {{ relation.studentFirstname }} {{ relation.studentName }}</span>
-                  <span class="meta">
-                    @if (relation.isPrimary === 1) {
-                      Primair contact
-                    } @else {
-                      Niet-primair contact
-                    }
-                  </span>
-                </li>
-              }
-            </ul>
-          }
-        }
-
-        @if (adminSection() === 'exports') {
-          @if (!canExportAccounting) {
-            <p class="muted">Je hebt geen rechten om exports te downloaden.</p>
-          } @else {
-            <p class="muted">Download inschrijvingen voor boekhouding in CSV of XLS.</p>
-            <div class="admin-export-controls">
-              <label>
-                Schooljaar (optioneel)
-                <input #yearInput type="text" [value]="exportYear()" placeholder="bv. 2025-2026" (input)="setExportYear(yearInput.value)" />
-              </label>
-              <div class="actions actions-inline">
-                <button type="button" [disabled]="exportingFormat() !== null" (click)="downloadAccountingExport('csv')">
-                  @if (exportingFormat() === 'csv') { CSV downloaden... } @else { Download CSV }
-                </button>
-                <button type="button" [disabled]="exportingFormat() !== null" (click)="downloadAccountingExport('xls')">
-                  @if (exportingFormat() === 'xls') { XLS downloaden... } @else { Download XLS }
-                </button>
-              </div>
-            </div>
-          }
-        }
-      </section>
-    }
+  </section>
+  }
   }
 </main>
