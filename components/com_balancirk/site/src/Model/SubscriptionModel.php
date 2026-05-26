@@ -167,22 +167,20 @@ class SubscriptionModel extends AdminModel
      **/
     public function add(array $data = null)
     {
-        $values = array();
-        array_push($values, $data['student']);
-        array_push($values, $data['lesson']);
+        $studentId = (int) $data['student'];
+        $lessonId = (int) $data['lesson'];
 
         // Check ik max numbers of students is not reached, if not subscribed == 0 else subscribed == 1
         /** @var lessonModel*/
         $model = $this->getMVCFactory()->createModel('Lesson', 'Site');
-        $lesson = $model->getItem($data['lesson'], $data['lesson']);
-        $waitinglist = ($model->getNumberOfStudents($data['lesson']) < $lesson->max_students) ? 0 : 1;
-        array_push($values, $waitinglist);
+        $lesson = $model->getItem($lessonId, $lessonId);
+        $waitinglist = ($model->getNumberOfStudents($lessonId) < $lesson->max_students) ? 0 : 1;
 
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
         $query->insert($db->quoteName('#__balancirk_subscriptions'))
             ->columns($db->quoteName(array('student', 'lesson', 'subscribed')))
-            ->values(implode(',', $values));
+            ->values($studentId . ',' . $lessonId . ',' . (int) $waitinglist);
         $db->setQuery($query)->execute();
 
         // Send mail to parent
@@ -259,8 +257,8 @@ Het Balancirk team');
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
         $query->delete($db->quoteName('#__balancirk_subscriptions'))
-            ->where($db->quoteName('student') . ' = ' . (int) $pks['student'])
-            ->where($db->quoteName('lesson') . ' = ' . (int) $pks['lesson']);
+            ->where($db->quoteName('student') . ' = ' . $pks['student'])
+            ->where($db->quoteName('lesson') . ' = ' . $pks['lesson']);
         $db->setQuery($query)->execute();
 
         return true;
