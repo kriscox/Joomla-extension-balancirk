@@ -27,7 +27,6 @@ $states = array(
     '-2' => Text::_('JTRASHED')
 );
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
-HTMLHelper::_('script', 'com_balancirk/balancirk_spa_navigation.js', ['version' => 'auto', 'relative' => true]);
 
 $userid = Factory::getApplication()->getIdentity()->id;
 $bearertoken = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
@@ -37,11 +36,11 @@ $bearertoken = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
 <div class="row">
 	<div class="col-md-12">
 		<nav aria-label="Toolbar">
-			<button class="button-new btn btn-success" type="button" onclick="BalancirkSpaNavigation.navigate('index.php?option=com_balancirk&view=subscription&id=0')">
+			<button class="button-new btn btn-success" type="button" onclick="location.href = 'index.php?option=com_balancirk&view=subscription&id=0';">
 				<span class=" icon-new" aria-hidden="true"></span>
 				<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
 			</button>
-			<a data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&view=students', false); ?>">
+			<a href="<?= Route::_('index.php?option=com_balancirk&view=students', false); ?>">
 				<button class="btn btn-primary" type="button"><?= TEXT::_('COM_BALANCIRK_STUDENTS_LINK') ?></button>
 			</a>
 		</nav>
@@ -107,10 +106,10 @@ $bearertoken = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
 									<?php endif; ?>
 								</td>
 								<td scope="row" class="d-md-table-cell">
-									<button class="btn btn-danger btn-sm"
-										onclick="showDeleteModal(<?= $item->id; ?>, '<?= $item->firstname; ?> <?= $item->name; ?>', '<?= $item->lesson; ?>')">
-										<span class="icon-purge" />
-									</button>
+								<button class="btn btn-danger btn-sm"
+									onclick="showDeleteModal(<?= (int) $item->id; ?>, '<?= htmlspecialchars($item->firstname, ENT_QUOTES, 'UTF-8'); ?> <?= htmlspecialchars($item->name, ENT_QUOTES, 'UTF-8'); ?>', '<?= htmlspecialchars($item->lesson, ENT_QUOTES, 'UTF-8'); ?>')">
+									<span class="icon-purge" />
+								</button>
 								</td>
 							</tr>
 						<?php endforeach; ?>
