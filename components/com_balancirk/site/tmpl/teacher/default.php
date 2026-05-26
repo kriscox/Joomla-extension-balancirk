@@ -31,6 +31,18 @@ HTMLHelper::_('behavior.keepalive');
 
 <?= HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
 <?= HtmlHelper::_('content.prepare', '{loadposition balancirk-subscriptions-top}'); ?>
+
+<div class="balancirk-admin-dashboard mb-4">
+	<h2>Balancirk Admin</h2>
+	<p>Overzicht voor teachers, administratie en boekhouding.</p>
+	<div class="row g-2">
+		<div class="col-12 col-md-4"><a class="btn btn-outline-primary w-100" href="<?= Route::_('index.php?option=com_balancirk&view=lessons'); ?>">Lessen beheren</a></div>
+		<div class="col-12 col-md-4"><a class="btn btn-outline-primary w-100" href="<?= Route::_('index.php?option=com_balancirk&view=students'); ?>">Leerlingen beheren</a></div>
+		<div class="col-12 col-md-4"><a class="btn btn-outline-primary w-100" href="<?= Route::_('index.php?option=com_balancirk&view=subscriptions'); ?>">Inschrijvingen beheren</a></div>
+		<div class="col-12 col-md-4"><a class="btn btn-outline-secondary w-100" href="<?= Route::_('index.php?option=com_balancirk&view=teacher'); ?>">Teacher prestaties</a></div>
+		<div class="col-12 col-md-4"><a class="btn btn-outline-secondary w-100" href="<?= Route::_('index.php?option=com_balancirk&view=member&layout=register'); ?>">Nieuw lid registreren</a></div>
+	</div>
+</div>
 <form action="<?= Route::_('index.php?option=com_balancirk&view=teacher'); ?>" method="post" id="teacher-form" name="adminForm" class="form-validate">
 	<label for="teacher_id"><?= Text::_('COM_BALANCIRK_TEACHER_SELECT') ?> :</label>
 	<select name="teacher_id" id="teacher_id">

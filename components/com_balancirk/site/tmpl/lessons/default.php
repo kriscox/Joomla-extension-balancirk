@@ -28,6 +28,7 @@ $app = Factory::getApplication();
 
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $app->getDocument()->getWebAssetManager();
+$wa->registerAndUseScript('balancirk-spa-navigation', 'media/com_balancirk/js/balancirk_spa_navigation.js');
 $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 ?>
 
@@ -105,7 +106,7 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 									</td>
 									<th scope="row" class="has-context">
 										<?php if ($this->canDo->get('lessons.register')) : ?>
-											<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&view=lesson&layout=default&id=' . $item->id); ?>">
+											<a class="hasTooltip" data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&view=lesson&layout=default&id=' . $item->id); ?>">
 											<?php endif ?>
 
 											<?= $this->escape(addslashes($item->name)) ?>
