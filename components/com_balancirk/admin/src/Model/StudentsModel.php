@@ -25,6 +25,14 @@ use Joomla\CMS\Helper\ContentHelper;
 class StudentsModel extends ListModel
 {
     /**
+     * Cached component actions.
+     *
+     * @var    \JObject|null
+     * @since  1.2.22
+     */
+    protected $canDo;
+
+    /**
      * Constructor.
      *
      * @param   array  $config  An optional associative array of configuration settings.
@@ -62,6 +70,8 @@ class StudentsModel extends ListModel
                 'a.phone',
                 'birthdate',
                 'a.birthdate',
+                'mutuality',
+                'a.mutuality',
                 'state',
                 'a.state'
             );
@@ -144,6 +154,8 @@ class StudentsModel extends ListModel
                     'a.city',
                     'a.phone',
                     'a.birthdate',
+                    'a.mutuality',
+                    'a.allow_photo',
                     'a.state'
                 ],
                 [
@@ -158,18 +170,25 @@ class StudentsModel extends ListModel
                     'city',
                     'phone',
                     'birthdate',
+                    'mutuality',
+                    'allow_photo',
                     'state'
                 ]
             )
         );
+        $query->select(
+            "GROUP_CONCAT(DISTINCT CONCAT(" . $db->quoteName('rm.firstname') . ", ' ', " . $db->quoteName('rm.name') . ") SEPARATOR ', ') AS " . $db->quoteName('parents')
+        );
         $query->from($db->quoteName('#__balancirk_students', 'a'));
+        $query->join('LEFT', $db->quoteName('#__balancirk_parents', 'rp') . ' ON ' . $db->quoteName('rp.child') . ' = ' . $db->quoteName('a.id'));
+        $query->join('LEFT', $db->quoteName('#__balancirk_members', 'rm') . ' ON ' . $db->quoteName('rm.id') . ' = ' . $db->quoteName('rp.parent'));
 
         // Based on the user access level, we need to filter the results.
         // What Access Permissions does this user have? What can (s)he do?
         $this->canDo = ContentHelper::getActions('com_balancirk');
-        if (!$this->canDo->get('students.viewall'))
+        if (!$this->canViewAllStudents())
         {
-            $query->join('INNER', $db->quoteName('#__balancirk_parents', 'p'), 'a.id = p.child AND p.parent = ' . Factory::getApplication()->getIdentity()->id);
+            $query->join('INNER', $db->quoteName('#__balancirk_parents', 'fp'), 'a.id = fp.child AND fp.parent = ' . Factory::getApplication()->getIdentity()->id);
         }
 
 
@@ -199,9 +218,46 @@ class StudentsModel extends ListModel
         $orderCol  = $this->state->get('list.ordering', 'a.id');
         $orderDirn = $this->state->get('list.direction', 'ASC');
 
+        $query->group(
+            $db->quoteName(
+                [
+                    'a.id',
+                    'a.name',
+                    'a.firstname',
+                    'a.email',
+                    'a.street',
+                    'a.number',
+                    'a.bus',
+                    'a.postcode',
+                    'a.city',
+                    'a.phone',
+                    'a.birthdate',
+                    'a.mutuality',
+                    'a.allow_photo',
+                    'a.state'
+                ]
+            )
+        );
         $query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
 
         return $query;
+    }
+
+    /**
+     * Check whether the current user may consult all students.
+     *
+     * @return  bool
+     *
+     * @since   1.2.22
+     */
+    private function canViewAllStudents(): bool
+    {
+        if ($this->canDo === null)
+        {
+            $this->canDo = ContentHelper::getActions('com_balancirk');
+        }
+
+        return $this->canDo->get('students.viewall') || $this->canDo->get('accounting.viewrelations');
     }
 
     /**

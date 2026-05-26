@@ -12,110 +12,189 @@ namespace CoCoCo\Component\Balancirk\Api\Controller;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\MVC\Controller\ApiController;
+use DateTimeImmutable;
+use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\MVC\Controller\Exception\ResourceNotFound;
+use Joomla\CMS\MVC\Controller\ApiController;
+use Joomla\CMS\Response\JsonResponse;
+use Joomla\Database\DatabaseInterface;
 
 /**
  * undocumented class
  */
 class PresencesController extends ApiController
 {
-    protected $contentType = 'student'; /* My understanding is that this maps to the desired model name */
+    protected $contentType = 'presences'; /* My understanding is that this maps to the desired model name */
     protected $default_view = 'presences'; /* This maps to the folder name containing the JSON API view */
 
-    public function getpresence()
+    /**
+     * Get present student ids for a lesson/date.
+     *
+     * @return  void
+     *
+     * @since   1.2.29
+     */
+    public function getpresence(): void
     {
+        $app = Factory::getApplication();
+
+        if (!$this->canRead()) {
+            echo new JsonResponse(null, Text::_('JLIB_APPLICATION_ERROR_ACCESS_FORBIDDEN'), true);
+            $app->close();
+        }
+
         $lesson = $this->input->getInt('lesson');
-        $date = $this->input->get('date', '', 'string');
+        $date = $this->normalizeDate($this->input->getString('date'));
 
-        /** @var \CoCoCo\Component\Balancirk\Administrator\Model\PresencesModel $model **/
-        $model = $this->getModel('Presences');
-        $model->getPresences($lesson, $date);
+        if ($lesson <= 0) {
+            echo new JsonResponse(null, Text::_('JGLOBAL_FIELD_ID_NOT_VALID'), true);
+            $app->close();
+        }
 
-        return $this->displayListModel($model);
+        /** @var DatabaseInterface $db */
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('student'))
+            ->from($db->quoteName('#__balancirk_presences'))
+            ->where($db->quoteName('lesson') . ' = ' . (int) $lesson)
+            ->where($db->quoteName('date') . ' = ' . $db->quote($date))
+            ->order($db->quoteName('student') . ' ASC');
+        $db->setQuery($query);
+        $students = array_map('intval', $db->loadColumn() ?: []);
+
+        echo new JsonResponse([
+            'lesson' => (int) $lesson,
+            'date' => $date,
+            'students' => $students,
+        ]);
+        $app->close();
     }
 
     /**
-     * Basic display of a list view
+     * Save present student ids for a lesson/date.
      *
-     * @return  static  A \JControllerLegacy object to support chaining.
+     * @return  void
      *
-     * @since   4.0.0
+     * @since   1.2.29
      */
-    public function displayListModel($model)
+    public function setpresence(): void
     {
-        // Assemble pagination information (using recommended JsonApi pagination notation for offset strategy)
-        $paginationInfo = $this->input->get('page', [], 'array');
-        $limit          = null;
-        $offset         = null;
+        $app = Factory::getApplication();
 
-        if (\array_key_exists('offset', $paginationInfo))
-        {
-            $offset = $paginationInfo['offset'];
-            $this->modelState->set($this->context . '.limitstart', $offset);
+        if (!$this->canWrite()) {
+            echo new JsonResponse(null, Text::_('JLIB_APPLICATION_ERROR_ACCESS_FORBIDDEN'), true);
+            $app->close();
         }
 
-        if (\array_key_exists('limit', $paginationInfo))
-        {
-            $limit = $paginationInfo['limit'];
-            $this->modelState->set($this->context . '.list.limit', $limit);
+        $payload = $this->getRequestData();
+        $lesson = $this->input->getInt('lesson', (int) ($payload['lesson'] ?? 0));
+        $date = $this->normalizeDate((string) ($payload['date'] ?? $this->input->getString('date')));
+        $students = isset($payload['students']) && \is_array($payload['students']) ? $payload['students'] : [];
+        $students = array_values(array_unique(array_filter(array_map('intval', $students), static fn(int $id): bool => $id > 0)));
+
+        if ($lesson <= 0) {
+            echo new JsonResponse(null, Text::_('JGLOBAL_FIELD_ID_NOT_VALID'), true);
+            $app->close();
         }
 
-        $viewType   = $this->app->getDocument()->getType();
-        $viewName   = $this->input->get('view', $this->default_view);
-        $viewLayout = $this->input->get('layout', 'default', 'string');
+        /** @var DatabaseInterface $db */
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
 
-        try
-        {
-            /** @var JsonApiView $view */
-            $view = $this->getView(
-                $viewName,
-                $viewType,
-                '',
-                ['base_path' => $this->basePath, 'layout' => $viewLayout, 'contentType' => $this->contentType]
-            );
-        }
-        catch (\Exception $e)
-        {
-            throw new \RuntimeException($e->getMessage());
-        }
+        $query = $db->getQuery(true)
+            ->delete($db->quoteName('#__balancirk_presences'))
+            ->where($db->quoteName('lesson') . ' = ' . (int) $lesson)
+            ->where($db->quoteName('date') . ' = ' . $db->quote($date));
+        $db->setQuery($query)->execute();
 
-        if (!$model)
+        foreach ($students as $student)
         {
-            throw new \RuntimeException(Text::_('JLIB_APPLICATION_ERROR_MODEL_CREATE'));
+            $query = $db->getQuery(true)
+                ->insert($db->quoteName('#__balancirk_presences'))
+                ->columns($db->quoteName(['lesson', 'student', 'date']))
+                ->values((int) $lesson . ', ' . (int) $student . ', ' . $db->quote($date));
+            $db->setQuery($query)->execute();
         }
 
-        // Push the model into the view (as default)
-        $view->setModel($model, true);
+        echo new JsonResponse([
+            'lesson' => (int) $lesson,
+            'date' => $date,
+            'students' => $students,
+            'updated' => true,
+        ]);
+        $app->close();
+    }
 
-        if ($offset)
-        {
-            $model->setState('list.start', $offset);
+    /**
+     * Decode request payload and support JSON:API format.
+     *
+     * @return  array
+     *
+     * @since   1.2.29
+     */
+    private function getRequestData(): array
+    {
+        $payload = (array) json_decode((string) $this->input->json->getRaw(), true);
+
+        if (isset($payload['data']) && \is_array($payload['data'])) {
+            $payloadData = $payload['data'];
+
+            return isset($payloadData['attributes']) && \is_array($payloadData['attributes'])
+                ? $payloadData['attributes']
+                : [];
         }
 
-        /**
-         * Sanity check we don't have too much data being requested as regularly in html we automatically set it back to
-         * the last page of data. If there isn't a limit start then set
-         */
-        if ($limit)
-        {
-            $model->setState('list.limit', $limit);
+        return $payload;
+    }
+
+    /**
+     * Check read permissions for attendance endpoints.
+     *
+     * @return  bool
+     *
+     * @since   1.2.29
+     */
+    private function canRead(): bool
+    {
+        $user = Factory::getApplication()->getIdentity();
+
+        return !$user->guest && $user->authorise('lessons.view', 'com_balancirk');
+    }
+
+    /**
+     * Check write permissions for attendance endpoints.
+     *
+     * @return  bool
+     *
+     * @since   1.2.29
+     */
+    private function canWrite(): bool
+    {
+        $user = Factory::getApplication()->getIdentity();
+
+        return !$user->guest && $user->authorise('lessons.admin', 'com_balancirk');
+    }
+
+    /**
+     * Normalize date input to Y-m-d.
+     *
+     * @param   string|null  $date  Input date.
+     *
+     * @return  string
+     *
+     * @since   1.2.29
+     */
+    private function normalizeDate(?string $date): string
+    {
+        if ($date === null || trim($date) === '') {
+            return date('Y-m-d');
         }
-        else
-        {
-            $model->setState('list.limit', $this->itemsPerPage);
+
+        $normalized = DateTimeImmutable::createFromFormat('Y-m-d', $date);
+
+        if ($normalized instanceof DateTimeImmutable) {
+            return $normalized->format('Y-m-d');
         }
 
-        if (!\is_null($offset) && $offset > $model->getTotal())
-        {
-            throw new ResourceNotFound;
-        }
-
-        $view->document = $this->app->getDocument();
-
-        $view->displayList();
-
-        return $this;
+        return date('Y-m-d');
     }
 }

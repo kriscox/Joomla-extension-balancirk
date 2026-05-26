@@ -18,6 +18,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\User\User;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Form\Form;
 use Joomla\CMS\User\UserHelper;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Application\SiteApplication;
@@ -137,6 +138,16 @@ class MemberModel extends AdminModel
         if (empty($form))
         {
             return false;
+        }
+
+        $isEditLayout = Factory::getApplication()->input->getCmd('layout') === 'edit';
+        $memberId = (int) ($data['id'] ?? 0);
+
+        if ($isEditLayout || $memberId > 0) {
+            $form->setFieldAttribute('password', 'required', 'false');
+            $form->setFieldAttribute('password2', 'required', 'false');
+            $form->setFieldAttribute('password', 'class', 'validate-password');
+            $form->setFieldAttribute('password2', 'class', 'validate-password');
         }
 
         return $form;
@@ -289,5 +300,92 @@ class MemberModel extends AdminModel
         }
 
         return true;
+    }
+
+    /**
+     * Save edited values of a member.
+     *
+     * @param   array  $data  Form data.
+     *
+     * @return  boolean
+     *
+     * @since   1.2.12
+     */
+    public function edit(array $data): bool
+    {
+        $app = Factory::getApplication();
+        $user = new User((int) $data['id']);
+
+        if (empty($data['password'])) {
+            unset($data['password'], $data['password2']);
+        }
+
+        if (!$user->bind($data)) {
+            $this->setError(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError());
+
+            return false;
+        }
+
+        if (!$user->save()) {
+            $this->setError(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError());
+
+            return false;
+        }
+
+        $this->saveToTable((int) $data['id'], $data);
+
+        return true;
+    }
+
+    /**
+     * Save data to member_additional table.
+     *
+     * @param   int   $id      Id of the user to save.
+     * @param   array $data    Data to save.
+     * @param   bool  $insert  True inserts new row, false updates existing row.
+     *
+     * @return  void
+     *
+     * @since   1.2.12
+     */
+    public function saveToTable(int $id, array $data, bool $insert = false): void
+    {
+        $db = $this->getDatabase();
+        $columns = ['id', 'firstname', 'street', 'number', 'bus', 'postcode', 'city', 'phone'];
+        $values = [
+            $id,
+            $data['firstname'] ?? '',
+            $data['street'] ?? '',
+            $data['number'] ?? '',
+            $data['bus'] ?? '',
+            $data['postcode'] ?? '',
+            $data['city'] ?? '',
+            $data['phone'] ?? '',
+        ];
+
+        $query = $db->getQuery(true);
+
+        if ($insert) {
+            $query->insert($db->quoteName('#__balancirk_members_additional'))
+                ->columns($db->quoteName($columns))
+                ->values(implode(',', array_map(fn ($value) => $db->quote($value), $values)));
+        } else {
+            $fields = [];
+
+            foreach ($columns as $column) {
+                if ($column === 'id') {
+                    continue;
+                }
+
+                $fields[] = $db->quoteName($column) . ' = ' . $db->quote($data[$column] ?? '');
+            }
+
+            $query->update($db->quoteName('#__balancirk_members_additional'))
+                ->set($fields)
+                ->where($db->quoteName('id') . ' = ' . $id);
+        }
+
+        $db->setQuery($query);
+        $db->execute();
     }
 }

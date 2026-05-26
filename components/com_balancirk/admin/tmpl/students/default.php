@@ -67,6 +67,11 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 								<th scope="col" style="width:10px" class="text_center d-none d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_BIRTHDATE', 'a.birthdate', $listDirn, $listOrder); ?>
 								</th>
+								<?php if ($this->canViewRelations) : ?>
+									<th scope="col" style="width:20px" class="text_center d-none d-md-table-cell">
+										<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_PARENTS'); ?>
+									</th>
+								<?php endif; ?>
 								<th scope="col" style="width:10px" class="text_center d-none d-md-table-cell">
 									Foto
 								</th>
@@ -88,9 +93,13 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 										<?= $this->escape(addslashes($item->id)); ?>
 									</td>
 									<td scope="row" class="d-none d-md-table-cell">
-										<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&task=student.edit&id=' . $item->id); ?>">
-											<?= $editIcon; ?><?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
-										</a>
+										<?php if ($this->canEdit) : ?>
+											<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&task=student.edit&id=' . $item->id); ?>">
+												<?= $editIcon; ?><?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
+											</a>
+										<?php else : ?>
+											<?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)) ?>
+										<?php endif; ?>
 									</td>
 									<td scope="row" class="d-none d-md-table-cell">
 										<?= $this->escape($item->email); ?>
@@ -110,6 +119,11 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 									<td scope="row" class="d-none d-md-table-cell">
 										<?= HtmlHelper::date($item->birthdate, Text::_('DATE_FORMAT_FILTER_DATE')); ?>
 									</td>
+									<?php if ($this->canViewRelations) : ?>
+										<td scope="row" class="d-none d-md-table-cell">
+											<?= $this->escape($item->parents ?? ''); ?>
+										</td>
+									<?php endif; ?>
 									<td scope="row" class="d-none d-md-table-cell">
 										<?= $this->escape($item->allow_photo); ?>
 									</td>

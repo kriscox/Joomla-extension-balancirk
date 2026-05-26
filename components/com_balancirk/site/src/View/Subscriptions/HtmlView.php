@@ -12,6 +12,7 @@ namespace CoCoCo\Component\Balancirk\Site\View\Subscriptions;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 
@@ -57,6 +58,13 @@ class HtmlView extends BaseHtmlView
      * @var  array
      */
     public $activeFilters;
+
+    /**
+     * The years for filtering
+     *
+     * @var  array
+     */
+    protected $years;
 
     /**
      * Method to display the view.

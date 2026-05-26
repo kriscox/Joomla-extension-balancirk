@@ -13,7 +13,12 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 \defined('_JEXEC') or die;
 
 use Exception;
+use RuntimeException;
+use CoCoCo\Component\Balancirk\Site\Helper\AccountingExportHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\SubscriptionMailHelper;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Mail\MailerFactoryInterface;
@@ -150,8 +155,50 @@ class SubscriptionModel extends AdminModel
     {
         /** @var lessonsModel */
         $model = $this->getMVCFactory()->createModel('Lessons', 'Site');
+        $data = $this->loadFormData();
+        $studentId = (int) ($data['student'] ?? 0);
 
-        return $model->getOpenLessons();
+        if ($studentId <= 0) {
+            return [];
+        }
+
+        return $model->getOpenLessons($studentId);
+    }
+
+    /**
+     * Check whether there are lessons with an open registration period.
+     *
+     * @return  bool
+     *
+     * @since   1.2.12
+     */
+    public function getHasOpenLessons(): bool
+    {
+        /** @var lessonsModel */
+        $model = $this->getMVCFactory()->createModel('Lessons', 'Site');
+
+        return count($model->getOpenLessons()) > 0;
+    }
+
+    /**
+     * Method to get the data that should be injected in the form.
+     *
+     * @return  array
+     *
+     * @since   1.2.12
+     */
+    protected function loadFormData()
+    {
+        $app = Factory::getApplication();
+        $data = (array) $app->getUserState('com_balancirk.subscription.data', array());
+        $selectedStudent = $app->input->getInt('student_id');
+
+        if ($selectedStudent > 0) {
+            $data['student'] = $selectedStudent;
+            unset($data['lesson']);
+        }
+
+        return $data;
     }
 
     /**
@@ -165,7 +212,7 @@ class SubscriptionModel extends AdminModel
      *
      * @version	__BUMP_VERSION__
      **/
-    public function add(array $data = null)
+    public function add(?array $data = null)
     {
         $studentId = (int) $data['student'];
         $lessonId = (int) $data['lesson'];
@@ -173,8 +220,16 @@ class SubscriptionModel extends AdminModel
         // Check ik max numbers of students is not reached, if not subscribed == 0 else subscribed == 1
         /** @var lessonModel*/
         $model = $this->getMVCFactory()->createModel('Lesson', 'Site');
-        $lesson = $model->getItem($lessonId, $lessonId);
-        $waitinglist = ($model->getNumberOfStudents($lessonId) < $lesson->max_students) ? 0 : 1;
+        $lesson = $model->getItem($data['lesson'], $data['lesson']);
+
+        if (!$lesson || !$this->isStudentEligibleForLesson((int) $data['student'], $lesson)) {
+            $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_AGE_MISMATCH'));
+
+            return false;
+        }
+
+        $waitinglist = ($model->getNumberOfStudents($data['lesson']) < $lesson->max_students) ? 0 : 1;
+        array_push($values, $waitinglist);
 
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
@@ -183,60 +238,38 @@ class SubscriptionModel extends AdminModel
             ->values($studentId . ',' . $lessonId . ',' . (int) $waitinglist);
         $db->setQuery($query)->execute();
 
-        // Send mail to parent
-        /** @var MailerInterface */
-        $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
-        $mailer->setSender('info@balancirk.be', 'Circusatelier Balancirk VZW');
-        // Get the students parents
         /** @var StudentModel */
         $studentModel = $this->getMVCFactory()->createModel('Student', 'Site');
+        $student = $studentModel->getItem((int) $data['student']);
         $parents = $studentModel->getParents($data['student']);
+        /** @var MemberModel */
+        $memberModel = $this->getMVCFactory()->createModel('Member', 'Site');
+        $mailDefaults = $this->getSubscriptionMailDefaults();
+        $subscriptionDate = date('Y-m-d');
 
         foreach ($parents as $parent)
         {
-            // Get the parent email
-            /** @var MemberModel */
-            $memberModel = $this->getMVCFactory()->createModel('Member', 'Site');
             $member = $memberModel->getItem($parent->parent);
 
-            // add the email to the mailAdresses array
-            $mailer->addRecipient($member->email);
+            if (!$student || !$member || empty($member->email)) {
+                continue;
+            }
+
+            $message = SubscriptionMailHelper::buildMailMessage(
+                $lesson,
+                $student,
+                $member,
+                $subscriptionDate,
+                (bool) $waitinglist,
+                $mailDefaults
+            );
+            $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+            $mailer->setSender('info@balancirk.be', 'Circusatelier Balancirk VZW')
+                ->addRecipient($member->email)
+                ->setSubject($message['subject'])
+                ->setBody($message['body'])
+                ->Send();
         }
-
-        if ($waitinglist == 0)
-        { // Not on waitinglist
-            $mailer->setSubject(Text::_('COM_BALANCIRK_SUBJECT_SUBSCRIPTION') . ' "' . $lesson->name . '"')
-                // TODO: This is a placeholder, replace this with the actual mail content
-                ->setBody('
-Hallo,
-
-Bedankt voor je inschrijving. 
- 
-Deze is goed ontvangen voor de les "' .
-                    $lesson->name . '". De lessen starten op ' . date('d/m/Y', strtotime($lesson->start)) . '.
-  
-De betaling moet je nog niet in orde brengen. In de loop van de maand oktober ontvang je een mail met de betalingsgegevens.
-  
-Met vriendelijke groeten,
-  
-Het Balancirk team');
-        }
-        else
-        { // On wiatinglist
-            $mailer->setSubject(Text::_('COM_BALANCIRK_SUBJECT_SUBSCRIPTION') . ' ' . $lesson->name)
-                ->setBody('
-Hallo,
-
-Bedankt voor je inschrijving. De les "' . $lesson->name . '" is volzet. De inschrijving is op de wachtlijst gekomen.
-
-Kom zeker in september naar de eerste lessen, zodat we je kunnen leren kennen en je kind kan kennismaken met de les. We zullen je op de hoogte houden van de inschrijvingen.
-
-Met vriendelijke groeten,
-
-Het Balancirk team');
-        }
-
-        $mailer->Send();
 
         return true;
     }
@@ -262,5 +295,136 @@ Het Balancirk team');
         $db->setQuery($query)->execute();
 
         return true;
+    }
+
+    /**
+     * Check if a student fits the lesson age category.
+     *
+     * @param   int     $studentId  Student id.
+     * @param   object  $lesson     Lesson record.
+     *
+     * @return  bool
+     *
+     * @since   1.2.12
+     */
+    private function isStudentEligibleForLesson(int $studentId, object $lesson): bool
+    {
+        /** @var StudentModel */
+        $studentModel = $this->getMVCFactory()->createModel('Student', 'Site');
+        $student = $studentModel->getItem($studentId);
+
+        if (!$student) {
+            return false;
+        }
+
+        return LessonAgeHelper::matchesLesson($student->birthdate ?? null, $lesson);
+    }
+
+    /**
+     * Get the configured default mail templates for subscriptions.
+     *
+     * @return  array<string, string>
+     *
+     * @since   1.2.20
+     */
+    private function getSubscriptionMailDefaults(): array
+    {
+        $params = ComponentHelper::getParams('com_balancirk');
+
+        return [
+            'subscription_subject' => (string) $params->get('email_subject_subscription', ''),
+            'subscription_body' => (string) $params->get('email_body_subscription', ''),
+            'waitinglist_subject' => (string) $params->get('email_subject_waitinglist', ''),
+            'waitinglist_body' => (string) $params->get('email_body_waitinglist', ''),
+        ];
+    }
+
+    /**
+     * Build the subscription export for accounting.
+     *
+     * @param   string|null  $year    School year filter.
+     * @param   string       $format  Export format.
+     *
+     * @return  array{content:string,filename:string,mimeType:string}
+     *
+     * @since   1.2.22
+     */
+    public function exportForAccounting(?string $year, string $format = 'csv'): array
+    {
+        $rows = $this->getAccountingExportRows($year);
+        $safeYear = $year !== null && $year !== '' ? preg_replace('/[^0-9A-Za-z_-]/', '', $year) : 'all';
+
+        if ($format === 'xls') {
+            return [
+                'content' => AccountingExportHelper::renderXls($rows),
+                'filename' => 'balancirk-subscriptions-' . $safeYear . '.xls',
+                'mimeType' => 'application/vnd.ms-excel; charset=utf-8',
+            ];
+        }
+
+        return [
+            'content' => AccountingExportHelper::renderCsv($rows),
+            'filename' => 'balancirk-subscriptions-' . $safeYear . '.csv',
+            'mimeType' => 'text/csv; charset=utf-8',
+        ];
+    }
+
+    /**
+     * Load the accounting export rows.
+     *
+     * @param   string|null  $year  School year filter.
+     *
+     * @return  array<int, array<string, string>>
+     *
+     * @since   1.2.22
+     */
+    public function getAccountingExportRows(?string $year = null): array
+    {
+        if (!Factory::getApplication()->getIdentity()->authorise('accounting.export', 'com_balancirk')) {
+            throw new RuntimeException(Text::_('JLIB_APPLICATION_ERROR_ACCESS_FORBIDDEN'), 403);
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $addressExpression = "TRIM(CONCAT_WS(' ', NULLIF(" . $db->quoteName('m.street') . ", ''), NULLIF(" . $db->quoteName('m.number') . ", '')))";
+        $parentJoin = $db->quoteName('#__balancirk_parents', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ('
+            . 'SELECT ' . $db->quoteName('pp.id')
+            . ' FROM ' . $db->quoteName('#__balancirk_parents', 'pp')
+            . ' WHERE ' . $db->quoteName('pp.child') . ' = ' . $db->quoteName('s.id')
+            . ' ORDER BY ' . $db->quoteName('pp.primary') . ' DESC, ' . $db->quoteName('pp.id') . ' ASC'
+            . ' LIMIT 1'
+            . ')';
+
+        $query->select($db->quoteName('m.firstname', 'firstname'))
+            ->select($db->quoteName('m.name', 'name'))
+            ->select($addressExpression . ' AS ' . $db->quoteName('address'))
+            ->select($db->quoteName('m.bus', 'bus'))
+            ->select($db->quoteName('m.postcode', 'postcode'))
+            ->select($db->quoteName('m.city', 'city'))
+            ->select($db->quoteName('m.email', 'email'))
+            ->select($db->quoteName('l.name', 'lesson'))
+            ->select($db->quoteName('s.firstname', 'student_firstname'))
+            ->select($db->quoteName('s.name', 'student_name'))
+            ->select($db->quoteName('s.uitpas', 'uitpas'))
+            ->select($db->quoteName('s.mutuality', 'mutuality'))
+            ->from($db->quoteName('#__balancirk_subscriptions', 'sub'))
+            ->join('INNER', $db->quoteName('#__balancirk_lessons', 'l') . ' ON ' . $db->quoteName('l.id') . ' = ' . $db->quoteName('sub.lesson'))
+            ->join('INNER', $db->quoteName('#__balancirk_students', 's') . ' ON ' . $db->quoteName('s.id') . ' = ' . $db->quoteName('sub.student'))
+            ->join('LEFT', $parentJoin)
+            ->join('LEFT', $db->quoteName('#__balancirk_members', 'm') . ' ON ' . $db->quoteName('m.id') . ' = ' . $db->quoteName('p.parent'))
+            ->where($db->quoteName('sub.subscribed') . ' = 0')
+            ->order($db->quoteName('m.name') . ' ASC, ' . $db->quoteName('m.firstname') . ' ASC, ' . $db->quoteName('s.name') . ' ASC, ' . $db->quoteName('s.firstname') . ' ASC, ' . $db->quoteName('l.name') . ' ASC');
+
+        if ($year !== null && $year !== '') {
+            $query->where($db->quoteName('l.year') . ' = :year')
+                ->bind(':year', $year);
+        }
+
+        $db->setQuery($query);
+
+        return array_map(
+            static fn(array $row): array => AccountingExportHelper::normalizeRow($row),
+            $db->loadAssocList()
+        );
     }
 }

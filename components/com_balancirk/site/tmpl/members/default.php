@@ -18,8 +18,8 @@ use Joomla\CMS\Layout\LayoutHelper;
 ?>
 
 <alert>Not yet implemented</alert>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-members-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-members-top}'); ?>
 <table class="table" id="memberList">
 	<thead>
 		<tr>
@@ -105,5 +105,5 @@ foreach ($this->items as $i => $item) :
 		<?php endforeach; ?>
 	</tbody>
 </table>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-members-bottom}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-members-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

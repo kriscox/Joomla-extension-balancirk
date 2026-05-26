@@ -28,8 +28,8 @@ HTMLHelper::_('behavior.keepalive');
 $listDirn  = $this->escape($this->state->get('list.direction'));
 ?>
 
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-student-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-student-top}'); ?>
 <?= LayoutHelper::render('student.fullname_state', $this); ?>
 <form action="<?= Route::_('index.php?option=com_balancirk&view=student&layout=default&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="student-form" class="form-validate">
 	<div class="balancirk_student" style="margin:30px">
@@ -51,6 +51,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 		</div>
 		<div class="row">
 			<?= $this->escape($this->item->uitpas) ?>
+			<?= $this->item->mutuality ?>
 		</div>
 		<div class="row">
 			<?php if ($this->item->allow_photo) {
@@ -72,5 +73,5 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 		</div>
 	</div>
 </form>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-student-bottom}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-student-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

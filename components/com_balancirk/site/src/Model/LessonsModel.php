@@ -14,6 +14,7 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 
 use DateInterval;
 use Exception;
+use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
 use Joomla\Database\ParameterType;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\CMS\Factory;
@@ -180,7 +181,29 @@ class LessonsModel extends ListModel
      *
      * @return array
      **/
-    public function getOpenLessons()
+    public function getOpenLessons(?int $studentId = null)
+    {
+        $rows = $this->getOpenLessonItems($studentId);
+        $lessons = [];
+
+        foreach ($rows as $row)
+        {
+            $lessons[$row->id] = $row->name;
+        }
+
+        return $lessons;
+    }
+
+    /**
+     * Method to get lesson records open for subscription.
+     *
+     * @param   int|null  $studentId  Selected student id.
+     *
+     * @return  array
+     *
+     * @since   1.2.12
+     */
+    public function getOpenLessonItems(?int $studentId = null): array
     {
         // Create a new query object.
         $db = $this->getDatabase();
@@ -193,12 +216,26 @@ class LessonsModel extends ListModel
         $query->select(
             $db->quoteName(
                 [
+                    'a.id',
+                    'a.name',
+                    'a.type',
+                    'a.fee',
+                    'a.year',
+                    'a.state',
+                    'a.start',
+                    'a.min_age',
+                    'a.max_age'
+                ],
+                [
                     'id',
                     'name',
                     'type',
                     'fee',
                     'year',
-                    'state'
+                    'state',
+                    'start',
+                    'min_age',
+                    'max_age'
                 ]
             )
         )
@@ -206,12 +243,29 @@ class LessonsModel extends ListModel
             ->where($db->quote($today) . ' between `start_registration` and `end_registration`')
             ->order('name');
 
-        $rows = $db->setQuery($query)->loadObjectlist();
+        if ($studentId !== null && $studentId > 0)
+        {
+            $subscriptionQuery = $db->getQuery(true)
+                ->select('1')
+                ->from($db->quoteName('#__balancirk_subscriptions', 's'))
+                ->where($db->quoteName('s.lesson') . ' = ' . $db->quoteName('a.id'))
+                ->where($db->quoteName('s.student') . ' = ' . (int) $studentId);
 
+            $query->where('NOT EXISTS (' . $subscriptionQuery . ')');
+        }
+
+        $rows = $db->setQuery($query)->loadObjectlist() ?: [];
+        $studentBirthdate = $studentId ? $this->getStudentBirthdate($studentId) : null;
         $lessons = [];
+
         foreach ($rows as $row)
         {
-            $lessons[$row->id] = $row->name;
+            if ($studentBirthdate !== null && !LessonAgeHelper::matchesLesson($studentBirthdate, $row))
+            {
+                continue;
+            }
+
+            $lessons[] = $row;
         }
 
         return $lessons;
@@ -251,6 +305,7 @@ class LessonsModel extends ListModel
             ->order('name');
 
         $rows = $db->setQuery($query)->loadObjectlist();
+        $lessons = [];
 
         foreach ($rows as $row)
         {
@@ -277,5 +332,34 @@ class LessonsModel extends ListModel
 
         $db->setQuery($query);
         return $db->loadColumn();
+    }
+
+    /**
+     * Returns a student's birthdate.
+     *
+     * @param   int  $studentId  Student id.
+     *
+     * @return  string|null
+     *
+     * @since   1.2.12
+     */
+    private function getStudentBirthdate(int $studentId): ?string
+    {
+        if ($studentId <= 0)
+        {
+            return null;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('birthdate'))
+            ->from($db->quoteName('#__balancirk_students'))
+            ->where($db->quoteName('id') . ' = ' . (int) $studentId);
+
+        $db->setQuery($query);
+
+        $birthdate = $db->loadResult();
+
+        return $birthdate !== null ? (string) $birthdate : null;
     }
 }

@@ -124,7 +124,24 @@ class MembersModel extends ListModel
                 ]
             )
         );
+        $query->select(
+            "GROUP_CONCAT(DISTINCT CONCAT(" . $db->quoteName('s.firstname') . ", ' ', " . $db->quoteName('s.name') . ") SEPARATOR ', ') AS " . $db->quoteName('students')
+        );
         $query->from($db->quoteName('#__balancirk_members', 'a'));
+        $query->join('LEFT', $db->quoteName('#__balancirk_parents', 'p') . ' ON ' . $db->quoteName('p.parent') . ' = ' . $db->quoteName('a.id'));
+        $query->join('LEFT', $db->quoteName('#__balancirk_students', 's') . ' ON ' . $db->quoteName('s.id') . ' = ' . $db->quoteName('p.child'));
+
+        // For API consumers without global rights, only expose the current member.
+        $app = Factory::getApplication();
+        $user = $app->getIdentity();
+        $canViewAll = $user->authorise('students.viewall', 'com_balancirk')
+            || $user->authorise('accounting.viewrelations', 'com_balancirk')
+            || $user->authorise('core.admin', 'com_balancirk');
+
+        if ($app->isClient('api') && !$canViewAll)
+        {
+            $query->where($db->quoteName('a.id') . ' = ' . (int) $user->id);
+        }
 
         // Filter by search in title.
         $search = $this->getState('filter.search');
@@ -139,6 +156,28 @@ class MembersModel extends ListModel
         $orderCol  = $this->state->get('list.ordering', 'a.id');
         $orderDirn = $this->state->get('list.direction', 'ASC');
 
+        $query->group(
+            $db->quoteName(
+                [
+                    'a.id',
+                    'a.name',
+                    'a.firstname',
+                    'a.username',
+                    'a.email',
+                    'a.street',
+                    'a.number',
+                    'a.bus',
+                    'a.postcode',
+                    'a.city',
+                    'a.phone',
+                    'a.block',
+                    'a.sendEmail',
+                    'a.registerDate',
+                    'a.lastvisitDate',
+                    'a.activation'
+                ]
+            )
+        );
         $query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
 
         return $query;
