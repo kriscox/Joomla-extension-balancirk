@@ -234,8 +234,8 @@ Het Balancirk team');
         $query = $db->getQuery(true);
 
         $query->delete($db->quoteName('#__balancirk_subscriptions'))
-            ->where($db->quoteName('student') . ' = ' . $subscription->student)
-            ->where($db->quoteName('lesson') . ' = ' . $subscription->lesson);
+            ->where($db->quoteName('student') . ' = ' . (int) $subscription->student)
+            ->where($db->quoteName('lesson') . ' = ' . (int) $subscription->lesson);
         $db->setQuery($query)->execute();
 
         return true;
@@ -246,7 +246,7 @@ Het Balancirk team');
      *
      * @param   integer  $pk  The id of the primary key.
      *
-     * @return  \stdClass|boolean  Object on success, false on failure.
+     * @return  CMSObject|boolean  Object on success, false on failure.
      *
      * @since   __BUMP_VERIONS__
      */

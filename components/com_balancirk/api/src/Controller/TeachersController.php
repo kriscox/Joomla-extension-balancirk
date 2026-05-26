@@ -27,8 +27,8 @@ class TeachersController extends ApiController
 
     public function getteacher()
     {
-        $lesson = $this->input->get('lesson');
-        $date = $this->input->get('date');
+        $lesson = $this->input->getInt('lesson');
+        $date = $this->input->get('date', '', 'string');
 
         /** @var \CoCoCo\Component\Balancirk\Administrator\Model\TeacherModel $model **/
         $model = $this->getModel('Teachers');

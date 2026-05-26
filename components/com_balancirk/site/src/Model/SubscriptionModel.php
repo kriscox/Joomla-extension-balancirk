@@ -155,38 +155,6 @@ class SubscriptionModel extends AdminModel
     }
 
     /**
-     * Method to get open lessons for a specific student, excluding existing subscriptions.
-     *
-     * @param   int  $studentId  Student id.
-     *
-     * @return  array
-     */
-    public function getLessonsForStudent(int $studentId): array
-    {
-        /** @var lessonsModel */
-        $model = $this->getMVCFactory()->createModel('Lessons', 'Site');
-        $openLessons = $model->getOpenLessons();
-
-        if ($studentId <= 0 || empty($openLessons)) {
-            return $openLessons;
-        }
-
-        $db = $this->getDatabase();
-        $query = $db->getQuery(true)
-            ->select($db->quoteName('lesson'))
-            ->from($db->quoteName('#__balancirk_subscriptions'))
-            ->where($db->quoteName('student') . ' = ' . (int) $studentId);
-
-        $subscribedLessonIds = array_map('intval', $db->setQuery($query)->loadColumn());
-
-        foreach ($subscribedLessonIds as $lessonId) {
-            unset($openLessons[$lessonId]);
-        }
-
-        return $openLessons;
-    }
-
-    /**
      * Add subscription to the database
      *
      * Add if not exists the subscription to the database
@@ -291,8 +259,8 @@ Het Balancirk team');
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
         $query->delete($db->quoteName('#__balancirk_subscriptions'))
-            ->where($db->quoteName('student') . ' = ' . $pks['student'])
-            ->where($db->quoteName('lesson') . ' = ' . $pks['lesson']);
+            ->where($db->quoteName('student') . ' = ' . (int) $pks['student'])
+            ->where($db->quoteName('lesson') . ' = ' . (int) $pks['lesson']);
         $db->setQuery($query)->execute();
 
         return true;

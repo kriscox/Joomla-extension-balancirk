@@ -295,7 +295,7 @@ class LessonModel extends AdminModel
         /** @var CMSApplication */
         $app = Factory::getApplication();
 
-        return $app->getIdentity()()->authorise('lessons.admin', $this->option);
+        return $app->getIdentity()->authorise('lessons.admin', $this->option);
     }
 
     /**

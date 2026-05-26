@@ -34,7 +34,7 @@ class SubscriptionController extends ApiController
 
     public function delete($recordKey = null)
     {
-        $recordKey = $this->input->get('id');
+        $recordKey = $this->input->getInt('id');
 
         $modelName = $this->input->get('model', Inflector::singularize($this->contentType));
 
