@@ -63,6 +63,12 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_YEAR', 'a.year', $listDirn, $listOrder); ?>
 								</th>
 								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
+									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_MIN_AGE', 'a.min_age', $listDirn, $listOrder); ?>
+								</th>
+								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
+									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_MAX_AGE', 'a.max_age', $listDirn, $listOrder); ?>
+								</th>
+								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
 									<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_START_REGISTRATION'); ?>
 								</th>
 								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
@@ -101,6 +107,12 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 									</th>
 									<th scope="row" class="has-context">
 										<?= $this->escape($item->year); ?>
+									</th>
+									<th scope="row" class="has-context">
+										<?= $item->min_age !== null && $item->min_age !== '' ? (int) $item->min_age : '-'; ?>
+									</th>
+									<th scope="row" class="has-context">
+										<?= $item->max_age !== null && $item->max_age !== '' ? (int) $item->max_age : '-'; ?>
 									</th>
 									<th scope="row" class="has-context">
 										<?= $this->escape($item->start_registration); ?>

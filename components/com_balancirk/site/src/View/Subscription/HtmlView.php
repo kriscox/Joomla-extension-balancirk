@@ -37,6 +37,13 @@ class HtmlView extends BaseHtmlView
     protected $lessons;
 
     /**
+     * Whether there are lessons currently open for subscription.
+     *
+     * @var  bool
+     */
+    protected $hasOpenLessons;
+
+    /**
      * The model state
      *
      * @var  object
@@ -75,6 +82,7 @@ class HtmlView extends BaseHtmlView
     {
         $this->students = $this->get('Students');
         $this->lessons = $this->get('Lessons');
+        $this->hasOpenLessons = (bool) $this->get('HasOpenLessons');
         $this->form = $this->get('Form');
 
         $this->lessonsByStudent = [];

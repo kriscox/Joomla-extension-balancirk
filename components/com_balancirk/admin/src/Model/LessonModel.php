@@ -132,6 +132,37 @@ class LessonModel extends AdminModel
     }
 
     /**
+     * Validate lesson data.
+     *
+     * @param   Form    $form   The form to validate against.
+     * @param   array   $data   The data to validate.
+     * @param   string  $group  The name of the field group to validate.
+     *
+     * @return  array|bool
+     *
+     * @since   1.2.12
+     */
+    public function validate($form, $data, $group = null)
+    {
+        $validData = parent::validate($form, $data, $group);
+
+        if ($validData === false) {
+            return false;
+        }
+
+        $minAge = $validData['min_age'] ?? null;
+        $maxAge = $validData['max_age'] ?? null;
+
+        if ($minAge !== '' && $maxAge !== '' && $minAge !== null && $maxAge !== null && (int) $maxAge < (int) $minAge) {
+            $this->setError(Text::_('COM_BALANCIRK_LESSON_AGE_RANGE_INVALID'));
+
+            return false;
+        }
+
+        return $validData;
+    }
+
+    /**
      * Method to get the data that should be injected in the form.
      *
      * @return  mixed  The data for the form.
@@ -164,7 +195,7 @@ class LessonModel extends AdminModel
      *
      * @since   0.0.1
      */
-    public function getHours(int $lesson = null)
+    public function getHours(?int $lesson = null)
     {
         // Don't know if it works
         $lesson = (!is_null($lesson) ? $lesson : (int) $this->getState('lesson.id'));

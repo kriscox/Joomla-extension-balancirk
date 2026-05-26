@@ -42,23 +42,27 @@ class LessonsField extends ListField
      */
     protected function getOptions()
     {
-        $app = Factory::getApplication();
-
         /** @var LessonsModel */
         $lessonModel = new LessonsModel(['OpenSubscriptions' => true]);
-        $lessons = $lessonModel->getOpenLessons();
+        $studentId = (int) $this->form->getValue('student');
+
+        if ($studentId <= 0) {
+            return parent::getOptions();
+        }
+
+        $lessons = $lessonModel->getOpenLessons($studentId);
 
         if (null == $lessons) {
             $lessons = [];
-        } else {
-            $lesOption = [];
+        }
 
-            foreach ($lessons as $id => $lesson) {
-                array_push(
-                    $lesOption,
-                    array('value' => $id, 'text' => $lesson)
-                );
-            }
+        $lesOption = [];
+
+        foreach ($lessons as $id => $lesson) {
+            array_push(
+                $lesOption,
+                array('value' => $id, 'text' => $lesson)
+            );
         }
 
         // Merge any additional options in the XML definition.

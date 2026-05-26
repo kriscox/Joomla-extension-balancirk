@@ -37,6 +37,8 @@ HTMLHelper::_('behavior.keepalive');
 						<?= $this->form->renderField('fee'); ?>
 						<?= $this->form->renderField('year'); ?>
 						<?= $this->form->renderField('max_students'); ?>
+						<?= $this->form->renderField('min_age'); ?>
+						<?= $this->form->renderField('max_age'); ?>
 					</div>
 				</div>
 			</div>
@@ -65,6 +67,17 @@ HTMLHelper::_('behavior.keepalive');
 			<div class="col-md-6">
 				<?= $this->form->getLabel('lesdays_field'); ?>
 				<?= $this->form->getInput('lesdays_field'); ?>
+			</div>
+		</div>
+		<?= HTMLHelper::_('uitab.endTab'); ?>
+
+		<?= HTMLHelper::_('uitab.addTab', 'myTab', 'emails', Text::_('COM_BALANCIRK_LESSON_TAB_EMAILS')); ?>
+		<div class="row">
+			<div class="col-md-12">
+				<?= $this->form->renderField('subscription_email_subject'); ?>
+				<?= $this->form->renderField('subscription_email_body'); ?>
+				<?= $this->form->renderField('waitinglist_email_subject'); ?>
+				<?= $this->form->renderField('waitinglist_email_body'); ?>
 			</div>
 		</div>
 		<?= HTMLHelper::_('uitab.endTab'); ?>

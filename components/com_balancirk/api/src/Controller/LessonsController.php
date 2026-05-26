@@ -17,7 +17,7 @@ class LessonsController extends ApiController
     protected function save($recordKey = null)
     {
         $data = (array) json_decode($this->input->json->getRaw(), true);
-        foreach (FieldsHelper::getFields('com_balancirk.members') as $field)
+        foreach (FieldsHelper::getFields('com_balancirk.lesson') as $field)
         { // This probably looks for a model of the same name
             if (isset($data[$field->name]))
             {

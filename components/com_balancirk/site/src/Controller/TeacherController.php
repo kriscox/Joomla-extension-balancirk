@@ -11,7 +11,7 @@
 namespace CoCoCo\Component\Balancirk\Site\Controller;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Router\Route as JRoute;
+use Joomla\CMS\Router\Route;
 use Joomla\CMS\MVC\Controller\FormController;
 
 defined('_JEXEC') or die;
@@ -46,7 +46,7 @@ class BalancirkControllerTeachers extends FormController
 
 		// Redirect back to the view with filters applied
 		$app->redirect(
-			JRoute::_('index.php?option=com_balancirk&view=teachers&teacher_id=' . $teacherId . '&start_date=' . $startDate . '&end_date=' . $endDate, false)
+			Route::_('index.php?option=com_balancirk&view=teachers&teacher_id=' . $teacherId . '&start_date=' . $startDate . '&end_date=' . $endDate, false)
 		);
 	}
 }

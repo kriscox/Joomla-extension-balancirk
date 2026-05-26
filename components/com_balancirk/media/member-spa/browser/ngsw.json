@@ -1,0 +1,80 @@
+{
+  "configVersion": 1,
+  "timestamp": 1777580841190,
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/index.html",
+        "/main.js",
+        "/manifest.webmanifest",
+        "/polyfills.js",
+        "/styles.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/assets/icons/icon-maskable.svg",
+        "/assets/icons/icon.svg"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "balancirk-api",
+      "patterns": [
+        "\\/api\\/index\\.php\\/v1\\/balancirk\\/.*"
+      ],
+      "strategy": "freshness",
+      "maxSize": 100,
+      "maxAge": 43200000,
+      "timeoutMs": 8000,
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "version": 1
+    }
+  ],
+  "hashTable": {
+    "/assets/icons/icon-maskable.svg": "7385618a33abf16451132cf48cc99ae12abb75cb",
+    "/assets/icons/icon.svg": "961de653a7048504b24ea8a7f090563a93f8db78",
+    "/index.html": "dff251a6df829ff1a0e59435df873b59b6470923",
+    "/main.js": "19a04eedc3439aef12bfe84e08981c46f01ec0d7",
+    "/manifest.webmanifest": "86e09bc454195c930e3ebf2de859c9e1402deafe",
+    "/polyfills.js": "bf76ac291d7f51c1139b7edcf86b359a30c08c64",
+    "/styles.css": "681ca3ab95e24643c44e02d072fb01a6ef307286"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}
