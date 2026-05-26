@@ -3,13 +3,14 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, signal } from '@a
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
 import { MemberApiService } from './core/api/member-api.service';
+import { LessonSummary } from './core/models/lesson.model';
 import { MemberProfile, MemberProfileUpdate } from './core/models/member.model';
 import { ParentStudentRelation } from './core/models/relation.model';
 import { SubscriptionSummary } from './core/models/subscription.model';
 import { StudentSummary } from './core/models/student.model';
 
-type PortalSection = 'home' | 'notices' | 'students' | 'subscriptions' | 'profile' | 'admin';
-type AdminSection = 'overview' | 'relations' | 'exports';
+type PortalSection = 'dashboard' | 'students' | 'subscriptions' | 'profile' | 'staff';
+type StaffSection = 'overview' | 'lessons' | 'presence' | 'relations' | 'exports' | 'analytics';
 
 @Component({
   selector: 'app-member-root',
@@ -22,18 +23,23 @@ type AdminSection = 'overview' | 'relations' | 'exports';
 export class AppComponent implements OnInit {
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
+  protected readonly staffLoading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly success = signal<string | null>(null);
-  protected readonly activeSection = signal<PortalSection>('home');
+  protected readonly activeSection = signal<PortalSection>('dashboard');
   protected readonly member = signal<MemberProfile | null>(null);
   protected readonly students = signal<StudentSummary[]>([]);
   protected readonly subscriptions = signal<SubscriptionSummary[]>([]);
+  protected readonly lessons = signal<LessonSummary[]>([]);
   protected readonly relations = signal<ParentStudentRelation[]>([]);
   protected readonly relationsLoading = signal(false);
   protected readonly relationsError = signal<string | null>(null);
-  protected readonly adminNotice = signal<string | null>(null);
-  protected readonly adminError = signal<string | null>(null);
-  protected readonly adminSection = signal<AdminSection>('overview');
+  protected readonly staffNotice = signal<string | null>(null);
+  protected readonly staffError = signal<string | null>(null);
+  protected readonly staffSection = signal<StaffSection>('overview');
+  protected readonly selectedLessonId = signal<number>(0);
+  protected readonly presenceDate = signal<string>(this.defaultPresenceDate());
+  protected readonly presentStudentIds = signal<number[]>([]);
   protected readonly exportYear = signal<string>(`${new Date().getFullYear()}`);
   protected readonly selectedSubscriptionYear = signal<string>('');
   protected readonly subscriptionYears = computed(() => {
@@ -52,14 +58,32 @@ export class AppComponent implements OnInit {
   protected readonly exportingFormat = signal<'csv' | 'xls' | null>(null);
   protected readonly now = new Date();
   protected readonly adminVariant = this.getOptionBoolean('adminVariant', false);
+  protected readonly portalMode = this.getOptionValue('portalMode', this.adminVariant ? 'staff' : 'member');
   protected readonly canViewRelations = this.getOptionBoolean('canViewRelations', false);
   protected readonly canExportAccounting = this.getOptionBoolean('canExportAccounting', false);
+  protected readonly allowAdminInMemberPortal = this.getOptionBoolean('allowAdminInMemberPortal', false);
   protected readonly canAdminPortal =
     this.adminVariant ||
     this.canViewRelations ||
     this.canExportAccounting ||
     this.getOptionBoolean('canAdminPortal', false);
   protected readonly subscriptionCreateUrl = this.getOptionValue('subscriptionCreateUrl', '/index.php?option=com_balancirk&view=subscription&id=0');
+  protected readonly isStaffPortal = this.portalMode === 'staff';
+  protected readonly showAdminEntry = this.isStaffPortal || (this.allowAdminInMemberPortal && this.canAdminPortal);
+  protected readonly canOpenStaffArea = this.canAdminPortal;
+  protected readonly subscriptionsByYear = computed(() => {
+    const map = new Map<string, number>();
+    this.subscriptions().forEach((subscription) => {
+      const year = String(subscription.year || 'Onbekend');
+      map.set(year, (map.get(year) ?? 0) + 1);
+    });
+    return Array.from(map.entries())
+      .map(([year, count]) => ({ year, count }))
+      .sort((a, b) => b.year.localeCompare(a.year));
+  });
+  protected readonly maxYearSubscriptionCount = computed(() =>
+    Math.max(1, ...this.subscriptionsByYear().map((row) => row.count))
+  );
 
   protected readonly profileForm = this.fb.nonNullable.group({
     firstname: ['', [Validators.required, Validators.maxLength(255)]],
@@ -78,11 +102,11 @@ export class AppComponent implements OnInit {
   constructor(
     private readonly api: MemberApiService,
     private readonly fb: FormBuilder
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    if (this.adminVariant && this.canAdminPortal) {
-      this.activeSection.set('admin');
+    if (this.isStaffPortal && this.canOpenStaffArea) {
+      this.activeSection.set('staff');
     }
 
     this.loadPage();
@@ -92,18 +116,26 @@ export class AppComponent implements OnInit {
     this.activeSection.set(section);
     this.success.set(null);
 
-    if (section === 'admin' && this.adminSection() === 'relations') {
-      this.loadRelations();
+    if (section === 'staff' && this.staffSection() === 'relations') {
+      this.loadRelations(true);
     }
   }
 
-  protected goToAdminSection(section: AdminSection): void {
-    this.adminSection.set(section);
-    this.adminNotice.set(null);
-    this.adminError.set(null);
+  protected goToStaffSection(section: StaffSection): void {
+    this.staffSection.set(section);
+    this.staffNotice.set(null);
+    this.staffError.set(null);
 
     if (section === 'relations') {
-      this.loadRelations();
+      this.loadRelations(true);
+    }
+
+    if (section === 'lessons' || section === 'presence') {
+      this.loadLessons();
+    }
+
+    if (section === 'presence' && this.selectedLessonId() > 0) {
+      this.loadPresence();
     }
   }
 
@@ -116,8 +148,8 @@ export class AppComponent implements OnInit {
       return;
     }
 
-    this.adminNotice.set(null);
-    this.adminError.set(null);
+    this.staffNotice.set(null);
+    this.staffError.set(null);
     this.exportingFormat.set(format);
 
     this.api
@@ -126,12 +158,37 @@ export class AppComponent implements OnInit {
       .subscribe({
         next: ({ blob, filename }) => {
           this.triggerDownload(blob, filename);
-          this.adminNotice.set(`Export ${format.toUpperCase()} is gedownload.`);
+          this.staffNotice.set(`Export ${format.toUpperCase()} is gedownload.`);
         },
         error: (err: unknown) => {
-          this.adminError.set(this.toErrorMessage(err, 'Exporteren mislukt. Probeer later opnieuw.'));
+          this.staffError.set(this.toErrorMessage(err, 'Exporteren mislukt. Probeer later opnieuw.'));
         }
       });
+  }
+
+  protected selectLesson(lessonId: number): void {
+    this.selectedLessonId.set(lessonId);
+    this.presentStudentIds.set([]);
+    if (lessonId > 0) {
+      this.loadPresence();
+    }
+  }
+
+  protected setPresenceDate(date: string): void {
+    this.presenceDate.set(date);
+    if (this.selectedLessonId() > 0) {
+      this.loadPresence();
+    }
+  }
+
+  protected togglePresence(studentId: number): void {
+    const set = new Set(this.presentStudentIds());
+    if (set.has(studentId)) {
+      set.delete(studentId);
+    } else {
+      set.add(studentId);
+    }
+    this.presentStudentIds.set(Array.from(set));
   }
 
   protected saveProfile(): void {
@@ -222,6 +279,54 @@ export class AppComponent implements OnInit {
       });
   }
 
+  private loadLessons(): void {
+    if (!this.canOpenStaffArea || this.staffLoading()) {
+      return;
+    }
+
+    this.staffLoading.set(true);
+    this.staffError.set(null);
+    this.api
+      .getLessons()
+      .pipe(finalize(() => this.staffLoading.set(false)))
+      .subscribe({
+        next: (lessons) => {
+          this.lessons.set(lessons);
+          if (lessons.length > 0 && this.selectedLessonId() === 0) {
+            this.selectedLessonId.set(lessons[0].id);
+            this.loadPresence();
+          }
+        },
+        error: (err: unknown) => {
+          this.staffError.set(this.toErrorMessage(err, 'Lessen konden niet geladen worden.'));
+        }
+      });
+  }
+
+  private loadPresence(): void {
+    const lessonId = this.selectedLessonId();
+    const date = this.presenceDate();
+
+    if (!this.canOpenStaffArea || lessonId <= 0 || date.trim() === '') {
+      return;
+    }
+
+    this.staffLoading.set(true);
+    this.staffError.set(null);
+    this.api
+      .getPresenceByLessonAndDate(lessonId, date)
+      .pipe(finalize(() => this.staffLoading.set(false)))
+      .subscribe({
+        next: (presence) => {
+          this.presentStudentIds.set(presence.entries.map((entry) => entry.student));
+        },
+        error: (err: unknown) => {
+          this.presentStudentIds.set([]);
+          this.staffError.set(this.toErrorMessage(err, 'Aanwezigheden konden niet geladen worden.'));
+        }
+      });
+  }
+
   private loadRelations(force = false): void {
     if (!this.canViewRelations || this.relationsLoading()) {
       return;
@@ -277,6 +382,10 @@ export class AppComponent implements OnInit {
     return value === 0 ? 'Ingeschreven' : 'Wachtlijst';
   }
 
+  protected isPresent(studentId: number): boolean {
+    return this.presentStudentIds().includes(studentId);
+  }
+
   private getOptionValue(key: string, fallback: string): string {
     const joomla = (globalThis as { Joomla?: { getOptions?: (name: string) => unknown } }).Joomla;
     const options = joomla?.getOptions?.('balancirk-member-spa') as Record<string, unknown> | undefined;
@@ -295,5 +404,9 @@ export class AppComponent implements OnInit {
     }
 
     return fallback;
+  }
+
+  private defaultPresenceDate(): string {
+    return new Date().toISOString().slice(0, 10);
   }
 }

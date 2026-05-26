@@ -66,6 +66,7 @@ if (!$user->guest)
 		'token' => $apiToken,
 		'apiBase' => '/api/index.php/v1',
 		'subscriptionCreateUrl' => Route::_('index.php?option=com_balancirk&view=subscription&id=0', false),
+		'portalMode' => 'staff',
 		'canAdminPortal' => $canAdminPortal,
 		'canViewRelations' => $canViewRelations,
 		'canExportAccounting' => $canExportAccounting,

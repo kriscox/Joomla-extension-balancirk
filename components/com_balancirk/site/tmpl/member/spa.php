@@ -46,6 +46,8 @@ if (!$user->guest)
 
 ?>
 
+
+
 <div class="page-header">
 	<h1><?= $this->item->title; ?></h1>
 </div>
@@ -62,9 +64,11 @@ if (!$user->guest)
 		'token' => $apiToken,
 		'apiBase' => '/api/index.php/v1',
 		'subscriptionCreateUrl' => Route::_('index.php?option=com_balancirk&view=subscription&id=0', false),
+		'portalMode' => 'member',
 		'canAdminPortal' => $canAdminPortal,
 		'canViewRelations' => $canViewRelations,
 		'canExportAccounting' => $canExportAccounting,
+		'allowAdminInMemberPortal' => false,
 	]);
 	$document->addHeadLink($manifestUrl, 'manifest', 'rel');
 	?>
