@@ -16,3 +16,10 @@ joomla-builder/
 *.tar.gz
 pkg_balancirk.zip
 packages/*.zip
+
+# Dependencies and environment
+vendor/
+.env.test
+tests/reports/
+frontend/member-spa/node_modules/
+frontend/member-spa/dist/

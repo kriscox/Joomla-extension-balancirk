@@ -12,5 +12,22 @@
 	"phpcs.standard": "",
 	"yaml.schemas": {
 		"openapi:v3": "file:///Users/krisc/Documents/com_balancirk/components/com_balancirk/api/src/Balancirk.yml"
-	}
+	},
+	"sqltools.connections": [],
+	"[sql]": {
+		"editor.defaultFormatter": "renesaarsoo.sql-formatter-vsc",
+		"editor.formatOnSave": true,
+		"editor.insertSpaces": true,
+		"editor.tabSize": 4
+	},
+	"SQL-Formatter-VSCode.dialect": "mysql",
+	"SQL-Formatter-VSCode.ignoreTabSettings": true,
+	"SQL-Formatter-VSCode.tabSizeOverride": 4,
+	"SQL-Formatter-VSCode.insertSpacesOverride": true,
+	"SQL-Formatter-VSCode.keywordCase": "upper",
+	"SQL-Formatter-VSCode.indentStyle": "standard",
+	"SQL-Formatter-VSCode.logicalOperatorNewline": "before",
+	"SQL-Formatter-VSCode.expressionWidth": 80,
+	"SQL-Formatter-VSCode.linesBetweenQueries": 1,
+	"SQL-Formatter-VSCode.newlineBeforeSemicolon": false
 }

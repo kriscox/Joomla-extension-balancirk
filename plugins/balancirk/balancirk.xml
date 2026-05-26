@@ -22,7 +22,7 @@
     </files>
 
     <!-- While this construct works in components, it appears to cause failure messages in plugin installations
-             Language files that exist in properly locale-labelled foldeers will continue to be installed as normal
+             Language files that exist in properly locale-labelled folders will continue to be installed as normal
              this is due to the language folder listed under files above.
         <languages>
           <language tag="en-GB">en-GB.plg_webservices_balancirk.ini</language>

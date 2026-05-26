@@ -51,7 +51,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
     {
         echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_INSTALL');
 
-        $this->addTeacherGroup();
+        $this->ensureDefaultGroupsAndPermissions();
 
         return true;
     }
@@ -85,6 +85,8 @@ class Com_BalancirkInstallerScript extends InstallerScript
     public function update($parent): bool
     {
         echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_UPDATE');
+
+        $this->ensureDefaultGroupsAndPermissions();
 
         return true;
     }
@@ -154,6 +156,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
         if ($type !== 'uninstall')
         {
             $this->conditionalInstallDashboard('com-balancirk-dashboard', 'balancirk');
+            $this->ensureDefaultGroupsAndPermissions();
         }
 
         return true;
@@ -205,21 +208,161 @@ class Com_BalancirkInstallerScript extends InstallerScript
      **/
     public function addTeacherGroup()
     {
-        // Parent is registered
-        $group = array('id' => 0, 'title' => 'Teachers', 'parent_id' => 2);
-        ModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_user/models');
+        return $this->ensureUserGroup('Teachers');
+    }
+
+    /**
+     * Create bookkeeper user group.
+     *
+     * Create bookkeeper user group to be used to identify who can export and consult relations.
+     *
+     * @return integer|false  Group id on success, false otherwise.
+     *
+     * @since   1.2.22
+     */
+    public function addBookkeeperGroup()
+    {
+        return $this->ensureUserGroup('Bookkeepers');
+    }
+
+    /**
+     * Ensure the default Balancirk groups and permissions exist.
+     *
+     * @return  void
+     *
+     * @since   1.2.22
+     */
+    private function ensureDefaultGroupsAndPermissions(): void
+    {
+        $this->addTeacherGroup();
+
+        $bookkeeperGroupId = $this->addBookkeeperGroup();
+
+        if ($bookkeeperGroupId !== false)
+        {
+            $this->setComponentPermissions(
+                (int) $bookkeeperGroupId,
+                [
+                    'core.manage' => true,
+                    'accounting.viewrelations' => true,
+                    'accounting.export' => true,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Ensure a Joomla user group exists.
+     *
+     * @param   string  $title     Group title.
+     * @param   int     $parentId  Parent group id.
+     *
+     * @return  integer|false  Group id on success, false otherwise.
+     *
+     * @since   1.2.22
+     */
+    private function ensureUserGroup(string $title, int $parentId = 2)
+    {
+        $groupId = $this->getUserGroupId($title);
+
+        if ($groupId !== null)
+        {
+            return $groupId;
+        }
+
+        $group = array('id' => 0, 'title' => $title, 'parent_id' => $parentId);
+        ModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_users/models');
 
         /** @var \Joomla\Component\Users\Administrator\Model\GroupModel $groupModel */
         $groupModel = ModelLegacy::getInstance('Group', 'UsersModel');
 
+        if (!$groupModel)
+        {
+            return false;
+        }
+
         if (!$groupModel->save($group))
         {
-            JFactory::getApplication()->enqueueMessage($groupModel->getError());
+            Factory::getApplication()->enqueueMessage($groupModel->getError());
 
             return false;
         }
 
-        return true;
+        return $this->getUserGroupId($title) ?: false;
+    }
+
+    /**
+     * Get a Joomla user group id by title.
+     *
+     * @param   string  $title  Group title.
+     *
+     * @return  integer|null
+     *
+     * @since   1.2.22
+     */
+    private function getUserGroupId(string $title): ?int
+    {
+        $db = Factory::getContainer()->get('DatabaseDriver');
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('id'))
+            ->from($db->quoteName('#__usergroups'))
+            ->where($db->quoteName('title') . ' = ' . $db->quote($title));
+
+        $db->setQuery($query);
+        $result = $db->loadResult();
+
+        return $result !== null ? (int) $result : null;
+    }
+
+    /**
+     * Set component permissions for a user group.
+     *
+     * @param   int    $groupId       Joomla user group id.
+     * @param   array  $permissions   Permission map.
+     *
+     * @return  void
+     *
+     * @since   1.2.22
+     */
+    private function setComponentPermissions(int $groupId, array $permissions): void
+    {
+        $db = Factory::getContainer()->get('DatabaseDriver');
+        $query = $db->getQuery(true)
+            ->select($db->quoteName(['id', 'rules']))
+            ->from($db->quoteName('#__assets'))
+            ->where($db->quoteName('name') . ' = ' . $db->quote('com_balancirk'));
+
+        $db->setQuery($query);
+        $asset = $db->loadAssoc();
+
+        if (!$asset)
+        {
+            return;
+        }
+
+        $rules = json_decode($asset['rules'] ?? '{}', true);
+
+        if (!is_array($rules))
+        {
+            $rules = [];
+        }
+
+        foreach ($permissions as $action => $value)
+        {
+            if (!isset($rules[$action]) || !is_array($rules[$action]))
+            {
+                $rules[$action] = [];
+            }
+
+            $rules[$action][(string) $groupId] = $value ? 1 : 0;
+        }
+
+        $update = $db->getQuery(true)
+            ->update($db->quoteName('#__assets'))
+            ->set($db->quoteName('rules') . ' = ' . $db->quote(json_encode($rules)))
+            ->where($db->quoteName('id') . ' = ' . (int) $asset['id']);
+
+        $db->setQuery($update)->execute();
     }
 
     public function addHiddenMenu()

@@ -12,7 +12,7 @@ class JsonapiView extends BaseApiView
     protected $fieldsToRenderItem = ['id', 'alias', 'name', 'catid'];
     protected $fieldsToRenderList = ['id', 'alias', 'name', 'catid'];
 
-    public function displayList(array $items = null)
+    public function displayList(?array $items = null)
     {
         foreach (FieldsHelper::getFields('com_balancirk.lesson') as $field) {
             $this->fieldsToRenderList[] = $field->id;

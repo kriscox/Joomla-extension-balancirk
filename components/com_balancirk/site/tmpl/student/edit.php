@@ -73,11 +73,14 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 				<?= $this->form->renderField('birthdate'); ?>
 			</div>
 			<div class="col-md-6">
-				<?= $this->form->renderField('uitpas'); ?>
+				<?= $this->form->renderField('mutuality'); ?>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-12">
+			<div class="col-md-6">
+				<?= $this->form->renderField('uitpas'); ?>
+			</div>
+			<div class="col-md-6">
 				<?= $this->form->renderField('allow_photo'); ?>
 			</div>
 		</div>

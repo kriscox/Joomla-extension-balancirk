@@ -12,6 +12,7 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
+use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
 use Joomla\CMS\Factory;
 use Joomla\Database\ParameterType;
 use Joomla\CMS\MVC\Model\ListModel;
@@ -41,6 +42,8 @@ class LessonsModel extends ListModel
                 'type', 'a.type',
                 'fee', 'a.fee',
                 'year', 'a.year',
+                'min_age', 'a.min_age',
+                'max_age', 'a.max_age',
                 'start', 'a.start',
                 'end', 'a.end',
                 'start_registration', 'a.start_registration',
@@ -115,7 +118,7 @@ class LessonsModel extends ListModel
             $db->quoteName(
                 [
                     'a.id', 'a.name', 'a.type', 'a.fee', 'a.year',
-                    'a.start', 'a.end', 'a.start_registration',
+                    'a.min_age', 'a.max_age', 'a.start', 'a.end', 'a.start_registration',
                     'a.end_registration'
                 ]
             )
@@ -161,21 +164,51 @@ class LessonsModel extends ListModel
      *
      * @return array
      **/
-    public function getOpenLessons()
+    public function getOpenLessons(?int $studentId = null, ?string $date = null): array
+    {
+        $rows = $this->getOpenLessonItems($studentId, $date);
+        $lessons = [];
+
+        foreach ($rows as $row)
+        {
+            $lessons[(int) $row->id] = $row->name;
+        }
+
+        return $lessons;
+    }
+
+    /**
+     * Method to get lesson records open for subscription.
+     *
+     * @param   int|null     $studentId  Selected student id.
+     * @param   string|null  $date       Reference date (Y-m-d).
+     *
+     * @return  array
+     *
+     * @since   1.2.29
+     */
+    public function getOpenLessonItems(?int $studentId = null, ?string $date = null): array
     {
         // Create a new query object.
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
 
         // Get the current date
-        $today = date("Y-m-d");
+        $today = $date ?: date('Y-m-d');
 
         // Select the required fields from the table.
         $query->select(
             $db->quoteName(
                 [
-                    'id', 'name', 'type',
-                    'fee', 'year', 'state'
+                    'a.id',
+                    'a.name',
+                    'a.type',
+                    'a.fee',
+                    'a.year',
+                    'a.state',
+                    'a.start',
+                    'a.min_age',
+                    'a.max_age'
                 ]
             )
         )
@@ -183,12 +216,53 @@ class LessonsModel extends ListModel
             ->where($db->quote($today) . ' between `start_registration` and `end_registration`')
             ->order('name');
 
-        $rows = $db->setQuery($query)->loadObjectlist();
+        if ($studentId !== null && $studentId > 0)
+        {
+            $subscriptionQuery = $db->getQuery(true)
+                ->select('1')
+                ->from($db->quoteName('#__balancirk_subscriptions', 's'))
+                ->where($db->quoteName('s.lesson') . ' = ' . $db->quoteName('a.id'))
+                ->where($db->quoteName('s.student') . ' = ' . (int) $studentId);
 
-        foreach ($rows as $row) {
-            $lessons[$row->id] = $row->name;
+            $query->where('NOT EXISTS (' . $subscriptionQuery . ')');
+        }
+
+        $rows = $db->setQuery($query)->loadObjectList() ?: [];
+        $studentBirthdate = $studentId ? $this->getStudentBirthdate($studentId) : null;
+        $lessons = [];
+
+        foreach ($rows as $row)
+        {
+            if ($studentBirthdate !== null && !LessonAgeHelper::matchesLesson($studentBirthdate, $row))
+            {
+                continue;
+            }
+
+            $lessons[] = $row;
         }
 
         return $lessons;
+    }
+
+    /**
+     * Load birthdate for a student.
+     *
+     * @param   int  $studentId  Student id.
+     *
+     * @return  string|null
+     *
+     * @since   1.2.29
+     */
+    private function getStudentBirthdate(int $studentId): ?string
+    {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('birthdate'))
+            ->from($db->quoteName('#__balancirk_students'))
+            ->where($db->quoteName('id') . ' = ' . (int) $studentId);
+        $db->setQuery($query);
+        $value = $db->loadResult();
+
+        return $value !== null ? (string) $value : null;
     }
 }

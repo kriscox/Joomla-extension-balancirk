@@ -18,6 +18,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Layout\LayoutHelper;
+use Joomla\CMS\Session\Session;
 
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
@@ -42,10 +43,10 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 	<div class="row">
 		<nav aria-label="Toolbar" style="display: flex; align-items: center;">
 			<?= LayoutHelper::render(
-			    'joomla.searchtools.default.bar',
-			    array('view' => $this),
-			    '',
-			    array('filtersHidden' => ['filter_published'])
+				'joomla.searchtools.default.bar',
+				array('view' => $this),
+				'',
+				array('filtersHidden' => ['filter_published'])
 			); ?>
 			<div class="js-stools" role="search">
 				<div class="js-stools-container-bar">
@@ -58,6 +59,23 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 								</option>
 							<?php endforeach; ?>
 						</select>
+
+						<?php if ($this->canExportAccounting) : ?>
+							<?php
+							$selectedYear = (string) $this->state->get('filter.year', date('Y'));
+							$token = Session::getFormToken() . '=1';
+							$csvUrl = Route::_('index.php?option=com_balancirk&task=subscription.export&format=csv&year=' . urlencode($selectedYear) . '&' . $token, false);
+							$xlsUrl = Route::_('index.php?option=com_balancirk&task=subscription.export&format=xls&year=' . urlencode($selectedYear) . '&' . $token, false);
+							?>
+							<div class="btn-group ms-3">
+								<a class="btn btn-primary btn-sm" href="<?= $csvUrl; ?>" title="<?= Text::_('COM_BALANCIRK_SUBSCRIPTIONS_EXPORT_CSV'); ?>">
+									<span class="icon-download" aria-hidden="true"></span> CSV
+								</a>
+								<a class="btn btn-secondary btn-sm" href="<?= $xlsUrl; ?>" title="<?= Text::_('COM_BALANCIRK_SUBSCRIPTIONS_EXPORT_XLS'); ?>">
+									<span class="icon-download" aria-hidden="true"></span> Excel
+								</a>
+							</div>
+						<?php endif; ?>
 					</div>
 				</div>
 			</div>
@@ -99,7 +117,7 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 						</thead>
 						<tbody>
 							<?php $n = count($this->items);
-				    foreach ($this->items as $i => $item) : ?>
+							foreach ($this->items as $i => $item) : ?>
 								<tr class="row<?= $i % 2; ?>">
 									<td class="hidden d-none d-md-table-cell text-center">
 										<?= $item->id; ?>

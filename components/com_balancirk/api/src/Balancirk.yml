@@ -238,6 +238,122 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "500":
           $ref: "#/components/responses/ServerError"
+    put:
+      summary: Update current authenticated member
+      description: Updates the profile of the currently authenticated member.
+      operationId: updateCurrentMember
+      tags:
+        - Members
+      requestBody:
+        description: Member object with updated fields.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemberInput"
+      responses:
+        "200":
+          description: Member updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/members/register:
+    post:
+      summary: Register a new member (public)
+      description: Public endpoint to register a new member account.
+      operationId: registerMember
+      tags:
+        - Members
+      security: []
+      requestBody:
+        description: Member registration payload.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemberInput"
+      responses:
+        "200":
+          description: Registration handled.
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/settings/public:
+    get:
+      summary: Get public frontend settings
+      description: Returns public settings used by frontend forms.
+      operationId: getPublicSettings
+      tags:
+        - Members
+      security: []
+      responses:
+        "200":
+          description: Settings payload.
+          content:
+            application/json:
+              schema:
+                type: object
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/settings:
+    get:
+      summary: Get editable component settings
+      description: Returns editable settings for administrative clients.
+      operationId: getSettings
+      tags:
+        - Members
+      responses:
+        "200":
+          description: Settings payload.
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      summary: Save editable component settings
+      description: Updates editable settings such as mutualities and mail templates.
+      operationId: saveSettings
+      tags:
+        - Members
+      requestBody:
+        description: Settings payload to store.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Settings updated.
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /v1/members/{id}:
     get:
@@ -1037,6 +1153,9 @@ components:
         phone:
           type: string
           description: The phonenumber of the student
+        mutuality:
+          type: string
+          description: The mutuality of the student
     StudentInput:
       type: object
       required:
@@ -1055,6 +1174,9 @@ components:
         phone:
           type: string
           description: The phonenumber of the student
+        mutuality:
+          type: string
+          description: The mutuality of the student
 
     Subscription:
       type: object

@@ -7,12 +7,15 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\HTML\HTMLHelper;
+?>
+
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 ?>
 
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-top}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-member-top}'); ?>
 
 <div class="balancirk-member-dashboard">
     <h2><?= Text::_('COM_BALANCIRK_MEMBER_DASHBOARD_TITLE') ?: 'Mijn Balancirk'; ?></h2>
@@ -73,5 +76,5 @@ use Joomla\CMS\Router\Route;
     <?php endif; ?>
 </div>
 
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-member-bottom}'); ?>
-<?php echo JHtml::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-member-bottom}'); ?>
+<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

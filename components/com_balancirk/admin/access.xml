@@ -34,5 +34,11 @@
 		<action name="students.editall"
 			title="COM_BALANCIRK_JACTION_EDITALL_STUDENTS"
 			description="COM_BALANCIRK_JACTION_EDITALL_STUDENTS_DESC" />
+		<action name="accounting.viewrelations"
+			title="COM_BALANCIRK_JACTION_ACCOUNTING_VIEW_RELATIONS"
+			description="COM_BALANCIRK_JACTION_ACCOUNTING_VIEW_RELATIONS_DESC" />
+		<action name="accounting.export"
+			title="COM_BALANCIRK_JACTION_ACCOUNTING_EXPORT"
+			description="COM_BALANCIRK_JACTION_ACCOUNTING_EXPORT_DESC" />
 	</section>
 </access>
