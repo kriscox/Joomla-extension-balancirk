@@ -11,7 +11,6 @@
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Log\Log;
-use Joomla\CMS\Table\Table;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Installer\InstallerScript;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel as ModelLegacy;
@@ -241,7 +240,9 @@ class Com_BalancirkInstallerScript extends InstallerScript
             return;
         }
 
-        $menuType = new \Joomla\Component\Menus\Administrator\Table\MenuTypeTable($db);
+        $menuType = Factory::getApplication()->bootComponent('menus')
+            ->getMVCFactory()
+            ->createTable('MenuType', 'Administrator');
 
         $menuType->menutype = 'hiddenmenu';
         $menuType->title = 'Hidden Menu';
