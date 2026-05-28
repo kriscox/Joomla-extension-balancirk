@@ -1,0 +1,102 @@
+<section class="card">
+  <div class="card-title-row">
+    <h2>{{ editId() ? 'Leerling bewerken' : 'Leerling toevoegen' }}</h2>
+  </div>
+
+  @if (loading()) {
+    <p class="status">Bezig met laden...</p>
+  } @else {
+    @if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <div class="grid">
+        <label>
+          Voornaam <span class="required">*</span>
+          <input formControlName="firstname" autocomplete="given-name"
+                 [class.invalid]="form.controls.firstname.invalid && form.controls.firstname.touched" />
+        </label>
+
+        <label>
+          Naam <span class="required">*</span>
+          <input formControlName="name" autocomplete="family-name"
+                 [class.invalid]="form.controls.name.invalid && form.controls.name.touched" />
+        </label>
+
+        <label class="full">
+          Geboortedatum <span class="required">*</span>
+          <input type="date" formControlName="birthdate"
+                 [class.invalid]="form.controls.birthdate.invalid && form.controls.birthdate.touched" />
+        </label>
+
+        <label>
+          Straat
+          <input formControlName="street" autocomplete="address-line1" />
+        </label>
+
+        <label>
+          Nummer
+          <input formControlName="number" autocomplete="address-line2" />
+        </label>
+
+        <label>
+          Bus
+          <input formControlName="bus" />
+        </label>
+
+        <label>
+          Postcode
+          <input formControlName="postcode" autocomplete="postal-code" />
+        </label>
+
+        <label class="full">
+          Gemeente
+          <input formControlName="city" autocomplete="address-level2" />
+        </label>
+
+        <label>
+          Telefoon
+          <input formControlName="phone" autocomplete="tel" />
+        </label>
+
+        <label>
+          E-mail
+          <input formControlName="email" type="email" autocomplete="email"
+                 [class.invalid]="form.controls.email.invalid && form.controls.email.touched" />
+        </label>
+
+        <label class="full">
+          Mutualiteit
+          @if (mutualityOptions().length > 0) {
+            <select formControlName="mutuality">
+              <option value="">— kies —</option>
+              @for (opt of mutualityOptions(); track opt) {
+                <option [value]="opt">{{ opt }}</option>
+              }
+            </select>
+          } @else {
+            <input formControlName="mutuality" />
+          }
+        </label>
+
+        <label>
+          UiTPAS-nummer
+          <input formControlName="uitpas" maxlength="13" />
+        </label>
+
+        <label class="full checkbox-label">
+          <input type="checkbox" formControlName="allow_photo" />
+          Toestemming foto's
+        </label>
+      </div>
+
+      <div class="actions actions-row">
+        <button type="submit" [disabled]="saving()">
+          @if (saving()) { Opslaan... } @else { Opslaan }
+        </button>
+        <a class="btn-secondary" routerLink="/students">Annuleren</a>
+      </div>
+    </form>
+  }
+</section>

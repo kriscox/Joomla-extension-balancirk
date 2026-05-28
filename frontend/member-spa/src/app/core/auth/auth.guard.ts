@@ -1,0 +1,13 @@
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { AuthService } from './auth.service';
+
+export const authGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+
+  if (auth.isUnauthorized()) {
+    return inject(Router).createUrlTree(['/dashboard']);
+  }
+
+  return true;
+};

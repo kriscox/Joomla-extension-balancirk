@@ -46,10 +46,15 @@ class JsonapiView extends BaseApiView
      */
     protected $fieldsToRenderList = [
         'id',
+        'studentid',
         'name',
         'firstname',
+        'lessonid',
         'lesson',
-        'year'
+        'year',
+        'start',
+        'end',
+        'subscribed',
     ];
 
     /**
