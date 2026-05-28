@@ -13,6 +13,7 @@ namespace CoCoCo\Component\Balancirk\Site\View\Member;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 
@@ -71,19 +72,28 @@ class HtmlView extends BaseHtmlView
         $this->form = $this->get('Form');
         $this->item = $this->get('Item');
 
-                $studentsModel = $this->getModel()->getMVCFactory()->createModel('Students', 'Site');
-        $subscriptionsModel = $this->getModel()->getMVCFactory()->createModel('Subscriptions', 'Site');
+        // SPA layouts delegate all data loading to the Angular app via REST API.
+        if ($tpl !== 'spa' && $tpl !== 'spaadmin') {
+            /** @var MVCFactoryInterface $factory */
+            $factory = Factory::getApplication()
+                ->bootComponent('com_balancirk')
+                ->getMVCFactory();
 
-        $app = Factory::getApplication();
-        $selectedYear = $app->input->getString('filter_year', '');
-        if ($selectedYear !== '') {
-            $subscriptionsModel->setState('filter.year', $selectedYear);
+            $studentsModel     = $factory->createModel('Students', 'Site');
+            $subscriptionsModel = $factory->createModel('Subscriptions', 'Site');
+
+            $app = Factory::getApplication();
+            $selectedYear = $app->input->getString('filter_year', '');
+
+            if ($selectedYear !== '') {
+                $subscriptionsModel->setState('filter.year', $selectedYear);
+            }
+
+            $this->students      = $studentsModel->getItems();
+            $this->subscriptions = $subscriptionsModel->getItems();
+            $this->years         = $subscriptionsModel->getYears();
+            $this->selectedYear  = $subscriptionsModel->getState('filter.year');
         }
-
-        $this->students = $studentsModel->getItems();
-        $this->subscriptions = $subscriptionsModel->getItems();
-        $this->years = $subscriptionsModel->getYears();
-        $this->selectedYear = $subscriptionsModel->getState('filter.year');
 
         if (count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);
