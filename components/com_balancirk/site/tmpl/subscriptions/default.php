@@ -37,7 +37,7 @@ $bearertoken = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
 <div class="row">
 	<div class="col-md-12">
 		<nav aria-label="Toolbar">
-			<button class="button-new btn btn-success" type="button" onclick="BalancirkSpaNavigation.navigate('index.php?option=com_balancirk&view=subscription&id=0')">
+			<button class="button-new btn btn-success" type="button" onclick="BalancirkSpaNavigation.navigate('<?= Route::_('index.php?option=com_balancirk&view=subscription&id=0', false) ?>')">
 				<span class=" icon-new" aria-hidden="true"></span>
 				<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
 			</button>

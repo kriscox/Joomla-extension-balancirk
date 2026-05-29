@@ -11,6 +11,7 @@
 namespace CoCoCo\Component\Balancirk\Site\Controller;
 
 use Joomla\CMS\MVC\Controller\FormController;
+use Joomla\CMS\Router\Route;
 
 \defined('_JEXEC') or die;
 
@@ -35,9 +36,6 @@ class StudentController extends FormController
     {
         parent::cancel($key);
 
-        // Set up the redirect back to the previous page (put in the header in HtmlView.php)
-        $this->redirect(
-            '/administrator/index.php?option=' . $this->option . '&view=students'
-        );
+        $this->setRedirect(Route::_('index.php?option=' . $this->option . '&view=students', false));
     }
 }

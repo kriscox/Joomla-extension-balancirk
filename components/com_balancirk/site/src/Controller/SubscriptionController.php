@@ -46,10 +46,7 @@ class SubscriptionController extends FormController
     {
         parent::cancel($key);
 
-        // Set up the redirect back to the previous page (put in the header in HtmlView.php)
-        $this->redirect(
-            '/administrator/index.php?option=' . $this->option . '&view=subscriptions'
-        );
+        $this->setRedirect(Route::_('index.php?option=' . $this->option . '&view=subscriptions', false));
     }
 
     /**
