@@ -1,13 +1,10 @@
 /**************************************************************************************************
  *                                                                                                 *
- *  Repair script: ensure min_age/max_age and email template columns exist on lessons table.       *
+ *  Repair script for sites where 1.3.2.sql ran with errors (ADD COLUMN IF NOT EXISTS was used    *
+ *  and failed on MySQL < 8.0.3, leaving some columns missing).                                   *
  *                                                                                                 *
- *  Each column is added in a separate ALTER TABLE statement so that a "Duplicate column"          *
- *  error on an already-upgraded site does not prevent the remaining columns from being added.     *
- *                                                                                                 *
- *  Note: ADD COLUMN IF NOT EXISTS is NOT used because it is unsupported on MySQL < 8.0.3.        *
- *  Joomla's schema updater logs and skips individual statement errors, so duplicate-column        *
- *  errors are harmless here.                                                                      *
+ *  Each statement is intentionally split so a "Duplicate column" error on a site that already    *
+ *  has the column does not block the remaining statements.                                        *
  *                                                                                                 *
  **************************************************************************************************/
 ALTER TABLE `#__balancirk_lessons`
