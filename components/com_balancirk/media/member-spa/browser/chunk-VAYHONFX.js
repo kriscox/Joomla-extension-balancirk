@@ -1,0 +1,1 @@
+import{a as s}from"./chunk-S3XB7PKU.js";function n(e){let t=e.attributes??{};return s({id:Number(e.id??t.id??0)},t)}function r(e){return(Array.isArray(e.data)?e.data:[]).map(n)}function o(e){return!!e&&typeof e=="object"&&("success"in e||"message"in e)}export{n as a,r as b,o as c};

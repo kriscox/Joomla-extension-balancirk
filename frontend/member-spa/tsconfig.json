@@ -15,11 +15,7 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "moduleResolution": "bundler",
-    "lib": [
-      "ES2022",
-      "DOM"
-    ]
+    "moduleResolution": "bundler"
   },
   "angularCompilerOptions": {
     "strictInjectionParameters": true,
