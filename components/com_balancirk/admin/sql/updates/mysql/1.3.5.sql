@@ -1,30 +1,11 @@
 /**************************************************************************************************
  *                                                                                                 *
- *  Repair script for sites where 1.3.2.sql ran with errors (ADD COLUMN IF NOT EXISTS was used    *
- *  and failed on MySQL < 8.0.3, leaving some columns missing).                                   *
+ *  Restore the lessons_complete view for sites where 1.3.2.sql left it in an inconsistent state. *
  *                                                                                                 *
- *  Each statement is intentionally split so a "Duplicate column" error on a site that already    *
- *  has the column does not block the remaining statements.                                        *
+ *  The ALTER TABLE column additions from 1.2.12.sql and 1.2.20.sql already ran on all            *
+ *  upgraded sites, so the columns exist. Only the view needs to be recreated here.               *
  *                                                                                                 *
  **************************************************************************************************/
-ALTER TABLE `#__balancirk_lessons`
-    ADD COLUMN `min_age` int(11) DEFAULT NULL AFTER `max_students`;
-
-ALTER TABLE `#__balancirk_lessons`
-    ADD COLUMN `max_age` int(11) DEFAULT NULL AFTER `min_age`;
-
-ALTER TABLE `#__balancirk_lessons`
-    ADD COLUMN `subscription_email_subject` varchar(255) DEFAULT NULL AFTER `max_age`;
-
-ALTER TABLE `#__balancirk_lessons`
-    ADD COLUMN `subscription_email_body` text DEFAULT NULL AFTER `subscription_email_subject`;
-
-ALTER TABLE `#__balancirk_lessons`
-    ADD COLUMN `waitinglist_email_subject` varchar(255) DEFAULT NULL AFTER `subscription_email_body`;
-
-ALTER TABLE `#__balancirk_lessons`
-    ADD COLUMN `waitinglist_email_body` text DEFAULT NULL AFTER `waitinglist_email_subject`;
-
 CREATE OR REPLACE VIEW `#__balancirk_lessons_complete` AS
 SELECT a.`id`,
     a.`name`,
