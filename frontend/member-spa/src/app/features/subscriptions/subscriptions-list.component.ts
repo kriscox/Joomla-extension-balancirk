@@ -2,7 +2,9 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, signal } from '@a
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { SubscriptionApiService } from '../../core/member/subscription-api.service';
+import { StudentApiService } from '../../core/member/student-api.service';
 import { SubscriptionSummary } from '../../core/member/models/subscription.model';
+import { StudentSummary } from '../../core/member/models/student.model';
 
 @Component({
   selector: 'app-subscriptions-list',
@@ -18,7 +20,9 @@ export class SubscriptionsListComponent implements OnInit {
   protected readonly error = signal<string | null>(null);
   protected readonly notice = signal<string | null>(null);
   protected readonly subscriptions = signal<SubscriptionSummary[]>([]);
+  protected readonly students = signal<StudentSummary[]>([]);
   protected readonly selectedYear = signal('');
+  protected readonly selectedStudentId = signal<number>(0);
 
   protected readonly years = computed(() => {
     const all = [...new Set(this.subscriptions().map(s => String(s.year ?? '')).filter(Boolean))];
@@ -26,18 +30,32 @@ export class SubscriptionsListComponent implements OnInit {
   });
 
   protected readonly filtered = computed(() => {
+    let list = this.subscriptions();
     const y = this.selectedYear();
-    return y ? this.subscriptions().filter(s => String(s.year) === y) : this.subscriptions();
+    const sid = this.selectedStudentId();
+    if (y) list = list.filter(s => String(s.year) === y);
+    if (sid) list = list.filter(s => Number(s.studentid) === sid);
+    return list;
   });
 
-  constructor(private readonly api: SubscriptionApiService) {}
+  constructor(
+    private readonly api: SubscriptionApiService,
+    private readonly studentApi: StudentApiService,
+  ) {}
 
   ngOnInit(): void {
+    this.studentApi.getMyStudents().subscribe({
+      next: s => this.students.set(s),
+    });
     this.load();
   }
 
   protected setYear(event: Event): void {
     this.selectedYear.set((event.target as HTMLSelectElement).value);
+  }
+
+  protected setStudent(event: Event): void {
+    this.selectedStudentId.set(Number((event.target as HTMLSelectElement).value));
   }
 
   protected deleteSubscription(id: number): void {

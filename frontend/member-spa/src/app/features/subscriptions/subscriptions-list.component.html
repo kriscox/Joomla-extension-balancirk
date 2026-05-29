@@ -18,6 +18,14 @@
 
     <div class="actions actions-row">
       <a class="btn-primary" routerLink="/subscriptions/new">Nieuwe inschrijving</a>
+      @if (students().length > 1) {
+        <select class="year-filter" [value]="selectedStudentId()" (change)="setStudent($event)" aria-label="Filter op leerling">
+          <option value="0">Alle leerlingen</option>
+          @for (s of students(); track s.id) {
+            <option [value]="s.id">{{ s.firstname }} {{ s.name }}</option>
+          }
+        </select>
+      }
       @if (years().length > 1) {
         <select class="year-filter" [value]="selectedYear()" (change)="setYear($event)" aria-label="Filter op schooljaar">
           <option value="">Alle schooljaren</option>

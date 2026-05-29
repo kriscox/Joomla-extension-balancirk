@@ -34,6 +34,30 @@ class SubscriptionsController extends ApiController
      */
     protected $default_view = 'subscriptions'; /* This maps to the folder name containing the JSON API view */
 
+    /**
+     * Override list display to scope results to the current user.
+     *
+     * Admins have the `students.viewall` permission which normally bypasses the
+     * parent filter in SubscriptionsModel. For the member-portal API the list
+     * must always be limited to the requesting user's own children.
+     *
+     * @param   mixed  $data  Unused.
+     *
+     * @return  mixed
+     *
+     * @since   1.3.5
+     */
+    public function displayList($data = null)
+    {
+        $model = $this->getModel();
+
+        if ($model) {
+            $model->setState('filter.parent_id', (int) Factory::getApplication()->getIdentity()->id);
+        }
+
+        return parent::displayList($data);
+    }
+
     protected function save($recordKey = null)
     {
         $data = $this->getRequestData();
