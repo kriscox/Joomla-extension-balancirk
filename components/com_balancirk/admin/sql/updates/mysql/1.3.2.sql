@@ -2,29 +2,31 @@
  *                                                                                                 *
  *  Repair script: ensure min_age/max_age and email template columns exist on lessons table.       *
  *                                                                                                 *
- *  The original 1.2.12 and 1.2.20 ALTER TABLE statements combined multiple ADD COLUMN clauses     *
- *  where later clauses referenced columns added earlier in the same statement. This can fail      *
- *  on certain MariaDB/MySQL versions. This script safely re-adds all potentially missing          *
- *  columns for sites that upgraded through the broken scripts.                                    *
+ *  Each column is added in a separate ALTER TABLE statement so that a "Duplicate column"          *
+ *  error on an already-upgraded site does not prevent the remaining columns from being added.     *
+ *                                                                                                 *
+ *  Note: ADD COLUMN IF NOT EXISTS is NOT used because it is unsupported on MySQL < 8.0.3.        *
+ *  Joomla's schema updater logs and skips individual statement errors, so duplicate-column        *
+ *  errors are harmless here.                                                                      *
  *                                                                                                 *
  **************************************************************************************************/
 ALTER TABLE `#__balancirk_lessons`
-    ADD COLUMN IF NOT EXISTS `min_age` int(11) DEFAULT NULL AFTER `max_students`;
+    ADD COLUMN `min_age` int(11) DEFAULT NULL AFTER `max_students`;
 
 ALTER TABLE `#__balancirk_lessons`
-    ADD COLUMN IF NOT EXISTS `max_age` int(11) DEFAULT NULL AFTER `min_age`;
+    ADD COLUMN `max_age` int(11) DEFAULT NULL AFTER `min_age`;
 
 ALTER TABLE `#__balancirk_lessons`
-    ADD COLUMN IF NOT EXISTS `subscription_email_subject` varchar(255) DEFAULT NULL AFTER `max_age`;
+    ADD COLUMN `subscription_email_subject` varchar(255) DEFAULT NULL AFTER `max_age`;
 
 ALTER TABLE `#__balancirk_lessons`
-    ADD COLUMN IF NOT EXISTS `subscription_email_body` text DEFAULT NULL AFTER `subscription_email_subject`;
+    ADD COLUMN `subscription_email_body` text DEFAULT NULL AFTER `subscription_email_subject`;
 
 ALTER TABLE `#__balancirk_lessons`
-    ADD COLUMN IF NOT EXISTS `waitinglist_email_subject` varchar(255) DEFAULT NULL AFTER `subscription_email_body`;
+    ADD COLUMN `waitinglist_email_subject` varchar(255) DEFAULT NULL AFTER `subscription_email_body`;
 
 ALTER TABLE `#__balancirk_lessons`
-    ADD COLUMN IF NOT EXISTS `waitinglist_email_body` text DEFAULT NULL AFTER `waitinglist_email_subject`;
+    ADD COLUMN `waitinglist_email_body` text DEFAULT NULL AFTER `waitinglist_email_subject`;
 
 CREATE OR REPLACE VIEW `#__balancirk_lessons_complete` AS
 SELECT a.`id`,

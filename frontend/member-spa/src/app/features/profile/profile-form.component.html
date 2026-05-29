@@ -1,0 +1,81 @@
+<section class="card">
+  <div class="card-title-row">
+    <h2>Profiel aanpassen</h2>
+  </div>
+
+  @if (loading()) {
+    <p class="status">Bezig met laden...</p>
+  } @else {
+    @if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    }
+    @if (success()) {
+      <div class="alert alert-success">{{ success() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <div class="grid">
+        <label>
+          Voornaam <span class="required">*</span>
+          <input formControlName="firstname" autocomplete="given-name" [class.invalid]="form.controls.firstname.invalid && form.controls.firstname.touched" />
+        </label>
+
+        <label>
+          Naam <span class="required">*</span>
+          <input formControlName="name" autocomplete="family-name" [class.invalid]="form.controls.name.invalid && form.controls.name.touched" />
+        </label>
+
+        <label class="full">
+          E-mail <span class="required">*</span>
+          <input formControlName="email" type="email" autocomplete="email" [class.invalid]="form.controls.email.invalid && form.controls.email.touched" />
+        </label>
+
+        <label class="full">
+          Telefoon
+          <input formControlName="phone" autocomplete="tel" />
+        </label>
+
+        <label>
+          Straat
+          <input formControlName="street" autocomplete="address-line1" />
+        </label>
+
+        <label>
+          Nummer
+          <input formControlName="number" autocomplete="address-line2" />
+        </label>
+
+        <label>
+          Bus
+          <input formControlName="bus" />
+        </label>
+
+        <label>
+          Postcode
+          <input formControlName="postcode" autocomplete="postal-code" />
+        </label>
+
+        <label class="full">
+          Gemeente
+          <input formControlName="city" autocomplete="address-level2" />
+        </label>
+
+        <label>
+          Nieuw wachtwoord
+          <input type="password" formControlName="password" autocomplete="new-password" />
+        </label>
+
+        <label>
+          Herhaal wachtwoord
+          <input type="password" formControlName="password2" autocomplete="new-password" />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="submit" [disabled]="saving()">
+          @if (saving()) { Opslaan... } @else { Profiel opslaan }
+        </button>
+      </div>
+    </form>
+  }
+</section>
