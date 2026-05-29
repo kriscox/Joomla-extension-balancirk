@@ -93,12 +93,27 @@ class SubscriptionsModel extends ListModel
         );
         $query->from($db->quoteName('#__balancirk_subscriptions_view', 'a'));
 
-        // Based on the user access level, we need to filter the results.
-        // What Access Permissions does this user have? What can (s)he do?
-        $this->canDo = ContentHelper::getActions('com_balancirk');
-        if (!$this->canDo->get('students.viewall'))
-        {
-            $query->join('INNER', $db->quoteName('#__balancirk_parents', 'p'), 'a.studentid = p.child AND p.parent = ' . Factory::getApplication()->getIdentity()->id);
+        // filter.parent_id: when set (e.g. by the member-portal API), always
+        // scope to that parent regardless of admin permissions.
+        $parentId = (int) $this->getState('filter.parent_id', 0);
+
+        if ($parentId > 0) {
+            $query->join(
+                'INNER',
+                $db->quoteName('#__balancirk_parents', 'p'),
+                'a.studentid = p.child AND p.parent = ' . $parentId
+            );
+        } else {
+            // Fall back to permission-based filter for the admin backend.
+            $this->canDo = ContentHelper::getActions('com_balancirk');
+
+            if (!$this->canDo->get('students.viewall')) {
+                $query->join(
+                    'INNER',
+                    $db->quoteName('#__balancirk_parents', 'p'),
+                    'a.studentid = p.child AND p.parent = ' . Factory::getApplication()->getIdentity()->id
+                );
+            }
         }
 
         return $query;
