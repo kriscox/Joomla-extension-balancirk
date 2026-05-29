@@ -38,10 +38,7 @@ class LessonController extends FormController
     {
         parent::cancel($key);
 
-        // Set up the redirect back to the previous page (put in the header in HtmlView.php)
-        $this->redirect(
-            '/index.php?option=' . $this->option . '&view=lessons'
-        );
+        $this->setRedirect(Route::_('index.php?option=' . $this->option . '&view=lessons', false));
     }
 
     /**

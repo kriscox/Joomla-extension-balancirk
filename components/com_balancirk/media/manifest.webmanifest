@@ -1,7 +1,7 @@
 {
   "name": "Balancirk",
   "short_name": "Balancirk",
-  "start_url": "/index.php?option=com_balancirk&view=member",
+  "start_url": ".",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",

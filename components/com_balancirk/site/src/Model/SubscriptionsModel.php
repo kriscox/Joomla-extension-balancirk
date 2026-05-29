@@ -87,6 +87,9 @@ class SubscriptionsModel extends ListModel
         $current = $this->getUserStateFromRequest($this->context . '.filter.current', 'filter_current', '');
         $this->setState('filter.current', $current);
 
+        $year = $this->getUserStateFromRequest($this->context . '.filter.year', 'filter_year', '');
+        $this->setState('filter.year', $year);
+
         // List state information.
         parent::populateState($ordering, $direction);
     }

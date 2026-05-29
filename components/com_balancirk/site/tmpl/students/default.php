@@ -33,7 +33,7 @@ HTMLHelper::_('script', 'com_balancirk/balancirk_spa_navigation.js', ['version' 
 	<div class="row">
 		<nav aria-label="Toolbar" style="display: flex; align-items: center;">
 			<div class="col-md-6">
-				<button class="button-new btn btn-success" type="button" onclick="BalancirkSpaNavigation.navigate('index.php?option=com_balancirk&view=student&layout=edit&id=0')">
+				<button class="button-new btn btn-success" type="button" onclick="BalancirkSpaNavigation.navigate('<?= Route::_('index.php?option=com_balancirk&view=student&layout=edit&id=0', false) ?>')">
 					<span class=" icon-new" aria-hidden="true"></span>
 					<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
 				</button>
