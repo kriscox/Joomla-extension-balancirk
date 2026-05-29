@@ -329,7 +329,8 @@ class LessonModel extends AdminModel
      */
     public static function getDates($start, $end, $lesday)
     {
-        $period = new DatePeriod(new DateTime($start), new DateInterval('P1D'), new DateTime($end));
+        $endDate = (new DateTime($end))->modify('+1 day');
+        $period = new DatePeriod(new DateTime($start), new DateInterval('P1D'), $endDate);
         $dates = array();
 
         foreach ($period as $date) {
