@@ -20,10 +20,10 @@
 			id="pkg_balancirk">pkg_balancirk.zip</file>
 	</files>
 
-	<changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_changelog.xml</changelogurl>
+	<changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_changelog.xml</changelogurl>
 
 	<updateservers>
 		<server type="extension"
-			name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_update.xml</server>
+			name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_update.xml</server>
 	</updateservers>
 </extension>
