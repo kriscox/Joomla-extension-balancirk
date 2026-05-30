@@ -37,4 +37,36 @@ class MutualityOptionsHelperTest extends TestCase
             MutualityOptionsHelper::getOptions($configured)
         );
     }
+
+    public function testNullInputFallsBackToDefaultMutualities(): void
+    {
+        $this->assertSame(
+            ['CM', 'Solidaris', 'Helan', 'VNZ'],
+            MutualityOptionsHelper::getOptions(null)
+        );
+    }
+
+    public function testWhitespaceOnlyInputFallsBackToDefaultMutualities(): void
+    {
+        $this->assertSame(
+            ['CM', 'Solidaris', 'Helan', 'VNZ'],
+            MutualityOptionsHelper::getOptions('   ')
+        );
+    }
+
+    public function testSemicolonSeparatedInputIsParsedCorrectly(): void
+    {
+        $this->assertSame(
+            ['CM', 'VNZ'],
+            MutualityOptionsHelper::getOptions('CM;VNZ')
+        );
+    }
+
+    public function testCommaSeparatedInputIsParsedCorrectly(): void
+    {
+        $this->assertSame(
+            ['CM', 'VNZ'],
+            MutualityOptionsHelper::getOptions('CM,VNZ')
+        );
+    }
 }

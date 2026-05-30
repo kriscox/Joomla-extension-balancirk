@@ -109,4 +109,92 @@ final class SubscriptionMailHelperTest extends TestCase
 
         $this->assertSame("A\n\nB", $rendered);
     }
+
+    public function testBuildMailMessageWithWaitingListUsesWaitingListTemplates(): void
+    {
+        $lesson = (object) [
+            'name' => 'Acro',
+            'start' => '2026-09-10',
+            'end' => '2027-05-20',
+            'waitinglist_email_subject' => 'Wachtlijst {lesson_name}',
+            'waitinglist_email_body' => 'Beste {member_firstname}, je staat op de wachtlijst.',
+        ];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $mail = SubscriptionMailHelper::buildMailMessage($lesson, $student, $member, '2026-08-20', true, []);
+
+        $this->assertSame('Wachtlijst Acro', $mail['subject']);
+        $this->assertSame('Beste Els, je staat op de wachtlijst.', $mail['body']);
+    }
+
+    public function testBuildMailMessageFallsBackToDefaultWaitingListBodyTemplate(): void
+    {
+        $lesson = (object) [
+            'name' => 'Acro',
+            'start' => '2026-09-10',
+            'end' => '2027-05-20',
+        ];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $mail = SubscriptionMailHelper::buildMailMessage($lesson, $student, $member, '2026-08-20', true, []);
+
+        $this->assertStringContainsString('wachtlijst', strtolower($mail['body']));
+    }
+
+    public function testGetDefaultBodyTemplateForWaitingListContainsWachtlijstKeyword(): void
+    {
+        $body = SubscriptionMailHelper::getDefaultBodyTemplate(true);
+
+        $this->assertStringContainsString('wachtlijst', $body);
+    }
+
+    public function testGetDefaultBodyTemplateForSubscriptionContainsLessonStartDatePlaceholder(): void
+    {
+        $body = SubscriptionMailHelper::getDefaultBodyTemplate(false);
+
+        $this->assertStringContainsString('{lesson_start_date}', $body);
+    }
+
+    public function testGetDefaultSubjectTemplateForWaitingListContainsWachtlijstSuffix(): void
+    {
+        $subject = SubscriptionMailHelper::getDefaultSubjectTemplate(true);
+
+        $this->assertStringContainsString('wachtlijst', $subject);
+    }
+
+    public function testGetDefaultSubjectTemplateForSubscriptionDoesNotContainWachtlijst(): void
+    {
+        $subject = SubscriptionMailHelper::getDefaultSubjectTemplate(false);
+
+        $this->assertStringNotContainsString('wachtlijst', $subject);
+    }
+
+    public function testBuildContextWithMissingLessonEndDateReturnsEmptyString(): void
+    {
+        $lesson = (object) ['name' => 'Acro', 'start' => '2026-09-10'];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $context = SubscriptionMailHelper::buildContext($lesson, $student, $member, '2026-08-20', false);
+
+        $this->assertSame('', $context['{lesson_end_date}']);
+    }
+
+    public function testBuildMailMessageWithGlobalDefaultTemplatesWhenNoLessonTemplate(): void
+    {
+        $lesson = (object) ['name' => 'Acro', 'start' => '2026-09-10', 'end' => '2027-05-20'];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+        $defaults = [
+            'subscription_subject' => 'Global subject {lesson_name}',
+            'subscription_body' => 'Global body for {member_firstname}',
+        ];
+
+        $mail = SubscriptionMailHelper::buildMailMessage($lesson, $student, $member, '2026-08-20', false, $defaults);
+
+        $this->assertSame('Global subject Acro', $mail['subject']);
+        $this->assertSame('Global body for Els', $mail['body']);
+    }
 }
