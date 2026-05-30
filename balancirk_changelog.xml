@@ -56,4 +56,12 @@
 			<item>Added to lessons search for lessons in the past years</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>com_balancirk</element>
+		<type>package</type>
+		<version>1.3.6</version>
+		<change>
+			<item>Lesson age restrictions are now year based instead of date based: a min_age/max_age lesson admits everyone who reaches that age during the calendar year of the lesson (matching school grades / leerjaren).</item>
+		</change>
+	</changelog>
 </changelogs>
