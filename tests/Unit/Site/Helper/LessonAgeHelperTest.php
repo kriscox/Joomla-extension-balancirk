@@ -20,11 +20,12 @@ use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
  */
 class LessonAgeHelperTest extends TestCase
 {
-    public function testGetAgeOnLessonStartDate(): void
+    public function testGetAgeInYearUsesCalendarYearDifference(): void
     {
-        $age = LessonAgeHelper::getAgeOnDate('2015-09-02', '2025-09-01');
+        // Turns 10 during 2025 even though the birthday falls after the lesson start.
+        $age = LessonAgeHelper::getAgeInYear('2015-09-02', '2025-09-01');
 
-        $this->assertSame(9, $age);
+        $this->assertSame(10, $age);
     }
 
     public function testMatchesLessonReturnsTrueWithinConfiguredRange(): void
@@ -38,15 +39,28 @@ class LessonAgeHelperTest extends TestCase
         $this->assertTrue(LessonAgeHelper::matchesLesson('2015-08-20', $lesson));
     }
 
-    public function testMatchesLessonReturnsFalseBelowMinimumAge(): void
+    public function testMatchesLessonIncludesStudentReachingMinimumAgeLaterInYear(): void
     {
+        // Born late in 2016, turns 9 during 2025: should qualify for a 9+ lesson.
         $lesson = (object) [
             'start' => '2025-09-01',
-            'min_age' => 10,
-            'max_age' => 12,
+            'min_age' => 9,
+            'max_age' => 11,
         ];
 
-        $this->assertFalse(LessonAgeHelper::matchesLesson('2016-10-10', $lesson));
+        $this->assertTrue(LessonAgeHelper::matchesLesson('2016-10-10', $lesson));
+    }
+
+    public function testMatchesLessonReturnsFalseBelowMinimumAge(): void
+    {
+        // Born in 2017, turns only 8 during 2025: below the 9+ minimum.
+        $lesson = (object) [
+            'start' => '2025-09-01',
+            'min_age' => 9,
+            'max_age' => 11,
+        ];
+
+        $this->assertFalse(LessonAgeHelper::matchesLesson('2017-01-05', $lesson));
     }
 
     public function testMatchesLessonReturnsFalseAboveMaximumAge(): void
@@ -57,7 +71,7 @@ class LessonAgeHelperTest extends TestCase
             'max_age' => 8,
         ];
 
-        $this->assertFalse(LessonAgeHelper::matchesLesson('2015-01-01', $lesson));
+        $this->assertFalse(LessonAgeHelper::matchesLesson('2015-12-31', $lesson));
     }
 
     public function testMatchesLessonReturnsTrueWithoutAgeRestrictions(): void
@@ -82,10 +96,10 @@ class LessonAgeHelperTest extends TestCase
         $this->assertFalse(LessonAgeHelper::matchesLesson(null, $lesson));
     }
 
-    public function testGetAgeOnDateReturnsNullForInvalidDates(): void
+    public function testGetAgeInYearReturnsNullForInvalidDates(): void
     {
-        $this->assertNull(LessonAgeHelper::getAgeOnDate('not-a-date', '2025-09-01'));
-        $this->assertNull(LessonAgeHelper::getAgeOnDate('2015-01-01', 'invalid-reference'));
+        $this->assertNull(LessonAgeHelper::getAgeInYear('not-a-date', '2025-09-01'));
+        $this->assertNull(LessonAgeHelper::getAgeInYear('2015-01-01', 'invalid-reference'));
     }
 
     public function testNormalizeNullableIntCastsAndHandlesEmptyValues(): void
