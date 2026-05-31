@@ -15,6 +15,7 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 use DateInterval;
 use Exception;
 use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 use Joomla\Database\ParameterType;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\CMS\Factory;
@@ -142,8 +143,9 @@ class LessonsModel extends ListModel
         $selectedYear = $this->getState('filter.year');
         if (empty($selectedYear))
         {
-            $query->where($db->quote(date('Y', strtotime($today . '- 5 months'))) . ' = `year`');
-            $this->setState('filter.year', date('Y', strtotime($today . '- 5 months')));
+            $schoolYear = SchoolYearHelper::getCurrentSchoolYear($today);
+            $query->where($db->quote($schoolYear) . ' = `year`');
+            $this->setState('filter.year', $schoolYear);
         }
         else
         {

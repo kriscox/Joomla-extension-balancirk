@@ -12,6 +12,7 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 
 \defined('_JEXEC') or die;
 
+use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
@@ -158,11 +159,9 @@ class SubscriptionsModel extends ListModel
         $today = date('Y-m-d');
         if (empty($selectedYear))
         {
-            $query->where($db->quote(date(
-                'Y',
-                strtotime($today . '- 5 months')
-            )) . ' = `year`');
-            $this->setState('filter.year', date('Y', strtotime($today . '- 5 months')));
+            $schoolYear = SchoolYearHelper::getCurrentSchoolYear($today);
+            $query->where($db->quote($schoolYear) . ' = `year`');
+            $this->setState('filter.year', $schoolYear);
         }
         else
         {
