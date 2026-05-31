@@ -158,7 +158,11 @@ class StudentModel extends AdminModel
         $query = $db->getQuery(true)
             ->select('COUNT(*)')
             ->from($db->quoteName('#__balancirk_subscriptions', 's'))
-            ->join('INNER', $db->quoteName('#__balancirk_lessons', 'l') . ' ON ' . $db->quoteName('l.id') . ' = ' . $db->quoteName('s.lesson'))
+            ->join(
+                'INNER',
+                $db->quoteName('#__balancirk_lessons', 'l')
+                    . ' ON ' . $db->quoteName('l.id') . ' = ' . $db->quoteName('s.lesson')
+            )
             ->where($db->quoteName('s.student') . ' = :studentId')
             ->where($db->quoteName('s.subscribed') . ' = 0')
             ->where($db->quoteName('l.year') . ' = :schoolYear')
