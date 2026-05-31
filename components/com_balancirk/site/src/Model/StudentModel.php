@@ -13,6 +13,7 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 \defined('_JEXEC') or die;
 
 use Exception;
+use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Helper\ContentHelper;
@@ -153,7 +154,7 @@ class StudentModel extends AdminModel
             return false;
         }
 
-        $schoolYear = (int) date('Y', strtotime(date('Y-m-d') . '- 5 months'));
+        $schoolYear = SchoolYearHelper::getCurrentSchoolYear();
         $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select('COUNT(*)')

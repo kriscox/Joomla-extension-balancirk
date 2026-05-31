@@ -58,5 +58,14 @@
 			default="CM&#10;Solidaris&#10;Helan&#10;VNZ"
 			rows="6"
 			filter="raw" />
+		<field name="school_year_offset_months"
+			type="number"
+			label="COM_BALANCIRK_SCHOOL_YEAR_OFFSET_MONTHS_LABEL"
+			description="COM_BALANCIRK_SCHOOL_YEAR_OFFSET_MONTHS_DESCRIPTION"
+			default="6"
+			min="0"
+			max="12"
+			step="1"
+			filter="integer" />
 	</fieldset>
 </config>
