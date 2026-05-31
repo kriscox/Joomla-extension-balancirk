@@ -95,9 +95,15 @@ class StudentModel extends AdminModel
      */
     public function getItem($pk = null)
     {
-        $canDo = ContentHelper::getActions('com_balancirk');
-        if (!($canDo->get('students.viewall') || $this->isParent($pk))) {
-            return false;
+        $pk = (!empty($pk)) ? $pk : (int) $this->getState('student.id');
+
+        // A new (empty) record is always available; only existing records are access checked.
+        if (!empty($pk)) {
+            $canDo = ContentHelper::getActions('com_balancirk');
+
+            if (!($canDo->get('students.viewall') || $this->isParent($pk))) {
+                return false;
+            }
         }
 
         return parent::getItem($pk);
@@ -191,6 +197,11 @@ class StudentModel extends AdminModel
 
         if (empty($data)) {
             $data = $this->getItem();
+        }
+
+        // getItem() can return false when access is denied; never pass that to preprocessData().
+        if ($data === false) {
+            $data = [];
         }
 
         $this->preprocessData($this->typeAlias, $data);
