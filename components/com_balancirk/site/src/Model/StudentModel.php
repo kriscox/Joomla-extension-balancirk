@@ -138,7 +138,7 @@ class StudentModel extends AdminModel
     }
 
     /**
-     * Check whether the student has at least one subscription in the current school year.
+     * Check whether the student has at least one subscription in a non-trashed lesson.
      *
      * @param   int|null  $studentId  Student id.
      *
@@ -154,7 +154,7 @@ class StudentModel extends AdminModel
             return false;
         }
 
-        $schoolYear = SchoolYearHelper::getCurrentSchoolYear();
+        $trashedState = -2;
         $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select('COUNT(*)')
@@ -165,11 +165,9 @@ class StudentModel extends AdminModel
                     . ' ON ' . $db->quoteName('l.id') . ' = ' . $db->quoteName('s.lesson')
             )
             ->where($db->quoteName('s.student') . ' = :studentId')
-            ->where($db->quoteName('l.year') . ' = :schoolYear')
             ->where($db->quoteName('l.state') . ' <> :trashedState')
             ->bind(':studentId', $studentId, ParameterType::INTEGER)
-            ->bind(':schoolYear', $schoolYear, ParameterType::INTEGER)
-            ->bind(':trashedState', -2, ParameterType::INTEGER);
+            ->bind(':trashedState', $trashedState, ParameterType::INTEGER);
 
         $db->setQuery($query);
 

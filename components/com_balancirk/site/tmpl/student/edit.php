@@ -30,7 +30,13 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 
 <form action="<?= Route::_('index.php?option=com_balancirk&view=student&layout=edit&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="student-form" class="form-validate">
 
-	<?= LayoutHelper::render('student.fullname_state', $this); ?>
+	<?= LayoutHelper::render(
+	    'student.fullname_state',
+	    array(
+	        'view' => $this,
+	        'hasCurrentYearSubscription' => $this->hasCurrentYearSubscription,
+	    )
+	); ?>
 
 	<div>
 		<div class="row">
