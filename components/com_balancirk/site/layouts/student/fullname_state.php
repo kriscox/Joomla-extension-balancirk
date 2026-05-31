@@ -28,10 +28,10 @@ $stateLabel = $states[$state] ?? $states['1'];
 
 ?>
 <div class="row title-alias form-vertical mb-3">
-	<div class="col-12 col-md-6">
-		<h1> <?= htmlspecialchars($fullname, ENT_QUOTES, 'UTF-8') ?> </h1>
-	</div>
-	<div class="col-12 col-md-6">
-		<h5><?= Text::_('COM_BALANCIRK_STATUS_LABEL') . ":  " . $stateLabel; ?> </h5>
-	</div>
+    <div class="col-12 col-md-6">
+        <h1> <?= htmlspecialchars($fullname, ENT_QUOTES, 'UTF-8') ?> </h1>
+    </div>
+    <div class="col-12 col-md-6">
+        <h5><?= Text::_('COM_BALANCIRK_STATUS_LABEL') . ":  " . $stateLabel; ?> </h5>
+    </div>
 </div>
