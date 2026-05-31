@@ -155,6 +155,7 @@ class StudentModel extends AdminModel
         }
 
         $schoolYear = SchoolYearHelper::getCurrentSchoolYear();
+        $trashedState = -2;
         $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select('COUNT(*)')
@@ -169,7 +170,7 @@ class StudentModel extends AdminModel
             ->where($db->quoteName('l.state') . ' <> :trashedState')
             ->bind(':studentId', $studentId, ParameterType::INTEGER)
             ->bind(':schoolYear', $schoolYear, ParameterType::INTEGER)
-            ->bind(':trashedState', -2, ParameterType::INTEGER);
+            ->bind(':trashedState', $trashedState, ParameterType::INTEGER);
 
         $db->setQuery($query);
 
