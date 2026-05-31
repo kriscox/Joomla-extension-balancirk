@@ -57,7 +57,7 @@
             type="text"
             label="COM_BALANCIRK_TABLE_TABLEHEAD_UITPAS"
             maxlength="13"
-            minlenght="13" />
+            minlength="13" />
         <field name="allow_photo"
             type="list"
             label="COM_BALANCIRK_TABLE_TABLEHEAD_ALLOW_PHOTO"

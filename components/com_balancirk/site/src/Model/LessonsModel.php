@@ -241,6 +241,7 @@ class LessonsModel extends ListModel
         )
             ->from($db->quoteName('#__balancirk_lessons', 'a'))
             ->where($db->quote($today) . ' between `start_registration` and `end_registration`')
+            ->where($db->quoteName('a.state') . ' = 1')
             ->order('name');
 
         if ($studentId !== null && $studentId > 0)

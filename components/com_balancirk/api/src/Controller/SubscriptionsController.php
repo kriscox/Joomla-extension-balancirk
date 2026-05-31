@@ -227,7 +227,7 @@ class SubscriptionsController extends ApiController
         }
         catch (\Throwable $e)
         {
-            throw new \RuntimeException(Text::_('JLIB_APPLICATION_ERROR_SAVE_FAILED'), 400, $e);
+            throw new \RuntimeException($model->getError() ?: Text::_('JLIB_APPLICATION_ERROR_SAVE_FAILED'), 400, $e);
         }
 
         if (!$created) {

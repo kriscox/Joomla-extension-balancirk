@@ -94,11 +94,15 @@ class MemberController extends FormController
                     $app->enqueueMessage($error, 'warning');
                 }
             }
+
+            $this->setRedirect($redirectUrl);
+
+            return false;
         }
 
 
         // Register the user
-        if ($model->register($data))
+        if ($model->register($validData))
         {
             // Rmove the form data in the session, using a unique identifier
             $app->setUserState('com_balancirk.member.data', null);
