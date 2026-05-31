@@ -73,4 +73,16 @@
 			<item>Fixed a fatal TypeError ("Argument #1 ($value) must be of type object|array, false given") when registering a new student: the student form no longer passes a denied/empty record to the data preparation event.</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.8</version>
+		<fix>
+			<item>Fixed member registration so invalid form data no longer creates Joomla users and validated data is used consistently.</item>
+			<item>Hardened lesson subscriptions with server-side checks for open registration periods, non-trashed lessons, duplicate subscriptions, and clearer API error messages.</item>
+			<item>Fixed student detail status so it is based on actual subscriptions in non-trashed lessons instead of the stored student state.</item>
+			<item>Added a configurable school year offset, defaulting to six months.</item>
+			<item>Fixed Joomla update metadata so package updates match the installed package identity.</item>
+		</fix>
+	</changelog>
 </changelogs>
