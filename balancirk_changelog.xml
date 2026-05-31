@@ -64,4 +64,13 @@
 			<item>Lesson age restrictions are now year based instead of date based: a min_age/max_age lesson admits everyone who reaches that age during the calendar year of the lesson (matching school grades / leerjaren).</item>
 		</change>
 	</changelog>
+	<changelog>
+		<element>com_balancirk</element>
+		<type>package</type>
+		<version>1.3.7</version>
+		<fix>
+			<item>Fixed "Duplicate column name" error that could abort the update: the 1.3.2 repair script no longer re-adds columns that 1.2.12.sql and 1.2.20.sql already create.</item>
+			<item>Fixed a fatal TypeError ("Argument #1 ($value) must be of type object|array, false given") when registering a new student: the student form no longer passes a denied/empty record to the data preparation event.</item>
+		</fix>
+	</changelog>
 </changelogs>
