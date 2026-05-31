@@ -18,6 +18,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Application\CMSApplicationInterface;
+use Joomla\Database\ParameterType;
 
 /**
  * Student model for the Joomla Balancirk component.
@@ -133,6 +134,40 @@ class StudentModel extends AdminModel
         }
 
         return false;
+    }
+
+    /**
+     * Check whether the student has at least one active subscription in the current school year.
+     *
+     * @param   int|null  $studentId  Student id.
+     *
+     * @return  bool
+     *
+     * @since   1.3.8
+     */
+    public function hasCurrentYearSubscription(?int $studentId = null): bool
+    {
+        $studentId = $studentId ?: (int) $this->getState('student.id');
+
+        if ($studentId <= 0) {
+            return false;
+        }
+
+        $schoolYear = (int) date('Y', strtotime(date('Y-m-d') . '- 5 months'));
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__balancirk_subscriptions', 's'))
+            ->join('INNER', $db->quoteName('#__balancirk_lessons', 'l') . ' ON ' . $db->quoteName('l.id') . ' = ' . $db->quoteName('s.lesson'))
+            ->where($db->quoteName('s.student') . ' = :studentId')
+            ->where($db->quoteName('s.subscribed') . ' = 0')
+            ->where($db->quoteName('l.year') . ' = :schoolYear')
+            ->bind(':studentId', $studentId, ParameterType::INTEGER)
+            ->bind(':schoolYear', $schoolYear, ParameterType::INTEGER);
+
+        $db->setQuery($query);
+
+        return (int) $db->loadResult() > 0;
     }
 
     /**

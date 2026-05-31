@@ -63,6 +63,10 @@ class HtmlView extends BaseHtmlView
         $this->item = $this->get('Item');
         $this->state = $this->get('State');
 
+        if ($this->item) {
+            $this->item->hasCurrentYearSubscription = $this->getModel()->hasCurrentYearSubscription((int) $this->item->id);
+        }
+
         if (count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);
         }
