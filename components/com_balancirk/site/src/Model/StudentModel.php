@@ -248,9 +248,11 @@ class StudentModel extends AdminModel
 
                 return true;
             }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

@@ -160,9 +160,4 @@
 
 	<changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_changelog.xml</changelogurl>
 
-	<updateservers>
-		<server type="extension"
-			name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_update.xml</server>
-	</updateservers>
-
 </extension>

@@ -56,10 +56,11 @@
 		<php_minimum>8.0</php_minimum>
 	</update>
 	<update>
-		<name>com_balancirk</name>
-		<description>This is the balancirk plugin</description>
-		<element>com_balancirk</element>
+		<name>Balancirk</name>
+		<description>Balancirk extension package</description>
+		<element>pkg_balancirk</element>
 		<type>package</type>
+		<client>site</client>
 		<version>1.2.6</version>
 		<changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_changelog.xml</changelogurl>
 		<infourl title="agosms">https://github.com/kriscox/Joomla-extension-balancirk/blob/master/README.md</infourl>
@@ -75,10 +76,11 @@
 		<php_minimum>8.0</php_minimum>
 	</update>
 	<update>
-		<name>com_balancirk</name>
-		<description>This is the balancirk plugin</description>
-		<element>com_balancirk</element>
+		<name>Balancirk</name>
+		<description>Balancirk extension package</description>
+		<element>pkg_balancirk</element>
 		<type>package</type>
+		<client>site</client>
 		<version>1.2.8</version>
 		<changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_changelog.xml</changelogurl>
 		<infourl title="agosms">https://github.com/kriscox/Joomla-extension-balancirk/blob/master/README.md</infourl>
@@ -94,10 +96,11 @@
 		<php_minimum>8.0</php_minimum>
 	</update>
 	<update>
-		<name>com_balancirk</name>
-		<description>This is the balancirk plugin</description>
-		<element>com_balancirk</element>
+		<name>Balancirk</name>
+		<description>Balancirk extension package</description>
+		<element>pkg_balancirk</element>
 		<type>package</type>
+		<client>site</client>
 		<version>1.2.9</version>
 		<changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_changelog.xml</changelogurl>
 		<infourl title="agosms">https://github.com/kriscox/Joomla-extension-balancirk/blob/master/README.md</infourl>
@@ -113,10 +116,11 @@
 		<php_minimum>8.1</php_minimum>
 	</update>
 	<update>
-		<name>com_balancirk</name>
-		<description>This is the balancirk plugin</description>
-		<element>com_balancirk</element>
+		<name>Balancirk</name>
+		<description>Balancirk extension package</description>
+		<element>pkg_balancirk</element>
 		<type>package</type>
+		<client>site</client>
 		<version>1.3.0</version>
 		<changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_changelog.xml</changelogurl>
 		<infourl title="agosms">https://github.com/kriscox/Joomla-extension-balancirk/blob/master/README.md</infourl>
@@ -131,10 +135,11 @@
 		<php_minimum>8.1</php_minimum>
 	</update>
 	<update>
-		<name>com_balancirk</name>
-		<description>This is the balancirk plugin</description>
-		<element>com_balancirk</element>
+		<name>Balancirk</name>
+		<description>Balancirk extension package</description>
+		<element>pkg_balancirk</element>
 		<type>package</type>
+		<client>site</client>
 		<version>1.3.6</version>
 		<changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_changelog.xml</changelogurl>
 		<infourl title="agosms">https://github.com/kriscox/Joomla-extension-balancirk/blob/master/README.md</infourl>
@@ -149,10 +154,11 @@
 		<php_minimum>8.1</php_minimum>
 	</update>
 	<update>
-		<name>com_balancirk</name>
-		<description>This is the balancirk plugin</description>
-		<element>com_balancirk</element>
+		<name>Balancirk</name>
+		<description>Balancirk extension package</description>
+		<element>pkg_balancirk</element>
 		<type>package</type>
+		<client>site</client>
 		<version>1.3.7</version>
 		<changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_changelog.xml</changelogurl>
 		<infourl title="agosms">https://github.com/kriscox/Joomla-extension-balancirk/blob/master/README.md</infourl>

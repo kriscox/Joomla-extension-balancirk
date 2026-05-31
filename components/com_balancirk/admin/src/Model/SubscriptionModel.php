@@ -180,8 +180,20 @@ class SubscriptionModel extends AdminModel
         $model = $this->getMVCFactory()->createModel('Lesson', 'Site');
         $lesson = $model->getItem($lessonId, $lessonId);
 
-        if (!$lesson || !$this->isStudentEligibleForLesson($studentId, $lesson)) {
+        if (!$lesson || !$this->isLessonOpenForRegistration($lesson)) {
+            $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_REGISTRATION_CLOSED'));
+
+            return false;
+        }
+
+        if (!$this->isStudentEligibleForLesson($studentId, $lesson)) {
             $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_AGE_MISMATCH'));
+
+            return false;
+        }
+
+        if ($this->subscriptionExists($studentId, $lessonId)) {
+            $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_ALREADY_EXISTS'));
 
             return false;
         }
@@ -265,6 +277,57 @@ class SubscriptionModel extends AdminModel
         }
 
         return LessonAgeHelper::matchesLesson($student->birthdate ?? null, $lesson);
+    }
+
+    /**
+     * Check whether a lesson is published and open for registration today.
+     *
+     * @param   object  $lesson  Lesson record.
+     *
+     * @return  bool
+     *
+     * @since   1.3.8
+     */
+    private function isLessonOpenForRegistration(object $lesson): bool
+    {
+        if ((string) ($lesson->state ?? '') !== '1') {
+            return false;
+        }
+
+        $startRegistration = (string) ($lesson->start_registration ?? '');
+        $endRegistration = (string) ($lesson->end_registration ?? '');
+
+        if ($startRegistration === '' || $endRegistration === '') {
+            return false;
+        }
+
+        $today = date('Y-m-d');
+
+        return $today >= $startRegistration && $today <= $endRegistration;
+    }
+
+    /**
+     * Check whether this student is already linked to the lesson.
+     *
+     * @param   int  $studentId  Student id.
+     * @param   int  $lessonId   Lesson id.
+     *
+     * @return  bool
+     *
+     * @since   1.3.8
+     */
+    private function subscriptionExists(int $studentId, int $lessonId): bool
+    {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('1')
+            ->from($db->quoteName('#__balancirk_subscriptions'))
+            ->where($db->quoteName('student') . ' = ' . $studentId)
+            ->where($db->quoteName('lesson') . ' = ' . $lessonId);
+
+        $db->setQuery($query);
+
+        return (bool) $db->loadResult();
     }
 
     /**

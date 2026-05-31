@@ -20,7 +20,7 @@ export interface Student extends StudentSummary {
   phone?: string;
   email?: string;
   allow_photo?: boolean;
-  state?: string;
+  state?: number;
 }
 
 /** Payload for POST /v1/students and PATCH /v1/students/:id. */
@@ -38,5 +38,5 @@ export interface StudentWrite {
   mutuality?: string;
   uitpas?: string;
   allow_photo?: boolean;
-  state?: string;
+  state?: number;
 }
