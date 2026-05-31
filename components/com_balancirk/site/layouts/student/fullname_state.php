@@ -12,9 +12,10 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Language\Text;
 
-$form  = $displayData->getForm();
+$view = $displayData['view'];
+$form  = $view->getForm();
 $fullname = $form->getField('firstname')->value . " " . $form->getField('name')->value;
-$hasCurrentYearSubscription = (bool) ($displayData->item->hasCurrentYearSubscription ?? false);
+$hasCurrentYearSubscription = (bool) ($displayData['hasCurrentYearSubscription'] ?? false);
 $statusLabel = $hasCurrentYearSubscription
     ? Text::_('COM_BALANCIRK_STATUS_SUBSCRIBED')
     : Text::_('COM_BALANCIRK_STATUS_UNSUBSCRIBED');
