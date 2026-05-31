@@ -137,7 +137,7 @@ class StudentModel extends AdminModel
     }
 
     /**
-     * Check whether the student has at least one active subscription in the current school year.
+     * Check whether the student has at least one subscription in the current school year.
      *
      * @param   int|null  $studentId  Student id.
      *
@@ -155,6 +155,8 @@ class StudentModel extends AdminModel
 
         $schoolYear = (int) date('Y', strtotime(date('Y-m-d') . '- 5 months'));
         $db = $this->getDatabase();
+        $currentLesson = '(' . $db->quoteName('l.state') . ' = 1 OR '
+            . $db->quoteName('l.year') . ' = :schoolYear)';
         $query = $db->getQuery(true)
             ->select('COUNT(*)')
             ->from($db->quoteName('#__balancirk_subscriptions', 's'))
@@ -164,8 +166,7 @@ class StudentModel extends AdminModel
                     . ' ON ' . $db->quoteName('l.id') . ' = ' . $db->quoteName('s.lesson')
             )
             ->where($db->quoteName('s.student') . ' = :studentId')
-            ->where($db->quoteName('s.subscribed') . ' = 0')
-            ->where($db->quoteName('l.year') . ' = :schoolYear')
+            ->where($currentLesson)
             ->bind(':studentId', $studentId, ParameterType::INTEGER)
             ->bind(':schoolYear', $schoolYear, ParameterType::INTEGER);
 
