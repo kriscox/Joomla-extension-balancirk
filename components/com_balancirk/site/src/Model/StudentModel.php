@@ -155,8 +155,6 @@ class StudentModel extends AdminModel
 
         $schoolYear = (int) date('Y', strtotime(date('Y-m-d') . '- 5 months'));
         $db = $this->getDatabase();
-        $currentLesson = '(' . $db->quoteName('l.state') . ' = 1 OR '
-            . $db->quoteName('l.year') . ' = :schoolYear)';
         $query = $db->getQuery(true)
             ->select('COUNT(*)')
             ->from($db->quoteName('#__balancirk_subscriptions', 's'))
@@ -166,9 +164,11 @@ class StudentModel extends AdminModel
                     . ' ON ' . $db->quoteName('l.id') . ' = ' . $db->quoteName('s.lesson')
             )
             ->where($db->quoteName('s.student') . ' = :studentId')
-            ->where($currentLesson)
+            ->where($db->quoteName('l.year') . ' = :schoolYear')
+            ->where($db->quoteName('l.state') . ' <> :trashedState')
             ->bind(':studentId', $studentId, ParameterType::INTEGER)
-            ->bind(':schoolYear', $schoolYear, ParameterType::INTEGER);
+            ->bind(':schoolYear', $schoolYear, ParameterType::INTEGER)
+            ->bind(':trashedState', -2, ParameterType::INTEGER);
 
         $db->setQuery($query);
 
