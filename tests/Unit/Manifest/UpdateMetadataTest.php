@@ -55,6 +55,6 @@ class UpdateMetadataTest extends TestCase
         $componentManifest = simplexml_load_file(dirname(__DIR__, 3) . '/components/com_balancirk/balancirk.xml');
         $this->assertNotFalse($componentManifest);
 
-        $this->assertCount(0, $componentManifest->updateservers->server);
+        $this->assertSame([], $componentManifest->xpath('/extension/updateservers/server'));
     }
 }
