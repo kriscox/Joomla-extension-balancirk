@@ -13,6 +13,7 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 \defined('_JEXEC') or die;
 
 use Exception;
+use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Helper\ContentHelper;
