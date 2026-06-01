@@ -90,6 +90,9 @@ class SubscriptionsModel extends ListModel
         $year = $this->getUserStateFromRequest($this->context . '.filter.year', 'filter_year', '');
         $this->setState('filter.year', $year);
 
+        $student = $this->getUserStateFromRequest($this->context . '.filter.student', 'filter_student', '');
+        $this->setState('filter.student', $student);
+
         // List state information.
         parent::populateState($ordering, $direction);
     }
@@ -116,6 +119,7 @@ class SubscriptionsModel extends ListModel
             $db->quoteName(
                 [
                     'a.id',
+                    'a.studentid',
                     'a.name',
                     'a.firstname',
                     'a.lesson',
@@ -127,7 +131,8 @@ class SubscriptionsModel extends ListModel
                     'a.start_registration',
                     'a.end_registration',
                     'a.state',
-                    'a.subscribed'
+                    'a.subscribed',
+                    'p.primary'
                 ]
             )
         );
@@ -153,11 +158,21 @@ class SubscriptionsModel extends ListModel
             $query->where('(' . $db->quoteName('a.state') . ' = 0 OR ' . $db->quoteName('a.state') . ' = 1)');
         }
 
-        // Filter by selected year
+        // Filter by selected year — default to the latest year available
         $selectedYear = $this->getState('filter.year');
-        if ($selectedYear !== '' && $selectedYear !== null)
-        {
+        if ($selectedYear === '' || $selectedYear === null) {
+            $years = $this->getYears();
+            $selectedYear = $years[0] ?? null;
+            $this->setState('filter.year', $selectedYear);
+        }
+        if ($selectedYear !== null) {
             $query->where($db->quoteName('a.year') . ' = ' . $db->quote($selectedYear));
+        }
+
+        // Filter by student
+        $selectedStudent = $this->getState('filter.student');
+        if (!empty($selectedStudent)) {
+            $query->where($db->quoteName('a.studentid') . ' = ' . (int) $selectedStudent);
         }
 
         // Filter by search in title.
@@ -224,5 +239,31 @@ class SubscriptionsModel extends ListModel
 
         $db->setQuery($query);
         return $db->loadColumn();
+    }
+
+    /**
+     * Get students belonging to the current parent.
+     *
+     * @return  array  List of student objects with id, firstname, name.
+     *
+     * @since   1.3.2
+     */
+    public function getStudents(): array
+    {
+        $app = Factory::getApplication();
+        $user = $app->getIdentity();
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select($db->quoteName(['s.id', 's.firstname', 's.name']))
+            ->from($db->quoteName('#__balancirk_students', 's'))
+            ->join(
+                'INNER',
+                $db->quoteName('#__balancirk_parents', 'p'),
+                's.id = p.child AND p.parent = ' . (int) $user->id
+            )
+            ->order('s.firstname, s.name');
+
+        return $db->setQuery($query)->loadObjectList() ?: [];
     }
 }

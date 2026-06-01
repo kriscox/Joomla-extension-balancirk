@@ -28,6 +28,10 @@ $app = Factory::getApplication();
 /** create list of lesdays */
 $lessons = [];
 $lesdays = LessonModel::getDates($this->item->start, $this->item->end, LessonModel::getLesdays($this->item->lesdays));
+if (empty($lesdays)) {
+    echo '<div class="alert alert-info">' . Text::_('COM_BALANCIRK_LESSON_NO_DATES_YET') . '</div>';
+    return;
+}
 $firstLesDay = min($lesdays)->format('d/m/Y');
 $lastLesDay = max($lesdays)->format('d/m/Y');
 foreach ($lesdays as $lesday) {

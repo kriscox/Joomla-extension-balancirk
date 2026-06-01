@@ -71,6 +71,20 @@ class HtmlView extends BaseHtmlView
     protected $lesdays;
 
     /**
+     * Teachers assigned to this lesson.
+     *
+     * @var array
+     */
+    protected $teachers;
+
+    /**
+     * All members available as teachers.
+     *
+     * @var array
+     */
+    protected $availableTeachers;
+
+    /**
      * Display the view.
      *
      * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
@@ -82,6 +96,8 @@ class HtmlView extends BaseHtmlView
         $this->form  = $this->get('Form');
         $this->item = $this->get('Item');
         $this->hours = $this->get('hours');
+        $this->teachers = $this->get('Teachers');
+        $this->availableTeachers = $this->get('AvailableTeachers');
         $this->form->bind(["lesdays_field" => LessonModel::getLesdays($this->item->lesdays)]);
 
         if (count($errors = $this->get('Errors'))) {

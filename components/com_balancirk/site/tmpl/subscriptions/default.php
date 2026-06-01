@@ -32,6 +32,7 @@ HTMLHelper::_('script', 'com_balancirk/balancirk_spa_navigation.js', ['version' 
 $userid = Factory::getApplication()->getIdentity()->id;
 $bearertoken = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
 $selectedYear = $this->state->get('filter.year', '');
+$selectedStudent = $this->state->get('filter.student', '');
 ?>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-subscriptions-top}'); ?>
@@ -54,6 +55,16 @@ $selectedYear = $this->state->get('filter.year', '');
 					<?php foreach ($this->years as $year) : ?>
 						<option value="<?= $this->escape($year) ?>" <?= $selectedYear == $year ? 'selected' : '' ?>>
 							<?= $this->escape($year) ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+				<?php endif; ?>
+				<?php if (!empty($this->students)) : ?>
+				<select name="filter_student" class="form-select w-auto" onchange="document.getElementById('subscriptionFilterForm').submit();" aria-label="<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_STUDENT') ?>">
+					<option value=""><?= Text::_('COM_BALANCIRK_FILTER_ALL_STUDENTS') ?></option>
+					<?php foreach ($this->students as $student) : ?>
+						<option value="<?= (int) $student->id ?>" <?= $selectedStudent == $student->id ? 'selected' : '' ?>>
+							<?= $this->escape($student->firstname . ' ' . $student->name) ?>
 						</option>
 					<?php endforeach; ?>
 				</select>
@@ -106,7 +117,15 @@ $selectedYear = $this->state->get('filter.year', '');
 									<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
 								</td>
 								<td scope="row" class="d-md-table-cell">
-									<?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)); ?>
+									<?php if ($item->primary == 1) : ?>
+										<a data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&task=student.edit&id=' . (int) $item->studentid) ?>">
+											<?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)); ?>
+										</a>
+									<?php else : ?>
+										<a data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&view=student&layout=default&id=' . (int) $item->studentid) ?>">
+											<?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)); ?>
+										</a>
+									<?php endif; ?>
 								</td>
 								<td scope="row" class="d-md-table-cell">
 									<?= $this->escape(addslashes($item->lesson)); ?>

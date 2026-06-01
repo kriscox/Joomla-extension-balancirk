@@ -74,6 +74,9 @@ class LessonsModel extends ListModel
         $published = $this->getUserStateFromRequest($this->context . '.filter.published', 'filter_published', '');
         $this->setState('filter.published', $published);
 
+        $year = $this->getUserStateFromRequest($this->context . '.filter.year', 'filter_year', '');
+        $this->setState('filter.year', $year);
+
         // List state information.
         parent::populateState($ordering, $direction);
     }
@@ -96,6 +99,7 @@ class LessonsModel extends ListModel
         // Compile the store id.
         $id .= ':' . $this->getState('filter.search');
         $id .= ':' . $this->getState('filter.published');
+        $id .= ':' . $this->getState('filter.year');
 
         return parent::getStoreId($id);
     }
@@ -124,6 +128,17 @@ class LessonsModel extends ListModel
             )
         );
         $query->from($db->quoteName('#__balancirk_lessons_complete', 'a'));
+
+        // Filter by year — default to the latest year available
+        $selectedYear = $this->getState('filter.year');
+        if ($selectedYear === '' || $selectedYear === null) {
+            $years = $this->getYears();
+            $selectedYear = $years[0] ?? null;
+            $this->setState('filter.year', $selectedYear);
+        }
+        if ($selectedYear !== null) {
+            $query->where($db->quoteName('a.year') . ' = ' . $db->quote($selectedYear));
+        }
 
         // Filter by search in title.
         $search = $this->getState('filter.search');
@@ -265,5 +280,23 @@ class LessonsModel extends ListModel
         $value = $db->loadResult();
 
         return $value !== null ? (string) $value : null;
+    }
+
+    /**
+     * Get distinct years from lessons for filter dropdown.
+     *
+     * @return  array
+     *
+     * @since   1.3.2
+     */
+    public function getYears(): array
+    {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('DISTINCT ' . $db->quoteName('year'))
+            ->from($db->quoteName('#__balancirk_lessons'))
+            ->order($db->quoteName('year') . ' DESC');
+
+        return $db->setQuery($query)->loadColumn() ?: [];
     }
 }

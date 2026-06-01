@@ -264,6 +264,16 @@ class StudentModel extends AdminModel
         // Set default value of student to unsubscribed
         $data['state'] = 1;
 
+        // For existing students, only the primary parent may save changes
+        $studentId = (int) ($data['id'] ?? 0);
+        if ($studentId > 0) {
+            $userId = Factory::getApplication()->getIdentity()->id;
+            if (!$this->isPrimairyParent($userId, $studentId)) {
+                $this->setError(Text::_('COM_BALANCIRK_ERROR_NOT_PRIMARY_PARENT'));
+                return false;
+            }
+        }
+
         // If save is successfull and this is a new student than fill the user as primairy parent
         if (parent::save($data)) {
             if ($this->state->get("student.new")) {
