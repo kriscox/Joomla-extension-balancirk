@@ -85,4 +85,12 @@
 			<item>Fixed Joomla update metadata so package updates match the installed package identity.</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.9</version>
+		<fix>
+			<item>Fixed the subscriptions year filter so "All school years" keeps the year filter empty and shows subscriptions across all years.</item>
+		</fix>
+	</changelog>
 </changelogs>
