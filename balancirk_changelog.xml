@@ -93,4 +93,20 @@
 			<item>Fixed the subscriptions year filter so "All school years" keeps the year filter empty and shows subscriptions across all years.</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.12</version>
+		<fix>
+			<item>Subscriptions year filter defaults to the latest school year.</item>
+			<item>Fixed min() crash when viewing attendance for lessons that haven't started yet.</item>
+			<item>Added Teachers tab to lesson detail (frontend) and lesson edit (backend) with add/remove.</item>
+			<item>Added student filter to subscriptions list.</item>
+			<item>Linked student names in subscriptions to their detail page and vice versa.</item>
+			<item>Non-primary parents can no longer edit student data via URL manipulation.</item>
+			<item>Added year filter to backend lessons overview.</item>
+			<item>Added waiting list count to lessons overview.</item>
+			<item>Removed "Not yet implemented" placeholder from lessons page.</item>
+		</fix>
+	</changelog>
 </changelogs>
