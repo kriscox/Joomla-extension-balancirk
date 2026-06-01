@@ -131,7 +131,8 @@ class SubscriptionsModel extends ListModel
                     'a.start_registration',
                     'a.end_registration',
                     'a.state',
-                    'a.subscribed'
+                    'a.subscribed',
+                    'p.primary'
                 ]
             )
         );
