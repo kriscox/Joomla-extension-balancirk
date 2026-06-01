@@ -106,9 +106,9 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 			</button>
 		</div>
 		<div class="col-12 col-md-4">
-			<a href="<?= Route::_('index.php?option=com_balancirk&view=subscriptions&filter_student=' . (int) $this->item->id) ?>" class="balancirk_button" style="text-decoration:none; display:inline-block;">
-				<?= Text::_('COM_BALANCIRK_SUBSCRIPTIONS_LINK') ?>
-			</a>
+			<button type="button" class="balancirk_button" onclick="window.location.href='<?= Route::_('index.php?option=com_balancirk&view=subscriptions&filter_student=' . (int) $this->item->id) ?>'">
+				<span class="icon-list"> <?= Text::_('COM_BALANCIRK_SUBSCRIPTIONS_LINK') ?></span>
+			</button>
 		</div>
 	</div>
 </form>
