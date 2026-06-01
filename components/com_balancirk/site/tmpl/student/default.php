@@ -72,10 +72,15 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 	<input type="hidden" name="task" value="">
 	<?= HTMLHelper::_('form.token'); ?>
 	<div class="row title-alias form-vertical mb-3">
-		<div class="col-12 col-md-6">
+		<div class="col-12 col-md-3">
 			<button type="button" class="balancirk_button" onclick="Joomla.submitbutton('student.cancel')">
 				<span class="icon-arrow-left-4"> <?= Text::_('JCLOSE') ?></span>
 			</button>
+		</div>
+		<div class="col-12 col-md-3">
+			<a href="<?= Route::_('index.php?option=com_balancirk&view=subscriptions&filter_student=' . (int) $this->item->id) ?>" class="balancirk_button" style="text-decoration:none; display:inline-block;">
+				<?= Text::_('COM_BALANCIRK_SUBSCRIPTIONS_LINK') ?>
+			</a>
 		</div>
 	</div>
 </form>
