@@ -115,6 +115,7 @@ class LessonsModel extends ListModel
                     'a.year',
                     'a.state',
                     'a.numberOfStudents',
+                    'a.numberOnWaitingList',
                     'a.max_students'
                 ],
                 [
@@ -124,6 +125,7 @@ class LessonsModel extends ListModel
                     'year',
                     'state',
                     'numberOfStudents',
+                    'numberOnWaitingList',
                     'max_students'
                 ]
             )

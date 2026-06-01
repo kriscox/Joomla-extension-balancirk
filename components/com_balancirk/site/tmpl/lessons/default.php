@@ -23,6 +23,7 @@ use Joomla\CMS\Session\Session;
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
 $total_number_of_subscriptions = 0;
+$total_number_on_waiting_list = 0;
 
 /** @var Joomla\CMS\Application $app */
 $app = Factory::getApplication();
@@ -139,8 +140,11 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 										<?= $this->escape($item->year); ?>
 									</th>
 									<th scope="row" class="has-context">
-										<?php $total_number_of_subscriptions += $item->numberOfStudents; ?>
-										<?= $this->escape($item->numberOfStudents); ?> &#47; <?= $this->escape($item->max_students); ?>
+										<?php
+										$total_number_of_subscriptions += $item->numberOfStudents;
+										$total_number_on_waiting_list += $item->numberOnWaitingList;
+										?>
+										<?= $this->escape($item->numberOfStudents); ?>&#47;<?= $this->escape($item->max_students); ?><?php if ($item->numberOnWaitingList > 0) : ?> (<?= (int) $item->numberOnWaitingList; ?>)<?php endif; ?>
 									</th>
 									<th scope="row" class="has-context">
 										<?= $this->escape($item->state); ?>
@@ -153,7 +157,7 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 				<div class="col-md-6">
 					<div class="row" id="jform">
 						<div class="col-md-4" id="label"> <?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_SUBSCRIPTIONS') ?> </div>
-						<div class="col-md-8" id="value"> <?= $total_number_of_subscriptions ?> </div>
+						<div class="col-md-8" id="value"> <?= $total_number_of_subscriptions ?><?php if ($total_number_on_waiting_list > 0) : ?> (<?= $total_number_on_waiting_list ?> <?= Text::_('COM_BALANCIRK_ON_WAITING_LIST') ?>)<?php endif; ?></div>
 					</div>
 				</div>
 				<input type="hidden" name="task" value="">
