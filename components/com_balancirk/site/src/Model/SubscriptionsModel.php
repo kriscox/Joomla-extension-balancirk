@@ -150,9 +150,7 @@ class SubscriptionsModel extends ListModel
         }
         elseif ($current === '')
         {
-            $trashedState = -2;
-            $query->where($db->quoteName('a.state') . ' <> :trashedState');
-            $query->bind(':trashedState', $trashedState, ParameterType::INTEGER);
+            $query->where('(' . $db->quoteName('a.state') . ' = 0 OR ' . $db->quoteName('a.state') . ' = 1)');
         }
 
         // Filter by selected year
