@@ -153,10 +153,14 @@ class SubscriptionsModel extends ListModel
             $query->where('(' . $db->quoteName('a.state') . ' = 0 OR ' . $db->quoteName('a.state') . ' = 1)');
         }
 
-        // Filter by selected year
+        // Filter by selected year — default to the latest year available
         $selectedYear = $this->getState('filter.year');
-        if ($selectedYear !== '' && $selectedYear !== null)
-        {
+        if ($selectedYear === '' || $selectedYear === null) {
+            $years = $this->getYears();
+            $selectedYear = $years[0] ?? null;
+            $this->setState('filter.year', $selectedYear);
+        }
+        if ($selectedYear !== null) {
             $query->where($db->quoteName('a.year') . ' = ' . $db->quote($selectedYear));
         }
 
