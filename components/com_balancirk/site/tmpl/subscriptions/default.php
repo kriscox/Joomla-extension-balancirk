@@ -117,7 +117,7 @@ $selectedStudent = $this->state->get('filter.student', '');
 									<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
 								</td>
 								<td scope="row" class="d-md-table-cell">
-									<a data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&view=student&id=' . (int) $item->studentid) ?>">
+									<a data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&view=student&layout=edit&id=' . (int) $item->studentid) ?>">
 										<?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)); ?>
 									</a>
 								</td>
