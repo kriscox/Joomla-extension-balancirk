@@ -33,7 +33,6 @@ $wa->registerAndUseScript('balancirk-spa-navigation', 'media/com_balancirk/js/ba
 $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 ?>
 
-<alert>Not yet implemented</alert>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-lessons-top}'); ?>
 <form action=" <?= Route::_('index.php?option=com_balancirk&view=lessons'); ?>" method="post" name="adminForm" id="adminForm">
