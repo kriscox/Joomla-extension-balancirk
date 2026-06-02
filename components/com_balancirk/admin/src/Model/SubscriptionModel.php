@@ -87,18 +87,28 @@ class SubscriptionModel extends AdminModel
             return true;
         }
 
-        /** @var StudentModel $studentModel */
-        $studentModel = $this->getMVCFactory()->createModel('Student', 'Admin');
-        /** @var PresencesModel $presencesModel */
-        $presencesModel = $this->getMVCFactory()->createModel('Presences', 'Admin');
+        $db = $this->getDatabase();
 
-        if (!$studentModel || !$presencesModel)
-        {
+        $parentQuery = $db->getQuery(true)
+            ->select('1')
+            ->from($db->quoteName('#__balancirk_parents', 'p'))
+            ->where($db->quoteName('p.parent') . ' = ' . (int) $user->id)
+            ->where($db->quoteName('p.child') . ' = ' . (int) $record->student)
+            ->where($db->quoteName('p.primary') . ' = 1');
+        $isPrimary = (bool) $db->setQuery($parentQuery)->loadResult();
+
+        if (!$isPrimary) {
             return false;
         }
 
-        return $studentModel->isPrimairyParent((int) $user->id, (int) $record->student)
-            && $presencesModel->numberOfPresences((int) $record->student, (int) $record->lesson) <= 2;
+        $presenceQuery = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__balancirk_presences'))
+            ->where($db->quoteName('student') . ' = ' . (int) $record->student)
+            ->where($db->quoteName('lesson') . ' = ' . (int) $record->lesson);
+        $presenceCount = (int) $db->setQuery($presenceQuery)->loadResult();
+
+        return $presenceCount <= 2;
     }
 
     /**
