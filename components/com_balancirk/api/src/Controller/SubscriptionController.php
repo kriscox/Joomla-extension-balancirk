@@ -67,7 +67,14 @@ class SubscriptionController extends ApiController
             throw new \RuntimeException(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'), 403);
         }
 
-        return $model->delete($recordKey);
+        if (!$model->delete($recordKey))
+        {
+            throw new \RuntimeException(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'), 500);
+        }
+
+        $this->app->setHeader('status', 204);
+
+        return;
     }
 
     /**

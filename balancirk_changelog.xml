@@ -117,4 +117,12 @@
 			<item>Fixed unsubscribe failing for primary parents when model instantiation failed in API context.</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.14</version>
+		<fix>
+			<item>Fixed unsubscribe showing "Failed" error even though the subscription was successfully deleted. The API now returns a proper HTTP 204 response.</item>
+		</fix>
+	</changelog>
 </changelogs>
