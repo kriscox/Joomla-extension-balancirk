@@ -109,4 +109,12 @@
 			<item>Removed "Not yet implemented" placeholder from lessons page.</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.13</version>
+		<fix>
+			<item>Fixed unsubscribe failing for primary parents when model instantiation failed in API context.</item>
+		</fix>
+	</changelog>
 </changelogs>
