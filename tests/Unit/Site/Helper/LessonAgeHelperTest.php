@@ -109,4 +109,65 @@ class LessonAgeHelperTest extends TestCase
         $this->assertSame(0, LessonAgeHelper::normalizeNullableInt('0'));
         $this->assertSame(12, LessonAgeHelper::normalizeNullableInt('12'));
     }
+
+    public function testMatchesLessonWithOnlyMinAgeAllowsStudentOldEnough(): void
+    {
+        // max_age is null: any student turning 9+ during the year qualifies.
+        $lesson = (object) [
+            'start' => '2025-09-01',
+            'min_age' => 9,
+            'max_age' => null,
+        ];
+
+        $this->assertTrue(LessonAgeHelper::matchesLesson('2013-03-15', $lesson));
+    }
+
+    public function testMatchesLessonWithOnlyMinAgeBlocksStudentTooYoung(): void
+    {
+        $lesson = (object) [
+            'start' => '2025-09-01',
+            'min_age' => 9,
+            'max_age' => null,
+        ];
+
+        // Born in 2018, turns only 7 during 2025: below minimum.
+        $this->assertFalse(LessonAgeHelper::matchesLesson('2018-06-01', $lesson));
+    }
+
+    public function testMatchesLessonWithOnlyMaxAgeAllowsStudentYoungEnough(): void
+    {
+        $lesson = (object) [
+            'start' => '2025-09-01',
+            'min_age' => null,
+            'max_age' => 12,
+        ];
+
+        // Born in 2018, turns 7 during 2025: below or equal to max of 12.
+        $this->assertTrue(LessonAgeHelper::matchesLesson('2018-03-15', $lesson));
+    }
+
+    public function testMatchesLessonWithOnlyMaxAgeBlocksStudentTooOld(): void
+    {
+        $lesson = (object) [
+            'start' => '2025-09-01',
+            'min_age' => null,
+            'max_age' => 12,
+        ];
+
+        // Born in 2010, turns 15 during 2025: exceeds maximum.
+        $this->assertFalse(LessonAgeHelper::matchesLesson('2010-01-01', $lesson));
+    }
+
+    public function testGetAgeInYearReturnsZeroWhenBornInReferenceYear(): void
+    {
+        $age = LessonAgeHelper::getAgeInYear('2025-06-15', '2025-09-01');
+
+        $this->assertSame(0, $age);
+    }
+
+    public function testGetAgeInYearReturnsNullForEmptyBirthdate(): void
+    {
+        $this->assertNull(LessonAgeHelper::getAgeInYear('', '2025-09-01'));
+        $this->assertNull(LessonAgeHelper::getAgeInYear(null, '2025-09-01'));
+    }
 }
