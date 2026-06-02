@@ -161,7 +161,7 @@ $selectedStudent = $this->state->get('filter.student', '');
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="deleteModalLabel"><?= Text::_('COM_BALANCIRK_MODEL_UNSUBSCRIBE_TITLE') ?></h5>
+				<h5 class="modal-title" id="deleteModalLabel"><?= Text::_('COM_BALANCIRK_MODAL_UNSUBSCRIBE_TITLE') ?></h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
