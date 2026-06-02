@@ -21,39 +21,100 @@
 		<version>1.2.5</version>
 		<fix>
 			<item>Minor bug fixes.</item>
-			<item>Added view of lessons for teachers</item>
-			<item>Added presences part 1</item>
+			<item>Added a lesson overview for teachers.</item>
+			<item>Added the first part of attendance tracking.</item>
 		</fix>
 	</changelog>
 	<changelog>
-		<element>com_balancirk</element>
+		<element>pkg_balancirk</element>
 		<type>package</type>
 		<version>1.2.6</version>
 		<fix>
-			<item>Changed from component to package.</item>
-			<item>Added presences with update of existing</item>
-			<item>Added presence history graph behind lesson</item>
-			<item>Added waiting lists for lessons that are full</item>
-			<item>Fixed end-date subscriptions not taken into account</item>
+			<item>Changed the extension from a component-only install to a package install.</item>
+			<item>Added attendance tracking with updates for existing records.</item>
+			<item>Added an attendance history graph for lessons.</item>
+			<item>Added waiting lists for lessons that are full.</item>
+			<item>Fixed subscription end dates not being taken into account.</item>
 		</fix>
 	</changelog>
 	<changelog>
-		<element>com_balancirk</element>
+		<element>pkg_balancirk</element>
 		<type>package</type>
 		<version>1.2.8</version>
 		<fix>
-			<item>Only technical fixes</item>
+			<item>Added technical fixes only.</item>
 		</fix>
 	</changelog>
 	<changelog>
-		<element>com_balancirk</element>
+		<element>pkg_balancirk</element>
 		<type>package</type>
 		<version>1.2.9</version>
 		<fix>
-			<item>fixed: Error in case of no lessons to subscribe to </item>
-			<item>Holidays added</item>
-			<item>Joomla-builder2 used</item>
-			<item>Added to lessons search for lessons in the past years</item>
+			<item>Fixed an error when there are no lessons open for subscription.</item>
+			<item>Added holiday management.</item>
+			<item>Switched the build process to Joomla Builder 2.</item>
+			<item>Added support for searching lessons from previous years.</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.6</version>
+		<change>
+			<item>Lesson age restrictions are now year based instead of date based: a min_age/max_age lesson admits everyone who reaches that age during the calendar year of the lesson, matching school grades.</item>
+		</change>
+	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.7</version>
+		<fix>
+			<item>Fixed "Duplicate column name" error that could abort the update: the 1.3.2 repair script no longer re-adds columns that 1.2.12.sql and 1.2.20.sql already create.</item>
+			<item>Fixed a fatal TypeError ("Argument #1 ($value) must be of type object|array, false given") when registering a new student: the student form no longer passes a denied/empty record to the data preparation event.</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.8</version>
+		<fix>
+			<item>Fixed member registration so invalid form data no longer creates Joomla users and validated data is used consistently.</item>
+			<item>Hardened lesson subscriptions with server-side checks for open registration periods, non-trashed lessons, duplicate subscriptions, and clearer API error messages.</item>
+			<item>Fixed student detail status so it is based on actual subscriptions in non-trashed lessons instead of the stored student state.</item>
+			<item>Added a configurable school year offset, defaulting to six months.</item>
+			<item>Fixed Joomla update metadata so package updates match the installed package identity.</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.9</version>
+		<fix>
+			<item>Fixed the subscriptions year filter so "All school years" keeps the year filter empty and shows subscriptions across all years.</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.12</version>
+		<fix>
+			<item>Subscriptions year filter defaults to the latest school year.</item>
+			<item>Fixed min() crash when viewing attendance for lessons that haven't started yet.</item>
+			<item>Added Teachers tab to lesson detail (frontend) and lesson edit (backend) with add/remove.</item>
+			<item>Added student filter to subscriptions list.</item>
+			<item>Linked student names in subscriptions to their detail page and vice versa.</item>
+			<item>Non-primary parents can no longer edit student data via URL manipulation.</item>
+			<item>Added year filter to backend lessons overview.</item>
+			<item>Added waiting list count to lessons overview.</item>
+			<item>Removed "Not yet implemented" placeholder from lessons page.</item>
+		</fix>
+	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.13</version>
+		<fix>
+			<item>Fixed unsubscribe failing for primary parents when model instantiation failed in API context.</item>
 		</fix>
 	</changelog>
 </changelogs>

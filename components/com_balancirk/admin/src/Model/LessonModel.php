@@ -232,4 +232,138 @@ class LessonModel extends AdminModel
         $returnvalue .= (1 == (1 & $lesdays) ? "1" : "");
         return $returnvalue;
     }
+
+    /**
+     * Get teachers assigned to a lesson.
+     *
+     * @param   int|null  $lessonId  Lesson id (defaults to current item).
+     *
+     * @return  array
+     *
+     * @since   1.3.2
+     */
+    public function getTeachers(?int $lessonId = null): array
+    {
+        $lessonId = $lessonId ?: (int) $this->getState('lesson.id');
+        if (!$lessonId) {
+            return [];
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select($db->quoteName(['m.id', 'm.firstname', 'u.name', 'u.email']))
+            ->from($db->quoteName('#__balancirk_teachers', 't'))
+            ->join(
+                'INNER',
+                $db->quoteName('#__balancirk_members_additional', 'm'),
+                't.member = m.id'
+            )
+            ->join(
+                'INNER',
+                $db->quoteName('#__users', 'u'),
+                'u.id = m.id'
+            )
+            ->where($db->quoteName('t.lesson') . ' = ' . (int) $lessonId)
+            ->order('u.name');
+
+        return $db->setQuery($query)->loadObjectList() ?: [];
+    }
+
+    /**
+     * Get members available as teachers (in the Teachers user group).
+     *
+     * @return  array
+     *
+     * @since   1.3.2
+     */
+    public function getAvailableTeachers(): array
+    {
+        $db = $this->getDatabase();
+
+        $groupQuery = $db->getQuery(true)
+            ->select($db->quoteName('id'))
+            ->from($db->quoteName('#__usergroups'))
+            ->where($db->quoteName('title') . ' = ' . $db->quote('Teachers'));
+        $groupId = $db->setQuery($groupQuery)->loadResult();
+
+        if (!$groupId) {
+            return [];
+        }
+
+        $query = $db->getQuery(true)
+            ->select($db->quoteName(['m.id', 'm.firstname', 'u.name', 'u.email']))
+            ->from($db->quoteName('#__balancirk_members_additional', 'm'))
+            ->join(
+                'INNER',
+                $db->quoteName('#__users', 'u'),
+                'u.id = m.id'
+            )
+            ->join(
+                'INNER',
+                $db->quoteName('#__user_usergroup_map', 'g'),
+                'g.user_id = m.id'
+            )
+            ->where($db->quoteName('g.group_id') . ' = ' . (int) $groupId)
+            ->order('u.name');
+
+        return $db->setQuery($query)->loadObjectList() ?: [];
+    }
+
+    /**
+     * Save teacher assignments for a lesson.
+     *
+     * @param   int    $lessonId    Lesson id.
+     * @param   array  $teacherIds  Array of member ids to assign.
+     *
+     * @return  void
+     *
+     * @since   1.3.2
+     */
+    public function saveTeachers(int $lessonId, array $teacherIds): void
+    {
+        $db = $this->getDatabase();
+
+        $deleteQuery = $db->getQuery(true)
+            ->delete($db->quoteName('#__balancirk_teachers'))
+            ->where($db->quoteName('lesson') . ' = ' . (int) $lessonId);
+        $db->setQuery($deleteQuery)->execute();
+
+        foreach ($teacherIds as $memberId) {
+            $memberId = (int) $memberId;
+            if ($memberId <= 0) {
+                continue;
+            }
+            $insertQuery = $db->getQuery(true)
+                ->insert($db->quoteName('#__balancirk_teachers'))
+                ->columns([$db->quoteName('member'), $db->quoteName('lesson')])
+                ->values($memberId . ', ' . (int) $lessonId);
+            $db->setQuery($insertQuery)->execute();
+        }
+    }
+
+    /**
+     * Override save to also handle teacher assignments.
+     *
+     * @param   array  $data  The form data.
+     *
+     * @return  boolean  True on success.
+     *
+     * @since   1.3.2
+     */
+    public function save($data)
+    {
+        $teacherIds = $data['teachers'] ?? [];
+        unset($data['teachers']);
+
+        if (!parent::save($data)) {
+            return false;
+        }
+
+        $lessonId = (int) ($this->getState('lesson.id') ?: $data['id'] ?? 0);
+        if ($lessonId && is_array($teacherIds)) {
+            $this->saveTeachers($lessonId, $teacherIds);
+        }
+
+        return true;
+    }
 }

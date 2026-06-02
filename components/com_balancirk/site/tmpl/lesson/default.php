@@ -216,6 +216,35 @@ $teached_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=teach
 			<canvas id="PresenceChart"> </canvas>
 		</div>
 		<?= HTMLHelper::_('uitab.endTab'); ?>
+
+		<?= HTMLHelper::_('uitab.addTab', 'myTab', 'teachers', Text::_('COM_BALANCIRK_LESSON_TAB_TEACHERS')); ?>
+		<?php if (!empty($this->teachers)) : ?>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_FIRSTNAME') ?></th>
+					<th><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_NAME') ?></th>
+					<th><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_EMAIL') ?></th>
+					<th><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_PHONE') ?></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach ($this->teachers as $teacher) : ?>
+				<tr>
+					<td><?= $this->escape($teacher->firstname) ?></td>
+					<td><?= $this->escape($teacher->name) ?></td>
+					<td><?= $this->escape($teacher->email ?? '') ?></td>
+					<td><?= $this->escape($teacher->phone ?? '') ?></td>
+				</tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
+		<?php else : ?>
+		<div class="alert alert-info">
+			<?= Text::_('JGLOBAL_NO_MATCHING_RESULTS') ?>
+		</div>
+		<?php endif; ?>
+		<?= HTMLHelper::_('uitab.endTab'); ?>
 		<?= HTMLHelper::_('uitab.endTabSet'); ?>
 		<input type="hidden" name="task" value="">
 		<?= HTMLHelper::_('form.token'); ?>

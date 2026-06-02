@@ -8,11 +8,10 @@
  * @license     GNU General Public License version 3.
  */
 
-namespace CoCoCo\Component\Balancirk\site\Field;
+namespace CoCoCo\Component\Balancirk\Site\Field;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Field\ListField;
-use CoCoCo\Component\Balancirk\site\Model\StudentsModel;
+use CoCoCo\Component\Balancirk\Site\Model\StudentsModel;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -42,17 +41,14 @@ class StudentsField extends ListField
      */
     protected function getOptions()
     {
-        $app = Factory::getApplication();
-
         /** @var studentsModel */
         $studentsModel = new StudentsModel();
         $myStudents = $studentsModel->getItems();
+        $studentOption = [];
 
         if (null == $myStudents) {
             $myStudents = [];
         } else {
-            $studentOption = [];
-
             foreach ($myStudents as $student) {
                 array_push(
                     $studentOption,

@@ -11,6 +11,9 @@ spl_autoload_register(static function (string $class): void {
         'CoCoCo\\Component\\Balancirk\\Site\\' => dirname(__DIR__) . '/components/com_balancirk/site/src/',
         'CoCoCo\\Component\\Balancirk\\Administrator\\' => dirname(__DIR__) . '/components/com_balancirk/admin/src/',
         'CoCoCo\\Component\\Balancirk\\Api\\' => dirname(__DIR__) . '/components/com_balancirk/api/src/',
+        // Joomlaology shared library (lowercase directory names on disk)
+        'Joomlaology\\Traits\\' => dirname(__DIR__) . '/libraries/joomlaology/traits/',
+        'Joomlaology\\Classes\\' => dirname(__DIR__) . '/libraries/joomlaology/classes/',
     ];
 
     foreach ($prefixes as $prefix => $basePath) {

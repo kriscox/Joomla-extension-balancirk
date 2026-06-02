@@ -189,8 +189,14 @@ class LessonModel extends AdminModel
         )
             ->select('MAX(p.date) as last_presence')
             ->from($dbo->quoteName('#__balancirk_students', 'a'))
-            ->join('INNER', $dbo->quoteName('#__balancirk_subscriptions', 's'), 's.student = a.id', 's.subscribed = 0')
-            ->join('LEFT', $dbo->quoteName('#__balancirk_presences', 'p'), 'p.student = a.id AND p.lesson = s.lesson')
+            ->join(
+                'INNER',
+                $dbo->quoteName('#__balancirk_subscriptions', 's') . ' ON s.student = a.id AND s.subscribed = 0'
+            )
+            ->join(
+                'LEFT',
+                $dbo->quoteName('#__balancirk_presences', 'p') . ' ON p.student = a.id AND p.lesson = s.lesson'
+            )
             ->where('s.lesson = ' . $lessonid)
             ->order(['a.name', 'a.firstname'])
             ->group('a.id', 'a.name', 'a.firstname', 'a.phone', 'a.email', 'a.birthdate', 'a.allow_photo', 'a.state');

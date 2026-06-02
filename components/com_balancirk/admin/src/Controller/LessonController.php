@@ -84,6 +84,9 @@ class LessonController extends FormController
         }
         $validData['lesdays'] = $lesday;
 
+        // Pass teachers from raw form data (not in form XML, so stripped by validate)
+        $validData['teachers'] = $data['teachers'] ?? [];
+
         if ($validData === false) {
             $errors = $model->getErrors();
 

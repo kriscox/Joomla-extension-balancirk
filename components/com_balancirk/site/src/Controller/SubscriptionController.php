@@ -63,12 +63,17 @@ class SubscriptionController extends FormController
     protected function allowAdd($data = array())
     {
         $user     = Factory::getApplication()->getIdentity();
+        $studentId = (int) ($data['student'] ?? 0);
+
+        if ($studentId <= 0) {
+            return false;
+        }
 
         /** @var StudentModel */
         $model    = $this->getModel('Student');
 
         // Check if the user is the primary parent of the student
-        return $model->isPrimairyParent($user->id, $data['student']);
+        return $model->isPrimairyParent((int) $user->id, $studentId);
     }
 
     /**
@@ -85,13 +90,18 @@ class SubscriptionController extends FormController
     protected function allowDelete($data = array())
     {
         $user    = Factory::getApplication()->getIdentity();
+        $studentId = (int) ($data['student'] ?? 0);
+
+        if ($studentId <= 0) {
+            return false;
+        }
 
         /** @var StudentModel */
         $studentModel = $this->getModel('Student');
         /** @var PresenceModel */
         $presenceModel = $this->getModel('Presence');
 
-        return ($studentModel->isPrimairyParent($user->id, $data['student'])); // &&
+        return ($studentModel->isPrimairyParent((int) $user->id, $studentId)); // &&
         // $presenceModel->numberOfPresences($data['student'], $data['lesson']) <= 2);
     }
 
@@ -224,10 +234,16 @@ class SubscriptionController extends FormController
 
         /** @var SubscriptionModel */
         $model = $this->getModel();
+        $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscriptions');
 
         if ($this->allowDelete($data)) {
-            $model->delete($data);
-            $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscriptions');
+            if (!$model->delete($data) && $model->getError()) {
+                $app = Factory::getApplication();
+                $app->enqueueMessage($model->getError(), 'warning');
+            }
+        } else {
+            $app = Factory::getApplication();
+            $app->enqueueMessage(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'), 'warning');
         }
 
         $this->setRedirect($redirectUrl);

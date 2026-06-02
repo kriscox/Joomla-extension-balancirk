@@ -118,4 +118,45 @@ class AccountingExportHelperTest extends TestCase
 
         $this->assertStringContainsString('"Ann ""A"""', $csv);
     }
+
+    public function testRenderCsvWithNoRowsReturnsOnlyHeaderLine(): void
+    {
+        $csv = AccountingExportHelper::renderCsv([]);
+        $lines = preg_split("/\r\n|\n|\r/", trim($csv));
+
+        $this->assertCount(1, $lines);
+        $this->assertStringContainsString('"firstname"', $lines[0]);
+        $this->assertStringContainsString('"mutuality"', $lines[0]);
+    }
+
+    public function testNormalizeRowTrimsLeadingAndTrailingWhitespace(): void
+    {
+        $row = AccountingExportHelper::normalizeRow([
+            'firstname' => '  Anna  ',
+            'city' => ' Gent ',
+        ]);
+
+        $this->assertSame('Anna', $row['firstname']);
+        $this->assertSame('Gent', $row['city']);
+    }
+
+    public function testNormalizeRowConvertsNonScalarValueToEmptyString(): void
+    {
+        $row = AccountingExportHelper::normalizeRow([
+            'firstname' => ['nested', 'array'],
+            'name' => null,
+        ]);
+
+        $this->assertSame('', $row['firstname']);
+        $this->assertSame('', $row['name']);
+    }
+
+    public function testRenderXlsWithNoRowsReturnsTableWithHeaderOnly(): void
+    {
+        $xls = AccountingExportHelper::renderXls([]);
+
+        $this->assertStringContainsString('<table>', $xls);
+        $this->assertStringContainsString('<th>firstname</th>', $xls);
+        $this->assertStringNotContainsString('<td>', $xls);
+    }
 }

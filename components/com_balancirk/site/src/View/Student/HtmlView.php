@@ -51,6 +51,13 @@ class HtmlView extends BaseHtmlView
     protected $canDo;
 
     /**
+     * Whether the active student has a subscription.
+     *
+     * @var  bool
+     */
+    protected $hasCurrentYearSubscription = false;
+
+    /**
      * Display the view.
      *
      * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
@@ -62,6 +69,11 @@ class HtmlView extends BaseHtmlView
         $this->form = $this->get('Form');
         $this->item = $this->get('Item');
         $this->state = $this->get('State');
+
+        if ($this->item) {
+            $this->hasCurrentYearSubscription = $this->getModel()
+                ->hasCurrentYearSubscription((int) $this->item->id);
+        }
 
         if (count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);

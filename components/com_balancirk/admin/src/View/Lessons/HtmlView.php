@@ -18,6 +18,7 @@ use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Helper\ContentHelper;
+use Joomla\CMS\HTML\HTMLHelper;
 
 /**
  * View class for a list of lessons
@@ -72,12 +73,23 @@ class HtmlView extends BaseHtmlView
      */
     public function display($tpl = null): void
     {
-        # todo: adapt fields
         $this->items       = $this->get('Items');
         $this->pagination    = $this->get('Pagination');
         $this->state         = $this->get('State');
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
+
+        // Populate year filter options from database
+        $model = $this->getModel();
+        $years = $model->getYears();
+        if ($this->filterForm && !empty($years)) {
+            $yearField = $this->filterForm->getField('year', 'filter');
+            if ($yearField) {
+                foreach ($years as $year) {
+                    $yearField->addOption($year, ['value' => $year]);
+                }
+            }
+        }
 
         if (!count($this->items) && $this->get('IsEmptyState')) {
             $this->setLayout('emptystate');

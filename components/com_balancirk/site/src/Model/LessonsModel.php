@@ -15,6 +15,7 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 use DateInterval;
 use Exception;
 use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 use Joomla\Database\ParameterType;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\CMS\Factory;
@@ -114,6 +115,7 @@ class LessonsModel extends ListModel
                     'a.year',
                     'a.state',
                     'a.numberOfStudents',
+                    'a.numberOnWaitingList',
                     'a.max_students'
                 ],
                 [
@@ -123,6 +125,7 @@ class LessonsModel extends ListModel
                     'year',
                     'state',
                     'numberOfStudents',
+                    'numberOnWaitingList',
                     'max_students'
                 ]
             )
@@ -142,8 +145,9 @@ class LessonsModel extends ListModel
         $selectedYear = $this->getState('filter.year');
         if (empty($selectedYear))
         {
-            $query->where($db->quote(date('Y', strtotime($today . '- 5 months'))) . ' = `year`');
-            $this->setState('filter.year', date('Y', strtotime($today . '- 5 months')));
+            $schoolYear = SchoolYearHelper::getCurrentSchoolYear($today);
+            $query->where($db->quote($schoolYear) . ' = `year`');
+            $this->setState('filter.year', $schoolYear);
         }
         else
         {
@@ -241,6 +245,7 @@ class LessonsModel extends ListModel
         )
             ->from($db->quoteName('#__balancirk_lessons', 'a'))
             ->where($db->quote($today) . ' between `start_registration` and `end_registration`')
+            ->where($db->quoteName('a.state') . ' = 1')
             ->order('name');
 
         if ($studentId !== null && $studentId > 0)

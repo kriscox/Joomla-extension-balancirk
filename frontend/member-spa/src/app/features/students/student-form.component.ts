@@ -109,7 +109,7 @@ export class StudentFormComponent implements OnInit {
       mutuality:   v.mutuality,
       uitpas:      v.uitpas.trim(),
       allow_photo: v.allow_photo,
-      state:       'published',
+      state:       1,
     };
 
     this.saving.set(true);

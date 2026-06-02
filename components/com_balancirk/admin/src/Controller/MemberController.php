@@ -13,6 +13,7 @@ namespace CoCoCo\Component\Balancirk\Administrator\Controller;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\MVC\Controller\FormController;
 
@@ -70,12 +71,11 @@ class MemberController extends FormController
         }
 
         // Set the default redirection url
-        $this->setRedirect(
-            Route::_(
-                'index.php?option=' . $this->option . '&view=member&layout=edit',
-                false
-            )
+        $redirectUrl = Route::_(
+            'index.php?option=' . $this->option . '&view=member&layout=edit',
+            false
         );
+        $this->setRedirect($redirectUrl);
 
         // Validate data and fill form data cache
         $validData = $model->validate($form, $data);
@@ -96,7 +96,7 @@ class MemberController extends FormController
         }
 
         // Save the changes to the profile
-        if ($model->edit($data)) {
+        if ($model->edit($validData)) {
             // Rmove the form data in the session, using a unique identifier
             $app->setUserState('com_balancirk.edit.member.data', null);
 
@@ -151,10 +151,14 @@ class MemberController extends FormController
                     $app->enqueueMessage($error, 'warning');
                 }
             }
+
+            $this->setRedirect($redirectUrl);
+
+            return false;
         }
 
         // Register the user
-        if ($model->register($data)) {
+        if ($model->register($validData)) {
             // Rmove the form data in the session, using a unique identifier
             $app->setUserState('com_balancirk.edit.member.data', null);
 

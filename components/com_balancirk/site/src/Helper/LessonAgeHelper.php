@@ -42,7 +42,7 @@ class LessonAgeHelper
         }
 
         $referenceDate = (string) ($lesson->start ?? '');
-        $age = self::getAgeOnDate($birthdate, $referenceDate);
+        $age = self::getAgeInYear($birthdate, $referenceDate);
 
         if ($age === null) {
             return false;
@@ -60,16 +60,20 @@ class LessonAgeHelper
     }
 
     /**
-     * Calculate age on a specific reference date.
+     * Calculate the age a student reaches during the reference calendar year.
+     *
+     * The age restriction is year based (not date based): everyone who turns
+     * the configured age during the calendar year of the lesson qualifies.
+     * This matches the way school grades ("leerjaren") are grouped.
      *
      * @param   string|null  $birthdate      Student birthdate.
      * @param   string|null  $referenceDate  Reference date.
      *
      * @return  int|null
      *
-     * @since   1.2.12
+     * @since   1.3.6
      */
-    public static function getAgeOnDate(?string $birthdate, ?string $referenceDate): ?int
+    public static function getAgeInYear(?string $birthdate, ?string $referenceDate): ?int
     {
         if (empty($birthdate)) {
             return null;
@@ -82,7 +86,7 @@ class LessonAgeHelper
             return null;
         }
 
-        return $birthDateObject->diff($referenceDateObject)->y;
+        return (int) $referenceDateObject->format('Y') - (int) $birthDateObject->format('Y');
     }
 
     /**

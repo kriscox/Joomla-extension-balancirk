@@ -11,7 +11,7 @@
 	<authorEmail>info@cococo.be</authorEmail>
 	<copyright>CoCoCo</copyright>
 	<license>GPL v3</license>
-	<version>1.2.35</version>
+	<version>1.3.13</version>
 	<description>PKG_BALANCIRK_MODULE_DESCRIPTION</description>
 
 	<!-- on update don't forget to add also to makefile -->
@@ -20,10 +20,10 @@
 			id="pkg_balancirk">pkg_balancirk.zip</file>
 	</files>
 
-	<changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_changelog.xml</changelogurl>
+	<changelogurl>https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_changelog.xml</changelogurl>
 
 	<updateservers>
 		<server type="extension"
-			name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-test/master/balancirk_update.xml</server>
+			name="Balancirk">https://raw.githubusercontent.com/kriscox/Joomla-extension-balancirk/master/balancirk_update.xml</server>
 	</updateservers>
 </extension>

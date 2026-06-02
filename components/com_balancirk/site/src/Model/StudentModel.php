@@ -13,11 +13,13 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 \defined('_JEXEC') or die;
 
 use Exception;
+use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Application\CMSApplicationInterface;
+use Joomla\Database\ParameterType;
 
 /**
  * Student model for the Joomla Balancirk component.
@@ -95,9 +97,15 @@ class StudentModel extends AdminModel
      */
     public function getItem($pk = null)
     {
-        $canDo = ContentHelper::getActions('com_balancirk');
-        if (!($canDo->get('students.viewall') || $this->isParent($pk))) {
-            return false;
+        $pk = (!empty($pk)) ? $pk : (int) $this->getState('student.id');
+
+        // A new (empty) record is always available; only existing records are access checked.
+        if (!empty($pk)) {
+            $canDo = ContentHelper::getActions('com_balancirk');
+
+            if (!($canDo->get('students.viewall') || $this->isParent($pk))) {
+                return false;
+            }
         }
 
         return parent::getItem($pk);
@@ -127,6 +135,43 @@ class StudentModel extends AdminModel
         }
 
         return false;
+    }
+
+    /**
+     * Check whether the student has at least one subscription in a non-trashed lesson.
+     *
+     * @param   int|null  $studentId  Student id.
+     *
+     * @return  bool
+     *
+     * @since   1.3.8
+     */
+    public function hasCurrentYearSubscription(?int $studentId = null): bool
+    {
+        $studentId = $studentId ?: (int) $this->getState('student.id');
+
+        if ($studentId <= 0) {
+            return false;
+        }
+
+        $trashedState = -2;
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__balancirk_subscriptions', 's'))
+            ->join(
+                'INNER',
+                $db->quoteName('#__balancirk_lessons', 'l')
+                    . ' ON ' . $db->quoteName('l.id') . ' = ' . $db->quoteName('s.lesson')
+            )
+            ->where($db->quoteName('s.student') . ' = :studentId')
+            ->where($db->quoteName('l.state') . ' <> :trashedState')
+            ->bind(':studentId', $studentId, ParameterType::INTEGER)
+            ->bind(':trashedState', $trashedState, ParameterType::INTEGER);
+
+        $db->setQuery($query);
+
+        return (int) $db->loadResult() > 0;
     }
 
     /**
@@ -193,6 +238,11 @@ class StudentModel extends AdminModel
             $data = $this->getItem();
         }
 
+        // getItem() can return false when access is denied; never pass that to preprocessData().
+        if ($data === false) {
+            $data = [];
+        }
+
         $this->preprocessData($this->typeAlias, $data);
 
         return $data;
@@ -213,6 +263,16 @@ class StudentModel extends AdminModel
     {
         // Set default value of student to unsubscribed
         $data['state'] = 1;
+
+        // For existing students, only the primary parent may save changes
+        $studentId = (int) ($data['id'] ?? 0);
+        if ($studentId > 0) {
+            $userId = Factory::getApplication()->getIdentity()->id;
+            if (!$this->isPrimairyParent($userId, $studentId)) {
+                $this->setError(Text::_('COM_BALANCIRK_ERROR_NOT_PRIMARY_PARENT'));
+                return false;
+            }
+        }
 
         // If save is successfull and this is a new student than fill the user as primairy parent
         if (parent::save($data)) {
@@ -237,9 +297,11 @@ class StudentModel extends AdminModel
 
                 return true;
             }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

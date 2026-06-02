@@ -67,6 +67,13 @@ class HtmlView extends BaseHtmlView
     protected $years;
 
     /**
+     * The students for filtering
+     *
+     * @var  array
+     */
+    protected $students;
+
+    /**
      * Method to display the view.
      *
      * @param   string $tpl A template file to load. [optional]
@@ -83,10 +90,11 @@ class HtmlView extends BaseHtmlView
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
 
-        // Get list of years for filtering
+        // Get list of years and students for filtering
         /** @var SubscriptionsModel */
         $subscriptionsModel = $this->getModel();
         $this->years = $subscriptionsModel->getYears();
+        $this->students = $subscriptionsModel->getStudents();
 
         if (!$this->items || (!count($this->items) && $this->get('IsEmptyState')))
         {
