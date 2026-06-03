@@ -1,0 +1,45 @@
+<header class="hero">
+  <p class="eyebrow">Balancirk ledenportaal</p>
+  <h1>Welkom in je ledenomgeving</h1>
+  <p class="subtitle">Mobile-first en overzichtelijk, met duidelijke menu's per onderwerp.</p>
+</header>
+
+@if (loading()) {
+  <section class="card">
+    <p class="status">Bezig met laden...</p>
+  </section>
+} @else if (error()) {
+  <section class="card card-error">
+    <p>{{ error() }}</p>
+  </section>
+} @else {
+  <section class="card">
+    <div class="card-title-row">
+      <h2>Home</h2>
+      <span class="muted">{{ now | date: 'dd/MM HH:mm' }}</span>
+    </div>
+    <p class="lead">
+      @if (member()) {
+        Dag {{ member()?.firstname || member()?.name }}, kies hieronder waar je naartoe wil.
+      } @else {
+        Kies hieronder waar je naartoe wil.
+      }
+    </p>
+    <div class="stats-grid">
+      <article class="stat">
+        <strong>{{ studentCount() }}</strong>
+        <span>Leerling(en)</span>
+      </article>
+      <article class="stat">
+        <strong>{{ subscriptionCount() }}</strong>
+        <span>Inschrijving(en)</span>
+      </article>
+    </div>
+    <div class="quick-grid">
+      <a class="quick-action" routerLink="/member/students">Overzicht leerlingen</a>
+      <a class="quick-action" routerLink="/member/subscriptions">Mijn inschrijvingen</a>
+      <a class="quick-action" routerLink="/member/subscriptions/new">Nieuwe inschrijving</a>
+      <a class="quick-action" routerLink="/member/profile">Profiel aanpassen</a>
+    </div>
+  </section>
+}

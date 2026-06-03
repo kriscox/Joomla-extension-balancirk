@@ -1,0 +1,24 @@
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.stat {
+  background: var(--surface-soft);
+  border-radius: 12px;
+  padding: 0.7rem 0.85rem;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.stat strong {
+  font-size: 1.3rem;
+  color: var(--brand);
+}
+
+.stat span {
+  font-size: 0.85rem;
+  color: var(--muted);
+}

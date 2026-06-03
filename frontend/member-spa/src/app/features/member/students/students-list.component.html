@@ -1,0 +1,52 @@
+<section class="card">
+  <div class="card-title-row">
+    <h2>Mijn leerlingen</h2>
+    @if (!loading()) {
+      <span class="muted">{{ students().length }} leerling(en)</span>
+    }
+  </div>
+
+  @if (loading()) {
+    <p class="status">Bezig met laden...</p>
+  } @else if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else {
+    <div class="actions">
+      <a class="btn-primary" routerLink="/member/students/new">Leerling toevoegen</a>
+    </div>
+
+    @if (students().length === 0) {
+      <p class="muted">Er zijn nog geen gekoppelde leerlingen gevonden.</p>
+    } @else {
+      <ul class="item-list">
+        @for (student of students(); track student.id) {
+          <li class="item-card">
+            <div class="item-main">
+              <strong>{{ student.firstname }} {{ student.name }}</strong>
+              <span class="meta">
+                @if (student.birthdate) {
+                  {{ student.birthdate | date: 'dd/MM/yyyy' }}
+                } @else {
+                  Geboortedatum niet ingevuld
+                }
+              </span>
+              @if (student.mutuality) {
+                <span class="meta">Mutualiteit: {{ student.mutuality }}</span>
+              }
+              @if (student.uitpas) {
+                <span class="meta">UiTPAS: {{ student.uitpas }}</span>
+              }
+            </div>
+            <div class="item-actions">
+              @if (student.isPrimary === 1 || student.isPrimary === undefined) {
+                <a class="btn-secondary" [routerLink]="['/member/students', student.id, 'edit']">Bewerken</a>
+              } @else {
+                <a class="btn-secondary" [routerLink]="['/member/students', student.id]">Bekijken</a>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+</section>
