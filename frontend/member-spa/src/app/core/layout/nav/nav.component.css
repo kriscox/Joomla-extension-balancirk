@@ -5,6 +5,10 @@
   margin-top: 1rem;
 }
 
+.nav-bar--admin {
+  grid-template-columns: repeat(4, 1fr);
+}
+
 .nav-link {
   display: flex;
   align-items: center;

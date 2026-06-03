@@ -1,14 +1,65 @@
-<nav class="nav-bar" aria-label="Ledenmenu">
-  <a class="nav-link" routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-    Home
-  </a>
-  <a class="nav-link" routerLink="/students" routerLinkActive="active">
-    Leerlingen
-  </a>
-  <a class="nav-link" routerLink="/subscriptions" routerLinkActive="active">
-    Inschrijvingen
-  </a>
-  <a class="nav-link" routerLink="/profile" routerLinkActive="active">
-    Profiel
-  </a>
-</nav>
+@if (isAdmin) {
+  <nav class="nav-bar nav-bar--admin" aria-label="Beheerdermenu">
+    <a class="nav-link" routerLink="/admin" routerLinkActive="active">
+      Beheer
+    </a>
+    <a class="nav-link" routerLink="/teacher/attendance" routerLinkActive="active">
+      Aanwezigheid
+    </a>
+    <a class="nav-link" routerLink="/accounting/export" routerLinkActive="active">
+      Exporteren
+    </a>
+    <a class="nav-link" routerLink="/member/profile" routerLinkActive="active">
+      Profiel
+    </a>
+  </nav>
+} @else if (isAccountant) {
+  <nav class="nav-bar" aria-label="Boekhoudmenu">
+    <a class="nav-link" routerLink="/accounting" routerLinkActive="active">
+      Overzicht
+    </a>
+    <a class="nav-link" routerLink="/teacher/lessons" routerLinkActive="active">
+      Lessen
+    </a>
+    <a class="nav-link" routerLink="/teacher/attendance" routerLinkActive="active">
+      Aanwezigheid
+    </a>
+    <a class="nav-link" routerLink="/accounting/export" routerLinkActive="active">
+      Exporteren
+    </a>
+    <a class="nav-link" routerLink="/member/profile" routerLinkActive="active">
+      Profiel
+    </a>
+  </nav>
+} @else if (isTeacher) {
+  <nav class="nav-bar" aria-label="Lesgevermenu">
+    <a class="nav-link" routerLink="/teacher" routerLinkActive="active">
+      Overzicht
+    </a>
+    <a class="nav-link" routerLink="/teacher/lessons" routerLinkActive="active">
+      Lessen
+    </a>
+    <a class="nav-link" routerLink="/teacher/attendance" routerLinkActive="active">
+      Aanwezigheid
+    </a>
+    <a class="nav-link" routerLink="/member/profile" routerLinkActive="active">
+      Profiel
+    </a>
+  </nav>
+} @else {
+  <nav class="nav-bar" aria-label="Ledenmenu">
+    <a class="nav-link" routerLink="/member/dashboard" routerLinkActive="active"
+       [routerLinkActiveOptions]="{ exact: true }">
+      Home
+    </a>
+    <a class="nav-link" routerLink="/member/students" routerLinkActive="active">
+      Leerlingen
+    </a>
+    <a class="nav-link" routerLink="/member/subscriptions" routerLinkActive="active">
+      Inschrijvingen
+    </a>
+    <a class="nav-link" routerLink="/member/profile" routerLinkActive="active">
+      Profiel
+    </a>
+  </nav>
+}

@@ -1,0 +1,21 @@
+<header class="hero">
+  <p class="eyebrow">Balancirk — Beheer</p>
+  <h1>Beheerdersportaal</h1>
+  <p class="subtitle">Volledig beheer van leden, leerlingen, lessen en inschrijvingen.</p>
+</header>
+
+<section class="card">
+  <div class="card-title-row">
+    <h2>Beheer</h2>
+    <span class="muted">{{ now | date: 'dd/MM/yyyy' }}</span>
+  </div>
+  <p class="lead">Kies een sectie om te beheren.</p>
+  <div class="quick-grid">
+    <a class="quick-action" routerLink="/admin/members">Leden</a>
+    <a class="quick-action" routerLink="/admin/students">Leerlingen</a>
+    <a class="quick-action" routerLink="/admin/lessons">Lessen</a>
+    <a class="quick-action" routerLink="/admin/subscriptions">Inschrijvingen</a>
+    <a class="quick-action" routerLink="/accounting/export">Exporteren</a>
+    <a class="quick-action" routerLink="/teacher/attendance">Aanwezigheid</a>
+  </div>
+</section>

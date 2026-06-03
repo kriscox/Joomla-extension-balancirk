@@ -1,0 +1,59 @@
+<section class="card">
+  <div class="card-title-row">
+    <h2>Nieuwe inschrijving</h2>
+  </div>
+
+  @if (loading()) {
+    <p class="status">Bezig met laden...</p>
+  } @else {
+    @if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    }
+
+    @if (students().length === 0) {
+      <p class="muted">Je hebt nog geen leerlingen. Voeg eerst een leerling toe.</p>
+      <div class="actions">
+        <a class="btn-primary" routerLink="/member/students/new">Leerling toevoegen</a>
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="grid">
+          <label class="full">
+            Leerling <span class="required">*</span>
+            <select formControlName="student" (change)="onStudentChange($event)"
+                    [class.invalid]="form.controls.student.invalid && form.controls.student.touched">
+              <option value="">— kies een leerling —</option>
+              @for (s of students(); track s.id) {
+                <option [value]="s.id">{{ s.firstname }} {{ s.name }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="full">
+            Les <span class="required">*</span>
+            @if (loadingLessons()) {
+              <p class="status">Lessen laden...</p>
+            } @else if (lessons().length > 0) {
+              <select formControlName="lesson"
+                      [class.invalid]="form.controls.lesson.invalid && form.controls.lesson.touched">
+                <option value="">— kies een les —</option>
+                @for (l of lessons(); track l.value) {
+                  <option [value]="l.value">{{ l.text }}</option>
+                }
+              </select>
+            } @else if (lessonsMessage()) {
+              <div class="alert alert-info">{{ lessonsMessage() }}</div>
+            }
+          </label>
+        </div>
+
+        <div class="actions actions-row">
+          <button type="submit" [disabled]="saving() || lessons().length === 0">
+            @if (saving()) { Bezig... } @else { Inschrijven }
+          </button>
+          <a class="btn-secondary" routerLink="/member/subscriptions">Annuleren</a>
+        </div>
+      </form>
+    }
+  }
+</section>
