@@ -49,11 +49,12 @@ class SubscriptionsController extends ApiController
      */
     public function displayList($data = null)
     {
-        $model = $this->getModel();
-
-        if ($model) {
-            $model->setState('filter.parent_id', (int) Factory::getApplication()->getIdentity()->id);
-        }
+        // ApiController injects $this->modelState into the list model; setState on a
+        // throwaway getModel() instance is ignored by parent::displayList().
+        $this->modelState->set(
+            'filter.parent_id',
+            (int) Factory::getApplication()->getIdentity()->id
+        );
 
         return parent::displayList($data);
     }
