@@ -10,6 +10,10 @@ Balancirk is a Joomla 4 extension package for managing members, students, lesson
 
 This is NOT a standalone application. It requires installation into a Joomla 4 CMS instance.
 
+## Conventions
+
+- Write **code comments** and **in-repository documentation** (README sections, inline notes in source) in **English**. User-facing Joomla language strings stay in their locale files.
+
 ## Cursor Cloud specific instructions
 
 ### Prerequisites (installed by update script)

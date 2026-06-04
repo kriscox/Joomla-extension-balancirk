@@ -87,21 +87,21 @@ Na deploy wordt de build geplaatst in `components/com_balancirk/media/member-spa
 
 `index.php?option=com_balancirk&view=member&layout=spa`
 
-### Git-workflow (SPA-ontwikkeling)
+### Git workflow (SPA development)
 
-SPA-wijzigingen lopen via een aparte integratiebranch, niet rechtstreeks naar `master`:
+SPA changes go through a dedicated integration branch, not directly into `master`:
 
-| Branch | Doel |
-|--------|------|
-| `Single-page-site-ontwikkeling` | Integratiebranch voor alle SPA-werk |
-| `cursor/...` of feature branches | Concrete wijzigingen (bijv. `cursor/single-page-site-3637`) |
-| `master` | Productie / Joomla-releases (SPA merge pas wanneer klaar) |
+| Branch | Purpose |
+|--------|---------|
+| `Single-page-site-ontwikkeling` | Integration branch for all SPA work |
+| `cursor/...` or feature branches | Individual changes (e.g. `cursor/single-page-site-3637`) |
+| `master` | Production / Joomla releases (merge SPA when ready) |
 
-**Stappen:**
+**Steps:**
 
-1. Branch af van `Single-page-site-ontwikkeling` (niet van `master`).
-2. Open een PR met **base** `Single-page-site-ontwikkeling`.
-3. Na review: merge in `Single-page-site-ontwikkeling`.
-4. Als de SPA-kern stabiel is: aparte PR van `Single-page-site-ontwikkeling` → `master`.
+1. Branch from `Single-page-site-ontwikkeling` (not from `master`).
+2. Open a PR with **base** `Single-page-site-ontwikkeling`.
+3. After review, merge into `Single-page-site-ontwikkeling`.
+4. When the SPA core is stable, open a separate PR from `Single-page-site-ontwikkeling` → `master`.
 
-Meer detail over de Angular-app zelf: `frontend/member-spa/README.md`.
+See `frontend/member-spa/README.md` for Angular app details.
