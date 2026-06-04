@@ -86,3 +86,22 @@ make member-spa-deploy
 Na deploy wordt de build geplaatst in `components/com_balancirk/media/member-spa/browser` en kan je in Joomla een menu-item maken naar:
 
 `index.php?option=com_balancirk&view=member&layout=spa`
+
+### Git workflow (SPA development)
+
+SPA changes go through a dedicated integration branch, not directly into `master`:
+
+| Branch | Purpose |
+|--------|---------|
+| `Single-page-site-ontwikkeling` | Integration branch for all SPA work |
+| `cursor/...` or feature branches | Individual changes (e.g. `cursor/single-page-site-3637`) |
+| `master` | Production / Joomla releases (merge SPA when ready) |
+
+**Steps:**
+
+1. Branch from `Single-page-site-ontwikkeling` (not from `master`).
+2. Open a PR with **base** `Single-page-site-ontwikkeling`.
+3. After review, merge into `Single-page-site-ontwikkeling`.
+4. When the SPA core is stable, open a separate PR from `Single-page-site-ontwikkeling` → `master`.
+
+See `frontend/member-spa/README.md` for Angular app details.

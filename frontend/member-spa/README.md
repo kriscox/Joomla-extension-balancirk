@@ -1,13 +1,13 @@
 # Balancirk Member SPA (Angular)
 
-Mobile-first one-page ledenmodule voor Balancirk, gebouwd op de bestaande Joomla API backend.
+Mobile-first one-page member area for Balancirk, built on the existing Joomla API backend.
 
-## Doel
+## Goals
 
-- eenvoudig voor niet-technische gebruikers
-- helder op smartphone schermen
-- bruikbaar als PWA (installable op GSM)
-- integreerbaar in Joomla via `layout=spa`
+- Simple for non-technical users
+- Clear on smartphone screens
+- Usable as a PWA (installable on mobile)
+- Integrable in Joomla via `layout=spa`
 
 ## Local development
 
@@ -17,22 +17,22 @@ npm install
 npm start
 ```
 
-Standaard API-base: `/api/index.php/v1/balancirk` (zelfde domain, Joomla sessie/cookies).
+Default API base: `/api/index.php/v1/balancirk` (same domain, Joomla session/cookies).
 
-## Productie build + Joomla deploy
+## Production build + Joomla deploy
 
 ```bash
 cd frontend/member-spa
 npm run build:deploy
 ```
 
-Dit kopieert de build naar:
+This copies the build to:
 
 `components/com_balancirk/media/member-spa/browser`
 
-De Joomla layout `member&layout=spa` laadt daarna automatisch deze bestanden.
+The Joomla layout `member&layout=spa` then loads these files automatically.
 
-## Auth in de app
+## Auth in the app
 
-- Primair: Joomla sessiecookie (`withCredentials`)
-- Optioneel: Bearer token via `localStorage.setItem('balancirk_api_token', '...')`
+- Primary: Joomla session cookie (`withCredentials`)
+- Optional: Bearer token via `localStorage.setItem('balancirk_api_token', '...')`
