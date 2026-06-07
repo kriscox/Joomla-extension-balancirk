@@ -104,6 +104,8 @@ class MemberController extends FormController
         // Register the user
         if ($model->register($validData))
         {
+            $app->enqueueMessage(Text::_('COM_BALANCIRK_REGISTRATION_SUCCESS'), 'message');
+
             // Rmove the form data in the session, using a unique identifier
             $app->setUserState('com_balancirk.member.data', null);
 

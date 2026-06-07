@@ -12,7 +12,6 @@ namespace CoCoCo\Component\Balancirk\Site\Model;
 
 \defined('_JEXEC') or die;
 
-use JConfig;
 use Exception;
 use Joomla\CMS\Factory;
 use Joomla\CMS\User\User;
@@ -252,28 +251,22 @@ class MemberModel extends AdminModel
         $db->execute();
 
         // Send activation mail
-        $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+        try {
+            $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+            $config = Factory::getConfig();
+            $mailFrom = $config->get('mailfrom') ?: 'info@balancirk.be';
+            $fromName = $config->get('fromname') ?: 'Circusatelier Balancirk VZW';
+            $linkMode = (int) $config->get('force_ssl') === 2 ? 1 : 0;
+            $activationUrl = Route::link(
+                'site',
+                'index.php?option=com_users&task=registration.activate&token=' . $hash,
+                false,
+                $linkMode,
+                true
+            );
 
-        // Set the sender
-        $config = Factory::getApplication()->get('config');
-        $sender = array(
-            $config->get('mailfrom'),
-            $config->get('fromname')
-        );
-
-        // Get the activation url
-        $linkMode = $config->force_ssl == 2 ? 1 : 0;
-        $activationUrl = Route::link(
-            'site',
-            'index.php?option=com_users&task=registration.activate&token=' . $hash,
-            false,
-            $linkMode,
-            true
-        );
-
-        // TODO Message configureerbaar maken in de backend
-        // Set the mailbody
-        $message = "
+            // TODO Message configureerbaar maken in de backend
+            $message = "
 		Hallo {$data['firstname']},
 
 		Bedankt om je te registreren.
@@ -285,16 +278,16 @@ class MemberModel extends AdminModel
 		Rudi en Kris
 		";
 
-        // Set the Recipient
-        $send = $mailer->addRecipient($data['email'])
-            ->setSender($sender)
-            ->setSubject("Welkom bij balancirk")
-            ->setBody($message)
-            ->Send();
-
-        if ($send != true)
-        {
-            $app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . 'Error sending email', 'error');
+            $mailer->addRecipient($data['email'])
+                ->setSender($mailFrom, $fromName)
+                ->setSubject('Welkom bij balancirk')
+                ->setBody($message)
+                ->send();
+        } catch (\Exception $e) {
+            $app->enqueueMessage(
+                Text::_('COM_BALANCIRK_USER_ERROR') . Text::sprintf('COM_BALANCIRK_REGISTRATION_EMAIL_ERROR', $e->getMessage()),
+                'error'
+            );
 
             return false;
         }
