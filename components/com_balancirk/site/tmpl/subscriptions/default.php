@@ -87,10 +87,10 @@ $selectedStudent = $this->state->get('filter.student', '');
 					<caption id="captionTable">
 						<?= Text::_('COM_BALANCIRK_SUBSCRIPTIONS_TABLE_CAPTION'); ?>
 					</caption>
-					<thead>
-						<tr>
-							<th style="width:1%" class="d-none text-center">
-								<?= HTMLHelper::_('grid.checkall'); ?>
+						<thead>
+							<tr>
+								<th style="width:1%" class="d-none text-center">
+									<?= HTMLHelper::_('grid.checkall'); ?>
 							</th>
 							<th scope="col" class="text_center d-md-table-cell">
 								<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_STUDENT', 'a.firstname', $listDirn, $listOrder); ?>
@@ -106,13 +106,15 @@ $selectedStudent = $this->state->get('filter.student', '');
 								<span class="fas fa-clock fa-xs"> </span><?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_WAITINGLIST', 'a.subscribed', $listDirn, $listOrder) ?>
 							</th>
 							<th scope="col" class="text_center d-md-table-cell">
-								<a href=#> <?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_UNSUBSCRIBE'); ?> </a>
-							</th>
-						</tr>
-						<?php $n = count($this->items);
+									<a href=#> <?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_UNSUBSCRIBE'); ?> </a>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php $n = count($this->items);
 
-						foreach ($this->items as $i => $item) : ?>
-							<tr class="row<?= $i % 2; ?>">
+							foreach ($this->items as $i => $item) : ?>
+								<tr class="row<?= $i % 2; ?>">
 								<td class="text-center d-none">
 									<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
 								</td>
@@ -147,9 +149,9 @@ $selectedStudent = $this->state->get('filter.student', '');
 									</button>
 								</td>
 							</tr>
-						<?php endforeach; ?>
+							<?php endforeach; ?>
 						</tbody>
-				</table>
+					</table>
 
 			<?php endif; ?>
 		</div>
