@@ -44,30 +44,30 @@ $selectedStudent = $this->state->get('filter.student', '');
 			<nav aria-label="Toolbar" class="d-flex align-items-center gap-2 flex-wrap">
 				<button class="button-new btn btn-success" type="button" onclick="BalancirkSpaNavigation.navigate('<?= Route::_('index.php?option=com_balancirk&view=subscription&id=0', false) ?>')">
 					<span class=" icon-new" aria-hidden="true"></span>
-					<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
+					<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW_SUBSCRIPTION') ?>
 				</button>
 				<a data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&view=students', false); ?>">
 					<button class="btn btn-primary" type="button"><?= TEXT::_('COM_BALANCIRK_STUDENTS_LINK') ?></button>
 				</a>
 				<?php if (!empty($this->years)) : ?>
-				<select name="filter_year" class="form-select w-auto" onchange="document.getElementById('subscriptionFilterForm').submit();" aria-label="<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_YEAR') ?>">
-					<option value=""><?= Text::_('COM_BALANCIRK_FILTER_ALL_YEARS') ?></option>
-					<?php foreach ($this->years as $year) : ?>
-						<option value="<?= $this->escape($year) ?>" <?= $selectedYear == $year ? 'selected' : '' ?>>
-							<?= $this->escape($year) ?>
-						</option>
-					<?php endforeach; ?>
-				</select>
+					<select name="filter_year" class="form-select w-auto" onchange="document.getElementById('subscriptionFilterForm').submit();" aria-label="<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_YEAR') ?>">
+						<option value=""><?= Text::_('COM_BALANCIRK_FILTER_ALL_YEARS') ?></option>
+						<?php foreach ($this->years as $year) : ?>
+							<option value="<?= $this->escape($year) ?>" <?= $selectedYear == $year ? 'selected' : '' ?>>
+								<?= $this->escape($year) ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
 				<?php endif; ?>
 				<?php if (!empty($this->students)) : ?>
-				<select name="filter_student" class="form-select w-auto" onchange="document.getElementById('subscriptionFilterForm').submit();" aria-label="<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_STUDENT') ?>">
-					<option value=""><?= Text::_('COM_BALANCIRK_FILTER_ALL_STUDENTS') ?></option>
-					<?php foreach ($this->students as $student) : ?>
-						<option value="<?= (int) $student->id ?>" <?= $selectedStudent == $student->id ? 'selected' : '' ?>>
-							<?= $this->escape($student->firstname . ' ' . $student->name) ?>
-						</option>
-					<?php endforeach; ?>
-				</select>
+					<select name="filter_student" class="form-select w-auto" onchange="document.getElementById('subscriptionFilterForm').submit();" aria-label="<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_STUDENT') ?>">
+						<option value=""><?= Text::_('COM_BALANCIRK_FILTER_ALL_STUDENTS') ?></option>
+						<?php foreach ($this->students as $student) : ?>
+							<option value="<?= (int) $student->id ?>" <?= $selectedStudent == $student->id ? 'selected' : '' ?>>
+								<?= $this->escape($student->firstname . ' ' . $student->name) ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
 				<?php endif; ?>
 			</nav>
 		</div>
@@ -141,10 +141,10 @@ $selectedStudent = $this->state->get('filter.student', '');
 									<?php endif; ?>
 								</td>
 								<td scope="row" class="d-md-table-cell">
-								<button class="btn btn-danger btn-sm"
-									onclick="showDeleteModal(<?= (int) $item->id; ?>, '<?= htmlspecialchars($item->firstname, ENT_QUOTES, 'UTF-8'); ?> <?= htmlspecialchars($item->name, ENT_QUOTES, 'UTF-8'); ?>', '<?= htmlspecialchars($item->lesson, ENT_QUOTES, 'UTF-8'); ?>')">
-									<span class="icon-purge" />
-								</button>
+									<button class="btn btn-danger btn-sm"
+										onclick="showDeleteModal(<?= (int) $item->id; ?>, '<?= htmlspecialchars($item->firstname, ENT_QUOTES, 'UTF-8'); ?> <?= htmlspecialchars($item->name, ENT_QUOTES, 'UTF-8'); ?>', '<?= htmlspecialchars($item->lesson, ENT_QUOTES, 'UTF-8'); ?>')">
+										<span class="icon-purge" />
+									</button>
 								</td>
 							</tr>
 						<?php endforeach; ?>

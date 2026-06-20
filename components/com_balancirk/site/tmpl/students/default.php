@@ -18,10 +18,10 @@ use Joomla\CMS\Layout\LayoutHelper;
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
 $states = array(
-    '0' => Text::_('COM_BALANCIRK_STATUS_SUBSCRIBED'),
-    '1' => Text::_('COM_BALANCIRK_STATUS_UNSUBSCRIBED'),
-    '2' => Text::_('JARCHIVED'),
-    '-2' => Text::_('JTRASHED')
+	'0' => Text::_('COM_BALANCIRK_STATUS_SUBSCRIBED'),
+	'1' => Text::_('COM_BALANCIRK_STATUS_UNSUBSCRIBED'),
+	'2' => Text::_('JARCHIVED'),
+	'-2' => Text::_('JTRASHED')
 );
 
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
@@ -35,7 +35,7 @@ HTMLHelper::_('script', 'com_balancirk/balancirk_spa_navigation.js', ['version' 
 			<div class="col-md-6">
 				<button class="button-new btn btn-success" type="button" onclick="BalancirkSpaNavigation.navigate('<?= Route::_('index.php?option=com_balancirk&view=student&layout=edit&id=0', false) ?>')">
 					<span class=" icon-new" aria-hidden="true"></span>
-					<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW') ?>
+					<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW_STUDENT') ?>
 				</button>
 				<a data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&view=subscriptions', false); ?>">
 					<button class="btn btn-primary" type="button"><?= TEXT::_('COM_BALANCIRK_SUBSCRIPTIONS_LINK') ?></button>
@@ -72,9 +72,9 @@ HTMLHelper::_('script', 'com_balancirk/balancirk_spa_navigation.js', ['version' 
 						</thead>
 						<tbody>
 							<?php
-                            $n = count($this->items);
-				    foreach ($this->items as $i => $item) :
-				        ?>
+							$n = count($this->items);
+							foreach ($this->items as $i => $item) :
+							?>
 								<tr class="row<?= $i % 2; ?>">
 									<td class="text-center d-none">
 										<?php if ($item->primary == 1) : ?>
