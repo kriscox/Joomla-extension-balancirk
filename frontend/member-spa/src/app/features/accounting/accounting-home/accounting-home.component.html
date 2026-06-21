@@ -1,0 +1,19 @@
+<header class="hero">
+  <p class="eyebrow">Balancirk — Boekhouding</p>
+  <h1>Boekhoudportaal</h1>
+  <p class="subtitle">Exporteer gegevens en bekijk relaties voor facturatie.</p>
+</header>
+
+<section class="card">
+  <div class="card-title-row">
+    <h2>Boekhouding</h2>
+    <span class="muted">{{ now | date: 'dd/MM/yyyy' }}</span>
+  </div>
+  <p class="lead">Kies hieronder een actie.</p>
+  <div class="quick-grid">
+    <a class="quick-action" routerLink="/accounting/export">Exporteren voor facturatie</a>
+    <a class="quick-action" routerLink="/teacher/lessons">Lessen bekijken</a>
+    <a class="quick-action" routerLink="/teacher/attendance">Aanwezigheid</a>
+    <a class="quick-action" routerLink="/member/profile">Mijn profiel</a>
+  </div>
+</section>
