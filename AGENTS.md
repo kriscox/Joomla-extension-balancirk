@@ -16,12 +16,14 @@ This is NOT a standalone application. It requires installation into a Joomla 4 C
 
 ## Cursor Cloud specific instructions
 
-### Prerequisites (installed by update script)
+### Prerequisites (installed by cloud agent install script)
 
 - PHP 8.3+ with extensions: cli, xml, mbstring, tokenizer, zip
 - Composer (for phpcs dev dependency)
 - GNU Make + zip (for building packages)
 - Node.js 22+ / npm (for Angular member-spa frontend)
+
+The cloud environment install command is defined in `.cursor/environment.json` and runs `scripts/cloud-agent-install.sh`. That script installs PHP dependencies with Composer and installs the member SPA npm packages when they are not already present.
 
 ### Lint
 
@@ -45,7 +47,7 @@ To build the Angular member-spa frontend:
 make member-spa-build
 ```
 
-The update script pre-installs `frontend/member-spa/node_modules` so this target runs without network access.
+The cloud install script pre-installs `frontend/member-spa/node_modules` when needed so `make member-spa-build` can run without extra setup.
 
 ### Testing
 

@@ -141,4 +141,13 @@
 			<item>Updated frontend action labels so the student and subscription create buttons use clearer, context-specific text.</item>
 		</change>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.17</version>
+		<fix>
+			<item>Fixed member registration not saving address and contact details to the members_additional table, which left new accounts missing from the member overview.</item>
+			<item>Aligned Angular member SPA dependencies so cloud and local npm installs no longer fail with peer dependency conflicts.</item>
+		</fix>
+	</changelog>
 </changelogs>
