@@ -205,6 +205,9 @@ class MemberModel extends AdminModel
         $app = Factory::getApplication();
         $user = new User();
 
+        // Keep Joomla user bind focused on core account fields only.
+        unset($data['id'], $data['password2']);
+
         // Throws \InvalidArgumentException, \UnexpectedValueException
         if (!$user->bind($data))
         {
@@ -221,34 +224,25 @@ class MemberModel extends AdminModel
             return false;
         }
 
-        // Fetch created userid.
-        $id = $user->id;
+        $id = (int) $user->id;
 
-        // Fill extra information in table
-        $db = $this->getDatabase();
+        if ($id <= 0) {
+            $app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . Text::_('JLIB_APPLICATION_ERROR_SAVE_FAILED'), 'error');
 
-        // Define columns and their values
-        $columns = array('id', 'firstname', 'street', 'number', 'bus', 'postcode', 'city', 'phone');
-        $values = array(
-            $id,
-            $data['firstname'],
-            $data['street'],
-            $data['number'],
-            $data['bus'],
-            $data['postcode'],
-            $data['city'],
-            $data['phone']
-        );
+            return false;
+        }
 
-        // Create query and don't forget to quote everything
-        $query = $db->getQuery(true)
-            ->insert($db->quoteName('#__balancirk_members_additional'))
-            ->columns($db->quoteName($columns))
-            ->values(implode(',', array_map(fn($n) => $db->quote($n), $values)));
+        try {
+            $this->saveToTable($id, $data, true);
+        } catch (\Exception $e) {
+            $user->delete();
+            $app->enqueueMessage(
+                Text::_("COM_BALANCIRK_USER_ERROR") . Text::sprintf('COM_BALANCIRK_REGISTRATION_ADDITIONAL_ERROR', $e->getMessage()),
+                'error'
+            );
 
-        // Execute query
-        $db->setQuery($query);
-        $db->execute();
+            return false;
+        }
 
         // Send activation mail
         try {
