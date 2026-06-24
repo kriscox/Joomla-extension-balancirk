@@ -169,17 +169,58 @@ class MemberModel extends AdminModel
      **/
     public function edit($data)
     {
-        // Get user object
-        $app = Factory::getApplication();
-        $user = new User($data['id']);
+        $memberId = (int) ($data['id'] ?? 0);
+        $isNew = $memberId <= 0;
+        $user = new User($isNew ? 0 : $memberId);
 
-        $user->bind($data);
-        $user->save();
+        if (!$user->bind($data)) {
+            $this->setError(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError());
 
-        // Save additional data to the database
-        $this->saveToTable($data['id'], $data);
+            return false;
+        }
+
+        if (!$user->save()) {
+            $this->setError(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError());
+
+            return false;
+        }
+
+        if ($isNew) {
+            $memberId = (int) $user->id;
+        }
+
+        if ($memberId <= 0) {
+            $this->setError(Text::_('JLIB_APPLICATION_ERROR_SAVE_FAILED'));
+
+            return false;
+        }
+
+        $this->saveToTable($memberId, $data, $isNew);
 
         return true;
+    }
+
+
+    /**
+     * Persist member data for API/admin save flows.
+     *
+     * @param   array  $data  Request payload.
+     *
+     * @return  boolean
+     *
+     * @since   1.3.16
+     */
+    public function save($data)
+    {
+        $memberId = (int) ($data['id'] ?? $this->getState('member.id') ?? 0);
+
+        if ($memberId <= 0) {
+            return $this->register($data);
+        }
+
+        $data['id'] = $memberId;
+
+        return $this->edit($data);
     }
 
 
@@ -209,6 +250,8 @@ class MemberModel extends AdminModel
         $app = Factory::getApplication();
         $user = new User();
 
+        unset($data['id'], $data['password2']);
+
         // Throws \InvalidArgumentException, \UnexpectedValueException
         if (!$user->bind($data)) {
             $app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . $user->getError(), 'error');
@@ -223,11 +266,25 @@ class MemberModel extends AdminModel
             return false;
         }
 
-        // Fetch created userid.
-        $id = $user->id;
+        $id = (int) $user->id;
 
-        // Save additional data to the database
-        $this->saveToTable($id, $data, true);
+        if ($id <= 0) {
+            $app->enqueueMessage(Text::_("COM_BALANCIRK_USER_ERROR") . Text::_('JLIB_APPLICATION_ERROR_SAVE_FAILED'), 'error');
+
+            return false;
+        }
+
+        try {
+            $this->saveToTable($id, $data, true);
+        } catch (\Exception $e) {
+            $user->delete();
+            $app->enqueueMessage(
+                Text::_("COM_BALANCIRK_USER_ERROR") . Text::sprintf('COM_BALANCIRK_REGISTRATION_ADDITIONAL_ERROR', $e->getMessage()),
+                'error'
+            );
+
+            return false;
+        }
 
         // Send activation mail
         $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
@@ -301,8 +358,14 @@ class MemberModel extends AdminModel
         // Define columns and their values
         $columns = array('id', 'firstname', 'street', 'number', 'bus', 'postcode', 'city', 'phone');
         $values = array(
-            $id, $data['firstname'], $data['street'], $data['number'], $data['bus'],
-            $data['postcode'], $data['city'], $data['phone']
+            $id,
+            $data['firstname'] ?? '',
+            $data['street'] ?? '',
+            $data['number'] ?? '',
+            $data['bus'] ?? '',
+            $data['postcode'] ?? '',
+            $data['city'] ?? '',
+            $data['phone'] ?? '',
         );
 
         // Create query and don't forget to quote everything
@@ -317,7 +380,7 @@ class MemberModel extends AdminModel
 
             foreach ($columns as $key) {
                 if ($key != 'id') {
-                    array_push($fields, $db->quoteName($key) . " = " . $db->quote($data[$key]));
+                    array_push($fields, $db->quoteName($key) . " = " . $db->quote($data[$key] ?? ''));
                 }
             }
             $query->update($db->quoteName('#__balancirk_members_additional'))
