@@ -34,7 +34,7 @@ make -B packages/com_balancirk.zip packages/balancirk.zip pkg_balancirk.zip
 1. Next version = latest **published GitHub release tag** + patch (check `gh release list`; do not trust a higher number already sitting in XML if it was never released).
 2. Set `<version>` in `balancirk.xml`, `pkg_balancirk.xml`, and `components/com_balancirk/balancirk.xml`.
 3. Add an English entry to `balancirk_changelog.xml` and a matching block to `balancirk_update.xml`.
-4. Rebuild `pkg_balancirk.zip` (command above). Optionally also build `VERSION.tar.gz` / `VERSION.zip` like previous releases.
+4. Rebuild `pkg_balancirk.zip` (command above). Do **not** commit zip/tar.gz artifacts; GitHub Releases store the installable package.
 5. Open a PR into `master` (branch is protected: **squash-merge**, no merge commits). After merge, tag `VERSION` on `master` and push the tag — GitHub Actions publishes the release with `pkg_balancirk.zip`.
 6. **Checksum:** the Release workflow hashes the built `pkg_balancirk.zip`, writes `<sha256>` into `balancirk_update.xml`, and opens/squash-merges a follow-up PR to `master`. No manual checksum step is required. Helper script: `scripts/set-update-checksum.sh`.
 
@@ -79,4 +79,4 @@ There are no automated unit/integration tests in this repository. Validation is 
 
 - The `vendor/` directory is committed to the repo, so `composer install` is fast (no network needed if lock file matches).
 - The `debug` target in `components/com_balancirk/Makefile` deploys to a remote server via SSH — do not use it in cloud environments.
-- Built artifacts (`pkg_balancirk.zip`, `packages/*.zip`) are also committed to the repo; rebuild them when shipping a package.
+- Build zips (`pkg_balancirk.zip`, `packages/*.zip`, `*.tar.gz`) are gitignored; build them locally for tests, publish via GitHub Releases.
