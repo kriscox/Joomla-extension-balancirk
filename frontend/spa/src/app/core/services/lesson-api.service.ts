@@ -14,33 +14,43 @@ export class LessonApiService {
   }
 
   getLessons(): Observable<LessonSummary[]> {
-    return this.http
-      .get<JsonApiResponse<LessonSummary>>(`${this.base}/lessons`)
-      .pipe(map(r => extractList(r)));
+    return this.http.get<JsonApiResponse<LessonSummary>>(`${this.base}/lessons`).pipe(
+      map((r) =>
+        extractList(r).map((lesson) => ({
+          ...lesson,
+          id: Number(lesson.id ?? 0),
+          name: lesson.name ?? '',
+          year: lesson.year ?? '',
+          start: lesson.start ?? lesson.startdate ?? '',
+          end: lesson.end ?? lesson.enddate ?? '',
+          enrolled: Number(lesson.numberOfStudents ?? lesson.enrolled ?? 0),
+          waiting: Number(lesson.numberOnWaitingList ?? lesson.waiting ?? 0),
+          max_students: Number(lesson.max_students ?? 0),
+        })),
+      ),
+    );
   }
 
   getLesson(id: number): Observable<LessonDetail> {
     return this.http
       .get<JsonApiResponse<LessonDetail>>(`${this.base}/lessons/${id}`)
-      .pipe(map(r => extractItem(r.data as JsonApiItem<LessonDetail>)));
+      .pipe(map((r) => extractItem(r.data as JsonApiItem<LessonDetail>)));
   }
 
   createLesson(data: Partial<LessonDetail>): Observable<LessonDetail> {
     return this.http
-      .post<JsonApiResponse<LessonDetail>>(
-        `${this.base}/lessons`,
-        { data: { type: 'lessons', attributes: data } },
-      )
-      .pipe(map(r => extractItem(r.data as JsonApiItem<LessonDetail>)));
+      .post<JsonApiResponse<LessonDetail>>(`${this.base}/lessons`, {
+        data: { type: 'lessons', attributes: data },
+      })
+      .pipe(map((r) => extractItem(r.data as JsonApiItem<LessonDetail>)));
   }
 
   updateLesson(id: number, data: Partial<LessonDetail>): Observable<LessonDetail> {
     return this.http
-      .patch<JsonApiResponse<LessonDetail>>(
-        `${this.base}/lessons/${id}`,
-        { data: { type: 'lessons', id: String(id), attributes: data } },
-      )
-      .pipe(map(r => extractItem(r.data as JsonApiItem<LessonDetail>)));
+      .patch<JsonApiResponse<LessonDetail>>(`${this.base}/lessons/${id}`, {
+        data: { type: 'lessons', id: String(id), attributes: data },
+      })
+      .pipe(map((r) => extractItem(r.data as JsonApiItem<LessonDetail>)));
   }
 
   deleteLesson(id: number): Observable<void> {

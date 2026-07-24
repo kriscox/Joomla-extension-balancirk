@@ -13,6 +13,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/auth/login/login.component').then((m) => m.LoginComponent),
   },
+  {
+    path: 'register',
+    loadComponent: () =>
+      import('./features/auth/register/register.component').then((m) => m.RegisterComponent),
+  },
 
   // ── Member section — all authenticated users ──────────────────────────────
   {
@@ -59,6 +64,11 @@ export const routes: Routes = [
         path: 'subscriptions/new',
         loadComponent: () =>
           import('./features/member/subscriptions/subscription-form.component').then(m => m.SubscriptionFormComponent),
+      },
+      {
+        path: 'messages',
+        loadComponent: () =>
+          import('./features/member/messages/messages.component').then(m => m.MemberMessagesComponent),
       },
     ],
   },

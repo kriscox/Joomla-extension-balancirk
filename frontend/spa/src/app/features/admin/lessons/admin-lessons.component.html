@@ -1,9 +1,25 @@
 <section class="card">
   <div class="card-title-row">
     <h2>Lessen</h2>
-    <a class="btn-secondary small" routerLink="/admin">← Overzicht</a>
+    <a class="btn-secondary small" routerLink="/admin">← Beheer</a>
   </div>
-  <div class="alert alert-info">
-    Dit scherm is in ontwikkeling. Aanmaken en beheren van lessen, lesgevers en tijdstippen.
-  </div>
+  @if (loading()) {
+    <p class="status">Bezig met laden...</p>
+  } @else if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else if (lessons().length === 0) {
+    <p class="muted">Geen lessen gevonden.</p>
+  } @else {
+    <ul class="item-list">
+      @for (lesson of lessons(); track lesson.id) {
+        <li class="item-card">
+          <div class="item-main">
+            <strong>{{ lesson.name }}</strong>
+            <span class="meta">Schooljaar: {{ lesson.year || '—' }}</span>
+            <span class="meta">Ingeschreven: {{ lesson.enrolled ?? 0 }}</span>
+          </div>
+        </li>
+      }
+    </ul>
+  }
 </section>

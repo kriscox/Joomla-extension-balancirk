@@ -1,18 +1,16 @@
-<header class="hero">
-  <p class="eyebrow">Balancirk — Lesgevers</p>
-  <h1>Lesgever portaal</h1>
-  <p class="subtitle">Overzicht van je lessen en aanwezigheidsregistratie.</p>
-</header>
-
 <section class="card">
   <div class="card-title-row">
-    <h2>Mijn lessen</h2>
-    <span class="muted">{{ now | date: 'dd/MM/yyyy' }}</span>
+    <h2>Lesgever</h2>
   </div>
-  <p class="lead">Welkom in het lesgeverportaal. Kies hieronder een sectie.</p>
-  <div class="quick-grid">
-    <a class="quick-action" routerLink="/teacher/lessons">Overzicht lessen</a>
-    <a class="quick-action" routerLink="/teacher/attendance">Aanwezigheid registreren</a>
-    <a class="quick-action" routerLink="/member/profile">Mijn profiel</a>
-  </div>
+  @if (loading()) {
+    <p class="status">Bezig met laden...</p>
+  } @else if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else {
+    <p class="lead">Je hebt toegang tot {{ lessonCount() }} les(sen).</p>
+    <div class="actions actions-row">
+      <a class="btn-primary" routerLink="/teacher/lessons">Lessen bekijken</a>
+      <a class="btn-secondary" routerLink="/teacher/attendance">Aanwezigheid</a>
+    </div>
+  }
 </section>

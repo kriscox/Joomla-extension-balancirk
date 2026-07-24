@@ -49,12 +49,20 @@ class SubscriptionsController extends ApiController
      */
     public function displayList($data = null)
     {
-        // ApiController injects $this->modelState into the list model; setState on a
-        // throwaway getModel() instance is ignored by parent::displayList().
-        $this->modelState->set(
-            'filter.parent_id',
-            (int) Factory::getApplication()->getIdentity()->id
+        $user = Factory::getApplication()->getIdentity();
+        $canViewAll = !$user->guest && (
+            $user->authorise('students.viewall', 'com_balancirk')
+            || $user->authorise('core.admin', 'com_balancirk')
+            || $user->authorise('accounting.viewrelations', 'com_balancirk')
         );
+
+        // Member portal: always scope to own children. Admin/accounting: full list.
+        if (!$canViewAll) {
+            $this->modelState->set(
+                'filter.parent_id',
+                (int) $user->id
+            );
+        }
 
         return parent::displayList($data);
     }

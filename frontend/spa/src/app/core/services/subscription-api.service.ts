@@ -27,12 +27,17 @@ export class SubscriptionApiService {
           extractList(r).map(s => ({
             ...s,
             id: Number(s.id ?? 0),
+            studentid: Number(s.studentid ?? 0) || undefined,
             lesson: s.lesson ?? '',
             year: s.year ?? '',
             subscribed: Number(s.subscribed ?? 0),
           })),
         ),
       );
+  }
+
+  getAllSubscriptions(): Observable<SubscriptionSummary[]> {
+    return this.getMySubscriptions();
   }
 
   getOpenLessonsForStudent(studentId: number): Observable<OpenLessonsPayload> {

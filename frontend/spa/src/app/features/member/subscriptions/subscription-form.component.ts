@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { finalize, switchMap } from 'rxjs';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 import { StudentApiService } from '../../../core/services/student-api.service';
 import { SubscriptionApiService } from '../../../core/services/subscription-api.service';
 import { StudentSummary } from '../../../core/models/student.model';
@@ -20,6 +20,7 @@ export class SubscriptionFormComponent implements OnInit {
   protected readonly saving = signal(false);
   protected readonly loadingLessons = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly success = signal<string | null>(null);
   protected readonly lessonsMessage = signal('');
   protected readonly hasOpenLessons = signal(false);
   protected readonly students = signal<StudentSummary[]>([]);
@@ -27,7 +28,7 @@ export class SubscriptionFormComponent implements OnInit {
 
   protected readonly form = this.fb.nonNullable.group({
     student: ['', [Validators.required]],
-    lesson:  ['', [Validators.required]],
+    lesson: ['', [Validators.required]],
   });
 
   constructor(
@@ -35,13 +36,21 @@ export class SubscriptionFormComponent implements OnInit {
     private readonly subscriptionApi: SubscriptionApiService,
     private readonly fb: FormBuilder,
     private readonly router: Router,
+    private readonly route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
+    const presetStudent = Number(this.route.snapshot.queryParamMap.get('student') || 0);
+
     this.studentApi.getMyStudents().subscribe({
-      next: students => {
+      next: (students) => {
         this.students.set(students);
         this.loading.set(false);
+
+        if (presetStudent > 0 && students.some((s) => s.id === presetStudent)) {
+          this.form.controls.student.setValue(String(presetStudent));
+          this.loadLessonsForStudent(presetStudent);
+        }
       },
       error: (err: unknown) => {
         this.error.set(this.toMessage(err));
@@ -55,28 +64,18 @@ export class SubscriptionFormComponent implements OnInit {
     this.form.controls.lesson.setValue('');
     this.lessons.set([]);
     this.lessonsMessage.set('');
+    this.success.set(null);
 
     if (!studentId) {
       return;
     }
 
-    this.loadingLessons.set(true);
-    this.subscriptionApi.getOpenLessonsForStudent(studentId)
-      .pipe(finalize(() => this.loadingLessons.set(false)))
-      .subscribe({
-        next: payload => {
-          this.hasOpenLessons.set(payload.hasOpenLessons ?? false);
-          this.lessons.set(payload.lessons ?? []);
-          this.lessonsMessage.set(payload.message ?? '');
-        },
-        error: (err: unknown) => {
-          this.error.set(this.toMessage(err));
-        },
-      });
+    this.loadLessonsForStudent(studentId);
   }
 
   protected submit(): void {
     this.error.set(null);
+    this.success.set(null);
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -88,21 +87,52 @@ export class SubscriptionFormComponent implements OnInit {
     const lessonId = Number(v.lesson);
 
     this.saving.set(true);
-    this.subscriptionApi.createSubscription(studentId, lessonId)
+    this.subscriptionApi
+      .createSubscription(studentId, lessonId)
       .pipe(finalize(() => this.saving.set(false)))
       .subscribe({
-        next: () => {
-          this.router.navigate(['/member/subscriptions']);
+        next: (created) => {
+          const waiting = Number(created.subscribed) === 1;
+          this.router.navigate(['/member/subscriptions'], {
+            queryParams: {
+              student: studentId,
+              notice: waiting ? 'waiting' : 'enrolled',
+            },
+          });
         },
         error: (err: unknown) => {
-          this.error.set(this.toMessage(err, 'Inschrijven mislukt. Controleer of de leerling al is ingeschreven of niet in de juiste leeftijdscategorie valt.'));
+          this.error.set(
+            this.toMessage(
+              err,
+              'Inschrijven mislukt. Controleer of de leerling al is ingeschreven of niet in de juiste leeftijdscategorie valt.',
+            ),
+          );
+        },
+      });
+  }
+
+  private loadLessonsForStudent(studentId: number): void {
+    this.loadingLessons.set(true);
+    this.subscriptionApi
+      .getOpenLessonsForStudent(studentId)
+      .pipe(finalize(() => this.loadingLessons.set(false)))
+      .subscribe({
+        next: (payload) => {
+          this.hasOpenLessons.set(payload.hasOpenLessons ?? false);
+          this.lessons.set(payload.lessons ?? []);
+          this.lessonsMessage.set(payload.message ?? '');
+        },
+        error: (err: unknown) => {
+          this.error.set(this.toMessage(err));
         },
       });
   }
 
   private toMessage(err: unknown, fallback = 'Er is een fout opgetreden.'): string {
     const e = err as { status?: number; error?: { message?: string }; message?: string };
-    if (e?.status === 401) return 'Authenticatie mislukt. Log in op de website en vernieuw de pagina.';
+    if (e?.status === 401) {
+      return 'Authenticatie mislukt. Log in op de website en vernieuw de pagina.';
+    }
     return e?.error?.message ?? e?.message ?? fallback;
   }
 }

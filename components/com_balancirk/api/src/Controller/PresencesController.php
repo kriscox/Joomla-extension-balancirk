@@ -60,12 +60,43 @@ class PresencesController extends ApiController
             ->where($db->quoteName('date') . ' = ' . $db->quote($date))
             ->order($db->quoteName('student') . ' ASC');
         $db->setQuery($query);
-        $students = array_map('intval', $db->loadColumn() ?: []);
+        $presentIds = array_map('intval', $db->loadColumn() ?: []);
+
+        $rosterQuery = $db->getQuery(true)
+            ->select([
+                $db->quoteName('a.id'),
+                $db->quoteName('a.firstname'),
+                $db->quoteName('a.name'),
+            ])
+            ->from($db->quoteName('#__balancirk_students', 'a'))
+            ->join(
+                'INNER',
+                $db->quoteName('#__balancirk_subscriptions', 's')
+                . ' ON ' . $db->quoteName('s.student') . ' = ' . $db->quoteName('a.id')
+                . ' AND ' . $db->quoteName('s.subscribed') . ' = 0'
+            )
+            ->where($db->quoteName('s.lesson') . ' = ' . (int) $lesson)
+            ->order($db->quoteName('a.firstname') . ' ASC')
+            ->order($db->quoteName('a.name') . ' ASC');
+        $db->setQuery($rosterQuery);
+        $rosterRows = $db->loadAssocList() ?: [];
+        $roster = [];
+
+        foreach ($rosterRows as $row) {
+            $studentId = (int) ($row['id'] ?? 0);
+            $roster[] = [
+                'id' => $studentId,
+                'firstname' => (string) ($row['firstname'] ?? ''),
+                'name' => (string) ($row['name'] ?? ''),
+                'present' => \in_array($studentId, $presentIds, true),
+            ];
+        }
 
         echo new JsonResponse([
             'lesson' => (int) $lesson,
             'date' => $date,
-            'students' => $students,
+            'students' => $presentIds,
+            'roster' => $roster,
         ]);
         $app->close();
     }
@@ -171,7 +202,10 @@ class PresencesController extends ApiController
     {
         $user = Factory::getApplication()->getIdentity();
 
-        return !$user->guest && $user->authorise('lessons.admin', 'com_balancirk');
+        return !$user->guest && (
+            $user->authorise('lessons.admin', 'com_balancirk')
+            || $user->authorise('lessons.view', 'com_balancirk')
+        );
     }
 
     /**

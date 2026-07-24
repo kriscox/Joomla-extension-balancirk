@@ -1,13 +1,15 @@
-export interface LessonPresenceEntry {
-  student: number;
-  date: string;
-  present?: boolean;
+export interface PresenceRosterStudent {
+  id: number;
+  firstname: string;
+  name: string;
+  present: boolean;
 }
 
 export interface LessonPresenceSummary {
-  lessonId: number;
+  lesson: number;
   date: string;
-  entries: LessonPresenceEntry[];
+  students: number[];
+  roster: PresenceRosterStudent[];
 }
 
 export interface TeacherEntry {
