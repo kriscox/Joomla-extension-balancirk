@@ -85,14 +85,17 @@ jobs:
           if gh pr view "${branch}" --json number >/dev/null 2>&1; then
             pr_url=$(gh pr view "${branch}" --json url -q .url)
           else
+            checksum="${{ steps.checksum.outputs.sha256 }}"
+            body=$(printf '%s\n' \
+              "Adds <sha256> for release ${version} to balancirk_update.xml so Joomla can validate package integrity." \
+              "" \
+              "Checksum: ${checksum}" \
+              "Generated automatically by the Release workflow.")
             pr_url=$(gh pr create \
               --base master \
               --head "${branch}" \
               --title "chore: add sha256 checksum for ${version}" \
-              --body "Adds \`<sha256>\` for release **${version}** to \`balancirk_update.xml\` so Joomla can validate package integrity.
-
-Checksum: \`${{ steps.checksum.outputs.sha256 }}\`
-Generated automatically by the Release workflow.")
+              --body "${body}")
           fi
 
           gh pr merge "${pr_url}" --squash --delete-branch \
