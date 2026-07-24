@@ -27,7 +27,6 @@ $states = array(
 	'-2' => Text::_('JTRASHED')
 );
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
-HTMLHelper::_('script', 'com_balancirk/balancirk_spa_navigation.js', ['version' => 'auto', 'relative' => true]);
 
 $userid = Factory::getApplication()->getIdentity()->id;
 $bearertoken = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
@@ -42,12 +41,12 @@ $selectedStudent = $this->state->get('filter.student', '');
 	<div class="row mb-2">
 		<div class="col-md-12">
 			<nav aria-label="Toolbar" class="d-flex align-items-center gap-2 flex-wrap">
-				<button class="button-new btn btn-success" type="button" onclick="BalancirkSpaNavigation.navigate('<?= Route::_('index.php?option=com_balancirk&view=subscription&id=0', false) ?>')">
+				<a class="button-new btn btn-success" href="<?= Route::_('index.php?option=com_balancirk&view=subscription&id=0', false) ?>">
 					<span class=" icon-new" aria-hidden="true"></span>
 					<?= TEXT::_('COM_BALANCIRK_BUTTON_NEW_SUBSCRIPTION') ?>
-				</button>
-				<a data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&view=students', false); ?>">
-					<button class="btn btn-primary" type="button"><?= TEXT::_('COM_BALANCIRK_STUDENTS_LINK') ?></button>
+				</a>
+				<a class="btn btn-primary" href="<?= Route::_('index.php?option=com_balancirk&view=students', false); ?>">
+					<?= TEXT::_('COM_BALANCIRK_STUDENTS_LINK') ?>
 				</a>
 				<?php if (!empty($this->years)) : ?>
 					<select name="filter_year" class="form-select w-auto" onchange="document.getElementById('subscriptionFilterForm').submit();" aria-label="<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_YEAR') ?>">
@@ -120,11 +119,11 @@ $selectedStudent = $this->state->get('filter.student', '');
 								</td>
 								<td scope="row" class="d-md-table-cell">
 									<?php if ($item->primary == 1) : ?>
-										<a data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&task=student.edit&id=' . (int) $item->studentid) ?>">
+										<a href="<?= Route::_('index.php?option=com_balancirk&task=student.edit&id=' . (int) $item->studentid) ?>">
 											<?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)); ?>
 										</a>
 									<?php else : ?>
-										<a data-balancirk-spa-nav href="<?= Route::_('index.php?option=com_balancirk&view=student&layout=default&id=' . (int) $item->studentid) ?>">
+										<a href="<?= Route::_('index.php?option=com_balancirk&view=student&layout=default&id=' . (int) $item->studentid) ?>">
 											<?= $this->escape(addslashes($item->firstname)); ?> <?= $this->escape(addslashes($item->name)); ?>
 										</a>
 									<?php endif; ?>

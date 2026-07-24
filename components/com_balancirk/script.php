@@ -39,6 +39,46 @@ class Com_BalancirkInstallerScript extends InstallerScript
     private $minimumPHPVersion = JOOMLA_MINIMUM_PHP;
 
     /**
+     * Obsolete files removed from the package (paths relative to JPATH_ROOT).
+     *
+     * Joomla upgrades do not delete files that disappeared from the zip, so these
+     * must be removed explicitly during update/postflight.
+     *
+     * Note: do not list active API controllers/views here (e.g. presence/teacher
+     * endpoints). Only remove confirmed SPA leftovers and accidental junk.
+     *
+     * @var    string[]
+     * @since  1.3.20
+     */
+    protected $deleteFiles = [
+        // Angular SPA layouts + assets
+        '/components/com_balancirk/tmpl/member/spa.php',
+        '/components/com_balancirk/tmpl/member/spa.xml',
+        '/components/com_balancirk/tmpl/member/spaadmin.php',
+        '/components/com_balancirk/tmpl/member/spaadmin.xml',
+        '/media/com_balancirk/js/balancirk_spa_navigation.js',
+        '/media/com_balancirk/js/balancirk_pwa_init.js',
+        '/media/com_balancirk/js/balancirk_sw.js',
+        '/media/com_balancirk/manifest.webmanifest',
+        '/media/com_balancirk/images/pwa-icon.svg',
+        // Accidental leftovers (not part of the API)
+        '/components/com_balancirk/layouts/student/edit_state.php',
+        '/components/com_balancirk/src/Controller/DisplayController copy.php',
+        '/components/com_balancirk/src/Controller/com_balancirk.code-workspace',
+        '/administrator/components/com_balancirk/Makefile',
+    ];
+
+    /**
+     * Obsolete folders removed from the package (paths relative to JPATH_ROOT).
+     *
+     * @var    string[]
+     * @since  1.3.20
+     */
+    protected $deleteFolders = [
+        '/media/com_balancirk/member-spa',
+    ];
+
+    /**
      * Method to install the extension
      *
      * @param   InstallerAdapter  $parent  The class calling this method
@@ -87,6 +127,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
         echo Text::_('COM_BALANCIRK_INSTALLERSCRIPT_UPDATE');
 
         $this->ensureDefaultGroupsAndPermissions();
+        $this->removeObsoleteSpaArtifacts();
 
         return true;
     }
@@ -157,9 +198,25 @@ class Com_BalancirkInstallerScript extends InstallerScript
         {
             $this->conditionalInstallDashboard('com-balancirk-dashboard', 'balancirk');
             $this->ensureDefaultGroupsAndPermissions();
+            $this->removeObsoleteSpaArtifacts();
         }
 
         return true;
+    }
+
+    /**
+     * Delete leftover Angular SPA / PWA files from previous installs.
+     *
+     * Joomla does not remove files that disappeared from an upgrade package;
+     * InstallerScript::removeFiles() deletes $deleteFiles / $deleteFolders.
+     *
+     * @return  void
+     *
+     * @since   1.3.20
+     */
+    private function removeObsoleteSpaArtifacts(): void
+    {
+        $this->removeFiles();
     }
 
     /**

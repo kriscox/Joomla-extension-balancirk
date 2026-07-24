@@ -10,6 +10,8 @@ Balancirk is a Joomla 4 extension package for managing members, students, lesson
 
 This is NOT a standalone application. It requires installation into a Joomla 4 CMS instance.
 
+The Angular member SPA is developed separately on the `Single-page-site-ontwikkeling` branch and is not part of `master`.
+
 ## Conventions
 
 - Write **code comments** and **in-repository documentation** (README sections, inline notes in source) in **English**. User-facing Joomla language strings stay in their locale files.
@@ -19,7 +21,7 @@ This is NOT a standalone application. It requires installation into a Joomla 4 C
 Cloud Agents use the install script in `.cursor/environment.json` to refresh dependencies after checkout:
 
 ```bash
-composer install --no-interaction && cd frontend/member-spa && npm install --no-audit --no-fund
+composer install --no-interaction
 ```
 
 ### Prerequisites (installed by update script)
@@ -27,7 +29,6 @@ composer install --no-interaction && cd frontend/member-spa && npm install --no-
 - PHP 8.3+ with extensions: cli, xml, mbstring, tokenizer, zip
 - Composer (for phpcs dev dependency)
 - GNU Make + zip (for building packages)
-- Node.js 22+ / npm (for Angular member-spa frontend)
 
 ### Lint
 
@@ -44,14 +45,6 @@ make -B
 ```
 
 This forces a full rebuild of the installable Joomla package zip (including sub-packages for the component and plugin). The `-B` flag unconditionally rebuilds all targets.
-
-To build the Angular member-spa frontend:
-
-```bash
-make member-spa-build
-```
-
-The update script pre-installs `frontend/member-spa/node_modules` so this target runs without network access.
 
 ### Testing
 
