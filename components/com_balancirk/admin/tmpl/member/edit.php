@@ -37,7 +37,6 @@ HTMLHelper::_('behavior.keepalive');
 						<?= $this->form->renderField('name'); ?>
 						<?= $this->form->renderField('email'); ?>
 						<?= $this->form->renderField('phone'); ?>
-						<?= $this->form->renderField('birthdate'); ?>
 					</div>
 				</div>
 			</div>

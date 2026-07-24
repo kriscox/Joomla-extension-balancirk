@@ -66,9 +66,6 @@ HTMLHelper::_('behavior.keepalive');
 			<div class="col-12 col-md-6">
 				<?= $this->form->renderField('phone'); ?>
 			</div>
-			<div class="col-12 col-md-6">
-				<?= $this->form->renderField('birthdate'); ?>
-			</div>
 		</div>
 	</div>
 
