@@ -1,0 +1,69 @@
+<section class="card">
+  <div class="card-title-row">
+    <h2>Mijn kinderen</h2>
+    <a class="btn-secondary small" routerLink="/member/dashboard">← Terug</a>
+  </div>
+  @if (!loading()) {
+    <p class="muted">{{ students().length }} leerling(en)</p>
+  }
+
+  @if (loading()) {
+    <p class="status">Bezig met laden...</p>
+  } @else if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else {
+    @if (isStaff) {
+      <div class="alert alert-info">
+        Hier zie je alleen leerlingen waaraan je als ouder gekoppeld bent.
+        Leerlingen van je lessen vind je onder
+        <a routerLink="/teacher/lessons">Lessen</a>@if (isAdmin) { of <a routerLink="/admin/students">Beheer</a>}.
+      </div>
+    }
+    <div class="actions actions-row">
+      <a class="btn-primary" routerLink="/member/students/new">Leerling toevoegen</a>
+      <a class="btn-secondary" routerLink="/member/dashboard">Naar home</a>
+    </div>
+
+    @if (students().length === 0) {
+      <div class="empty-state">
+        <p class="muted">Er zijn nog geen gekoppelde leerlingen gevonden.</p>
+        <a class="btn-primary" routerLink="/member/students/new">Eerste leerling toevoegen</a>
+      </div>
+    } @else {
+      <ul class="item-list">
+        @for (student of students(); track student.id) {
+          <li class="item-card">
+            <div class="item-main">
+              <strong>{{ student.firstname }} {{ student.name }}</strong>
+              <span class="meta">
+                @if (student.birthdate) {
+                  {{ student.birthdate | date: 'dd/MM/yyyy' }}
+                } @else {
+                  Geboortedatum niet ingevuld
+                }
+              </span>
+              @if (student.mutuality) {
+                <span class="meta">Mutualiteit: {{ student.mutuality }}</span>
+              }
+              @if (student.uitpas) {
+                <span class="meta">UiTPAS: {{ student.uitpas }}</span>
+              }
+            </div>
+            <div class="item-actions">
+              @if (student.isPrimary === 1) {
+                <a class="btn-secondary" [routerLink]="['/member/students', student.id, 'edit']">Bewerken</a>
+              } @else {
+                <a class="btn-secondary" [routerLink]="['/member/students', student.id]">Bekijken</a>
+              }
+              <a
+                class="btn-secondary"
+                [routerLink]="['/member/subscriptions']"
+                [queryParams]="{ student: student.id }"
+              >Inschrijvingen</a>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+</section>

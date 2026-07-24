@@ -73,20 +73,24 @@ make remote-docker-install REMOTE_HOST=cococo003
 - `scripts/container/refresh-unite-remote.sh`: remote unite refresh helper
 - `scripts/sql/`: ad-hoc maintenance SQL (not part of the Joomla installer)
 
-## Angular ledenmodule (one-page)
+## Angular SPA / PWA
 
-Er is nu een aparte Angular SPA voorzien in `frontend/member-spa` voor de ledenmodule (`profiel + kinderen`, mobile-first, PWA-ready).
+Er is een Angular SPA in `frontend/spa` (leden, lesgevers, boekhouding; admin later), mobile-first en PWA-ready.
 
 Belangrijkste commando's:
 ```bash
-make member-spa-install
-make member-spa-build
-make member-spa-deploy
+make spa-install
+make spa-build
+make spa-deploy
 ```
 
-Na deploy wordt de build geplaatst in `components/com_balancirk/media/member-spa/browser` en kan je in Joomla een menu-item maken naar:
+Na deploy wordt de build geplaatst in `components/com_balancirk/media/spa/browser` en kan je in Joomla een menu-item maken naar:
 
-`index.php?option=com_balancirk&view=member&layout=spa`
+`index.php?option=com_balancirk&view=spa`
+
+In de componentopties kun je het AcyMailing nieuwsbrief-menu-item koppelen. Oude menu's met `view=member&layout=spa` redirecten naar `view=spa`.
+
+Doelplatform: **Joomla 6**.
 
 ### Git workflow (SPA development)
 
@@ -95,7 +99,7 @@ SPA changes go through a dedicated integration branch, not directly into `master
 | Branch | Purpose |
 |--------|---------|
 | `Single-page-site-ontwikkeling` | Integration branch for all SPA work |
-| `cursor/...` or feature branches | Individual changes (e.g. `cursor/single-page-site-3637`) |
+| `cursor/...` or feature branches | Individual changes (e.g. `cursor/spa-pwa-foundation-ea5d`) |
 | `master` | Production / Joomla releases (merge SPA when ready) |
 
 **Steps:**
@@ -105,4 +109,4 @@ SPA changes go through a dedicated integration branch, not directly into `master
 3. After review, merge into `Single-page-site-ontwikkeling`.
 4. When the SPA core is stable, open a separate PR from `Single-page-site-ontwikkeling` → `master`.
 
-See `frontend/member-spa/README.md` for Angular app details.
+See `frontend/spa/README.md` for Angular app details.

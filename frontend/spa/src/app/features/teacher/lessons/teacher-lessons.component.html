@@ -1,0 +1,58 @@
+<section class="card">
+  <div class="card-title-row">
+    <h2>Lessen</h2>
+    <a class="btn-secondary small" routerLink="/teacher/attendance">Aanwezigheid</a>
+  </div>
+
+  @if (loading()) {
+    <p class="status">Bezig met laden...</p>
+  } @else if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else {
+    @if (years().length > 0) {
+      <div class="actions">
+        <select class="year-filter" [value]="selectedYear()" (change)="setYear($event)" aria-label="Filter op schooljaar">
+          <option value="">Alle schooljaren</option>
+          @for (year of years(); track year) {
+            <option [value]="year">{{ year }}</option>
+          }
+        </select>
+      </div>
+    }
+
+    @if (filtered().length === 0) {
+      <p class="muted">Geen lessen gevonden.</p>
+    } @else {
+      <ul class="item-list">
+        @for (lesson of filtered(); track lesson.id) {
+          <li class="item-card">
+            <a class="item-main item-card-link" [routerLink]="['/teacher/lessons', lesson.id]">
+              <strong>{{ lesson.name }}</strong>
+              <span class="meta">Schooljaar: {{ lesson.year || '—' }}</span>
+              <span class="meta">
+                Ingeschreven: <strong>{{ lesson.enrolled ?? 0 }}</strong>
+                @if (lesson.max_students) {
+                  / {{ lesson.max_students }}
+                }
+              </span>
+              @if ((lesson.waiting ?? 0) > 0) {
+                <span class="meta status-badge waiting">Wachtlijst: {{ lesson.waiting }}</span>
+              }
+            </a>
+            <div class="item-actions">
+              <a
+                class="btn-secondary small"
+                [routerLink]="['/teacher/lessons', lesson.id]"
+              >Details</a>
+              <a
+                class="btn-primary small"
+                [routerLink]="['/teacher/attendance']"
+                [queryParams]="{ lesson: lesson.id }"
+              >Aanwezigheid</a>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+</section>

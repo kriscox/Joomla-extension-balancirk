@@ -16,6 +16,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomla\CMS\Router\Route;
 
 /**
  * HTML Member view class for the balancirk component.
@@ -69,31 +70,37 @@ class HtmlView extends BaseHtmlView
      */
     public function display($tpl = null)
     {
+        // Legacy menu items still point at member&layout=spa|spaadmin.
+        if ($tpl === 'spa' || $tpl === 'spaadmin') {
+            Factory::getApplication()->redirect(
+                Route::_('index.php?option=com_balancirk&view=spa', false)
+            );
+
+            return;
+        }
+
         $this->form = $this->get('Form');
         $this->item = $this->get('Item');
 
-        // SPA layouts delegate all data loading to the Angular app via REST API.
-        if ($tpl !== 'spa' && $tpl !== 'spaadmin') {
-            /** @var MVCFactoryInterface $factory */
-            $factory = Factory::getApplication()
-                ->bootComponent('com_balancirk')
-                ->getMVCFactory();
+        /** @var MVCFactoryInterface $factory */
+        $factory = Factory::getApplication()
+            ->bootComponent('com_balancirk')
+            ->getMVCFactory();
 
-            $studentsModel     = $factory->createModel('Students', 'Site');
-            $subscriptionsModel = $factory->createModel('Subscriptions', 'Site');
+        $studentsModel     = $factory->createModel('Students', 'Site');
+        $subscriptionsModel = $factory->createModel('Subscriptions', 'Site');
 
-            $app = Factory::getApplication();
-            $selectedYear = $app->input->getString('filter_year', '');
+        $app = Factory::getApplication();
+        $selectedYear = $app->input->getString('filter_year', '');
 
-            if ($selectedYear !== '') {
-                $subscriptionsModel->setState('filter.year', $selectedYear);
-            }
-
-            $this->students      = $studentsModel->getItems();
-            $this->subscriptions = $subscriptionsModel->getItems();
-            $this->years         = $subscriptionsModel->getYears();
-            $this->selectedYear  = $subscriptionsModel->getState('filter.year');
+        if ($selectedYear !== '') {
+            $subscriptionsModel->setState('filter.year', $selectedYear);
         }
+
+        $this->students      = $studentsModel->getItems();
+        $this->subscriptions = $subscriptionsModel->getItems();
+        $this->years         = $subscriptionsModel->getYears();
+        $this->selectedYear  = $subscriptionsModel->getState('filter.year');
 
         if (count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);

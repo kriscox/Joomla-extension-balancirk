@@ -1,3 +1,3 @@
 {
-  "install": "composer install --no-interaction && cd frontend/member-spa && npm install --no-audit --no-fund"
+  "install": "composer install --no-interaction && cd frontend/spa && npm install --no-audit --no-fund"
 }

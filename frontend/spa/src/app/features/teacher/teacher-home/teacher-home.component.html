@@ -1,0 +1,16 @@
+<section class="card">
+  <div class="card-title-row">
+    <h2>Lesgever</h2>
+  </div>
+  @if (loading()) {
+    <p class="status">Bezig met laden...</p>
+  } @else if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else {
+    <p class="lead">Je hebt toegang tot {{ lessonCount() }} les(sen).</p>
+    <div class="actions actions-row">
+      <a class="btn-primary" routerLink="/teacher/lessons">Lessen bekijken</a>
+      <a class="btn-secondary" routerLink="/teacher/attendance">Aanwezigheid</a>
+    </div>
+  }
+</section>

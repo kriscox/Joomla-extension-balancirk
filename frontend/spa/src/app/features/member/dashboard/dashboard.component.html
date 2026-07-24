@@ -1,0 +1,121 @@
+<header class="hero">
+  <p class="eyebrow">Balancirk</p>
+  <h1>
+    @if (member()) {
+      Welkom, {{ member()?.firstname || member()?.name }}
+    } @else {
+      Mijn Balancirk
+    }
+  </h1>
+  <p class="subtitle">Beheer je leerlingen en inschrijvingen op één plek.</p>
+</header>
+
+@if (loading()) {
+  <section class="card">
+    <p class="status">Bezig met laden...</p>
+  </section>
+} @else if (error()) {
+  <section class="card card-error">
+    <p>{{ error() }}</p>
+  </section>
+} @else {
+  <section class="card">
+    <div class="actions actions-row">
+      <a class="btn-primary" routerLink="/member/students/new">Leerling toevoegen</a>
+      <a class="btn-secondary" routerLink="/member/subscriptions/new">Nieuwe inschrijving</a>
+      <a class="btn-secondary" routerLink="/member/profile">Profiel</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-title-row">
+      <h2>Mijn kinderen</h2>
+      <span class="muted">{{ students().length }}</span>
+    </div>
+
+    @if (isStaff) {
+      <div class="alert alert-info">
+        Als ouder zie je hier je eigen kinderen. Leerlingen van lessen staan onder
+        <a routerLink="/teacher/lessons">Lessen</a>.
+      </div>
+    }
+
+    @if (students().length === 0) {
+      <div class="empty-state">
+        <p>Nog geen leerlingen gekoppeld aan je account.</p>
+        <a class="btn-primary" routerLink="/member/students/new">Eerste leerling toevoegen</a>
+      </div>
+    } @else {
+      <ul class="item-list">
+        @for (student of students(); track student.id) {
+          <li class="item-card">
+            <div class="item-main">
+              <strong>{{ student.firstname }} {{ student.name }}</strong>
+              <span class="meta">
+                @if (student.birthdate) {
+                  {{ student.birthdate | date: 'dd/MM/yyyy' }}
+                } @else {
+                  Geboortedatum niet ingevuld
+                }
+              </span>
+            </div>
+            <div class="item-actions">
+              @if (canEditStudent(student)) {
+                <a class="btn-secondary" [routerLink]="['/member/students', student.id, 'edit']">Aanpassen</a>
+              } @else {
+                <a class="btn-secondary" [routerLink]="['/member/students', student.id]">Bekijken</a>
+              }
+              <a
+                class="btn-secondary"
+                [routerLink]="['/member/subscriptions']"
+                [queryParams]="{ student: student.id }"
+              >Inschrijvingen</a>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <section class="card">
+    <div class="card-title-row">
+      <h2>Mijn inschrijvingen</h2>
+      <a class="btn-secondary small" routerLink="/member/subscriptions">Alles</a>
+    </div>
+
+    @if (years().length > 1) {
+      <div class="actions">
+        <select class="year-filter" [value]="selectedYear()" (change)="setYear($event)" aria-label="Filter op schooljaar">
+          <option value="">Alle schooljaren</option>
+          @for (year of years(); track year) {
+            <option [value]="year">{{ year }}</option>
+          }
+        </select>
+      </div>
+    }
+
+    @if (subscriptions().length === 0) {
+      <div class="empty-state">
+        <p>Nog geen inschrijvingen gevonden.</p>
+        <a class="btn-primary" routerLink="/member/subscriptions/new">Inschrijven voor een les</a>
+      </div>
+    } @else if (filteredSubscriptions().length === 0) {
+      <p class="muted">Geen inschrijvingen voor dit schooljaar.</p>
+    } @else {
+      <ul class="item-list">
+        @for (sub of filteredSubscriptions(); track sub.id) {
+          <li class="item-card">
+            <div class="item-main">
+              <strong>{{ sub.lesson }}</strong>
+              <span class="meta">{{ sub.firstname }} {{ sub.name }}</span>
+              <span class="meta">Schooljaar: {{ sub.year || '—' }}</span>
+              <span class="meta status-badge" [class.waiting]="sub.subscribed === 1">
+                {{ stateLabel(sub.subscribed) }}
+              </span>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+}

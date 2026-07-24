@@ -1,0 +1,97 @@
+:host {
+  display: block;
+}
+
+.bottom-nav {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.25rem;
+  margin-top: 0.85rem;
+  padding: 0.35rem;
+  padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--brand, #0d5e56) 8%, #fff);
+  border: 1px solid color-mix(in srgb, var(--brand, #0d5e56) 20%, #fff);
+  border-radius: 14px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding: 0.3rem 0.25rem;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #1f3c38;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.78rem;
+  line-height: 1.15;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+}
+
+.nav-item.active,
+.nav-item--more.active {
+  background: var(--brand, #0d5e56);
+  color: var(--brand-contrast, #fff);
+}
+
+.more-panel {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 0.45rem;
+  padding: 0.6rem;
+  background: #fff;
+  border: 1px solid #c3d8d3;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(18, 48, 44, 0.08);
+}
+
+.more-user {
+  margin: 0 0 0.2rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #1f3c38;
+}
+
+.more-link {
+  display: block;
+  padding: 0.5rem 0.45rem;
+  border-radius: 8px;
+  color: #1f3c38;
+  font-weight: 650;
+  font-size: 0.9rem;
+  text-decoration: none;
+  text-align: left;
+}
+
+.more-link:hover,
+.more-link.active {
+  background: #e5f0ee;
+}
+
+.more-link--button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (min-width: 780px) {
+  .bottom-nav {
+    position: static;
+    padding-bottom: 0.35rem;
+  }
+
+  .nav-item {
+    font-size: 0.86rem;
+    min-height: 2.5rem;
+  }
+}

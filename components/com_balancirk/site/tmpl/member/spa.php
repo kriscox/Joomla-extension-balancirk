@@ -11,74 +11,11 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Router\Route;
-use Joomla\CMS\Uri\Uri;
-use Joomla\CMS\User\UserHelper;
 
-$document = Factory::getApplication()->getDocument();
-$wa = $document->getWebAssetManager();
-$assetBase = 'media/com_balancirk/member-spa/browser/';
-$mainAssetPath = JPATH_ROOT . '/' . $assetBase . 'main.js';
-$manifestUrl = Uri::root() . $assetBase . 'manifest.webmanifest';
-$user = Factory::getApplication()->getIdentity();
-$apiToken = '';
-$canViewRelations = false;
-$canExportAccounting = false;
-$canAdminPortal = false;
-
-if (!$user->guest)
-{
-	$profile = UserHelper::getProfile((int) $user->id);
-	$apiToken = (string) ($profile->get('joomlatoken')['token'] ?? '');
-	$canViewRelations = $user->authorise('accounting.viewrelations', 'com_balancirk')
-		|| $user->authorise('students.viewall', 'com_balancirk')
-		|| $user->authorise('lessons.admin', 'com_balancirk')
-		|| $user->authorise('core.admin', 'com_balancirk');
-	$canExportAccounting = $user->authorise('accounting.export', 'com_balancirk')
-		|| $user->authorise('core.admin', 'com_balancirk');
-	$canAdminPortal = $canViewRelations
-		|| $canExportAccounting
-		|| $user->authorise('core.manage', 'com_balancirk')
-		|| $user->authorise('students.viewall', 'com_balancirk')
-		|| $user->authorise('lessons.admin', 'com_balancirk');
-}
-
-?>
-
-
-
-<div class="page-header">
-	<h1><?= $this->item->title; ?></h1>
-</div>
-
-<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
-<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-member-top}'); ?>
-
-<?php if (is_file($mainAssetPath)): ?>
-	<?php
-	$wa->registerAndUseStyle('balancirk-member-spa-styles', $assetBase . 'styles.css');
-	$wa->registerAndUseScript('balancirk-member-spa-polyfills', $assetBase . 'polyfills.js', [], ['type' => 'module']);
-	$wa->registerAndUseScript('balancirk-member-spa-main', $assetBase . 'main.js', [], ['type' => 'module']);
-	$document->addScriptOptions('balancirk-member-spa', [
-		'token' => $apiToken,
-		'apiBase' => '/api/index.php/v1',
-		'subscriptionCreateUrl' => Route::_('index.php?option=com_balancirk&view=subscription&id=0', false),
-		'portalMode' => 'member',
-		'canAdminPortal' => $canAdminPortal,
-		'canViewRelations' => $canViewRelations,
-		'canExportAccounting' => $canExportAccounting,
-		'allowAdminInMemberPortal' => false,
-	]);
-	$document->addHeadLink($manifestUrl, 'manifest', 'rel');
-	?>
-	<app-member-root></app-member-root>
-<?php else: ?>
-	<div class="alert alert-warning">
-		De leden-app is nog niet gebouwd. Build en deploy eerst met:
-		<code>cd frontend/member-spa &amp;&amp; npm run build:deploy</code>
-	</div>
-<?php endif; ?>
-
-<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-member-bottom}'); ?>
-<?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>
+/**
+ * Legacy layout: SPA moved to view=spa.
+ * Keep this file so old menu items still open the app.
+ */
+$app = Factory::getApplication();
+$app->redirect(Route::_('index.php?option=com_balancirk&view=spa', false));
