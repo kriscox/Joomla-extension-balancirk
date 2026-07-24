@@ -67,5 +67,10 @@
 			max="12"
 			step="1"
 			filter="integer" />
+		<field name="newsletter_menu_item"
+			type="menuitem"
+			label="COM_BALANCIRK_NEWSLETTER_MENU_ITEM_LABEL"
+			description="COM_BALANCIRK_NEWSLETTER_MENU_ITEM_DESCRIPTION"
+			required="false" />
 	</fieldset>
 </config>
