@@ -152,4 +152,15 @@
 			<item>Activation email failures are now warnings only after the account and profile were saved successfully.</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.19</version>
+		<change>
+			<item>Removed the Angular member SPA from the master package; SPA work continues on the Single-page-site-ontwikkeling branch.</item>
+			<item>Installer cleanup removes leftover SPA/PWA files on upgrade while keeping the presence API intact.</item>
+			<item>Waiting-list students are shown at the bottom of the lesson view.</item>
+			<item>Removed orphan birthdate fields from member forms.</item>
+		</change>
+	</changelog>
 </changelogs>
