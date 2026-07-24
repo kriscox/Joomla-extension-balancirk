@@ -1,6 +1,6 @@
 <section class="card">
   <div class="card-title-row">
-    <h2>Mijn leerlingen</h2>
+    <h2>Mijn kinderen</h2>
     @if (!loading()) {
       <span class="muted">{{ students().length }} leerling(en)</span>
     }
@@ -11,6 +11,13 @@
   } @else if (error()) {
     <div class="alert alert-error">{{ error() }}</div>
   } @else {
+    @if (isStaff) {
+      <div class="alert alert-info">
+        Hier zie je alleen leerlingen waaraan je als ouder gekoppeld bent.
+        Leerlingen van je lessen vind je onder
+        <a routerLink="/teacher/lessons">Lessen</a>@if (isAdmin) { of <a routerLink="/admin/students">Beheer</a>}.
+      </div>
+    }
     <div class="actions">
       <a class="btn-primary" routerLink="/member/students/new">Leerling toevoegen</a>
     </div>

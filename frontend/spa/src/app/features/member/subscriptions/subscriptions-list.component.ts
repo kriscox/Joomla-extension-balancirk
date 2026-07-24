@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { SubscriptionApiService } from '../../../core/services/subscription-api.service';
 import { StudentApiService } from '../../../core/services/student-api.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { SubscriptionSummary } from '../../../core/models/subscription.model';
 import { StudentSummary } from '../../../core/models/student.model';
 
@@ -15,6 +16,8 @@ import { StudentSummary } from '../../../core/models/student.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SubscriptionsListComponent implements OnInit {
+  private readonly auth = inject(AuthService);
+
   protected readonly loading = signal(true);
   protected readonly deletingId = signal<number | null>(null);
   protected readonly error = signal<string | null>(null);
@@ -23,6 +26,7 @@ export class SubscriptionsListComponent implements OnInit {
   protected readonly students = signal<StudentSummary[]>([]);
   protected readonly selectedYear = signal('');
   protected readonly selectedStudentId = signal<number>(0);
+  protected readonly isStaff = this.auth.isTeacher();
 
   protected readonly years = computed(() => {
     const all = [...new Set(this.subscriptions().map((s) => String(s.year ?? '')).filter(Boolean))];

@@ -15,6 +15,13 @@
     @if (notice()) {
       <div class="alert alert-success">{{ notice() }}</div>
     }
+    @if (isStaff) {
+      <div class="alert alert-info">
+        Filters hier gaan over jouw kinderen (ouderkoppeling), niet over alle leerlingen van de school.
+        Lesroosters en aanwezigheid vind je onder
+        <a routerLink="/teacher/lessons">Lessen</a>.
+      </div>
+    }
 
     <div class="actions actions-row">
       <a
@@ -23,8 +30,8 @@
         [queryParams]="selectedStudentId() ? { student: selectedStudentId() } : {}"
       >Nieuwe inschrijving</a>
       @if (students().length > 1) {
-        <select class="year-filter" [value]="selectedStudentId()" (change)="setStudent($event)" aria-label="Filter op leerling">
-          <option value="0">Alle leerlingen</option>
+        <select class="year-filter" [value]="selectedStudentId()" (change)="setStudent($event)" aria-label="Filter op kind">
+          <option value="0">Al mijn kinderen</option>
           @for (s of students(); track s.id) {
             <option [value]="s.id">{{ s.firstname }} {{ s.name }}</option>
           }

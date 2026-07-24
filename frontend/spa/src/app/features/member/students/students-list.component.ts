@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { StudentApiService } from '../../../core/services/student-api.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { StudentSummary } from '../../../core/models/student.model';
 
 @Component({
@@ -13,15 +14,19 @@ import { StudentSummary } from '../../../core/models/student.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentsListComponent implements OnInit {
+  private readonly auth = inject(AuthService);
+
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
   protected readonly students = signal<StudentSummary[]>([]);
+  protected readonly isStaff = this.auth.isTeacher();
+  protected readonly isAdmin = this.auth.isAdmin();
 
   constructor(private readonly api: StudentApiService) {}
 
   ngOnInit(): void {
     this.api.getMyStudents().subscribe({
-      next: s => {
+      next: (s) => {
         this.students.set(s);
         this.loading.set(false);
       },
@@ -34,7 +39,9 @@ export class StudentsListComponent implements OnInit {
 
   private toMessage(err: unknown): string {
     const e = err as { status?: number; error?: { message?: string }; message?: string };
-    if (e?.status === 401) return 'Authenticatie mislukt. Log in op de website en vernieuw de pagina.';
+    if (e?.status === 401) {
+      return 'Authenticatie mislukt. Log in op de website en vernieuw de pagina.';
+    }
     return e?.error?.message ?? e?.message ?? 'Leerlingen konden niet geladen worden.';
   }
 }
