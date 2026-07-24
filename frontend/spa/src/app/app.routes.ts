@@ -90,6 +90,13 @@ export const routes: Routes = [
           import('./features/teacher/lessons/teacher-lessons.component').then(m => m.TeacherLessonsComponent),
       },
       {
+        path: 'lessons/:id',
+        loadComponent: () =>
+          import('./features/teacher/lessons/teacher-lesson-detail.component').then(
+            (m) => m.TeacherLessonDetailComponent,
+          ),
+      },
+      {
         path: 'attendance',
         loadComponent: () =>
           import('./features/teacher/attendance/attendance.component').then(m => m.AttendanceComponent),

@@ -1,7 +1,11 @@
 <section class="card">
   <div class="card-title-row">
     <h2>Aanwezigheid</h2>
-    <a class="btn-secondary small" routerLink="/teacher/lessons">← Lessen</a>
+    @if (selectedLessonId() > 0) {
+      <a class="btn-secondary small" [routerLink]="['/teacher/lessons', selectedLessonId()]">← Les</a>
+    } @else {
+      <a class="btn-secondary small" routerLink="/teacher/lessons">← Lessen</a>
+    }
   </div>
 
   @if (loading()) {
@@ -22,42 +26,63 @@
           Les
           <select [value]="selectedLessonId()" (change)="onLessonChange($event)">
             @for (lesson of lessons(); track lesson.id) {
-              <option [value]="lesson.id">{{ lesson.name }} ({{ lesson.year }})</option>
+              <option [value]="lesson.id">
+                {{ lesson.name }} ({{ lesson.year }}) — {{ lesson.enrolled ?? 0 }} inschr.
+              </option>
             }
           </select>
         </label>
         <label>
-          Datum
-          <input type="date" [value]="selectedDate()" (change)="onDateChange($event)" />
+          Lesdag
+          @if (dateOptions().length > 0) {
+            <select [value]="selectedDate()" (change)="onDateChange($event)">
+              @for (option of dateOptions(); track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          } @else {
+            <p class="muted">Geen lesdagen gevonden voor deze les.</p>
+          }
         </label>
       </div>
 
-      @if (loadingRoster()) {
+      @if (selectedLesson(); as lesson) {
+        <p class="meta">
+          Ingeschreven: <strong>{{ lesson.enrolled ?? 0 }}</strong>
+          @if (lesson.max_students) {
+            / {{ lesson.max_students }}
+          }
+          @if ((lesson.waiting ?? 0) > 0) {
+            · Wachtlijst: {{ lesson.waiting }}
+          }
+        </p>
+      }
+
+      @if (!selectedDate()) {
+        <p class="muted">Kies een lesdag om aanwezigheid te markeren.</p>
+      } @else if (loadingRoster()) {
         <p class="status">Leerlingen laden...</p>
       } @else if (roster().length === 0) {
         <p class="muted">Geen ingeschreven leerlingen voor deze les.</p>
       } @else {
-        <ul class="item-list">
+        <ul class="roster-list">
           @for (student of roster(); track student.id) {
-            <li class="item-card">
-              <div class="item-main">
-                <strong>{{ student.firstname }} {{ student.name }}</strong>
-              </div>
-              <div class="item-actions">
-                <button
-                  type="button"
-                  class="btn-secondary"
-                  [class.btn-primary]="student.present"
-                  (click)="togglePresent(student.id)"
-                >
-                  {{ student.present ? 'Aanwezig' : 'Afwezig' }}
-                </button>
-              </div>
+            <li class="roster-row">
+              <input
+                type="checkbox"
+                [checked]="student.present"
+                (change)="togglePresent(student.id)"
+                [attr.aria-label]="'Aanwezig: ' + student.firstname + ' ' + student.name"
+              />
+              <span class="roster-name">{{ student.firstname }} {{ student.name }}</span>
+              <span class="roster-state" [class.is-present]="student.present">
+                {{ student.present ? 'Aanwezig' : 'Afwezig' }}
+              </span>
             </li>
           }
         </ul>
 
-        <div class="actions">
+        <div class="actions-sticky">
           <button type="button" class="btn-primary" [disabled]="saving()" (click)="save()">
             @if (saving()) { Bezig... } @else { Opslaan }
           </button>

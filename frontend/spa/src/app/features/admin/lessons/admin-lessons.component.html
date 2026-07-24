@@ -13,10 +13,26 @@
     <ul class="item-list">
       @for (lesson of lessons(); track lesson.id) {
         <li class="item-card">
-          <div class="item-main">
+          <a class="item-main item-card-link" [routerLink]="['/teacher/lessons', lesson.id]">
             <strong>{{ lesson.name }}</strong>
             <span class="meta">Schooljaar: {{ lesson.year || '—' }}</span>
-            <span class="meta">Ingeschreven: {{ lesson.enrolled ?? 0 }}</span>
+            <span class="meta">
+              Ingeschreven: <strong>{{ lesson.enrolled ?? 0 }}</strong>
+              @if (lesson.max_students) {
+                / {{ lesson.max_students }}
+              }
+            </span>
+            @if ((lesson.waiting ?? 0) > 0) {
+              <span class="meta status-badge waiting">Wachtlijst: {{ lesson.waiting }}</span>
+            }
+          </a>
+          <div class="item-actions">
+            <a class="btn-secondary small" [routerLink]="['/teacher/lessons', lesson.id]">Details</a>
+            <a
+              class="btn-primary small"
+              [routerLink]="['/teacher/attendance']"
+              [queryParams]="{ lesson: lesson.id }"
+            >Aanwezigheid</a>
           </div>
         </li>
       }

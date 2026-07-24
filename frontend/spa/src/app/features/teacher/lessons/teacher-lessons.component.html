@@ -9,7 +9,7 @@
   } @else if (error()) {
     <div class="alert alert-error">{{ error() }}</div>
   } @else {
-    @if (years().length > 1) {
+    @if (years().length > 0) {
       <div class="actions">
         <select class="year-filter" [value]="selectedYear()" (change)="setYear($event)" aria-label="Filter op schooljaar">
           <option value="">Alle schooljaren</option>
@@ -26,11 +26,11 @@
       <ul class="item-list">
         @for (lesson of filtered(); track lesson.id) {
           <li class="item-card">
-            <div class="item-main">
+            <a class="item-main item-card-link" [routerLink]="['/teacher/lessons', lesson.id]">
               <strong>{{ lesson.name }}</strong>
               <span class="meta">Schooljaar: {{ lesson.year || '—' }}</span>
               <span class="meta">
-                Ingeschreven: {{ lesson.enrolled ?? 0 }}
+                Ingeschreven: <strong>{{ lesson.enrolled ?? 0 }}</strong>
                 @if (lesson.max_students) {
                   / {{ lesson.max_students }}
                 }
@@ -38,10 +38,14 @@
               @if ((lesson.waiting ?? 0) > 0) {
                 <span class="meta status-badge waiting">Wachtlijst: {{ lesson.waiting }}</span>
               }
-            </div>
+            </a>
             <div class="item-actions">
               <a
-                class="btn-primary"
+                class="btn-secondary small"
+                [routerLink]="['/teacher/lessons', lesson.id]"
+              >Details</a>
+              <a
+                class="btn-primary small"
                 [routerLink]="['/teacher/attendance']"
                 [queryParams]="{ lesson: lesson.id }"
               >Aanwezigheid</a>
