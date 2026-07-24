@@ -36,18 +36,7 @@ make -B packages/com_balancirk.zip packages/balancirk.zip pkg_balancirk.zip
 3. Add an English entry to `balancirk_changelog.xml` and a matching block to `balancirk_update.xml`.
 4. Rebuild `pkg_balancirk.zip` (command above). Optionally also build `VERSION.tar.gz` / `VERSION.zip` like previous releases.
 5. Open a PR into `master` (branch is protected: **squash-merge**, no merge commits). After merge, tag `VERSION` on `master` and push the tag — GitHub Actions publishes the release with `pkg_balancirk.zip`.
-6. **Checksum (required to avoid Joomla integrity warning):** after the GitHub release exists, download **that** release asset (Actions rebuilds the zip, so do not hash the local pre-tag zip), then add lowercase hashes to the matching `<update>` block in `balancirk_update.xml`:
-
-```bash
-gh release download VERSION -p pkg_balancirk.zip -D /tmp --clobber
-sha256sum /tmp/pkg_balancirk.zip
-```
-
-```xml
-<sha256>PASTE_HASH_HERE</sha256>
-```
-
-Optional: also `<sha384>` / `<sha512>`. Commit the updated `balancirk_update.xml` to `master` (small follow-up PR). Joomla reads the feed from GitHub raw; without these tags it shows “does not provide a checksum…”.
+6. **Checksum:** the Release workflow hashes the built `pkg_balancirk.zip`, writes `<sha256>` into `balancirk_update.xml`, and opens/squash-merges a follow-up PR to `master`. No manual checksum step is required. Helper script: `scripts/set-update-checksum.sh`.
 
 ## Cursor Cloud specific instructions
 

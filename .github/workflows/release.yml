@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   build-and-release:
@@ -14,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install build tools
         run: sudo apt-get update && sudo apt-get install -y zip make
@@ -31,6 +34,15 @@ jobs:
             exit 1
           fi
 
+      - name: Add sha256 checksum to update feed
+        id: checksum
+        run: |
+          sha256=$(sha256sum pkg_balancirk.zip | cut -d' ' -f1)
+          echo "sha256=${sha256}" >> "$GITHUB_OUTPUT"
+          chmod +x scripts/set-update-checksum.sh
+          ./scripts/set-update-checksum.sh "${GITHUB_REF_NAME}" "${sha256}" balancirk_update.xml
+          echo "Checksum for ${GITHUB_REF_NAME}: ${sha256}"
+
       - name: Create or update GitHub release with package
         env:
           GH_TOKEN: ${{ github.token }}
@@ -42,3 +54,47 @@ jobs:
               --title "${GITHUB_REF_NAME}" \
               --notes "Automated release for ${GITHUB_REF_NAME}. See balancirk_changelog.xml for details."
           fi
+
+      - name: Commit checksum to master via squash PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          version="${GITHUB_REF_NAME}"
+          branch="chore/update-checksum-${version}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet -- balancirk_update.xml; then
+            echo "balancirk_update.xml already has the expected checksum; nothing to commit."
+            exit 0
+          fi
+
+          # Build a linear commit on top of current master (branch protection: no merge commits).
+          git fetch origin master
+          git stash push -u -m "checksum-${version}" -- balancirk_update.xml
+          git checkout -B "${branch}" origin/master
+          git stash pop
+
+          git add balancirk_update.xml
+          git commit -m "chore: add sha256 checksum for ${version}"
+
+          git push -u origin "${branch}" --force
+
+          if gh pr view "${branch}" --json number >/dev/null 2>&1; then
+            pr_url=$(gh pr view "${branch}" --json url -q .url)
+          else
+            pr_url=$(gh pr create \
+              --base master \
+              --head "${branch}" \
+              --title "chore: add sha256 checksum for ${version}" \
+              --body "Adds \`<sha256>\` for release **${version}** to \`balancirk_update.xml\` so Joomla can validate package integrity.
+
+Checksum: \`${{ steps.checksum.outputs.sha256 }}\`
+Generated automatically by the Release workflow.")
+          fi
+
+          gh pr merge "${pr_url}" --squash --delete-branch \
+            --subject "chore: add sha256 checksum for ${version}" \
+            --body "Automated follow-up from the Release workflow."
