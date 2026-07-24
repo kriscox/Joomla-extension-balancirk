@@ -29,9 +29,16 @@
 
   <section class="card">
     <div class="card-title-row">
-      <h2>Mijn leerlingen</h2>
+      <h2>Mijn kinderen</h2>
       <span class="muted">{{ students().length }}</span>
     </div>
+
+    @if (isStaff) {
+      <div class="alert alert-info">
+        Als ouder zie je hier je eigen kinderen. Leerlingen van lessen staan onder
+        <a routerLink="/teacher/lessons">Lessen</a>.
+      </div>
+    }
 
     @if (students().length === 0) {
       <div class="empty-state">

@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 import { MemberApiService } from '../../../core/services/member-api.service';
 import { StudentApiService } from '../../../core/services/student-api.service';
 import { SubscriptionApiService } from '../../../core/services/subscription-api.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { MemberProfile } from '../../../core/models/member.model';
 import { StudentSummary } from '../../../core/models/student.model';
 import { SubscriptionSummary } from '../../../core/models/subscription.model';
@@ -24,6 +25,7 @@ export class MemberDashboardComponent implements OnInit {
   protected readonly students = signal<StudentSummary[]>([]);
   protected readonly subscriptions = signal<SubscriptionSummary[]>([]);
   protected readonly selectedYear = signal('');
+  protected readonly isStaff = inject(AuthService).isTeacher();
 
   protected readonly years = computed(() => {
     const all = [...new Set(this.subscriptions().map((s) => String(s.year ?? '')).filter(Boolean))];
