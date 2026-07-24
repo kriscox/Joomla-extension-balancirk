@@ -337,6 +337,7 @@
 			<downloadurl type="full"
 				format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.3.19/pkg_balancirk.zip</downloadurl>
 		</downloads>
+		<sha256>af3d7e652e6f068a48a6dd05bd1326e409ba88e2d4d78f74efdce4d32138b2b3</sha256>
 		<maintainer>CoCoCo</maintainer>
 		<maintainerurl>http://www.cococo.be</maintainerurl>
 		<targetplatform name="joomla"
