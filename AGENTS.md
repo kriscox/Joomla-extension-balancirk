@@ -15,6 +15,27 @@ The Angular member SPA is developed separately on the `Single-page-site-ontwikke
 ## Conventions
 
 - Write **code comments** and **in-repository documentation** (README sections, inline notes in source) in **English**. User-facing Joomla language strings stay in their locale files.
+- **`balancirk_changelog.xml` entries must be in English.**
+
+## Packages & testing
+
+- For test installs, **only** use root `pkg_balancirk.zip` (never sub-zips alone, never versioned `1.x.y.zip` as the install source).
+- Rebuild without bumping the version:
+
+```bash
+make -B packages/com_balancirk.zip packages/balancirk.zip pkg_balancirk.zip
+```
+
+- Do **not** run `make` / `make all` or `./scripts/version.sh bump` for ordinary fixes or test packages. That bumps the version; version bumps are **release-only** (see below).
+- Joomla `method="upgrade"` does **not** delete files removed from a new zip. If files must disappear on upgrade, add them to `$deleteFiles` / `$deleteFolders` in `components/com_balancirk/script.php` and call `removeFiles()`. Never remove active API files used for presence/attendance (`PresencesController`, routes in `plugins/balancirk/balancirk.php`).
+
+## Releases (master only)
+
+1. Next version = latest **published GitHub release tag** + patch (check `gh release list`; do not trust a higher number already sitting in XML if it was never released).
+2. Set `<version>` in `balancirk.xml`, `pkg_balancirk.xml`, and `components/com_balancirk/balancirk.xml`.
+3. Add an English entry to `balancirk_changelog.xml` and a matching block to `balancirk_update.xml`.
+4. Rebuild `pkg_balancirk.zip` (command above). Optionally also build `VERSION.tar.gz` / `VERSION.zip` like previous releases.
+5. Open a PR into `master` (branch is protected: **squash-merge**, no merge commits). After merge, tag `VERSION` on `master` and push the tag — GitHub Actions publishes the release with `pkg_balancirk.zip`.
 
 ## Cursor Cloud specific instructions
 
@@ -41,20 +62,20 @@ Note: The `composer.json` `cs-check` script targets `src/` which does not exist 
 ### Build
 
 ```bash
-make -B
+make -B packages/com_balancirk.zip packages/balancirk.zip pkg_balancirk.zip
 ```
 
-This forces a full rebuild of the installable Joomla package zip (including sub-packages for the component and plugin). The `-B` flag unconditionally rebuilds all targets.
+Rebuilds the installable Joomla package zip without bumping the version. Use this for test packages.
 
 ### Testing
 
 There are no automated unit/integration tests in this repository. Validation is done via:
 1. `phpcs` linting (PSR-12 standard)
-2. Building the package zip successfully
-3. Installing into a Joomla 4 instance (external)
+2. Building `pkg_balancirk.zip` successfully
+3. Installing **`pkg_balancirk.zip`** into a Joomla 4 test instance (external)
 
 ### Important notes
 
 - The `vendor/` directory is committed to the repo, so `composer install` is fast (no network needed if lock file matches).
 - The `debug` target in `components/com_balancirk/Makefile` deploys to a remote server via SSH — do not use it in cloud environments.
-- Built artifacts (`pkg_balancirk.zip`, `packages/*.zip`) are also committed to the repo; `make` rebuilds them fresh.
+- Built artifacts (`pkg_balancirk.zip`, `packages/*.zip`) are also committed to the repo; rebuild them when shipping a package.
