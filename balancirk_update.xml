@@ -11,6 +11,7 @@
 			<downloadurl type="full"
 				format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.0/com_balancirk.zip</downloadurl>
 		</downloads>
+		<sha256>977c4efc585650f6276ce7d9c6b3767ae460bb9e966b0d6a88da9007b0df6baf</sha256>
 		<maintainer>CoCoCo</maintainer>
 		<maintainerurl>http://www.cococo.be</maintainerurl>
 		<targetplatform name="joomla"
@@ -147,6 +148,7 @@
 			<downloadurl type="full"
 				format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.3.6/pkg_balancirk.zip</downloadurl>
 		</downloads>
+		<sha256>fefce5525ffb25203ed3a4b4100c13819759ecc3bd8947c73cc5d249e4e6eeee</sha256>
 		<maintainer>CoCoCo</maintainer>
 		<maintainerurl>http://www.cococo.be</maintainerurl>
 		<targetplatform name="joomla"
@@ -166,6 +168,7 @@
 			<downloadurl type="full"
 				format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.3.7/pkg_balancirk.zip</downloadurl>
 		</downloads>
+		<sha256>bbcbd38d78a8b7456d1d3e6faf7f9934d708d8e4250931ea0dfb28c1bccda698</sha256>
 		<maintainer>CoCoCo</maintainer>
 		<maintainerurl>http://www.cococo.be</maintainerurl>
 		<targetplatform name="joomla"
@@ -185,6 +188,7 @@
 			<downloadurl type="full"
 				format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.3.8/pkg_balancirk.zip</downloadurl>
 		</downloads>
+		<sha256>00a3c81630efa4bc16e80403a51bbe59d9b7548862bbc2f43a4b81a884ca204e</sha256>
 		<maintainer>CoCoCo</maintainer>
 		<maintainerurl>http://www.cococo.be</maintainerurl>
 		<targetplatform name="joomla"
@@ -204,6 +208,7 @@
 			<downloadurl type="full"
 				format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.3.9/pkg_balancirk.zip</downloadurl>
 		</downloads>
+		<sha256>6e391365f747b76da380abb5c479732de495c11a01053bb21387efe06cf25597</sha256>
 		<maintainer>CoCoCo</maintainer>
 		<maintainerurl>http://www.cococo.be</maintainerurl>
 		<targetplatform name="joomla"
@@ -223,6 +228,7 @@
 			<downloadurl type="full"
 				format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.3.12/pkg_balancirk.zip</downloadurl>
 		</downloads>
+		<sha256>12c5c3fd4fb27e205fe81f7373d8b78643a690c4f259261d6931de05b80a003c</sha256>
 		<maintainer>CoCoCo</maintainer>
 		<maintainerurl>http://www.cococo.be</maintainerurl>
 		<targetplatform name="joomla"
@@ -242,6 +248,7 @@
 			<downloadurl type="full"
 				format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.3.13/pkg_balancirk.zip</downloadurl>
 		</downloads>
+		<sha256>6ab4f4b2dbb87a473e1fc4c6798ec08d2faec47cd0aea809479b7fa3484a12e9</sha256>
 		<maintainer>CoCoCo</maintainer>
 		<maintainerurl>http://www.cococo.be</maintainerurl>
 		<targetplatform name="joomla"
@@ -261,6 +268,7 @@
 			<downloadurl type="full"
 				format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.3.14/pkg_balancirk.zip</downloadurl>
 		</downloads>
+		<sha256>be869364b7334f84053b33cff9f0c491836356d83ba6fc585d705cc5690ddd2d</sha256>
 		<maintainer>CoCoCo</maintainer>
 		<maintainerurl>http://www.cococo.be</maintainerurl>
 		<targetplatform name="joomla"
@@ -280,6 +288,7 @@
 			<downloadurl type="full"
 				format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.3.15/pkg_balancirk.zip</downloadurl>
 		</downloads>
+		<sha256>c84ffa86195bc071c95d3a2ee9ea3b9c5553b35afc089fde811c7822f8d82bf9</sha256>
 		<maintainer>CoCoCo</maintainer>
 		<maintainerurl>http://www.cococo.be</maintainerurl>
 		<targetplatform name="joomla"
@@ -299,6 +308,7 @@
 			<downloadurl type="full"
 				format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.3.16/pkg_balancirk.zip</downloadurl>
 		</downloads>
+		<sha256>bcb1e9dbb0d72aebd4a8750427035df26584e3324cb1c42aeb95f41e9f3e0452</sha256>
 		<maintainer>CoCoCo</maintainer>
 		<maintainerurl>http://www.cococo.be</maintainerurl>
 		<targetplatform name="joomla"
@@ -318,6 +328,7 @@
 			<downloadurl type="full"
 				format="zip">https://github.com/kriscox/Joomla-extension-balancirk/releases/download/1.3.18/pkg_balancirk.zip</downloadurl>
 		</downloads>
+		<sha256>7ee05acb6946d800f6f2f19ae7ea0a4553b95439a011c04be61f3b873f4b1bd0</sha256>
 		<maintainer>CoCoCo</maintainer>
 		<maintainerurl>http://www.cococo.be</maintainerurl>
 		<targetplatform name="joomla"
