@@ -50,14 +50,16 @@ class SubscriptionsController extends ApiController
     public function displayList($data = null)
     {
         $user = Factory::getApplication()->getIdentity();
+        $scope = strtolower((string) $this->input->getCmd('scope', 'mine'));
         $canViewAll = !$user->guest && (
             $user->authorise('students.viewall', 'com_balancirk')
             || $user->authorise('core.admin', 'com_balancirk')
             || $user->authorise('accounting.viewrelations', 'com_balancirk')
         );
 
-        // Member portal: always scope to own children. Admin/accounting: full list.
-        if (!$canViewAll) {
+        // Default is always "own children" (member portal).
+        // Admin screens must pass scope=all explicitly.
+        if ($scope !== 'all' || !$canViewAll) {
             $this->modelState->set(
                 'filter.parent_id',
                 (int) $user->id

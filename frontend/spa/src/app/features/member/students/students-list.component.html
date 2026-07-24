@@ -1,10 +1,11 @@
 <section class="card">
   <div class="card-title-row">
     <h2>Mijn kinderen</h2>
-    @if (!loading()) {
-      <span class="muted">{{ students().length }} leerling(en)</span>
-    }
+    <a class="btn-secondary small" routerLink="/member/dashboard">← Terug</a>
   </div>
+  @if (!loading()) {
+    <p class="muted">{{ students().length }} leerling(en)</p>
+  }
 
   @if (loading()) {
     <p class="status">Bezig met laden...</p>
@@ -18,8 +19,9 @@
         <a routerLink="/teacher/lessons">Lessen</a>@if (isAdmin) { of <a routerLink="/admin/students">Beheer</a>}.
       </div>
     }
-    <div class="actions">
+    <div class="actions actions-row">
       <a class="btn-primary" routerLink="/member/students/new">Leerling toevoegen</a>
+      <a class="btn-secondary" routerLink="/member/dashboard">Naar home</a>
     </div>
 
     @if (students().length === 0) {

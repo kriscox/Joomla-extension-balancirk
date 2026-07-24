@@ -34,7 +34,14 @@ export class SubscriptionsListComponent implements OnInit {
   });
 
   protected readonly filtered = computed(() => {
+    const ownIds = new Set(this.students().map((s) => s.id));
     let list = this.subscriptions();
+
+    // Extra safety: never show other parents' children in the member portal.
+    if (ownIds.size > 0) {
+      list = list.filter((s) => !s.studentid || ownIds.has(Number(s.studentid)));
+    }
+
     const y = this.selectedYear();
     const sid = this.selectedStudentId();
     if (y) list = list.filter((s) => String(s.year) === y);
