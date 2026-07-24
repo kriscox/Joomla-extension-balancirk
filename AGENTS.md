@@ -79,4 +79,4 @@ There are no automated unit/integration tests in this repository. Validation is 
 
 - The `vendor/` directory is committed to the repo, so `composer install` is fast (no network needed if lock file matches).
 - The `debug` target in `components/com_balancirk/Makefile` deploys to a remote server via SSH — do not use it in cloud environments.
-- Built artifacts (`pkg_balancirk.zip`, `packages/*.zip`) are also committed to the repo; rebuild them when shipping a package.
+- Build zips (`pkg_balancirk.zip`, `packages/*.zip`, `*.tar.gz`) are gitignored; build them locally for tests, publish via GitHub Releases.
