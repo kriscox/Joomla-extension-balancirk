@@ -72,28 +72,25 @@ class HtmlView extends BaseHtmlView
         $this->form = $this->get('Form');
         $this->item = $this->get('Item');
 
-        // SPA layouts delegate all data loading to the Angular app via REST API.
-        if ($tpl !== 'spa' && $tpl !== 'spaadmin') {
-            /** @var MVCFactoryInterface $factory */
-            $factory = Factory::getApplication()
-                ->bootComponent('com_balancirk')
-                ->getMVCFactory();
+        /** @var MVCFactoryInterface $factory */
+        $factory = Factory::getApplication()
+            ->bootComponent('com_balancirk')
+            ->getMVCFactory();
 
-            $studentsModel     = $factory->createModel('Students', 'Site');
-            $subscriptionsModel = $factory->createModel('Subscriptions', 'Site');
+        $studentsModel     = $factory->createModel('Students', 'Site');
+        $subscriptionsModel = $factory->createModel('Subscriptions', 'Site');
 
-            $app = Factory::getApplication();
-            $selectedYear = $app->input->getString('filter_year', '');
+        $app = Factory::getApplication();
+        $selectedYear = $app->input->getString('filter_year', '');
 
-            if ($selectedYear !== '') {
-                $subscriptionsModel->setState('filter.year', $selectedYear);
-            }
-
-            $this->students      = $studentsModel->getItems();
-            $this->subscriptions = $subscriptionsModel->getItems();
-            $this->years         = $subscriptionsModel->getYears();
-            $this->selectedYear  = $subscriptionsModel->getState('filter.year');
+        if ($selectedYear !== '') {
+            $subscriptionsModel->setState('filter.year', $selectedYear);
         }
+
+        $this->students      = $studentsModel->getItems();
+        $this->subscriptions = $subscriptionsModel->getItems();
+        $this->years         = $subscriptionsModel->getYears();
+        $this->selectedYear  = $subscriptionsModel->getState('filter.year');
 
         if (count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);

@@ -43,7 +43,6 @@
 		destination="com_balancirk">
 		<folder>js</folder>
 		<folder>css</folder>
-		<folder>member-spa</folder>
 	</media>
 
 	<positions>

@@ -36,7 +36,6 @@ $app = Factory::getApplication();
 
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $app->getDocument()->getWebAssetManager();
-$wa->registerAndUseScript('balancirk-spa-navigation', 'media/com_balancirk/js/balancirk_spa_navigation.js');
 $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
     ->registerAndUseScript('chart.js', 'https://cdn.jsdelivr.net/npm/chart.js')
     ->registerAndUseScript('chartjs-adapter-date-fns.js', 'https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js')
@@ -119,12 +118,12 @@ $teached_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=teach
 		</div>
 	</div>
 	<div class="balancirk_presence">
-		<button type="button" class="balancirk_presence_button" onclick="BalancirkSpaNavigation.navigate('<?= $presence_url ?>')" style="width: auto;">
+		<a class="balancirk_presence_button" href="<?= $presence_url ?>" style="width: auto;">
 			<?= Text::_('COM_BALANCIRK_LESSON_PRESENCE') ?>
-		</button>
-		<button type="button" class="balancirk_presence_button" onclick="BalancirkSpaNavigation.navigate('<?= $teached_url ?>')" style="width: auto;">
+		</a>
+		<a class="balancirk_presence_button" href="<?= $teached_url ?>" style="width: auto;">
 			<?= Text::_('COM_BALANCIRK_LESSON_TEACHED') ?>
-		</button>
+		</a>
 	</div>
 	<div>
 		<?= HTMLHelper::_('uitab.startTabSet', 'myTab', array('active' => 'students')); ?>
