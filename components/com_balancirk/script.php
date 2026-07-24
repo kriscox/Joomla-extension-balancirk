@@ -48,6 +48,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
      * @since  1.3.22
      */
     protected $deleteFiles = [
+        // Angular SPA layouts + assets
         '/components/com_balancirk/tmpl/member/spa.php',
         '/components/com_balancirk/tmpl/member/spa.xml',
         '/components/com_balancirk/tmpl/member/spaadmin.php',
@@ -57,6 +58,18 @@ class Com_BalancirkInstallerScript extends InstallerScript
         '/media/com_balancirk/js/balancirk_sw.js',
         '/media/com_balancirk/manifest.webmanifest',
         '/media/com_balancirk/images/pwa-icon.svg',
+        // Renamed / accidental leftovers on site
+        '/components/com_balancirk/layouts/student/edit_state.php',
+        '/components/com_balancirk/src/Controller/DisplayController copy.php',
+        '/components/com_balancirk/src/Controller/com_balancirk.code-workspace',
+        // Obsolete singular API controllers (replaced by plural Members/Students)
+        '/api/components/com_balancirk/src/Controller/MemberController.php',
+        '/api/components/com_balancirk/src/Controller/StudentController.php',
+        '/api/components/com_balancirk/src/View/Lessons/JsonapiView.php',
+        '/api/components/com_balancirk/src/View/member/JsonapiView.php',
+        '/api/components/com_balancirk/src/View/student/JsonapiView.php',
+        // Dev artifact incorrectly shipped in older packages
+        '/administrator/components/com_balancirk/Makefile',
     ];
 
     /**
@@ -67,6 +80,9 @@ class Com_BalancirkInstallerScript extends InstallerScript
      */
     protected $deleteFolders = [
         '/media/com_balancirk/member-spa',
+        '/api/components/com_balancirk/src/View/Lessons',
+        '/api/components/com_balancirk/src/View/member',
+        '/api/components/com_balancirk/src/View/student',
     ];
 
     /**
