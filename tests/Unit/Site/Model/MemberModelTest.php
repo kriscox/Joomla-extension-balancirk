@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for member additional-field handling.
  *
- * @since  1.3.16
+ * @since  1.3.17
  */
 class MemberModelTest extends TestCase
 {

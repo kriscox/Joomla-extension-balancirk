@@ -24,6 +24,7 @@ use Joomla\CMS\Application\SiteApplication;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\Database\ParameterType;
 
 /**
  * Member model for the Joomla Balancirk component.
@@ -280,10 +281,8 @@ class MemberModel extends AdminModel
         } catch (\Exception $e) {
             $app->enqueueMessage(
                 Text::_('COM_BALANCIRK_USER_ERROR') . Text::sprintf('COM_BALANCIRK_REGISTRATION_EMAIL_ERROR', $e->getMessage()),
-                'error'
+                'warning'
             );
-
-            return false;
         }
 
         return true;
@@ -319,9 +318,80 @@ class MemberModel extends AdminModel
             return false;
         }
 
-        $this->saveToTable((int) $data['id'], $data);
+        $memberId = (int) $data['id'];
+        $this->saveToTable($memberId, $data, !$this->hasAdditionalRecord($memberId));
 
         return true;
+    }
+
+    /**
+     * Check whether a member has a row in members_additional.
+     *
+     * @param   int  $userId  Joomla user id.
+     *
+     * @return  bool
+     *
+     * @since   1.3.17
+     */
+    public function hasAdditionalRecord(int $userId): bool
+    {
+        if ($userId <= 0) {
+            return false;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('1')
+            ->from($db->quoteName('#__balancirk_members_additional'))
+            ->where($db->quoteName('id') . ' = :userId')
+            ->bind(':userId', $userId, ParameterType::INTEGER);
+        $db->setQuery($query);
+
+        return (bool) $db->loadResult();
+    }
+
+    /**
+     * Ensure members_additional contains a row for the given Joomla user.
+     *
+     * @param   int  $userId  Joomla user id.
+     *
+     * @return  bool  True when the row exists or was created.
+     *
+     * @since   1.3.17
+     */
+    public function ensureAdditionalRecord(int $userId): bool
+    {
+        if ($userId <= 0) {
+            return false;
+        }
+
+        if ($this->hasAdditionalRecord($userId)) {
+            return true;
+        }
+
+        $user = Factory::getUser($userId);
+
+        if ($user->guest || (int) $user->id !== $userId) {
+            return false;
+        }
+
+        $data = [
+            'firstname' => trim((string) $user->name) !== '' ? trim((string) $user->name) : (string) $user->username,
+            'street' => '',
+            'number' => '',
+            'bus' => '',
+            'postcode' => '',
+            'city' => '',
+            'phone' => '',
+        ];
+
+        try {
+            $this->saveToTable($userId, $data, true);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return $this->hasAdditionalRecord($userId);
     }
 
     /**

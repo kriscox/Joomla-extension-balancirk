@@ -16,6 +16,12 @@ This is NOT a standalone application. It requires installation into a Joomla 4 C
 
 ## Cursor Cloud specific instructions
 
+Cloud Agents refresh dependencies via `.cursor/environment.json`, which runs:
+
+```bash
+bash scripts/cloud-agent-install.sh
+```
+
 ### Prerequisites (installed by cloud agent install script)
 
 - PHP 8.3+ with extensions: cli, xml, mbstring, tokenizer, zip
@@ -23,7 +29,7 @@ This is NOT a standalone application. It requires installation into a Joomla 4 C
 - GNU Make + zip (for building packages)
 - Node.js 22+ / npm (for Angular member-spa frontend)
 
-The cloud environment install command is defined in `.cursor/environment.json` and runs `scripts/cloud-agent-install.sh`. That script installs PHP dependencies with Composer and installs the member SPA npm packages when they are not already present.
+That script installs PHP dependencies with Composer and installs the member SPA npm packages when they are not already present.
 
 ### Lint
 

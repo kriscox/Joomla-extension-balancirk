@@ -48,6 +48,13 @@ class HtmlView extends BaseHtmlView
     protected $students;
 
     /**
+     * The waiting list for this lesson
+     *
+     * @var  array  list of students on the waiting list
+     */
+    protected $waitingListStudents;
+
+    /**
      *
      * The teachers list
      *
@@ -103,6 +110,7 @@ class HtmlView extends BaseHtmlView
         $this->form = $this->get('Form');
         $this->item = $this->get('Item');
         $this->students = $this->get('Students');
+        $this->waitingListStudents = $this->get('WaitingListStudents');
         $this->state = $this->get('State');
         $this->lesdays = LessonModel::getLesdays($this->item->lesdays);
         $this->presences = $this->get('Presences');

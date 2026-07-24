@@ -272,18 +272,30 @@ class StudentModel extends AdminModel
                 $this->setError(Text::_('COM_BALANCIRK_ERROR_NOT_PRIMARY_PARENT'));
                 return false;
             }
+        } elseif ($studentId <= 0) {
+            $parentId = (int) Factory::getApplication()->getIdentity()->id;
+
+            /** @var MemberModel $memberModel */
+            $memberModel = $this->getMVCFactory()->createModel('Member', 'Site', ['ignore_request' => true]);
+
+            if (!$memberModel || !$memberModel->ensureAdditionalRecord($parentId)) {
+                $this->setError(Text::_('COM_BALANCIRK_ERROR_MEMBER_PROFILE_MISSING'));
+                return false;
+            }
         }
 
         // If save is successfull and this is a new student than fill the user as primairy parent
         if (parent::save($data)) {
             if ($this->state->get("student.new")) {
+                $parentId = (int) Factory::getApplication()->getIdentity()->id;
+
                 $columns = array('child', 'parent', 'primary');
 
                 // Get the new student.id
                 $values = array($this->state->get('student.id'));
 
                 // Get the current user id as parent
-                array_push($values, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
+                array_push($values, $parentId);
 
                 // Set the parent as primairy
                 array_push($values, 1);

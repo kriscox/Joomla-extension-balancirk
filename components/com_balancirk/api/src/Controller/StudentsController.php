@@ -4,6 +4,7 @@ namespace CoCoCo\Component\Balancirk\Api\Controller;
 
 defined('_JEXEC') or die;
 
+use CoCoCo\Component\Balancirk\Site\Model\MemberModel as SiteMemberModel;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\ApiController;
@@ -177,6 +178,12 @@ class StudentsController extends ApiController
             return;
         }
 
+        $memberModel = $this->getSiteMemberModel();
+
+        if (!$memberModel->ensureAdditionalRecord($parentId)) {
+            throw new \RuntimeException(Text::_('COM_BALANCIRK_ERROR_MEMBER_PROFILE_MISSING'), 400);
+        }
+
         /** @var DatabaseInterface $db */
         $db = Factory::getContainer()->get(DatabaseInterface::class);
         $query = $db->getQuery(true)
@@ -256,5 +263,23 @@ class StudentsController extends ApiController
             $data['com_fields'][$field->name] = $data[$field->name];
             unset($data[$field->name]);
         }
+    }
+
+    /**
+     * Create the site member model.
+     *
+     * @return  SiteMemberModel
+     *
+     * @since   1.3.17
+     */
+    private function getSiteMemberModel(): SiteMemberModel
+    {
+        $model = $this->getMVCFactory()->createModel('Member', 'Site', ['ignore_request' => true]);
+
+        if (!$model instanceof SiteMemberModel) {
+            throw new \RuntimeException(Text::_('JLIB_APPLICATION_ERROR_MODEL_CREATE'));
+        }
+
+        return $model;
     }
 }

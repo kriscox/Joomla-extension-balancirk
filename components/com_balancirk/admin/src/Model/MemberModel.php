@@ -208,7 +208,7 @@ class MemberModel extends AdminModel
      *
      * @return  boolean
      *
-     * @since   1.3.16
+     * @since   1.3.17
      */
     public function save($data)
     {

@@ -144,10 +144,12 @@
 	<changelog>
 		<element>pkg_balancirk</element>
 		<type>package</type>
-		<version>1.3.17</version>
+		<version>1.3.18</version>
 		<fix>
-			<item>Fixed member registration not saving address and contact details to the members_additional table, which left new accounts missing from the member overview.</item>
-			<item>Aligned Angular member SPA dependencies so cloud and local npm installs no longer fail with peer dependency conflicts.</item>
+			<item>Fixed MySQL foreign key error 1452 when creating a student: ensure a member profile exists in #__balancirk_members_additional before linking the parent.</item>
+			<item>Fixed member registration leaving Joomla users without a row in #__balancirk_members_additional when optional address fields were missing under PHP 8.</item>
+			<item>Registration now uses saveToTable() with safe defaults; failed profile inserts roll back the orphan Joomla user.</item>
+			<item>Activation email failures are now warnings only after the account and profile were saved successfully.</item>
 		</fix>
 	</changelog>
 </changelogs>
