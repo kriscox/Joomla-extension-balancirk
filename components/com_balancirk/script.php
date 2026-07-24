@@ -44,8 +44,11 @@ class Com_BalancirkInstallerScript extends InstallerScript
      * Joomla upgrades do not delete files that disappeared from the zip, so these
      * must be removed explicitly during update/postflight.
      *
+     * Note: do not list active API controllers/views here (e.g. presence/teacher
+     * endpoints). Only remove confirmed SPA leftovers and accidental junk.
+     *
      * @var    string[]
-     * @since  1.3.22
+     * @since  1.3.20
      */
     protected $deleteFiles = [
         // Angular SPA layouts + assets
@@ -58,17 +61,10 @@ class Com_BalancirkInstallerScript extends InstallerScript
         '/media/com_balancirk/js/balancirk_sw.js',
         '/media/com_balancirk/manifest.webmanifest',
         '/media/com_balancirk/images/pwa-icon.svg',
-        // Renamed / accidental leftovers on site
+        // Accidental leftovers (not part of the API)
         '/components/com_balancirk/layouts/student/edit_state.php',
         '/components/com_balancirk/src/Controller/DisplayController copy.php',
         '/components/com_balancirk/src/Controller/com_balancirk.code-workspace',
-        // Obsolete singular API controllers (replaced by plural Members/Students)
-        '/api/components/com_balancirk/src/Controller/MemberController.php',
-        '/api/components/com_balancirk/src/Controller/StudentController.php',
-        '/api/components/com_balancirk/src/View/Lessons/JsonapiView.php',
-        '/api/components/com_balancirk/src/View/member/JsonapiView.php',
-        '/api/components/com_balancirk/src/View/student/JsonapiView.php',
-        // Dev artifact incorrectly shipped in older packages
         '/administrator/components/com_balancirk/Makefile',
     ];
 
@@ -76,13 +72,10 @@ class Com_BalancirkInstallerScript extends InstallerScript
      * Obsolete folders removed from the package (paths relative to JPATH_ROOT).
      *
      * @var    string[]
-     * @since  1.3.22
+     * @since  1.3.20
      */
     protected $deleteFolders = [
         '/media/com_balancirk/member-spa',
-        '/api/components/com_balancirk/src/View/Lessons',
-        '/api/components/com_balancirk/src/View/member',
-        '/api/components/com_balancirk/src/View/student',
     ];
 
     /**
@@ -219,7 +212,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
      *
      * @return  void
      *
-     * @since   1.3.22
+     * @since   1.3.20
      */
     private function removeObsoleteSpaArtifacts(): void
     {
