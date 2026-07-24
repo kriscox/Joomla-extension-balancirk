@@ -34,15 +34,19 @@
       @if (userName) {
         <p class="more-user">{{ userName }}</p>
       }
-      @if (isTeacher) {
-        <a class="more-link" routerLink="/member/dashboard" routerLinkActive="active" (click)="closeMore()">Ledenportaal</a>
+
+      @if (isAdmin) {
+        <a class="more-link" routerLink="/accounting/export" routerLinkActive="active" (click)="closeMore()">Exporteren</a>
+        <a class="more-link" routerLink="/member/students" routerLinkActive="active" (click)="closeMore()">Mijn kinderen</a>
+        <a class="more-link" routerLink="/member/subscriptions" routerLinkActive="active" (click)="closeMore()">Mijn inschrijvingen</a>
+      } @else if (isAccountant) {
+        <a class="more-link" routerLink="/member/students" routerLinkActive="active" (click)="closeMore()">Mijn kinderen</a>
+        <a class="more-link" routerLink="/member/subscriptions" routerLinkActive="active" (click)="closeMore()">Mijn inschrijvingen</a>
+      } @else if (isTeacher) {
         <a class="more-link" routerLink="/member/students" routerLinkActive="active" (click)="closeMore()">Mijn kinderen</a>
         <a class="more-link" routerLink="/member/subscriptions" routerLinkActive="active" (click)="closeMore()">Mijn inschrijvingen</a>
       }
-      @if (isAdmin) {
-        <a class="more-link" routerLink="/accounting/export" routerLinkActive="active" (click)="closeMore()">Exporteren</a>
-        <a class="more-link" routerLink="/teacher/lessons" routerLinkActive="active" (click)="closeMore()">Lessen</a>
-      }
+
       <a class="more-link" routerLink="/member/profile" routerLinkActive="active" (click)="closeMore()">Profiel wijzigen</a>
       <a class="more-link" routerLink="/member/messages" routerLinkActive="active" (click)="closeMore()">Berichten</a>
       @if (newsletterUrl) {

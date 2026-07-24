@@ -26,6 +26,7 @@ export class LessonApiService {
           enrolled: Number(lesson.numberOfStudents ?? lesson.enrolled ?? 0),
           waiting: Number(lesson.numberOnWaitingList ?? lesson.waiting ?? 0),
           max_students: Number(lesson.max_students ?? 0),
+          lesdays: Number(lesson.lesdays ?? 0),
         })),
       ),
     );
@@ -34,7 +35,24 @@ export class LessonApiService {
   getLesson(id: number): Observable<LessonDetail> {
     return this.http
       .get<JsonApiResponse<LessonDetail>>(`${this.base}/lessons/${id}`)
-      .pipe(map((r) => extractItem(r.data as JsonApiItem<LessonDetail>)));
+      .pipe(
+        map((r) => {
+          const lesson = extractItem(r.data as JsonApiItem<LessonDetail>);
+          return {
+            ...lesson,
+            id: Number(lesson.id ?? id),
+            name: lesson.name ?? '',
+            year: lesson.year ?? '',
+            start: lesson.start ?? lesson.startdate ?? '',
+            end: lesson.end ?? lesson.enddate ?? '',
+            enrolled: Number(lesson.numberOfStudents ?? lesson.enrolled ?? 0),
+            waiting: Number(lesson.numberOnWaitingList ?? lesson.waiting ?? 0),
+            max_students: Number(lesson.max_students ?? 0),
+            lesdays: Number(lesson.lesdays ?? 0),
+            description: lesson.description ?? '',
+          };
+        }),
+      );
   }
 
   createLesson(data: Partial<LessonDetail>): Observable<LessonDetail> {
