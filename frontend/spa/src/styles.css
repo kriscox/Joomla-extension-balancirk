@@ -92,6 +92,16 @@ h2 { margin: 0; font-size: 1.1rem; }
 .alert-success { background: #e9f7ef; color: #215f3a; border: 1px solid #b7e1c7; }
 .alert-info    { background: #f4f8f7; color: #1f3c38; border: 1px solid #d5e4e0; }
 
+.empty-state {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+}
+
+.empty-state p {
+  margin: 0;
+}
+
 /* ── Forms ──────────────────────────────────────────────── */
 .grid {
   display: grid;

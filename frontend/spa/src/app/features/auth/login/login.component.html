@@ -2,6 +2,7 @@
   <h2>Aanmelden</h2>
   <p>Meld je aan om je Balancirk-gegevens te bekijken.</p>
   <button type="button" class="btn-primary" (click)="login()">Naar aanmelden</button>
+  <a class="link-secondary" routerLink="/register">Nog geen account? Registreer</a>
   @if (resetUrl) {
     <a class="link-secondary" [href]="resetUrl">Wachtwoord vergeten?</a>
   }

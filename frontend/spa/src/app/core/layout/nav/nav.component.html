@@ -35,6 +35,7 @@
         <p class="more-user">{{ userName }}</p>
       }
       <a class="more-link" routerLink="/member/profile" routerLinkActive="active" (click)="closeMore()">Profiel wijzigen</a>
+      <a class="more-link" routerLink="/member/messages" routerLinkActive="active" (click)="closeMore()">Berichten</a>
       @if (newsletterUrl) {
         <a class="more-link" [href]="newsletterUrl" (click)="closeMore()">Nieuwsbrieven</a>
       }

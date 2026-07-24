@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
-import { LessonPresenceSummary, TeacherEntry } from '../models/presence.model';
+import { LessonPresenceSummary } from '../models/presence.model';
 import { JoomlaResponse } from './json-api.utils';
 
 @Injectable({ providedIn: 'root' })
@@ -17,27 +17,43 @@ export class PresenceApiService {
     const url = date
       ? `${this.base}/presence/${lessonId}/${date}`
       : `${this.base}/presence/${lessonId}`;
-    return this.http
-      .get<JoomlaResponse<LessonPresenceSummary>>(url)
-      .pipe(map(r => r.data ?? (r as unknown as LessonPresenceSummary)));
+    return this.http.get<JoomlaResponse<LessonPresenceSummary>>(url).pipe(
+      map((r) => {
+        const data = r.data ?? (r as unknown as LessonPresenceSummary);
+        return {
+          lesson: Number(data.lesson ?? lessonId),
+          date: String(data.date ?? date ?? ''),
+          students: Array.isArray(data.students) ? data.students.map(Number) : [],
+          roster: Array.isArray(data.roster)
+            ? data.roster.map((row) => ({
+                id: Number(row.id ?? 0),
+                firstname: String(row.firstname ?? ''),
+                name: String(row.name ?? ''),
+                present: Boolean(row.present),
+              }))
+            : [],
+        };
+      }),
+    );
   }
 
-  setPresence(lessonId: number, entries: { student: number; date: string; present: boolean }[]): Observable<void> {
+  setPresence(lessonId: number, date: string, studentIds: number[]): Observable<LessonPresenceSummary> {
     return this.http
-      .post<void>(`${this.base}/presence/${lessonId}`, { entries });
-  }
-
-  getTeachers(lessonId: number, date?: string): Observable<TeacherEntry[]> {
-    const url = date
-      ? `${this.base}/teacher/${lessonId}/${date}`
-      : `${this.base}/teacher/${lessonId}`;
-    return this.http
-      .get<JoomlaResponse<TeacherEntry[]>>(url)
-      .pipe(map(r => (Array.isArray(r.data) ? r.data : [])));
-  }
-
-  setTeacher(lessonId: number, entries: TeacherEntry[]): Observable<void> {
-    return this.http
-      .post<void>(`${this.base}/teacher/${lessonId}`, { entries });
+      .post<JoomlaResponse<LessonPresenceSummary>>(`${this.base}/presence/${lessonId}`, {
+        lesson: lessonId,
+        date,
+        students: studentIds,
+      })
+      .pipe(
+        map((r) => {
+          const data = r.data ?? (r as unknown as LessonPresenceSummary);
+          return {
+            lesson: Number(data.lesson ?? lessonId),
+            date: String(data.date ?? date),
+            students: Array.isArray(data.students) ? data.students.map(Number) : studentIds,
+            roster: Array.isArray(data.roster) ? data.roster : [],
+          };
+        }),
+      );
   }
 }

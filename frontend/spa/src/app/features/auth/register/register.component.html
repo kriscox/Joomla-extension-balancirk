@@ -1,0 +1,83 @@
+<section class="card register-card">
+  <div class="card-title-row">
+    <h2>Registreren</h2>
+    <a class="btn-secondary small" routerLink="/login">Aanmelden</a>
+  </div>
+
+  @if (success()) {
+    <div class="alert alert-success">{{ success() }}</div>
+    <div class="actions">
+      <button type="button" class="btn-primary" (click)="goLogin()">Naar aanmelden</button>
+    </div>
+  } @else {
+    @if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="grid">
+        <label>
+          Voornaam <span class="required">*</span>
+          <input formControlName="firstname" autocomplete="given-name"
+                 [class.invalid]="form.controls.firstname.invalid && form.controls.firstname.touched" />
+        </label>
+        <label>
+          Achternaam <span class="required">*</span>
+          <input formControlName="name" autocomplete="family-name"
+                 [class.invalid]="form.controls.name.invalid && form.controls.name.touched" />
+        </label>
+        <label>
+          Gebruikersnaam <span class="required">*</span>
+          <input formControlName="username" autocomplete="username"
+                 [class.invalid]="form.controls.username.invalid && form.controls.username.touched" />
+        </label>
+        <label>
+          E-mail <span class="required">*</span>
+          <input type="email" formControlName="email" autocomplete="email"
+                 [class.invalid]="form.controls.email.invalid && form.controls.email.touched" />
+        </label>
+        <label>
+          Telefoon
+          <input formControlName="phone" autocomplete="tel" />
+        </label>
+        <label>
+          Straat
+          <input formControlName="street" autocomplete="address-line1" />
+        </label>
+        <label>
+          Nummer
+          <input formControlName="number" />
+        </label>
+        <label>
+          Bus
+          <input formControlName="bus" />
+        </label>
+        <label>
+          Postcode
+          <input formControlName="postcode" autocomplete="postal-code" />
+        </label>
+        <label>
+          Gemeente
+          <input formControlName="city" autocomplete="address-level2" />
+        </label>
+        <label>
+          Wachtwoord <span class="required">*</span>
+          <input type="password" formControlName="password" autocomplete="new-password"
+                 [class.invalid]="form.controls.password.invalid && form.controls.password.touched" />
+        </label>
+        <label>
+          Herhaal wachtwoord <span class="required">*</span>
+          <input type="password" formControlName="password2" autocomplete="new-password"
+                 [class.invalid]="form.controls.password2.invalid && form.controls.password2.touched" />
+        </label>
+      </div>
+
+      <div class="actions actions-row">
+        <button type="submit" [disabled]="saving()">
+          @if (saving()) { Bezig... } @else { Account aanmaken }
+        </button>
+        <a class="btn-secondary" routerLink="/login">Annuleren</a>
+      </div>
+    </form>
+  }
+</section>

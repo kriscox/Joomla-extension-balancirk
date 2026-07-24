@@ -42,6 +42,19 @@
       <dd>{{ student()?.allow_photo ? 'Ja' : 'Nee' }}</dd>
     </dl>
 
+    <div class="actions actions-row">
+      <a
+        class="btn-primary"
+        [routerLink]="['/member/subscriptions']"
+        [queryParams]="{ student: student()?.id }"
+      >Inschrijvingen bekijken</a>
+      <a
+        class="btn-secondary"
+        [routerLink]="['/member/subscriptions/new']"
+        [queryParams]="{ student: student()?.id }"
+      >Nieuwe inschrijving</a>
+    </div>
+
     <p class="muted note">
       Je kunt deze leerling niet bewerken omdat jij geen primaire contactpersoon bent.
     </p>

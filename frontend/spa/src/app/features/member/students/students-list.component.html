@@ -16,7 +16,10 @@
     </div>
 
     @if (students().length === 0) {
-      <p class="muted">Er zijn nog geen gekoppelde leerlingen gevonden.</p>
+      <div class="empty-state">
+        <p class="muted">Er zijn nog geen gekoppelde leerlingen gevonden.</p>
+        <a class="btn-primary" routerLink="/member/students/new">Eerste leerling toevoegen</a>
+      </div>
     } @else {
       <ul class="item-list">
         @for (student of students(); track student.id) {
@@ -38,11 +41,16 @@
               }
             </div>
             <div class="item-actions">
-              @if (student.isPrimary === 1 || student.isPrimary === undefined) {
+              @if (student.isPrimary === 1) {
                 <a class="btn-secondary" [routerLink]="['/member/students', student.id, 'edit']">Bewerken</a>
               } @else {
                 <a class="btn-secondary" [routerLink]="['/member/students', student.id]">Bekijken</a>
               }
+              <a
+                class="btn-secondary"
+                [routerLink]="['/member/subscriptions']"
+                [queryParams]="{ student: student.id }"
+              >Inschrijvingen</a>
             </div>
           </li>
         }

@@ -17,7 +17,11 @@
     }
 
     <div class="actions actions-row">
-      <a class="btn-primary" routerLink="/member/subscriptions/new">Nieuwe inschrijving</a>
+      <a
+        class="btn-primary"
+        routerLink="/member/subscriptions/new"
+        [queryParams]="selectedStudentId() ? { student: selectedStudentId() } : {}"
+      >Nieuwe inschrijving</a>
       @if (students().length > 1) {
         <select class="year-filter" [value]="selectedStudentId()" (change)="setStudent($event)" aria-label="Filter op leerling">
           <option value="0">Alle leerlingen</option>
@@ -37,9 +41,12 @@
     </div>
 
     @if (subscriptions().length === 0) {
-      <p class="muted">Nog geen inschrijvingen gevonden.</p>
+      <div class="empty-state">
+        <p class="muted">Nog geen inschrijvingen gevonden.</p>
+        <a class="btn-primary" routerLink="/member/subscriptions/new">Inschrijven voor een les</a>
+      </div>
     } @else if (filtered().length === 0) {
-      <p class="muted">Geen inschrijvingen voor dit schooljaar.</p>
+      <p class="muted">Geen inschrijvingen voor deze filter.</p>
     } @else {
       <ul class="item-list">
         @for (sub of filtered(); track sub.id) {
@@ -55,13 +62,16 @@
               </span>
             </div>
             <div class="item-actions">
+              @if (sub.studentid) {
+                <a class="btn-secondary" [routerLink]="['/member/students', sub.studentid]">Leerling</a>
+              }
               <button
                 class="btn-danger"
-                (click)="deleteSubscription(sub.id)"
+                (click)="deleteSubscription(sub)"
                 [disabled]="deletingId() === sub.id"
                 type="button"
               >
-                @if (deletingId() === sub.id) { Bezig... } @else { Verwijderen }
+                @if (deletingId() === sub.id) { Bezig... } @else { Uitschrijven }
               </button>
             </div>
           </li>

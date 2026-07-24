@@ -47,6 +47,16 @@ export class StudentApiService {
       .pipe(map(r => extractItem(r.data as JsonApiItem<Student>)));
   }
 
+  getStudents(): Observable<StudentSummary[]> {
+    return this.http
+      .get<JsonApiResponse<StudentSummary>>(`${this.base}/students`)
+      .pipe(
+        map((r) =>
+          extractList(r).map((s) => this.normalizeStudentSummary(s as StudentSummary & { is_primary?: number | string })),
+        ),
+      );
+  }
+
   createStudent(data: StudentWrite): Observable<Student> {
     return this.http
       .post<JsonApiResponse<Student>>(
@@ -65,7 +75,8 @@ export class StudentApiService {
       .pipe(map(r => extractItem(r.data as JsonApiItem<Student>)));
   }
 
-  private normalizeStudentSummary(s: StudentSummary): StudentSummary {
+  private normalizeStudentSummary(s: StudentSummary & { is_primary?: number | string }): StudentSummary {
+    const rawPrimary = s.isPrimary ?? s.is_primary;
     return {
       ...s,
       id: Number(s.id ?? 0),
@@ -74,6 +85,7 @@ export class StudentApiService {
       birthdate: s.birthdate ?? '',
       mutuality: s.mutuality ?? '',
       uitpas: s.uitpas ?? '',
+      isPrimary: rawPrimary === undefined || rawPrimary === null ? 0 : Number(rawPrimary),
     };
   }
 }

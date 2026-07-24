@@ -1,9 +1,28 @@
 <section class="card">
   <div class="card-title-row">
     <h2>Inschrijvingen</h2>
-    <a class="btn-secondary small" routerLink="/admin">← Overzicht</a>
+    <a class="btn-secondary small" routerLink="/admin">← Beheer</a>
   </div>
-  <div class="alert alert-info">
-    Dit scherm is in ontwikkeling. Overzicht van alle inschrijvingen en wachtlijsten.
-  </div>
+  @if (loading()) {
+    <p class="status">Bezig met laden...</p>
+  } @else if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else if (subscriptions().length === 0) {
+    <p class="muted">Geen inschrijvingen gevonden.</p>
+  } @else {
+    <ul class="item-list">
+      @for (sub of subscriptions(); track sub.id) {
+        <li class="item-card">
+          <div class="item-main">
+            <strong>{{ sub.lesson }}</strong>
+            <span class="meta">{{ sub.firstname }} {{ sub.name }}</span>
+            <span class="meta">{{ sub.year }}</span>
+            <span class="meta status-badge" [class.waiting]="sub.subscribed === 1">
+              {{ stateLabel(sub.subscribed) }}
+            </span>
+          </div>
+        </li>
+      }
+    </ul>
+  }
 </section>
