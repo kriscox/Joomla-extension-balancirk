@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
@@ -20,24 +20,11 @@ export class SubscriptionApiService {
   }
 
   getMySubscriptions(): Observable<SubscriptionSummary[]> {
-    return this.http
-      .get<JsonApiResponse<SubscriptionSummary>>(`${this.base}/subscriptions`)
-      .pipe(
-        map(r =>
-          extractList(r).map(s => ({
-            ...s,
-            id: Number(s.id ?? 0),
-            studentid: Number(s.studentid ?? 0) || undefined,
-            lesson: s.lesson ?? '',
-            year: s.year ?? '',
-            subscribed: Number(s.subscribed ?? 0),
-          })),
-        ),
-      );
+    return this.fetchSubscriptions('mine');
   }
 
   getAllSubscriptions(): Observable<SubscriptionSummary[]> {
-    return this.getMySubscriptions();
+    return this.fetchSubscriptions('all');
   }
 
   getOpenLessonsForStudent(studentId: number): Observable<OpenLessonsPayload> {
@@ -46,7 +33,7 @@ export class SubscriptionApiService {
         `${this.base}/subscriptions/open-lessons/${studentId}`,
       )
       .pipe(
-        map(r => {
+        map((r) => {
           const payload = r.data ?? (r as unknown as OpenLessonsPayload);
           return {
             lessons: Array.isArray(payload.lessons) ? payload.lessons : [],
@@ -59,12 +46,11 @@ export class SubscriptionApiService {
 
   createSubscription(studentId: number, lessonId: number): Observable<SubscriptionSummary> {
     return this.http
-      .post<JsonApiResponse<SubscriptionSummary>>(
-        `${this.base}/subscriptions`,
-        { data: { type: 'subscriptions', attributes: { student: studentId, lesson: lessonId } } },
-      )
+      .post<JsonApiResponse<SubscriptionSummary>>(`${this.base}/subscriptions`, {
+        data: { type: 'subscriptions', attributes: { student: studentId, lesson: lessonId } },
+      })
       .pipe(
-        map(r => {
+        map((r) => {
           const raw = r.data;
           if (raw && !Array.isArray(raw)) {
             const attrs = (raw.attributes ?? {}) as Record<string, unknown>;
@@ -77,5 +63,23 @@ export class SubscriptionApiService {
 
   deleteSubscription(id: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/subscription/${id}`);
+  }
+
+  private fetchSubscriptions(scope: 'mine' | 'all'): Observable<SubscriptionSummary[]> {
+    const params = new HttpParams().set('scope', scope);
+    return this.http
+      .get<JsonApiResponse<SubscriptionSummary>>(`${this.base}/subscriptions`, { params })
+      .pipe(
+        map((r) =>
+          extractList(r).map((s) => ({
+            ...s,
+            id: Number(s.id ?? 0),
+            studentid: Number(s.studentid ?? 0) || undefined,
+            lesson: s.lesson ?? '',
+            year: s.year ?? '',
+            subscribed: Number(s.subscribed ?? 0),
+          })),
+        ),
+      );
   }
 }

@@ -1,10 +1,11 @@
 <section class="card">
   <div class="card-title-row">
     <h2>Mijn inschrijvingen</h2>
-    @if (!loading()) {
-      <span class="muted">{{ filtered().length }} item(s)</span>
-    }
+    <a class="btn-secondary small" routerLink="/member/dashboard">← Terug</a>
   </div>
+  @if (!loading()) {
+    <p class="muted">{{ filtered().length }} item(s)</p>
+  }
 
   @if (loading()) {
     <p class="status">Bezig met laden...</p>
@@ -17,9 +18,8 @@
     }
     @if (isStaff) {
       <div class="alert alert-info">
-        Filters hier gaan over jouw kinderen (ouderkoppeling), niet over alle leerlingen van de school.
-        Lesroosters en aanwezigheid vind je onder
-        <a routerLink="/teacher/lessons">Lessen</a>.
+        Dit is je ouderportaal: alleen inschrijvingen van jouw kinderen.
+        Lesleerlingen staan onder <a routerLink="/teacher/lessons">Lessen</a>.
       </div>
     }
 
@@ -29,7 +29,7 @@
         routerLink="/member/subscriptions/new"
         [queryParams]="selectedStudentId() ? { student: selectedStudentId() } : {}"
       >Nieuwe inschrijving</a>
-      @if (students().length > 1) {
+      @if (students().length > 0) {
         <select class="year-filter" [value]="selectedStudentId()" (change)="setStudent($event)" aria-label="Filter op kind">
           <option value="0">Al mijn kinderen</option>
           @for (s of students(); track s.id) {
@@ -37,7 +37,7 @@
           }
         </select>
       }
-      @if (years().length > 1) {
+      @if (years().length > 0) {
         <select class="year-filter" [value]="selectedYear()" (change)="setYear($event)" aria-label="Filter op schooljaar">
           <option value="">Alle schooljaren</option>
           @for (year of years(); track year) {

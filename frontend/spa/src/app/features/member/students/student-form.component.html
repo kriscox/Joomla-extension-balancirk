@@ -1,6 +1,7 @@
 <section class="card">
   <div class="card-title-row">
     <h2>{{ editId() ? 'Leerling bewerken' : 'Leerling toevoegen' }}</h2>
+    <a class="btn-secondary small" routerLink="/member/students">← Terug</a>
   </div>
 
   @if (loading()) {
