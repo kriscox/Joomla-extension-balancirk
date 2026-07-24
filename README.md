@@ -71,6 +71,7 @@ make remote-docker-install REMOTE_HOST=cococo003
 - `scripts/container/run-tests.sh`: container test runner
 - `scripts/container/restore-from-snapshot.sh`: DB/files restore in container
 - `scripts/container/refresh-unite-remote.sh`: remote unite refresh helper
+- `scripts/sql/`: ad-hoc maintenance SQL (not part of the Joomla installer)
 
 ## Angular ledenmodule (one-page)
 

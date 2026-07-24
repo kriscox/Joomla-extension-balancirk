@@ -130,7 +130,10 @@ $teached_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=teach
 		<?= HTMLHelper::_('uitab.startTabSet', 'myTab', array('active' => 'students')); ?>
 
 		<?= HTMLHelper::_('uitab.addTab', 'myTab', 'students', Text::_('COM_BALANCIRK_LESSON_TAB_STUDENTS')); ?>
-		<?= LayoutHelper::render('students.list', $this->students); ?>
+		<?= LayoutHelper::render('students.list', [
+			'students' => $this->students,
+			'waitingList' => $this->waitingListStudents,
+		]); ?>
 		<?= HTMLHelper::_('uitab.endTab'); ?>
 
 		<?= HTMLHelper::_('uitab.addTab', 'myTab', 'details', Text::_('COM_BALANCIRK_LESSON_TAB_DETAILS')); ?>

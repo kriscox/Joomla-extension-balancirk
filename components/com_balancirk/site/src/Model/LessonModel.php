@@ -207,6 +207,53 @@ class LessonModel extends AdminModel
     }
 
     /**
+     * Method to get the waiting list for a lesson.
+     *
+     * List of students currently on the waiting list for the lesson.
+     *
+     * @param   int|null  $lessonid  The id of the lesson
+     *
+     * @return  array  An array of students
+     */
+    public function getWaitingListStudents($lessonid = null)
+    {
+        $dbo = $this->getDatabase();
+        $query = $dbo->getQuery(true);
+
+        if ($lessonid == null) {
+            $lessonid = $this->getState('lesson.id');
+        }
+
+        $query->select(
+            $dbo->quoteName(
+                [
+                    'a.id',
+                    'a.name',
+                    'a.firstname',
+                    'a.birthdate',
+                ],
+                [
+                    'id',
+                    'name',
+                    'firstname',
+                    'birthdate',
+                ]
+            )
+        )
+            ->from($dbo->quoteName('#__balancirk_students', 'a'))
+            ->join(
+                'INNER',
+                $dbo->quoteName('#__balancirk_subscriptions', 's') . ' ON s.student = a.id AND s.subscribed = 1'
+            )
+            ->where('s.lesson = ' . (int) $lessonid)
+            ->order(['a.name', 'a.firstname']);
+
+        $dbo->setQuery($query);
+
+        return $dbo->loadObjectList();
+    }
+
+    /**
      * Method to get the number of students
      *
      * @return int 	number of students
