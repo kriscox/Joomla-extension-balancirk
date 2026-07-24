@@ -23,10 +23,7 @@ release:
 	@new_version=`$(VERSION_SCRIPT) bump major`; \
 	echo "Bumped version to $$new_version"; \
 	$(MAKE) pkg_balancirk.zip; \
-	rm -f "$$new_version.tar.gz" "$$new_version.zip"; \
-	tar czf "$$new_version.tar.gz" balancirk.xml balancirk_changelog.xml balancirk_update.xml pkg_balancirk.zip README.md; \
-	zip -r "$$new_version.zip" balancirk.xml balancirk_changelog.xml balancirk_update.xml pkg_balancirk.zip README.md; \
-	git add balancirk.xml pkg_balancirk.xml components/com_balancirk/balancirk.xml packages/com_balancirk.zip packages/balancirk.zip pkg_balancirk.zip "$$new_version.tar.gz" "$$new_version.zip"; \
+	git add balancirk.xml pkg_balancirk.xml components/com_balancirk/balancirk.xml balancirk_changelog.xml balancirk_update.xml; \
 	git commit -m "Release $$new_version"; \
 	git tag "$$new_version"; \
 	git push origin HEAD; \
