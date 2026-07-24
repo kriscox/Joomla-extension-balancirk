@@ -1,14 +1,15 @@
-# Balancirk - Joomla 4 Extension
+# Balancirk - Joomla 6 Extension
 
 ## Overview
 
-Balancirk is a Joomla 4 extension package for managing members, students, lessons, subscriptions, and attendance for a gymnastics/circus school. It consists of:
+Balancirk is a Joomla 6 extension package for managing members, students, lessons, subscriptions, and attendance for a gymnastics/circus school. It consists of:
 
 - **com_balancirk** — Main Joomla MVC component (admin + site + API)
 - **plg_webservices_balancirk** — Web services plugin (REST API routes)
 - **joomlaology** — Shared PHP utility library
+- **frontend/spa** — Angular PWA (members, teachers, accounting; admin later)
 
-This is NOT a standalone application. It requires installation into a Joomla 4 CMS instance.
+This is NOT a standalone application. It requires installation into a Joomla 6 CMS instance.
 
 ## Conventions
 
@@ -19,7 +20,7 @@ This is NOT a standalone application. It requires installation into a Joomla 4 C
 Cloud Agents use the install script in `.cursor/environment.json` to refresh dependencies after checkout:
 
 ```bash
-composer install --no-interaction && cd frontend/member-spa && npm install --no-audit --no-fund
+composer install --no-interaction && cd frontend/spa && npm install --no-audit --no-fund
 ```
 
 ### Prerequisites (installed by update script)
@@ -27,7 +28,7 @@ composer install --no-interaction && cd frontend/member-spa && npm install --no-
 - PHP 8.3+ with extensions: cli, xml, mbstring, tokenizer, zip
 - Composer (for phpcs dev dependency)
 - GNU Make + zip (for building packages)
-- Node.js 22+ / npm (for Angular member-spa frontend)
+- Node.js 22+ / npm (for Angular spa frontend)
 
 ### Lint
 
@@ -45,20 +46,20 @@ make -B
 
 This forces a full rebuild of the installable Joomla package zip (including sub-packages for the component and plugin). The `-B` flag unconditionally rebuilds all targets.
 
-To build the Angular member-spa frontend:
+To build the Angular spa frontend:
 
 ```bash
-make member-spa-build
+make spa-build
 ```
 
-The update script pre-installs `frontend/member-spa/node_modules` so this target runs without network access.
+The update script pre-installs `frontend/spa/node_modules` so this target runs without network access.
 
 ### Testing
 
 There are no automated unit/integration tests in this repository. Validation is done via:
 1. `phpcs` linting (PSR-12 standard)
 2. Building the package zip successfully
-3. Installing into a Joomla 4 instance (external)
+3. Installing into a Joomla 6 instance (external)
 
 ### Important notes
 

@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.page {
+  width: min(1080px, 100%);
+  margin: 0 auto;
+  padding: 1rem 0.9rem 1.25rem;
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.page-main {
+  flex: 1 1 auto;
+}
+
+@media (min-width: 780px) {
+  .page {
+    padding: 1.5rem 1.2rem 2rem;
+  }
+}

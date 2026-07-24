@@ -1,0 +1,47 @@
+@if (!isGuest) {
+  <nav class="bottom-nav" aria-label="Hoofdnavigatie">
+    @if (isAdmin) {
+      <a class="nav-item" routerLink="/admin" routerLinkActive="active" (click)="closeMore()">Beheer</a>
+      <a class="nav-item" routerLink="/teacher/attendance" routerLinkActive="active" (click)="closeMore()">Aanwezigheid</a>
+      <a class="nav-item" routerLink="/accounting/export" routerLinkActive="active" (click)="closeMore()">Export</a>
+    } @else if (isAccountant) {
+      <a class="nav-item" routerLink="/accounting" routerLinkActive="active" (click)="closeMore()">Overzicht</a>
+      <a class="nav-item" routerLink="/teacher/lessons" routerLinkActive="active" (click)="closeMore()">Lessen</a>
+      <a class="nav-item" routerLink="/accounting/export" routerLinkActive="active" (click)="closeMore()">Export</a>
+    } @else if (isTeacher) {
+      <a class="nav-item" routerLink="/teacher" routerLinkActive="active" (click)="closeMore()">Overzicht</a>
+      <a class="nav-item" routerLink="/teacher/lessons" routerLinkActive="active" (click)="closeMore()">Lessen</a>
+      <a class="nav-item" routerLink="/teacher/attendance" routerLinkActive="active" (click)="closeMore()">Aanwezigheid</a>
+    } @else {
+      <a
+        class="nav-item"
+        routerLink="/member/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMore()"
+      >Home</a>
+      <a class="nav-item" routerLink="/member/students" routerLinkActive="active" (click)="closeMore()">Leerlingen</a>
+      <a class="nav-item" routerLink="/member/subscriptions" routerLinkActive="active" (click)="closeMore()">Inschrijvingen</a>
+    }
+
+    <button type="button" class="nav-item nav-item--more" [class.active]="moreOpen()" (click)="toggleMore()" aria-expanded="{{ moreOpen() }}">
+      Meer
+    </button>
+  </nav>
+
+  @if (moreOpen()) {
+    <div class="more-panel" role="menu" aria-label="Accountmenu">
+      @if (userName) {
+        <p class="more-user">{{ userName }}</p>
+      }
+      <a class="more-link" routerLink="/member/profile" routerLinkActive="active" (click)="closeMore()">Profiel wijzigen</a>
+      @if (newsletterUrl) {
+        <a class="more-link" [href]="newsletterUrl" (click)="closeMore()">Nieuwsbrieven</a>
+      }
+      @if (passwordResetUrl) {
+        <a class="more-link" [href]="passwordResetUrl" (click)="closeMore()">Wachtwoord resetten</a>
+      }
+      <button type="button" class="more-link more-link--button" (click)="logout()">Uitloggen</button>
+    </div>
+  }
+}

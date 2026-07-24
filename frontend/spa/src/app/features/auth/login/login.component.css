@@ -1,0 +1,39 @@
+:host {
+  display: block;
+}
+
+.login-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.25rem 1rem;
+  background: color-mix(in srgb, var(--brand, #0d5e56) 8%, white);
+  border: 1px solid color-mix(in srgb, var(--brand, #0d5e56) 22%, white);
+  border-radius: 16px;
+}
+
+.login-card h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.login-card p {
+  margin: 0;
+  color: #35524e;
+}
+
+.btn-primary {
+  appearance: none;
+  border: 0;
+  border-radius: 12px;
+  min-height: 2.75rem;
+  padding: 0.7rem 1rem;
+  background: var(--brand, #0d5e56);
+  color: var(--brand-contrast, #fff);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.link-secondary {
+  color: #1f3c38;
+  font-weight: 600;
+}
