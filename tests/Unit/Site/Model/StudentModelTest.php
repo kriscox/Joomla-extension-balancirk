@@ -263,5 +263,241 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Site\Model {
                 }
             };
         }
+
+        // -----------------------------------------------------------------------
+        // isPrimairyParent() — DB-backed access control check
+        // -----------------------------------------------------------------------
+
+        /**
+         * When execute() succeeds and getNumRows() >= 1 the method must return true.
+         *
+         * isPrimairyParent() is the gatekeeper for student-record edits: a non-primary
+         * parent must not be able to modify a student's data.
+         *
+         * @return void
+         */
+        public function testIsPrimairyParentReturnsTrueWhenExecuteSucceedsAndHasRows(): void
+        {
+            $model = $this->makeIsPrimairyParentModel(true, 2);
+
+            $this->assertTrue($model->isPrimairyParent(5, 10));
+        }
+
+        /**
+         * When execute() succeeds but getNumRows() == 0 the method must return false.
+         *
+         * @return void
+         */
+        public function testIsPrimairyParentReturnsFalseWhenExecuteSucceedsButNoRows(): void
+        {
+            $model = $this->makeIsPrimairyParentModel(true, 0);
+
+            $this->assertFalse($model->isPrimairyParent(5, 10));
+        }
+
+        /**
+         * When execute() returns false (DB error) the method must return false.
+         *
+         * @return void
+         */
+        public function testIsPrimairyParentReturnsFalseWhenExecuteFails(): void
+        {
+            $model = $this->makeIsPrimairyParentModel(false, 0);
+
+            $this->assertFalse($model->isPrimairyParent(5, 10));
+        }
+
+        // -----------------------------------------------------------------------
+        // getParents() — primary filter flag
+        // -----------------------------------------------------------------------
+
+        /**
+         * With primary=true (default) the WHERE clause must include the primary filter.
+         *
+         * @return void
+         */
+        public function testGetParentsWithPrimaryTrueAddsPrimaryFilter(): void
+        {
+            $capturedWhere = [];
+
+            $model = $this->makeGetParentsModel($capturedWhere, []);
+            $model->getParents(7, true);
+
+            $combined = implode(' ', $capturedWhere);
+            $this->assertStringContainsString('primary', $combined);
+        }
+
+        /**
+         * With primary=false the WHERE clause must NOT include the primary filter.
+         *
+         * @return void
+         */
+        public function testGetParentsWithPrimaryFalseOmitsPrimaryFilter(): void
+        {
+            $capturedWhere = [];
+
+            $model = $this->makeGetParentsModel($capturedWhere, []);
+            $model->getParents(7, false);
+
+            $combined = implode(' ', $capturedWhere);
+            $this->assertStringNotContainsString('primary', $combined);
+        }
+
+        /**
+         * getParents() must return whatever loadObjectList() returns.
+         *
+         * @return void
+         */
+        public function testGetParentsReturnsLoadObjectListResult(): void
+        {
+            $expected = [(object)['parent' => 3], (object)['parent' => 9]];
+            $capturedWhere = [];
+
+            $model = $this->makeGetParentsModel($capturedWhere, $expected);
+
+            $this->assertSame($expected, $model->getParents(7));
+        }
+
+        // -----------------------------------------------------------------------
+        // Helpers for isPrimairyParent() and getParents()
+        // -----------------------------------------------------------------------
+
+        /**
+         * Build a StudentModel whose DB stub simulates isPrimairyParent() behaviour.
+         *
+         * @param   bool  $executeResult  Value returned by execute().
+         * @param   int   $numRows        Value returned by getNumRows().
+         *
+         * @return  StudentModel
+         */
+        private function makeIsPrimairyParentModel(bool $executeResult, int $numRows): StudentModel
+        {
+            $qb = new class {
+                public function select(mixed $x): static
+                {
+                    return $this;
+                }
+                public function from(mixed $t): static
+                {
+                    return $this;
+                }
+                public function where(mixed $c): static
+                {
+                    return $this;
+                }
+            };
+
+            $db = new class ($qb, $executeResult, $numRows) {
+                public function __construct(
+                    private readonly object $qb,
+                    private readonly bool   $executeResult,
+                    private readonly int    $numRows
+                ) {
+                }
+                public function getQuery(bool $new): object
+                {
+                    return $this->qb;
+                }
+                public function quote(mixed $v): string
+                {
+                    return "'$v'";
+                }
+                public function quoteName(mixed $n, mixed $a = null): string
+                {
+                    return "`$n`";
+                }
+                public function setQuery(mixed $q): static
+                {
+                    return $this;
+                }
+                public function execute(): bool
+                {
+                    return $this->executeResult;
+                }
+                public function getNumRows(): int
+                {
+                    return $this->numRows;
+                }
+            };
+
+            return new class ($db) extends StudentModel {
+                public function __construct(private readonly object $db)
+                {
+                }
+                public function getDatabase(): object
+                {
+                    return $this->db;
+                }
+            };
+        }
+
+        /**
+         * Build a StudentModel whose DB stub captures WHERE clauses and returns a
+         * fixed loadObjectList() value for getParents().
+         *
+         * @param   array  $capturedWhere  Reference array populated by the query builder.
+         * @param   array  $listResult     Value returned by loadObjectList().
+         *
+         * @return  StudentModel
+         */
+        private function makeGetParentsModel(array &$capturedWhere, array $listResult): StudentModel
+        {
+            $qb = new class ($capturedWhere) {
+                public function __construct(private array &$captured)
+                {
+                }
+                public function select(mixed $x): static
+                {
+                    return $this;
+                }
+                public function from(mixed $t): static
+                {
+                    return $this;
+                }
+                public function where(mixed $c): static
+                {
+                    $this->captured[] = (string) $c;
+                    return $this;
+                }
+            };
+
+            $db = new class ($qb, $listResult) {
+                public function __construct(
+                    private readonly object $qb,
+                    private readonly array  $listResult
+                ) {
+                }
+                public function getQuery(bool $new): object
+                {
+                    return $this->qb;
+                }
+                public function quote(mixed $v): string
+                {
+                    return "'$v'";
+                }
+                public function quoteName(mixed $n, mixed $a = null): string
+                {
+                    return "`$n`";
+                }
+                public function setQuery(mixed $q): static
+                {
+                    return $this;
+                }
+                public function loadObjectList(): array
+                {
+                    return $this->listResult;
+                }
+            };
+
+            return new class ($db) extends StudentModel {
+                public function __construct(private readonly object $db)
+                {
+                }
+                public function getDatabase(): object
+                {
+                    return $this->db;
+                }
+            };
+        }
     }
 }
