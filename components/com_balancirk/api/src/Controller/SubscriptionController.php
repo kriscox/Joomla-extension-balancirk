@@ -144,7 +144,7 @@ class SubscriptionController extends ApiController
             return true;
         }
 
-        return $this->isPrimaryParent((int) $user->id, $studentId) && $this->presenceCount($studentId, $lessonId) <= 2;
+        return $this->isPrimaryParent((int) $user->id, $studentId);
     }
 
     /**
@@ -172,27 +172,4 @@ class SubscriptionController extends ApiController
         return (bool) $db->loadResult();
     }
 
-    /**
-     * Count presences for a student in a lesson.
-     *
-     * @param   int  $studentId  Student id.
-     * @param   int  $lessonId   Lesson id.
-     *
-     * @return  int
-     *
-     * @since   1.2.29
-     */
-    private function presenceCount(int $studentId, int $lessonId): int
-    {
-        /** @var DatabaseInterface $db */
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
-            ->select('COUNT(*)')
-            ->from($db->quoteName('#__balancirk_presences', 'p'))
-            ->where($db->quoteName('p.student') . ' = ' . $studentId)
-            ->where($db->quoteName('p.lesson') . ' = ' . $lessonId);
-        $db->setQuery($query);
-
-        return (int) $db->loadResult();
-    }
 }

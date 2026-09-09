@@ -313,11 +313,37 @@ class SubscriptionModel extends AdminModel
     }
 
     /**
+     * Load a subscription row by id.
+     *
+     * @param   int  $id  Subscription id.
+     *
+     * @return  object|null
+     *
+     * @since   1.3.20
+     */
+    public function getSubscriptionRecord(int $id): ?object
+    {
+        if ($id <= 0) {
+            return null;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select($db->quoteName(['id', 'student', 'lesson', 'subscribed']))
+            ->from($db->quoteName('#__balancirk_subscriptions'))
+            ->where($db->quoteName('id') . ' = ' . $id);
+        $db->setQuery($query);
+        $row = $db->loadObject();
+
+        return $row ?: null;
+    }
+
+    /**
      * Delete subscription to the database
      *
-     * Delete if not exists the subscription to the database
+     * Accepts a subscription id or an array with student and lesson keys.
      *
-     * @param   array  $pks  An array of record primary keys.
+     * @param   mixed  $pks  Subscription id or student/lesson pair.
      *
      * @return 	boolean
      *
@@ -326,10 +352,33 @@ class SubscriptionModel extends AdminModel
     public function delete(&$pks)
     {
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
-        $query->delete($db->quoteName('#__balancirk_subscriptions'))
-            ->where($db->quoteName('student') . ' = ' . $pks['student'])
-            ->where($db->quoteName('lesson') . ' = ' . $pks['lesson']);
+        $query = $db->getQuery(true)
+            ->delete($db->quoteName('#__balancirk_subscriptions'));
+
+        if (is_array($pks) && isset($pks['student'], $pks['lesson'])) {
+            $studentId = (int) $pks['student'];
+            $lessonId = (int) $pks['lesson'];
+
+            if ($studentId <= 0 || $lessonId <= 0) {
+                $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_DELETE_FAILED'));
+
+                return false;
+            }
+
+            $query->where($db->quoteName('student') . ' = ' . $studentId)
+                ->where($db->quoteName('lesson') . ' = ' . $lessonId);
+        } else {
+            $id = (int) (is_array($pks) ? ($pks['id'] ?? reset($pks)) : $pks);
+
+            if ($id <= 0) {
+                $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_DELETE_NOT_FOUND'));
+
+                return false;
+            }
+
+            $query->where($db->quoteName('id') . ' = ' . $id);
+        }
+
         $db->setQuery($query)->execute();
 
         return true;

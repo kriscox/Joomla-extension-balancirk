@@ -97,18 +97,7 @@ class SubscriptionModel extends AdminModel
             ->where($db->quoteName('p.primary') . ' = 1');
         $isPrimary = (bool) $db->setQuery($parentQuery)->loadResult();
 
-        if (!$isPrimary) {
-            return false;
-        }
-
-        $presenceQuery = $db->getQuery(true)
-            ->select('COUNT(*)')
-            ->from($db->quoteName('#__balancirk_presences'))
-            ->where($db->quoteName('student') . ' = ' . (int) $record->student)
-            ->where($db->quoteName('lesson') . ' = ' . (int) $record->lesson);
-        $presenceCount = (int) $db->setQuery($presenceQuery)->loadResult();
-
-        return $presenceCount <= 2;
+        return $isPrimary;
     }
 
     /**

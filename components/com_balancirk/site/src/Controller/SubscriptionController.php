@@ -17,7 +17,6 @@ use Joomla\CMS\Session\Session;
 use Joomla\CMS\MVC\Controller\FormController;
 use Joomla\CMS\Response\JsonResponse;
 use CoCoCo\Component\Balancirk\Site\Model\StudentModel;
-use CoCoCo\Component\Balancirk\Site\Model\PresenceModel;
 use CoCoCo\Component\Balancirk\Site\Model\SubscriptionModel;
 use CoCoCo\Component\Balancirk\Site\Model\LessonsModel;
 
@@ -77,9 +76,10 @@ class SubscriptionController extends FormController
     }
 
     /**
-     * Method to check if you can delete a new record.
+     * Method to check if you can delete a subscription.
      *
-     * Delete the record if no more than 2 presences exists for the subscription
+     * Primary parents may unsubscribe. Lesson admins and users with delete
+     * permission may also remove a subscription.
      *
      * @param   array  $data  An array of input data.
      *
@@ -89,7 +89,17 @@ class SubscriptionController extends FormController
      */
     protected function allowDelete($data = array())
     {
-        $user    = Factory::getApplication()->getIdentity();
+        $user = Factory::getApplication()->getIdentity();
+
+        if (
+            $user->authorise('students.viewall', 'com_balancirk')
+            || $user->authorise('lessons.admin', 'com_balancirk')
+            || $user->authorise('core.delete', 'com_balancirk')
+            || $user->authorise('core.admin', 'com_balancirk')
+        ) {
+            return true;
+        }
+
         $studentId = (int) ($data['student'] ?? 0);
 
         if ($studentId <= 0) {
@@ -98,11 +108,8 @@ class SubscriptionController extends FormController
 
         /** @var StudentModel */
         $studentModel = $this->getModel('Student');
-        /** @var PresenceModel */
-        $presenceModel = $this->getModel('Presence');
 
-        return ($studentModel->isPrimairyParent((int) $user->id, $studentId)); // &&
-        // $presenceModel->numberOfPresences($data['student'], $data['lesson']) <= 2);
+        return $studentModel->isPrimairyParent((int) $user->id, $studentId);
     }
 
     /**
@@ -227,26 +234,77 @@ class SubscriptionController extends FormController
      **/
     public function delete(?array $key = null)
     {
-        // Check if token is correct. Security measure
         $this->checkToken();
 
-        $data = $this->input->get('jform', array(), 'array');
-
+        $wantsJson = $this->input->getCmd('format') === 'json';
         /** @var SubscriptionModel */
         $model = $this->getModel();
-        $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=subscriptions');
+        $subscriptionId = $this->input->getInt('id');
+        $data = $this->input->get('jform', array(), 'array');
 
-        if ($this->allowDelete($data)) {
-            if (!$model->delete($data) && $model->getError()) {
-                $app = Factory::getApplication();
-                $app->enqueueMessage($model->getError(), 'warning');
+        if ($subscriptionId > 0) {
+            $record = $model->getSubscriptionRecord($subscriptionId);
+
+            if (!$record) {
+                $this->sendDeleteResult($wantsJson, false, Text::_('COM_BALANCIRK_SUBSCRIPTION_DELETE_NOT_FOUND'));
+
+                return;
             }
-        } else {
-            $app = Factory::getApplication();
-            $app->enqueueMessage(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'), 'warning');
+
+            $data['id'] = (int) $record->id;
+            $data['student'] = (int) $record->student;
+            $data['lesson'] = (int) $record->lesson;
         }
 
-        $this->setRedirect($redirectUrl);
+        if (!$this->allowDelete($data)) {
+            $this->sendDeleteResult($wantsJson, false, Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'));
+
+            return;
+        }
+
+        $pk = $subscriptionId > 0 ? $subscriptionId : $data;
+
+        if (!$model->delete($pk)) {
+            $this->sendDeleteResult(
+                $wantsJson,
+                false,
+                $model->getError() ?: Text::_('COM_BALANCIRK_SUBSCRIPTION_DELETE_FAILED')
+            );
+
+            return;
+        }
+
+        $this->sendDeleteResult(
+            $wantsJson,
+            true,
+            Text::_('COM_BALANCIRK_SUBSCRIPTION_DELETED'),
+            $subscriptionId
+        );
+    }
+
+    /**
+     * Return a JSON or redirect response after a delete attempt.
+     *
+     * @param   bool    $wantsJson  Whether the client asked for JSON.
+     * @param   bool    $success    Whether the delete succeeded.
+     * @param   string  $message    Message to show.
+     * @param   int     $id         Deleted subscription id.
+     *
+     * @return  void
+     *
+     * @since   1.3.20
+     */
+    private function sendDeleteResult(bool $wantsJson, bool $success, string $message, int $id = 0): void
+    {
+        $app = Factory::getApplication();
+
+        if ($wantsJson) {
+            echo new JsonResponse($success ? ['id' => $id] : null, $message, !$success);
+            $app->close();
+        }
+
+        $app->enqueueMessage($message, $success ? 'success' : 'warning');
+        $this->setRedirect(Route::_('index.php?option=' . $this->option . '&view=subscriptions', false));
     }
 
     /**
