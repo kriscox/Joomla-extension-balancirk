@@ -171,4 +171,48 @@ class LessonModelTest extends TestCase
         $this->assertArrayHasKey('Saturday', $lesdays);
         $this->assertArrayHasKey('Sunday', $lesdays);
     }
+
+    public function testHasConfiguredLesdaysIsFalseForEmptyBitmask(): void
+    {
+        $this->assertFalse(LessonModel::hasConfiguredLesdays(LessonModel::getLesdays(0)));
+    }
+
+    public function testHasConfiguredLesdaysIsTrueWhenAWeekdayIsSelected(): void
+    {
+        $this->assertTrue(LessonModel::hasConfiguredLesdays(LessonModel::getLesdays(64)));
+    }
+
+    public function testIsValidLessonPeriodAcceptsInclusiveStartAndEnd(): void
+    {
+        $this->assertTrue(LessonModel::isValidLessonPeriod('2026-09-01', '2026-09-30'));
+        $this->assertTrue(LessonModel::isValidLessonPeriod('2026-09-09', '2026-09-09'));
+    }
+
+    public function testIsValidLessonPeriodRejectsMissingOrInvertedDates(): void
+    {
+        $this->assertFalse(LessonModel::isValidLessonPeriod('', '2026-09-30'));
+        $this->assertFalse(LessonModel::isValidLessonPeriod('2026-09-01', ''));
+        $this->assertFalse(LessonModel::isValidLessonPeriod('0000-00-00', '2026-09-30'));
+        $this->assertFalse(LessonModel::isValidLessonPeriod('2026-10-01', '2026-09-01'));
+    }
+
+    public function testParseLessonDateNormalizesMidnightAndRejectsInvalidValues(): void
+    {
+        $parsed = LessonModel::parseLessonDate('2026-09-09 14:30:00');
+
+        $this->assertInstanceOf(\DateTime::class, $parsed);
+        $this->assertSame('2026-09-09 00:00:00', $parsed->format('Y-m-d H:i:s'));
+        $this->assertNull(LessonModel::parseLessonDate('09/09/2026'));
+        $this->assertNull(LessonModel::parseLessonDate(null));
+    }
+
+    public function testEmptyBitmaskDoesNotPreventUsingTheLessonPeriod(): void
+    {
+        $this->assertTrue(LessonModel::isValidLessonPeriod('2026-09-01', '2026-09-30'));
+        $this->assertFalse(LessonModel::hasConfiguredLesdays(LessonModel::getLesdays(0)));
+        $this->assertSame(
+            [],
+            LessonModel::getDates('2026-09-01', '2026-09-30', LessonModel::getLesdays(0))
+        );
+    }
 }

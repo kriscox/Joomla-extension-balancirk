@@ -372,6 +372,66 @@ class LessonModel extends AdminModel
     }
 
     /**
+     * Whether a weekday bitmask has at least one selected day.
+     *
+     * @param   array<string, int>  $lesdays  Weekday flags from getLesdays().
+     *
+     * @return  bool
+     *
+     * @since   1.3.20
+     */
+    public static function hasConfiguredLesdays(array $lesdays): bool
+    {
+        return in_array(1, $lesdays, true);
+    }
+
+    /**
+     * Whether the lesson has a usable start and end date.
+     *
+     * @param   string|null  $start  Lesson start date.
+     * @param   string|null  $end    Lesson end date.
+     *
+     * @return  bool
+     *
+     * @since   1.3.20
+     */
+    public static function isValidLessonPeriod(?string $start, ?string $end): bool
+    {
+        $startDate = self::parseLessonDate($start);
+        $endDate = self::parseLessonDate($end);
+
+        return $startDate instanceof DateTime && $endDate instanceof DateTime && $startDate <= $endDate;
+    }
+
+    /**
+     * Parse a lesson date string into a DateTime at midnight.
+     *
+     * @param   string|null  $date  Date in Y-m-d or a datetime starting with Y-m-d.
+     *
+     * @return  DateTime|null
+     *
+     * @since   1.3.20
+     */
+    public static function parseLessonDate(?string $date): ?DateTime
+    {
+        $date = trim((string) $date);
+
+        if ($date === '' || str_starts_with($date, '0000-00-00')) {
+            return null;
+        }
+
+        $parsed = DateTime::createFromFormat('Y-m-d', substr($date, 0, 10));
+
+        if (!$parsed instanceof DateTime || $parsed->format('Y-m-d') !== substr($date, 0, 10)) {
+            return null;
+        }
+
+        $parsed->setTime(0, 0, 0);
+
+        return $parsed;
+    }
+
+    /**
      * Method to get the dates of the lessons based on startdate, enddate, lesdays and holidays
      *
      * @param	date	$startDate	Starting date of the lessons
