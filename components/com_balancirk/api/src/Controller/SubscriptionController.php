@@ -171,5 +171,4 @@ class SubscriptionController extends ApiController
 
         return (bool) $db->loadResult();
     }
-
 }

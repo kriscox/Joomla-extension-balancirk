@@ -345,10 +345,10 @@ class SubscriptionModel extends AdminModel
      *
      * @param   mixed  $pks  Subscription id or student/lesson pair.
      *
-     * @return 	boolean
+     * @return  boolean
      *
-     * @version	__BUMP_VERSION__
-     **/
+     * @since   1.3.20
+     */
     public function delete(&$pks)
     {
         $db = $this->getDatabase();
