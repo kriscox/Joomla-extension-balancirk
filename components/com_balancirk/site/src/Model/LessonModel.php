@@ -545,7 +545,19 @@ class LessonModel extends AdminModel
             return self::dateFromParts((int) $matches[3], (int) $matches[2], (int) $matches[1]);
         }
 
-        foreach (['Y-m-d H:i:s', 'Y-m-d', 'd-m-Y H:i:s', 'd/m/Y H:i:s', 'd-m-Y', 'd/m/Y', 'd.m.Y', 'j-n-Y', 'j/n/Y'] as $format) {
+        $formats = [
+            'Y-m-d H:i:s',
+            'Y-m-d',
+            'd-m-Y H:i:s',
+            'd/m/Y H:i:s',
+            'd-m-Y',
+            'd/m/Y',
+            'd.m.Y',
+            'j-n-Y',
+            'j/n/Y',
+        ];
+
+        foreach ($formats as $format) {
             $parsed = DateTime::createFromFormat('!' . $format, $date);
 
             if (!$parsed instanceof DateTime) {
