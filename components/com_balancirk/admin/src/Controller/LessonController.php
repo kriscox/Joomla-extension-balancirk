@@ -84,8 +84,14 @@ class LessonController extends FormController
         }
         $validData['lesdays'] = $lesday;
 
-        // Pass teachers from raw form data (not in form XML, so stripped by validate)
-        $validData['teachers'] = $data['teachers'] ?? [];
+        // Teachers are optional for API/SPA partial updates.
+        // The admin edit form always sends teachers_sync=1 so checkbox changes are applied
+        // (including "uncheck all", which would otherwise omit the teachers key).
+        if (\array_key_exists('teachers_sync', $data) || \array_key_exists('teachers', $data)) {
+            $validData['teachers'] = (isset($data['teachers']) && \is_array($data['teachers']))
+                ? $data['teachers']
+                : [];
+        }
 
         if ($validData === false) {
             $errors = $model->getErrors();
@@ -110,7 +116,26 @@ class LessonController extends FormController
         }
 
         // Save the changes to the profile
-        $model->save($validData);
+        if (!$model->save($validData)) {
+            $errors = $model->getErrors();
+
+            foreach ($errors as $error) {
+                if ($error instanceof \Exception) {
+                    $app->enqueueMessage($error->getMessage(), 'error');
+                } else {
+                    $app->enqueueMessage($error, 'error');
+                }
+            }
+
+            $this->setRedirect(
+                Route::_(
+                    'index.php?option=' . $this->option . '&view=' . $this->view_item . $this->getRedirectToItemAppend() . '&id=' . $this->input->get('id'),
+                    false
+                )
+            );
+
+            return false;
+        }
 
         // Redirect to the list screen.
         $this->setMessage(Text::_('COM_BALANCIRK_LESSON_SAVE_SUCCESS'));

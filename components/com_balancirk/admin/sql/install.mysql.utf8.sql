@@ -230,6 +230,22 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_teachers`(
     CONSTRAINT `fk_teachers_member` FOREIGN KEY (`member`) REFERENCES `#__balancirk_members_additional` (`id`)
 );
 /**************************************************************************************************
+ *                                                                                                 *
+ *  SQL script for table teached (teacher attendance per lesson/date)                              *
+ *                                                                                                 *
+ **************************************************************************************************/
+CREATE TABLE IF NOT EXISTS `#__balancirk_teached` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `lesson` INT(11) NOT NULL,
+    `teacher` INT(11) NOT NULL,
+    `date` DATE NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `teached` (`lesson`, `teacher`, `date`),
+    CONSTRAINT `fk_teached_lesson` FOREIGN KEY (`lesson`) REFERENCES `#__balancirk_lessons` (`id`),
+    CONSTRAINT `fk_teached_member` FOREIGN KEY (`teacher`) REFERENCES `#__balancirk_members_additional` (`id`),
+    CONSTRAINT `fk_teached_teacher` FOREIGN KEY (`teacher`, `lesson`) REFERENCES `#__balancirk_teachers` (`member`, `lesson`)
+);
+/**************************************************************************************************
  *                                                                                                 * 
  *  SQL script for table holidays                                                                  * 
  *                                                                                                 * 

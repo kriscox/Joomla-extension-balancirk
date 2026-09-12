@@ -90,6 +90,8 @@ HTMLHelper::_('behavior.keepalive');
 					return (int) $t->id;
 				}, $this->teachers ?? []);
 				?>
+				<?php // Marker so save() always syncs teachers from this admin form (even when all boxes are unchecked). ?>
+				<input type="hidden" name="jform[teachers_sync]" value="1" />
 				<p><strong><?= Text::_('COM_BALANCIRK_LESSON_TEACHERS_DESCRIPTION') ?></strong></p>
 				<?php if (!empty($this->availableTeachers)) : ?>
 				<table class="table table-striped">

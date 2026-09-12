@@ -310,35 +310,121 @@ class LessonModel extends AdminModel
     }
 
     /**
+     * Get member ids assigned as teachers for a lesson.
+     *
+     * @param   int  $lessonId  Lesson id.
+     *
+     * @return  int[]
+     *
+     * @since   1.3.18
+     */
+    public function getTeacherIdsForLesson(int $lessonId): array
+    {
+        if ($lessonId <= 0) {
+            return [];
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('member'))
+            ->from($db->quoteName('#__balancirk_teachers'))
+            ->where($db->quoteName('lesson') . ' = ' . (int) $lessonId);
+
+        return array_map('intval', $db->setQuery($query)->loadColumn() ?: []);
+    }
+
+    /**
+     * Check whether a member has attendance records as a teacher for a lesson.
+     *
+     * FK fk_teached_teacher is composite (teacher, lesson) → teachers(member, lesson),
+     * so only teached rows for this lesson block unassigning from that lesson.
+     *
+     * @param   int       $memberId  Member id.
+     * @param   int|null  $lessonId  Lesson id (required for the composite FK check).
+     *
+     * @return  bool
+     *
+     * @since   1.3.18
+     */
+    public function hasTeachedRecords(int $memberId, ?int $lessonId = null): bool
+    {
+        return $this->countTeachedRecords($memberId, $lessonId) > 0;
+    }
+
+    /**
+     * Count attendance records for a teacher member.
+     *
+     * When $lessonId is set, only rows for that lesson are counted (matches composite FK).
+     * When null, all lessons are counted (legacy/global).
+     *
+     * @param   int       $memberId  Member id.
+     * @param   int|null  $lessonId  Optional lesson id.
+     *
+     * @return  int
+     *
+     * @since   1.3.18
+     */
+    public function countTeachedRecords(int $memberId, ?int $lessonId = null): int
+    {
+        if ($memberId <= 0) {
+            return 0;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__balancirk_teached'))
+            ->where($db->quoteName('teacher') . ' = ' . (int) $memberId);
+
+        if ($lessonId !== null && $lessonId > 0) {
+            $query->where($db->quoteName('lesson') . ' = ' . (int) $lessonId);
+        }
+
+        return (int) $db->setQuery($query)->loadResult();
+    }
+
+    /**
      * Save teacher assignments for a lesson.
      *
      * @param   int    $lessonId    Lesson id.
      * @param   array  $teacherIds  Array of member ids to assign.
      *
-     * @return  void
+     * @return  bool  True on success.
      *
      * @since   1.3.2
      */
-    public function saveTeachers(int $lessonId, array $teacherIds): void
+    public function saveTeachers(int $lessonId, array $teacherIds): bool
     {
+        $teacherIds = $this->normalizeTeacherIds($teacherIds);
+        $current = $this->getTeacherIdsForLesson($lessonId);
+        $toAdd = array_diff($teacherIds, $current);
+        $toRemove = array_diff($current, $teacherIds);
+
+        foreach ($toRemove as $memberId) {
+            if (!$this->assertTeacherCanBeUnassigned((int) $memberId, $lessonId)) {
+                return false;
+            }
+        }
+
         $db = $this->getDatabase();
 
-        $deleteQuery = $db->getQuery(true)
-            ->delete($db->quoteName('#__balancirk_teachers'))
-            ->where($db->quoteName('lesson') . ' = ' . (int) $lessonId);
-        $db->setQuery($deleteQuery)->execute();
-
-        foreach ($teacherIds as $memberId) {
-            $memberId = (int) $memberId;
-            if ($memberId <= 0) {
-                continue;
-            }
+        foreach ($toAdd as $memberId) {
             $insertQuery = $db->getQuery(true)
                 ->insert($db->quoteName('#__balancirk_teachers'))
                 ->columns([$db->quoteName('member'), $db->quoteName('lesson')])
-                ->values($memberId . ', ' . (int) $lessonId);
+                ->values((int) $memberId . ', ' . (int) $lessonId);
             $db->setQuery($insertQuery)->execute();
         }
+
+        foreach ($toRemove as $memberId) {
+            $deleteQuery = $db->getQuery(true)
+                ->delete($db->quoteName('#__balancirk_teachers'))
+                ->where($db->quoteName('lesson') . ' = ' . (int) $lessonId)
+                ->where($db->quoteName('member') . ' = ' . (int) $memberId);
+            $db->setQuery($deleteQuery)->execute();
+        }
+
+        return true;
     }
 
     /**
@@ -352,18 +438,112 @@ class LessonModel extends AdminModel
      */
     public function save($data)
     {
-        $teacherIds = $data['teachers'] ?? [];
-        unset($data['teachers']);
+        $syncTeachers = \array_key_exists('teachers', $data);
+        $teacherIds = $syncTeachers ? $this->normalizeTeacherIds((array) ($data['teachers'] ?? [])) : [];
+        unset($data['teachers'], $data['teachers_sync']);
 
-        if (!parent::save($data)) {
+        $lessonId = (int) ($this->getState('lesson.id') ?: $data['id'] ?? 0);
+        if ($syncTeachers && $lessonId > 0 && !$this->canSyncTeachers($lessonId, $teacherIds)) {
+            return false;
+        }
+
+        if (!$this->saveLessonRecord($data)) {
             return false;
         }
 
         $lessonId = (int) ($this->getState('lesson.id') ?: $data['id'] ?? 0);
-        if ($lessonId && is_array($teacherIds)) {
-            $this->saveTeachers($lessonId, $teacherIds);
+        if ($syncTeachers && $lessonId > 0) {
+            return $this->saveTeachers($lessonId, $teacherIds);
         }
 
         return true;
+    }
+
+    /**
+     * Persist lesson record data.
+     *
+     * @param   array  $data  Lesson data without teacher assignments.
+     *
+     * @return  bool
+     *
+     * @since   1.3.18
+     */
+    protected function saveLessonRecord(array $data): bool
+    {
+        return parent::save($data);
+    }
+
+    /**
+     * Validate that requested teacher removals are allowed.
+     *
+     * @param   int    $lessonId    Lesson id.
+     * @param   array  $teacherIds  Requested teacher member ids.
+     *
+     * @return  bool
+     *
+     * @since   1.3.18
+     */
+    private function canSyncTeachers(int $lessonId, array $teacherIds): bool
+    {
+        $current = $this->getTeacherIdsForLesson($lessonId);
+        $toRemove = array_diff($current, $teacherIds);
+
+        foreach ($toRemove as $memberId) {
+            if (!$this->assertTeacherCanBeUnassigned((int) $memberId, $lessonId)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Block unassign when teached rows exist for this member on this lesson.
+     *
+     * @param   int  $memberId  Member id.
+     * @param   int  $lessonId  Lesson id.
+     *
+     * @return  bool
+     *
+     * @since   1.3.18
+     */
+    private function assertTeacherCanBeUnassigned(int $memberId, int $lessonId): bool
+    {
+        $teachedCount = $this->countTeachedRecords($memberId, $lessonId);
+
+        if ($teachedCount > 0) {
+            $this->setError(
+                Text::sprintf(
+                    'COM_BALANCIRK_LESSON_TEACHER_CANNOT_UNASSIGN_HAS_TEACHED',
+                    $memberId,
+                    $lessonId,
+                    $teachedCount
+                )
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Normalize teacher member ids from request data.
+     *
+     * @param   array  $teacherIds  Raw teacher ids.
+     *
+     * @return  int[]
+     *
+     * @since   1.3.18
+     */
+    private function normalizeTeacherIds(array $teacherIds): array
+    {
+        $ids = array_values(array_unique(array_filter(
+            array_map('intval', $teacherIds),
+            static fn(int $id): bool => $id > 0
+        )));
+        sort($ids);
+
+        return $ids;
     }
 }
