@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Unit\Site\Helper;
 
 use CoCoCo\Component\Balancirk\Site\Helper\SubscriptionMailHelper;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 final class SubscriptionMailHelperTest extends TestCase
@@ -24,6 +26,8 @@ final class SubscriptionMailHelperTest extends TestCase
         $this->assertSame('20/08/2026', $context['{subscription_date}']);
     }
 
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testInvoiceHintBeforeStartMentionsLessonStart(): void
     {
         $hint = SubscriptionMailHelper::getInvoiceHint('2026-09-10', '2026-08-20', false);
@@ -31,6 +35,8 @@ final class SubscriptionMailHelperTest extends TestCase
         $this->assertStringContainsString('10/09/2026', $hint);
     }
 
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testInvoiceHintAfterStartMentionsLessonAlreadyStarted(): void
     {
         $hint = SubscriptionMailHelper::getInvoiceHint('2026-09-10', '2026-10-01', false);
@@ -75,6 +81,8 @@ final class SubscriptionMailHelperTest extends TestCase
         $this->assertSame('Fallback template', $fromFallback);
     }
 
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testGetInvoiceHintFallsBackWhenDatesInvalid(): void
     {
         $hint = SubscriptionMailHelper::getInvoiceHint('not-a-date', 'also-invalid', false);
