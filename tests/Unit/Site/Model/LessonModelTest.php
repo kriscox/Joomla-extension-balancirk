@@ -208,6 +208,7 @@ class LessonModelTest extends TestCase
         $this->assertSame('2026-09-09', LessonModel::parseLessonDate('09.09.2026')?->format('Y-m-d'));
         $this->assertSame('2026-09-09', LessonModel::parseLessonDate('2026-09-09T14:30:00+02:00')?->format('Y-m-d'));
         $this->assertSame('2026-09-01', LessonModel::parseLessonDate('01/09/2026 00:00:00')?->format('Y-m-d'));
+        $this->assertSame('2026-09-12', LessonModel::parseLessonDate('2026-09-12')?->format('Y-m-d'));
         $this->assertNull(LessonModel::parseLessonDate(null));
         $this->assertNull(LessonModel::parseLessonDate('not-a-date'));
         $this->assertNull(LessonModel::parseLessonDate('32/13/2026'));

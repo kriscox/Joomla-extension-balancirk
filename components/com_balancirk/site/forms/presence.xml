@@ -14,6 +14,6 @@
 		<field name="students"
 			type="checkboxes"
 			label="COM_BALANCIRK_TABLE_TABLEHEAD_STUDENT"
-			required="true" />
+			required="false" />
 	</fieldset>
 </form>

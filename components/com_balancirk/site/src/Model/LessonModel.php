@@ -635,6 +635,33 @@ class LessonModel extends AdminModel
     }
 
     /**
+     * Return student ids already marked present for a lesson date.
+     *
+     * @param   int     $lessonId  Lesson id.
+     * @param   string  $date      Date in Y-m-d.
+     *
+     * @return  int[]
+     *
+     * @since   1.3.20
+     */
+    public function getPresentStudentIds(int $lessonId, string $date): array
+    {
+        if ($lessonId <= 0 || $date === '') {
+            return [];
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('student'))
+            ->from($db->quoteName('#__balancirk_presences'))
+            ->where($db->quoteName('lesson') . ' = ' . $lessonId)
+            ->where($db->quoteName('date') . ' = ' . $db->quote($date))
+            ->order($db->quoteName('student') . ' ASC');
+
+        return array_map('intval', $db->setQuery($query)->loadColumn() ?: []);
+    }
+
+    /**
      * Method to save the presence of the students
      *
      * @param	int		$id			Id of the lesson
@@ -645,12 +672,13 @@ class LessonModel extends AdminModel
      */
     public function savePresence($id, $date, $students)
     {
+        $students = is_array($students) ? $students : [];
         $dbo = $this->getDatabase();
         $query = $dbo->getQuery(true);
 
         // Delete all presences for this lesson
         $query->delete($dbo->quoteName('#__balancirk_presences'))
-            ->where($dbo->quoteName('lesson') . ' = ' . $id)
+            ->where($dbo->quoteName('lesson') . ' = ' . (int) $id)
             ->where($dbo->quoteName('date') . ' = ' . $dbo->quote($date));
         $dbo->setQuery($query);
         $dbo->execute();

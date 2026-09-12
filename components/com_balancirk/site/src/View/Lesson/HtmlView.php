@@ -112,7 +112,7 @@ class HtmlView extends BaseHtmlView
         $this->students = $this->get('Students');
         $this->waitingListStudents = $this->get('WaitingListStudents');
         $this->state = $this->get('State');
-        $this->lesdays = LessonModel::getLesdays($this->item->lesdays);
+        $this->lesdays = LessonModel::getLesdays((int) ($this->item->lesdays ?? 0));
         $this->presences = $this->get('Presences');
         $this->teachers = $this->get('Teachers');
 
