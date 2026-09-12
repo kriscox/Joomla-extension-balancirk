@@ -84,9 +84,13 @@ class LessonController extends FormController
         }
         $validData['lesdays'] = $lesday;
 
-        // Teachers are optional: only sync when explicitly submitted (SPA/API or teachers tab).
-        if (\array_key_exists('teachers', $data)) {
-            $validData['teachers'] = $data['teachers'];
+        // Teachers are optional for API/SPA partial updates.
+        // The admin edit form always sends teachers_sync=1 so checkbox changes are applied
+        // (including "uncheck all", which would otherwise omit the teachers key).
+        if (\array_key_exists('teachers_sync', $data) || \array_key_exists('teachers', $data)) {
+            $validData['teachers'] = (isset($data['teachers']) && \is_array($data['teachers']))
+                ? $data['teachers']
+                : [];
         }
 
         if ($validData === false) {

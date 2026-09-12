@@ -336,6 +336,10 @@ class LessonModel extends AdminModel
     /**
      * Check whether a member has attendance records as a teacher.
      *
+     * The database FK fk_teached_teacher references teachers.member only (not lesson),
+     * so any teached row for this member blocks deleting their teachers assignment
+     * for every lesson. The check is therefore global on purpose.
+     *
      * @param   int  $memberId  Member id.
      *
      * @return  bool
@@ -344,8 +348,22 @@ class LessonModel extends AdminModel
      */
     public function hasTeachedRecords(int $memberId): bool
     {
+        return $this->countTeachedRecords($memberId) > 0;
+    }
+
+    /**
+     * Count attendance records for a teacher member.
+     *
+     * @param   int  $memberId  Member id.
+     *
+     * @return  int
+     *
+     * @since   1.3.18
+     */
+    public function countTeachedRecords(int $memberId): int
+    {
         if ($memberId <= 0) {
-            return false;
+            return 0;
         }
 
         $db = $this->getDatabase();
@@ -354,7 +372,7 @@ class LessonModel extends AdminModel
             ->from($db->quoteName('#__balancirk_teached'))
             ->where($db->quoteName('teacher') . ' = ' . (int) $memberId);
 
-        return (int) $db->setQuery($query)->loadResult() > 0;
+        return (int) $db->setQuery($query)->loadResult();
     }
 
     /**
@@ -375,9 +393,7 @@ class LessonModel extends AdminModel
         $toRemove = array_diff($current, $teacherIds);
 
         foreach ($toRemove as $memberId) {
-            if ($this->hasTeachedRecords((int) $memberId)) {
-                $this->setError(Text::_('COM_BALANCIRK_LESSON_TEACHER_CANNOT_UNASSIGN_HAS_TEACHED'));
-
+            if (!$this->assertTeacherCanBeUnassigned((int) $memberId)) {
                 return false;
             }
         }
@@ -416,7 +432,7 @@ class LessonModel extends AdminModel
     {
         $syncTeachers = \array_key_exists('teachers', $data);
         $teacherIds = $syncTeachers ? $this->normalizeTeacherIds((array) ($data['teachers'] ?? [])) : [];
-        unset($data['teachers']);
+        unset($data['teachers'], $data['teachers_sync']);
 
         $lessonId = (int) ($this->getState('lesson.id') ?: $data['id'] ?? 0);
         if ($syncTeachers && $lessonId > 0 && !$this->canSyncTeachers($lessonId, $teacherIds)) {
@@ -465,11 +481,37 @@ class LessonModel extends AdminModel
         $toRemove = array_diff($current, $teacherIds);
 
         foreach ($toRemove as $memberId) {
-            if ($this->hasTeachedRecords((int) $memberId)) {
-                $this->setError(Text::_('COM_BALANCIRK_LESSON_TEACHER_CANNOT_UNASSIGN_HAS_TEACHED'));
-
+            if (!$this->assertTeacherCanBeUnassigned((int) $memberId)) {
                 return false;
             }
+        }
+
+        return true;
+    }
+
+    /**
+     * Block unassign when teached rows exist for this member (FK is member-global).
+     *
+     * @param   int  $memberId  Member id.
+     *
+     * @return  bool
+     *
+     * @since   1.3.18
+     */
+    private function assertTeacherCanBeUnassigned(int $memberId): bool
+    {
+        $teachedCount = $this->countTeachedRecords($memberId);
+
+        if ($teachedCount > 0) {
+            $this->setError(
+                Text::sprintf(
+                    'COM_BALANCIRK_LESSON_TEACHER_CANNOT_UNASSIGN_HAS_TEACHED',
+                    $memberId,
+                    $teachedCount
+                )
+            );
+
+            return false;
         }
 
         return true;
