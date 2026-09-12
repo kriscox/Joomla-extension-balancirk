@@ -313,6 +313,32 @@ class SubscriptionModel extends AdminModel
     }
 
     /**
+     * Count attendances for a student in a lesson.
+     *
+     * @param   int  $studentId  Student id.
+     * @param   int  $lessonId   Lesson id.
+     *
+     * @return  int
+     *
+     * @since   1.3.20
+     */
+    public function countPresences(int $studentId, int $lessonId): int
+    {
+        if ($studentId <= 0 || $lessonId <= 0) {
+            return 0;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__balancirk_presences'))
+            ->where($db->quoteName('student') . ' = ' . $studentId)
+            ->where($db->quoteName('lesson') . ' = ' . $lessonId);
+
+        return (int) $db->setQuery($query)->loadResult();
+    }
+
+    /**
      * Load a subscription row by id.
      *
      * @param   int  $id  Subscription id.

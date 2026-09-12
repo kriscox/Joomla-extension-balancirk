@@ -78,8 +78,9 @@ class SubscriptionController extends FormController
     /**
      * Method to check if you can delete a subscription.
      *
-     * Primary parents may unsubscribe. Lesson admins and users with delete
-     * permission may also remove a subscription.
+     * Primary parents may unsubscribe only when there are at most two
+     * attendances. Lesson admins and users with delete permission may always
+     * remove a subscription.
      *
      * @param   array  $data  An array of input data.
      *
@@ -89,6 +90,20 @@ class SubscriptionController extends FormController
      */
     protected function allowDelete($data = array())
     {
+        return $this->getDeleteDenialReason($data) === null;
+    }
+
+    /**
+     * Return why the current user may not delete this subscription.
+     *
+     * @param   array  $data  Student and lesson identifiers.
+     *
+     * @return  string|null  Denial message, or null when delete is allowed.
+     *
+     * @since   1.3.20
+     */
+    private function getDeleteDenialReason(array $data): ?string
+    {
         $user = Factory::getApplication()->getIdentity();
 
         if (
@@ -97,19 +112,31 @@ class SubscriptionController extends FormController
             || $user->authorise('core.delete', 'com_balancirk')
             || $user->authorise('core.admin', 'com_balancirk')
         ) {
-            return true;
+            return null;
         }
 
         $studentId = (int) ($data['student'] ?? 0);
+        $lessonId = (int) ($data['lesson'] ?? 0);
 
         if ($studentId <= 0) {
-            return false;
+            return Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED');
         }
 
-        /** @var StudentModel */
+        /** @var StudentModel $studentModel */
         $studentModel = $this->getModel('Student');
 
-        return $studentModel->isPrimairyParent((int) $user->id, $studentId);
+        if (!$studentModel->isPrimairyParent((int) $user->id, $studentId)) {
+            return Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED');
+        }
+
+        /** @var SubscriptionModel $subscriptionModel */
+        $subscriptionModel = $this->getModel();
+
+        if ($subscriptionModel->countPresences($studentId, $lessonId) > 2) {
+            return Text::_('COM_BALANCIRK_SUBSCRIPTION_DELETE_TOO_MANY_PRESENCES');
+        }
+
+        return null;
     }
 
     /**
@@ -256,8 +283,10 @@ class SubscriptionController extends FormController
             $data['lesson'] = (int) $record->lesson;
         }
 
-        if (!$this->allowDelete($data)) {
-            $this->sendDeleteResult($wantsJson, false, Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'));
+        $denialReason = $this->getDeleteDenialReason($data);
+
+        if ($denialReason !== null) {
+            $this->sendDeleteResult($wantsJson, false, $denialReason);
 
             return;
         }
