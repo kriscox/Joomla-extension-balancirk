@@ -156,9 +156,9 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
                     return [2];
                 }
 
-                public function hasTeachedRecords(int $memberId): bool
+                public function hasTeachedRecords(int $memberId, ?int $lessonId = null): bool
                 {
-                    return $memberId === 2;
+                    return $memberId === 2 && ($lessonId === null || $lessonId === 5);
                 }
 
                 protected function saveLessonRecord(array $data): bool

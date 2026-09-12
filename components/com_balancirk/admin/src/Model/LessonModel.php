@@ -334,33 +334,37 @@ class LessonModel extends AdminModel
     }
 
     /**
-     * Check whether a member has attendance records as a teacher.
+     * Check whether a member has attendance records as a teacher for a lesson.
      *
-     * The database FK fk_teached_teacher references teachers.member only (not lesson),
-     * so any teached row for this member blocks deleting their teachers assignment
-     * for every lesson. The check is therefore global on purpose.
+     * FK fk_teached_teacher is composite (teacher, lesson) → teachers(member, lesson),
+     * so only teached rows for this lesson block unassigning from that lesson.
      *
-     * @param   int  $memberId  Member id.
+     * @param   int       $memberId  Member id.
+     * @param   int|null  $lessonId  Lesson id (required for the composite FK check).
      *
      * @return  bool
      *
      * @since   1.3.18
      */
-    public function hasTeachedRecords(int $memberId): bool
+    public function hasTeachedRecords(int $memberId, ?int $lessonId = null): bool
     {
-        return $this->countTeachedRecords($memberId) > 0;
+        return $this->countTeachedRecords($memberId, $lessonId) > 0;
     }
 
     /**
      * Count attendance records for a teacher member.
      *
-     * @param   int  $memberId  Member id.
+     * When $lessonId is set, only rows for that lesson are counted (matches composite FK).
+     * When null, all lessons are counted (legacy/global).
+     *
+     * @param   int       $memberId  Member id.
+     * @param   int|null  $lessonId  Optional lesson id.
      *
      * @return  int
      *
      * @since   1.3.18
      */
-    public function countTeachedRecords(int $memberId): int
+    public function countTeachedRecords(int $memberId, ?int $lessonId = null): int
     {
         if ($memberId <= 0) {
             return 0;
@@ -371,6 +375,10 @@ class LessonModel extends AdminModel
             ->select('COUNT(*)')
             ->from($db->quoteName('#__balancirk_teached'))
             ->where($db->quoteName('teacher') . ' = ' . (int) $memberId);
+
+        if ($lessonId !== null && $lessonId > 0) {
+            $query->where($db->quoteName('lesson') . ' = ' . (int) $lessonId);
+        }
 
         return (int) $db->setQuery($query)->loadResult();
     }
@@ -393,7 +401,7 @@ class LessonModel extends AdminModel
         $toRemove = array_diff($current, $teacherIds);
 
         foreach ($toRemove as $memberId) {
-            if (!$this->assertTeacherCanBeUnassigned((int) $memberId)) {
+            if (!$this->assertTeacherCanBeUnassigned((int) $memberId, $lessonId)) {
                 return false;
             }
         }
@@ -481,7 +489,7 @@ class LessonModel extends AdminModel
         $toRemove = array_diff($current, $teacherIds);
 
         foreach ($toRemove as $memberId) {
-            if (!$this->assertTeacherCanBeUnassigned((int) $memberId)) {
+            if (!$this->assertTeacherCanBeUnassigned((int) $memberId, $lessonId)) {
                 return false;
             }
         }
@@ -490,23 +498,25 @@ class LessonModel extends AdminModel
     }
 
     /**
-     * Block unassign when teached rows exist for this member (FK is member-global).
+     * Block unassign when teached rows exist for this member on this lesson.
      *
      * @param   int  $memberId  Member id.
+     * @param   int  $lessonId  Lesson id.
      *
      * @return  bool
      *
      * @since   1.3.18
      */
-    private function assertTeacherCanBeUnassigned(int $memberId): bool
+    private function assertTeacherCanBeUnassigned(int $memberId, int $lessonId): bool
     {
-        $teachedCount = $this->countTeachedRecords($memberId);
+        $teachedCount = $this->countTeachedRecords($memberId, $lessonId);
 
         if ($teachedCount > 0) {
             $this->setError(
                 Text::sprintf(
                     'COM_BALANCIRK_LESSON_TEACHER_CANNOT_UNASSIGN_HAS_TEACHED',
                     $memberId,
+                    $lessonId,
                     $teachedCount
                 )
             );

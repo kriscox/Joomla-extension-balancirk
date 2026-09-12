@@ -128,6 +128,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
 
         $this->ensureDefaultGroupsAndPermissions();
         $this->removeObsoleteSpaArtifacts();
+        $this->migrateTeachedTeacherForeignKey();
 
         return true;
     }
@@ -199,9 +200,87 @@ class Com_BalancirkInstallerScript extends InstallerScript
             $this->conditionalInstallDashboard('com-balancirk-dashboard', 'balancirk');
             $this->ensureDefaultGroupsAndPermissions();
             $this->removeObsoleteSpaArtifacts();
+            $this->migrateTeachedTeacherForeignKey();
         }
 
         return true;
+    }
+
+    /**
+     * Migrate fk_teached_teacher from member-only to composite (teacher, lesson).
+     *
+     * Safe to run repeatedly: skips when the composite FK is already present.
+     *
+     * @return  void
+     *
+     * @since   1.3.20
+     */
+    private function migrateTeachedTeacherForeignKey(): void
+    {
+        try
+        {
+            /** @var \Joomla\Database\DatabaseDriver $db */
+            $db = Factory::getContainer()->get('DatabaseDriver');
+            $table = $db->replacePrefix('#__balancirk_teached');
+            $teachersTable = $db->replacePrefix('#__balancirk_teachers');
+            $schema = $db->setQuery('SELECT DATABASE()')->loadResult();
+
+            if (!$schema)
+            {
+                return;
+            }
+
+            $columnsQuery = $db->getQuery(true)
+                ->select($db->quoteName('COLUMN_NAME'))
+                ->from($db->quoteName('information_schema.KEY_COLUMN_USAGE'))
+                ->where($db->quoteName('CONSTRAINT_SCHEMA') . ' = ' . $db->quote($schema))
+                ->where($db->quoteName('TABLE_NAME') . ' = ' . $db->quote($table))
+                ->where($db->quoteName('CONSTRAINT_NAME') . ' = ' . $db->quote('fk_teached_teacher'))
+                ->order($db->quoteName('ORDINAL_POSITION') . ' ASC');
+            $columns = $db->setQuery($columnsQuery)->loadColumn() ?: [];
+
+            // Already migrated to composite (teacher, lesson).
+            if ($columns === ['teacher', 'lesson'])
+            {
+                return;
+            }
+
+            // Ensure every teached row has a matching teachers assignment.
+            $db->setQuery(
+                'INSERT IGNORE INTO ' . $db->quoteName($teachersTable) . ' ('
+                . $db->quoteName('member') . ', ' . $db->quoteName('lesson') . ') '
+                . 'SELECT DISTINCT t.' . $db->quoteName('teacher') . ', t.' . $db->quoteName('lesson') . ' '
+                . 'FROM ' . $db->quoteName($table) . ' AS t '
+                . 'LEFT JOIN ' . $db->quoteName($teachersTable) . ' AS te '
+                . 'ON te.' . $db->quoteName('member') . ' = t.' . $db->quoteName('teacher') . ' '
+                . 'AND te.' . $db->quoteName('lesson') . ' = t.' . $db->quoteName('lesson') . ' '
+                . 'WHERE te.' . $db->quoteName('id') . ' IS NULL'
+            )->execute();
+
+            if (!empty($columns))
+            {
+                $db->setQuery(
+                    'ALTER TABLE ' . $db->quoteName($table)
+                    . ' DROP FOREIGN KEY ' . $db->quoteName('fk_teached_teacher')
+                )->execute();
+            }
+
+            $db->setQuery(
+                'ALTER TABLE ' . $db->quoteName($table)
+                . ' ADD CONSTRAINT ' . $db->quoteName('fk_teached_teacher')
+                . ' FOREIGN KEY (' . $db->quoteName('teacher') . ', ' . $db->quoteName('lesson') . ')'
+                . ' REFERENCES ' . $db->quoteName($teachersTable)
+                . ' (' . $db->quoteName('member') . ', ' . $db->quoteName('lesson') . ')'
+            )->execute();
+        }
+        catch (\Throwable $e)
+        {
+            Log::add(
+                'Balancirk: could not migrate fk_teached_teacher to composite key: ' . $e->getMessage(),
+                Log::WARNING,
+                'jerror'
+            );
+        }
     }
 
     /**
