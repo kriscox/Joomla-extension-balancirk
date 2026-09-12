@@ -163,4 +163,16 @@
 			<item>Removed orphan birthdate fields from member forms.</item>
 		</change>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.20</version>
+		<fix>
+			<item>Fixed unsubscribe by using a site form POST with CSRF instead of the Joomla API token.</item>
+			<item>Parents can no longer unsubscribe from a lesson that already has more than two attendances.</item>
+			<item>Fixed the student attendance form so it stays usable without an API token or a blocking missing-period error, using the lesson start and end dates.</item>
+			<item>Fixed the teacher attendance form the same way, including loading existing marks through the site session.</item>
+			<item>Fixed saving a lesson when assigned teachers already have attendance records.</item>
+		</fix>
+	</changelog>
 </changelogs>
