@@ -10,13 +10,11 @@
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\HTML\Helpers\Tag;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Layout\LayoutHelper;
-use Joomla\CMS\User\UserHelper;
-use Joomla\CMS\Factory;
+use Joomla\CMS\Session\Session;
 
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
@@ -28,10 +26,10 @@ $states = array(
 );
 $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 
-$userid = Factory::getApplication()->getIdentity()->id;
-$bearertoken = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
 $selectedYear = $this->state->get('filter.year', '');
 $selectedStudent = $this->state->get('filter.student', '');
+$deleteEndpoint = Route::_('index.php?option=com_balancirk&task=subscription.delete&format=json', false);
+$deleteToken = Session::getFormToken();
 ?>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-subscriptions-top}'); ?>
@@ -199,27 +197,31 @@ $selectedStudent = $this->state->get('filter.student', '');
 	}
 
 	document.getElementById('confirmDeleteButton').addEventListener('click', function() {
-		if (subscriptionIdToDelete !== null) {
-			// Send the DELETE request to the API endpoint
-			fetch(`/api/index.php/v1/subscription/${subscriptionIdToDelete}`, {
-					method: 'DELETE',
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': 'Bearer <?= $bearertoken; ?>'
-					},
-				})
-				.then(response => {
-					if (response.ok) {
-						// Successfully deleted, reload the page
-						location.reload();
-					} else {
-						alert('Failed to delete subscription. Please try again.');
-					}
-				})
-				.catch(error => {
-					console.error('Error:', error);
-					alert('An error occurred while trying to delete the subscription.');
-				});
+		if (subscriptionIdToDelete === null) {
+			return;
 		}
+
+		const formData = new FormData();
+		formData.append('id', String(subscriptionIdToDelete));
+		formData.append('<?= $this->escape($deleteToken); ?>', '1');
+
+		fetch('<?= $deleteEndpoint; ?>', {
+				method: 'POST',
+				body: formData,
+				credentials: 'same-origin'
+			})
+			.then(response => response.json())
+			.then(payload => {
+				if (payload.success) {
+					location.reload();
+					return;
+				}
+
+				alert(payload.message || <?= json_encode(Text::_('COM_BALANCIRK_SUBSCRIPTION_DELETE_FAILED'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>);
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				alert(<?= json_encode(Text::_('COM_BALANCIRK_SUBSCRIPTION_DELETE_FAILED'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>);
+			});
 	});
 </script>

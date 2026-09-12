@@ -12,6 +12,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Session\Session;
 use Joomla\CMS\User\UserHelper;
 use CoCoCo\Component\Balancirk\Site\Model\LessonModel;
 
@@ -25,26 +26,53 @@ HTMLHelper::_('jquery.framework');
 /** @var Joomla\CMS\Application $app */
 $app = Factory::getApplication();
 
-/** create list of lesdays */
-$lessons = [];
-$lesdays = LessonModel::getDates($this->item->start, $this->item->end, LessonModel::getLesdays($this->item->lesdays));
-if (empty($lesdays)) {
-	echo '<div class="alert alert-info">' . Text::_('COM_BALANCIRK_LESSON_NO_DATES_YET') . '</div>';
-	return;
-}
-$firstLesDay = min($lesdays)->format('d/m/Y');
-$lastLesDay = max($lesdays)->format('d/m/Y');
-foreach ($lesdays as $lesday)
-{
-	array_push($lessons, $lesday->format('d/m/Y'));
-}
-$userid = Factory::getApplication()->getIdentity()->id;
-$api_token = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
+/** @var LessonModel $lessonModel */
+$lessonModel = $this->getModel();
+$item = is_object($this->item) ? $this->item : (object) [];
+$period = $lessonModel instanceof LessonModel
+	? $lessonModel->resolveLessonPeriod($item)
+	: LessonModel::periodFromValues($item->start ?? null, $item->end ?? null);
 
-$today = (new DateTime())->settime(0, 0, 0);
-if (!in_array($today, $lesdays))
-{
-	$today = null;
+if ($period === null) {
+	$startDate = (new DateTime('today'))->modify('-18 months');
+	$endDate = (new DateTime('today'))->modify('+18 months');
+} else {
+	$startDate = $period['start'];
+	$endDate = $period['end'];
+}
+
+$lesdayMask = LessonModel::getLesdays((int) ($item->lesdays ?? 0));
+$restrictToLesdays = LessonModel::hasConfiguredLesdays($lesdayMask);
+$matchedDates = $restrictToLesdays
+	? LessonModel::getDates($startDate->format('Y-m-d'), $endDate->format('Y-m-d'), $lesdayMask)
+	: [];
+
+if ($restrictToLesdays && empty($matchedDates)) {
+	$restrictToLesdays = false;
+}
+
+$lessons = [];
+foreach ($matchedDates as $lesday) {
+	$lessons[] = $lesday->format('d/m/Y');
+}
+
+$firstLesDay = $startDate->format('d/m/Y');
+$lastLesDay = $endDate->format('d/m/Y');
+$firstIso = $startDate->format('Y-m-d');
+$lastIso = $endDate->format('Y-m-d');
+$userid = Factory::getApplication()->getIdentity()->id;
+$joomlaToken = UserHelper::getProfile($userid)->get('joomlatoken');
+$api_token = is_array($joomlaToken) ? (string) ($joomlaToken['token'] ?? '') : '';
+$presencesUrl = Route::_(
+	'index.php?option=com_balancirk&task=lesson.presences&format=json&' . Session::getFormToken() . '=1',
+	false
+);
+
+$today = (new DateTime())->setTime(0, 0, 0);
+$todayInRange = $today >= $startDate && $today <= $endDate;
+
+if ($restrictToLesdays && !in_array($today->format('d/m/Y'), $lessons, true)) {
+	$todayInRange = false;
 }
 
 /** @var Joomla\CMS\Document\Document  */
@@ -58,57 +86,61 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 	->addInlineScript('
 	var changed = false;
 	jQuery(document).ready(function() {
-		jQuery("#jform_date").datepicker({
-			language: "nl-BE",
-			startDate: "' . $firstLesDay . '",
-    		endDate: "' . $lastLesDay . '",
-			todayHighlight: true,  //Do not to forget to define class today
-			todayBtn: true,
-			maxViewMode: 0,
-			weekStart: 1,
-			beforeShowDay: function(date) {
-				// Get day, month, and year components
-    			var day = date.getDate();
-    			var month = date.getMonth() + 1; // Months are zero-based
-				var year = date.getFullYear();
-
-				// Add leading zeros if necessary
-				day = (day < 10) ? "0" + day : day;
-				month = (month < 10) ? "0" + month : month;
-
-				// Create the formatted string
-				var formattedDate = day + "/" + month + "/" + year;
-
-				var lesdays = ["' . implode('","', $lessons) . '"];
-				if (jQuery.inArray(formattedDate, lesdays) > -1) {
-					return true;
-				} else {
-					return false;
-				}
-			}, // Do not forget to define class disabled
-			autoclose: true,
-		})
-	 ' . ($today ? 'jQuery("#jform_date").datepicker("setDate", "' . $today->format('d/m/Y') . '"); 
-	 changed = true' : '') . '
-	})
+		if (jQuery.fn.datepicker) {
+			jQuery("#jform_date").datepicker({
+				language: "nl-BE",
+				startDate: "' . $firstLesDay . '",
+				endDate: "' . $lastLesDay . '",
+				todayHighlight: true,
+				todayBtn: true,
+				maxViewMode: 0,
+				weekStart: 1,
+				beforeShowDay: function(date) {
+					' . ($restrictToLesdays ? '
+					var day = date.getDate();
+					var month = date.getMonth() + 1;
+					var year = date.getFullYear();
+					day = (day < 10) ? "0" + day : day;
+					month = (month < 10) ? "0" + month : month;
+					var formattedDate = day + "/" + month + "/" + year;
+					var lesdays = ["' . implode('","', $lessons) . '"];
+					return jQuery.inArray(formattedDate, lesdays) > -1;
+					' : 'return true;') . '
+				},
+				autoclose: true,
+			});
+			' . ($todayInRange ? 'jQuery("#jform_date").datepicker("setDate", "' . $today->format('d/m/Y') . '");
+			changed = true;' : '') . '
+		} else {
+			jQuery("#jform_date").attr({type: "date", min: "' . $firstIso . '", max: "' . $lastIso . '"});
+			' . ($todayInRange ? 'jQuery("#jform_date").val("' . $today->format('Y-m-d') . '");
+			changed = true;' : '') . '
+		}
+	});
 	');
-$doc->addScriptOptions('lesson-script', ['token' => $api_token]);
+$doc->addScriptOptions('lesson-script', [
+	'token' => $api_token,
+	'presencesUrl' => $presencesUrl,
+]);
 
-$students = $this->get('Students');
+$students = $this->get('Students') ?: [];
 $data = [];
-$data['id'] = $this->item->id;
+$data['id'] = (int) ($item->id ?? 0);
 
 $form = $this->get('PresenceForm');
-$form->bind($data);
+if ($form) {
+	$form->bind($data);
+	$studentsField = $form->getField('students');
 
-foreach ($students as $student)
-{
-	$form->getField('students')->addOption($student->firstname . " " . $student->name, ['value' => $student->id]);
+	if ($studentsField) {
+		foreach ($students as $student) {
+			$studentsField->addOption($student->firstname . " " . $student->name, ['value' => $student->id]);
+		}
+	}
 }
 
-
-$teached_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=teacher&id=' . (int) $this->item->id);
-$url = Route::_('index.php?option=com_balancirk&view=lesson');
+$teached_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=teacher&id=' . (int) ($item->id ?? 0));
+$url = Route::_('index.php?option=com_balancirk&view=lesson&id=' . (int) ($item->id ?? 0));
 ?>
 
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
@@ -116,14 +148,14 @@ $url = Route::_('index.php?option=com_balancirk&view=lesson');
 <form action="<?= $url ?>" method="POST" name="adminForm" id="presence-form" class="form-validate">
 	<div class="row">
 		<div class="col-md-12">
-			<h3><?= Text::_('COM_BALANCIRK_LESSONS_PRESENCES'); ?><?= $this->item->name ?></h3>
-			<?= $form->renderField('id'); ?>
+			<h3><?= Text::_('COM_BALANCIRK_LESSONS_PRESENCES'); ?><?= $this->escape($item->name ?? '') ?></h3>
+			<?= $form ? $form->renderField('id') : ''; ?>
 			<label for="lessonDate">Select Date:</label>
 			<input type="text" id="jform_date" class="form-control" name="jform[date]" />
 
 			<?= HTMLHelper::_('uitab.startTabSet', 'myTab', array('active' => 'students')); ?>
 
-			<?= $form->getInput('students'); ?>
+			<?= $form ? $form->getInput('students') : ''; ?>
 			<input type="hidden" name="task" />
 		</div>
 		<?= HTMLHelper::_('form.token'); ?>

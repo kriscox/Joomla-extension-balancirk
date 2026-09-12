@@ -144,7 +144,8 @@ class SubscriptionController extends ApiController
             return true;
         }
 
-        return $this->isPrimaryParent((int) $user->id, $studentId) && $this->presenceCount($studentId, $lessonId) <= 2;
+        return $this->isPrimaryParent((int) $user->id, $studentId)
+            && $this->presenceCount($studentId, $lessonId) <= 2;
     }
 
     /**

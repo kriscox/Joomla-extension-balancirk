@@ -3,29 +3,26 @@ var oldDate = '';
 
 jQuery(document).ready(function () {
 	const fieldset = document.querySelectorAll('fieldset#jform_students')[0];
-	fieldset.addEventListener('change', function () { changed = true; });
+
+	if (fieldset) {
+		fieldset.addEventListener('change', function () { changed = true; });
+	}
 
 	jQuery("#jform_date").on("change", function () {
-		// Set mouspointer to hourglass
 		document.body.style.cursor = 'wait';
 
 		var selectedDate = jQuery(this).val();
 
-		// TODO: Add a check to see if the date has changed
 		if (changed && oldDate != selectedDate) {
 			$('#confirmModal').modal('show');
 
-			// When user confirms the change
 			$('#confirmChange').on('click', function () {
-				// Close modal
 				$('#confirmModal').modal('hide');
 
 				update();
 			});
 
-			// When user cancels the change
 			$('#confirmModal').on('hidden.bs.modal', function (e) {
-				// Revert date value
 				$('#dateInput').val(oldDate);
 
 				return;
@@ -36,68 +33,129 @@ jQuery(document).ready(function () {
 
 		function update() {
 			changed = false;
-			// Save the old_date
 			oldDate = selectedDate;
 
 			var lesson = jQuery("#jform_id").val();
 			if (lesson && selectedDate) {
-				loadStudentsData(lesson, selectedDate).then(function (response) {
-					// Assuming the response is an array of student IDs
-					updateCheckboxes(response);
+				loadStudentsData(lesson, selectedDate).then(function (studentIds) {
+					updateCheckboxes(studentIds);
 				}).catch(function (error) {
 					console.error('Error fetching data:', error);
+					document.body.style.cursor = 'default';
 				});
+			} else {
+				document.body.style.cursor = 'default';
 			}
 		}
 	});
 
-})
+});
+
+function toIsoDate(selectedDate) {
+	if (!selectedDate) {
+		return '';
+	}
+
+	if (/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
+		return selectedDate;
+	}
+
+	var parts = selectedDate.split(/[\/.\-]/);
+
+	if (parts.length === 3 && parts[2].length === 4) {
+		var day = parts[0].padStart(2, '0');
+		var month = parts[1].padStart(2, '0');
+
+		return parts[2] + '-' + month + '-' + day;
+	}
+
+	return selectedDate;
+}
+
+function extractStudentIds(response) {
+	if (Array.isArray(response)) {
+		return response.map(function (item) {
+			return (item && typeof item === 'object') ? item.id : item;
+		});
+	}
+
+	if (!response || typeof response !== 'object') {
+		return [];
+	}
+
+	if (Array.isArray(response.students)) {
+		return response.students;
+	}
+
+	if (response.data && Array.isArray(response.data.students)) {
+		return response.data.students;
+	}
+
+	if (response.data && Array.isArray(response.data)) {
+		return response.data.map(function (item) {
+			return (item && typeof item === 'object') ? item.id : item;
+		});
+	}
+
+	return [];
+}
 
 function loadStudentsData(lesson, selectedDate) {
-	// reformat selectedDate from dd/mm/yyyy to yyyy-mm-dd
-	var dateParts = selectedDate.split("/");
-	selectedDate = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0];
+	selectedDate = toIsoDate(selectedDate);
+	var options = Joomla.getOptions('lesson-script') || {};
+	var url = options.presencesUrl;
 
-	// Make an API call using AJAX
-	var apiUrl = 'api/index.php/v1/presence/' + lesson + '/' + selectedDate;
-	var token = Joomla.getOptions('lesson-script').token;
+	if (url) {
+		url += (url.indexOf('?') === -1 ? '?' : '&') + 'id=' + encodeURIComponent(lesson)
+			+ '&date=' + encodeURIComponent(selectedDate);
+
+		return jQuery.ajax({
+			url: url,
+			method: 'GET',
+			dataType: 'json'
+		}).then(function (response) {
+			document.body.style.cursor = 'default';
+			return extractStudentIds(response);
+		});
+	}
+
+	var apiUrl = '/api/index.php/v1/presence/' + lesson + '/' + selectedDate;
+	var token = options.token;
 
 	return new Promise(function (resolve, reject) {
 		jQuery.ajax({
 			url: apiUrl,
 			method: 'GET',
-			headers: {
+			headers: token ? {
 				'Authorization': 'Bearer ' + token
-			},
+			} : {},
 			success: function (response) {
-				// Assuming the response is an array of student IDs
-				updateCheckboxes(response);
-
-				// Set mousepounter to default
 				document.body.style.cursor = 'default';
+				resolve(extractStudentIds(response));
 			},
 			error: function (error) {
 				console.error('Error fetching data:', error);
-
-				// Set mousepounter to default
 				document.body.style.cursor = 'default';
+				reject(error);
 			}
 		});
 	});
 }
 
 function updateCheckboxes(studentIds) {
-	// Assuming 'jform_students' is the ID of your checkboxes fieldset
 	var checkboxesFieldset = document.getElementById('jform_students');
 
-	// Uncheck all checkboxes
+	if (!checkboxesFieldset) {
+		return;
+	}
+
 	checkboxesFieldset.querySelectorAll('input[type="checkbox"]').forEach(function (checkbox) {
 		checkbox.checked = false;
 	});
 
-	// Check checkboxes based on the API response
-	studentIds.data.forEach(function (studentId) {
-		var checkbox = checkboxesFieldset.querySelector('input[value="' + studentId['id'] + '"]');
+	(studentIds || []).forEach(function (studentId) {
+		var id = (studentId && typeof studentId === 'object') ? studentId.id : studentId;
+		var checkbox = checkboxesFieldset.querySelector('input[value="' + id + '"]');
 		if (checkbox) {
 			checkbox.checked = true;
 		}
