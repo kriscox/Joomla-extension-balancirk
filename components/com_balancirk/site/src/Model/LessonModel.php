@@ -311,10 +311,14 @@ class LessonModel extends AdminModel
         $dbo = $this->getDatabase();
         $query = $dbo->getQuery(true);
 
-        $today = new DateTime('now');
-
         if ($lessonid == null) {
             $lessonid = $this->getState('lesson.id');
+        }
+
+        $lessonid = (int) $lessonid;
+
+        if ($lessonid <= 0) {
+            return [];
         }
 
         // Select the required fields from the table.
@@ -337,15 +341,16 @@ class LessonModel extends AdminModel
             )
         )
             ->from($dbo->quoteName('#__balancirk_members', 'a'))
-            ->join('INNER', $dbo->quoteName('#__balancirk_teachers', 't'), 't.member = a.id', 's.subscribed = 0')
-            ->join('LEFT', $dbo->quoteName('#__balancirk_teached', 'p'), 'p.teacher = a.id AND p.lesson = t.lesson')
+            ->join(
+                'INNER',
+                $dbo->quoteName('#__balancirk_teachers', 't') . ' ON t.member = a.id'
+            )
             ->where('t.lesson = ' . $lessonid)
-            ->order(['a.name', 'a.firstname'])
-            ->group('a.id', 'a.name', 'a.firstname', 'a.phone', 'a.email');
+            ->order(['a.name', 'a.firstname']);
 
         $dbo->setQuery($query);
 
-        return $dbo->loadObjectList();
+        return $dbo->loadObjectList() ?: [];
     }
 
     /**
@@ -695,6 +700,33 @@ class LessonModel extends AdminModel
     }
 
     /**
+     * Return teacher ids already marked as present for a lesson date.
+     *
+     * @param   int     $lessonId  Lesson id.
+     * @param   string  $date      Date in Y-m-d.
+     *
+     * @return  int[]
+     *
+     * @since   1.3.20
+     */
+    public function getTeachedTeacherIds(int $lessonId, string $date): array
+    {
+        if ($lessonId <= 0 || $date === '') {
+            return [];
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('teacher'))
+            ->from($db->quoteName('#__balancirk_teached'))
+            ->where($db->quoteName('lesson') . ' = ' . $lessonId)
+            ->where($db->quoteName('date') . ' = ' . $db->quote($date))
+            ->order($db->quoteName('teacher') . ' ASC');
+
+        return array_map('intval', $db->setQuery($query)->loadColumn() ?: []);
+    }
+
+    /**
      * Method to save the teachers of the lesson
      *
      * @param	int		$id			Id of the lesson
@@ -704,25 +736,68 @@ class LessonModel extends AdminModel
      */
     public function saveTeacher($id, $date, $teachers)
     {
+        $teachers = is_array($teachers) ? $teachers : [];
         $dbo = $this->getDatabase();
         $query = $dbo->getQuery(true);
 
         // Delete all teachers for this lesson
         $query->delete($dbo->quoteName('#__balancirk_teached'))
-            ->where($dbo->quoteName('lesson') . ' = ' . $id)
+            ->where($dbo->quoteName('lesson') . ' = ' . (int) $id)
             ->where($dbo->quoteName('date') . ' = ' . $dbo->quote($date));
         $dbo->setQuery($query);
         $dbo->execute();
 
         // Insert the new teachers
         foreach ($teachers as $teacher) {
+            $teacherId = (int) $teacher;
+
+            if ($teacherId <= 0) {
+                continue;
+            }
+
+            $this->ensureTeacherAssigned((int) $id, $teacherId);
+
             $query->clear();
             $query->insert($dbo->quoteName('#__balancirk_teached'))
                 ->columns($dbo->quoteName(['lesson', 'teacher', 'date']))
-                ->values($id . ', ' . $teacher . ', ' . $dbo->quote($date));
+                ->values((int) $id . ', ' . $teacherId . ', ' . $dbo->quote($date));
             $dbo->setQuery($query);
             $dbo->execute();
         }
+    }
+
+    /**
+     * Ensure a teacher is assigned to the lesson before storing a teached row.
+     *
+     * @param   int  $lessonId   Lesson id.
+     * @param   int  $teacherId  Member id of the teacher.
+     *
+     * @return  void
+     *
+     * @since   1.3.20
+     */
+    private function ensureTeacherAssigned(int $lessonId, int $teacherId): void
+    {
+        if ($lessonId <= 0 || $teacherId <= 0) {
+            return;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('member'))
+            ->from($db->quoteName('#__balancirk_teachers'))
+            ->where($db->quoteName('member') . ' = ' . $teacherId)
+            ->where($db->quoteName('lesson') . ' = ' . $lessonId);
+
+        if ($db->setQuery($query)->loadResult()) {
+            return;
+        }
+
+        $insert = $db->getQuery(true)
+            ->insert($db->quoteName('#__balancirk_teachers'))
+            ->columns($db->quoteName(['member', 'lesson']))
+            ->values($teacherId . ', ' . $lessonId);
+        $db->setQuery($insert)->execute();
     }
 
     /**

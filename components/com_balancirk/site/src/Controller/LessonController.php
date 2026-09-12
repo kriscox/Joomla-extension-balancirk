@@ -145,23 +145,25 @@ class LessonController extends FormController
         /** @var CMSApplication */
         $app = Factory::getApplication();
 
-        // Get the data from the form POST
         $data = $this->input->post->get('jform', [], 'array');
+        $lessonId = (int) ($data['id'] ?? 0);
+        $parsedDate = LessonModel::parseLessonDate($data['date'] ?? null);
+        $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=lesson&id=' . $lessonId, false);
 
-        // Get the model and the form used
-        /** @var LessonModel */
+        if ($lessonId <= 0 || !$parsedDate instanceof \DateTime) {
+            $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_TEACHER_INVALID_DATE'), 'warning');
+            $this->setRedirect($redirectUrl);
+
+            return;
+        }
+
+        $data['id'] = $lessonId;
+        $data['date'] = $parsedDate->format('Y-m-d');
+        $data['teachers'] = isset($data['teachers']) && is_array($data['teachers']) ? $data['teachers'] : [];
+
+        /** @var LessonModel $model */
         $model = $this->getModel('Lesson');
-        $form = $model->getForm($data, false);
-
-        // Convert date from nl-BE to 'Y-m-d'
-        $data['date'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['date'])));
-
-        // Set the default rediection url
-        $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=lesson&id=' . $data['id'], false);
-
-        // Fill form data cache
         $app->setUserState('com_balancirk.teacher.data', $data);
-
         $model->saveTeacher($data['id'], $data['date'], $data['teachers']);
 
         // Set success message
@@ -169,5 +171,41 @@ class LessonController extends FormController
 
         // Redirect to the lesson page
         $this->setRedirect($redirectUrl);
+    }
+
+    /**
+     * Return teacher ids marked as present for a lesson date as JSON.
+     *
+     * @return  void
+     *
+     * @since   1.3.20
+     */
+    public function teachers(): void
+    {
+        $this->checkToken('request');
+
+        /** @var \Joomla\CMS\Application\CMSApplication $app */
+        $app = Factory::getApplication();
+        $user = $app->getIdentity();
+
+        if ($user->guest || !$user->authorise('lessons.view', 'com_balancirk')) {
+            echo new JsonResponse(null, Text::_('JLIB_APPLICATION_ERROR_ACCESS_FORBIDDEN'), true);
+            $app->close();
+        }
+
+        $lessonId = $this->input->getInt('id');
+        $parsedDate = LessonModel::parseLessonDate($this->input->getString('date'));
+
+        if ($lessonId <= 0 || !$parsedDate instanceof \DateTime) {
+            echo new JsonResponse(null, Text::_('COM_BALANCIRK_LESSON_TEACHER_INVALID_DATE'), true);
+            $app->close();
+        }
+
+        /** @var LessonModel $model */
+        $model = $this->getModel('Lesson');
+        echo new JsonResponse([
+            'teachers' => $model->getTeachedTeacherIds($lessonId, $parsedDate->format('Y-m-d')),
+        ]);
+        $app->close();
     }
 }
