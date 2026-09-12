@@ -25,13 +25,19 @@ HTMLHelper::_('jquery.framework');
 /** @var Joomla\CMS\Application $app */
 $app = Factory::getApplication();
 
-$startDate = LessonModel::parseLessonDate($this->item->start ?? null);
-$endDate = LessonModel::parseLessonDate($this->item->end ?? null);
+/** @var LessonModel $lessonModel */
+$lessonModel = $this->getModel();
+$period = $lessonModel instanceof LessonModel
+	? $lessonModel->resolveLessonPeriod($this->item)
+	: LessonModel::periodFromValues($this->item->start ?? null, $this->item->end ?? null);
 
-if (!LessonModel::isValidLessonPeriod($this->item->start ?? null, $this->item->end ?? null)) {
+if ($period === null) {
 	echo '<div class="alert alert-info">' . Text::_('COM_BALANCIRK_LESSON_NO_PERIOD') . '</div>';
 	return;
 }
+
+$startDate = $period['start'];
+$endDate = $period['end'];
 
 $lesdayMask = LessonModel::getLesdays((int) ($this->item->lesdays ?? 0));
 $restrictToLesdays = LessonModel::hasConfiguredLesdays($lesdayMask);

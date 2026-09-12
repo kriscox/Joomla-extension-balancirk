@@ -25,24 +25,43 @@ HTMLHelper::_('jquery.framework');
 /** @var Joomla\CMS\Application $app */
 $app = Factory::getApplication();
 
-/** create list of lesdays */
-$lessons = [];
-$lesdays = LessonModel::getDates($this->item->start, $this->item->end, LessonModel::getLesdays($this->item->lesdays));
-if (empty($lesdays)) {
-    echo '<div class="alert alert-info">' . Text::_('COM_BALANCIRK_LESSON_NO_DATES_YET') . '</div>';
-    return;
-}
-$firstLesDay = min($lesdays)->format('d/m/Y');
-$lastLesDay = max($lesdays)->format('d/m/Y');
-foreach ($lesdays as $lesday) {
-    array_push($lessons, $lesday->format('d/m/Y'));
-}
-$userid = Factory::getApplication()->getIdentity()->id;
-$api_token = UserHelper::getProfile($userid)->get('joomlatoken')['token'];
+/** @var LessonModel $lessonModel */
+$lessonModel = $this->getModel();
+$period = $lessonModel instanceof LessonModel
+	? $lessonModel->resolveLessonPeriod($this->item)
+	: LessonModel::periodFromValues($this->item->start ?? null, $this->item->end ?? null);
 
-$today = (new DateTime())->settime(0, 0, 0);
-if (!in_array($today, $lesdays)) {
-    $today = null;
+if ($period === null) {
+	echo '<div class="alert alert-info">' . Text::_('COM_BALANCIRK_LESSON_NO_PERIOD') . '</div>';
+	return;
+}
+
+$lesdayMask = LessonModel::getLesdays((int) ($this->item->lesdays ?? 0));
+$restrictToLesdays = LessonModel::hasConfiguredLesdays($lesdayMask);
+$lesdays = $restrictToLesdays
+	? LessonModel::getDates($period['start']->format('Y-m-d'), $period['end']->format('Y-m-d'), $lesdayMask)
+	: [];
+
+if ($restrictToLesdays && empty($lesdays)) {
+	$restrictToLesdays = false;
+}
+
+$lessons = [];
+foreach ($lesdays as $lesday) {
+	$lessons[] = $lesday->format('d/m/Y');
+}
+
+$firstLesDay = $period['start']->format('d/m/Y');
+$lastLesDay = $period['end']->format('d/m/Y');
+$userid = Factory::getApplication()->getIdentity()->id;
+$joomlaToken = UserHelper::getProfile($userid)->get('joomlatoken');
+$api_token = is_array($joomlaToken) ? (string) ($joomlaToken['token'] ?? '') : '';
+
+$today = (new DateTime())->setTime(0, 0, 0);
+$todayInRange = $today >= $period['start'] && $today <= $period['end'];
+
+if ($restrictToLesdays && !in_array($today->format('d/m/Y'), $lessons, true)) {
+	$todayInRange = false;
 }
 
 /** @var Joomla\CMS\Document\Document  */
@@ -66,28 +85,20 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 			maxViewMode: 0,
 			weekStart: 1,
 			beforeShowDay: function(date) {
-				// Get day, month, and year components
-    			var day = date.getDate();
-    			var month = date.getMonth() + 1; // Months are zero-based
+				' . ($restrictToLesdays ? '
+				var day = date.getDate();
+				var month = date.getMonth() + 1;
 				var year = date.getFullYear();
-
-				// Add leading zeros if necessary
 				day = (day < 10) ? "0" + day : day;
 				month = (month < 10) ? "0" + month : month;
-
-				// Create the formatted string
 				var formattedDate = day + "/" + month + "/" + year;
-
 				var lesdays = ["' . implode('","', $lessons) . '"];
-				if (jQuery.inArray(formattedDate, lesdays) > -1) {
-					return true;
-				} else {
-					return false;
-				}
-			}, // Do not forget to define class disabled
+				return jQuery.inArray(formattedDate, lesdays) > -1;
+				' : 'return true;') . '
+			},
 			autoclose: true,
-		}) // datepicker
-	 ' . ($today ? 'jQuery("#jform_date").datepicker("setDate", "' . $today->format('d/m/Y') . '"); 
+		})
+	 ' . ($todayInRange ? 'jQuery("#jform_date").datepicker("setDate", "' . $today->format('d/m/Y') . '");
 	 changed = true' : '') . '
 	}); //ready
 	'

@@ -44,6 +44,37 @@ class LessonModel extends AdminModel
     protected $textPrefix = 'COM_BALANCIRK';
 
     /**
+     * Load a lesson and normalise start/end from the lessons table.
+     *
+     * The site table reads `#__balancirk_lessons_complete`. Older or broken
+     * views can omit those date columns, and Joomla Table::bind() skips NULL
+     * values. Attendance needs the real DATE values from `#__balancirk_lessons`.
+     *
+     * @param   int|null  $pk  Primary key.
+     *
+     * @return  object|false
+     *
+     * @since   1.3.20
+     */
+    public function getItem($pk = null)
+    {
+        $item = parent::getItem($pk);
+
+        if (!is_object($item) || (int) ($item->id ?? 0) <= 0) {
+            return $item;
+        }
+
+        $period = $this->resolveLessonPeriod($item);
+
+        if ($period !== null) {
+            $item->start = $period['start']->format('Y-m-d');
+            $item->end = $period['end']->format('Y-m-d');
+        }
+
+        return $item;
+    }
+
+    /**
      * Method to get the row form.
      *
      * @param	array   $data	    Data from the form.
@@ -388,14 +419,14 @@ class LessonModel extends AdminModel
     /**
      * Whether the lesson has a usable start and end date.
      *
-     * @param   string|null  $start  Lesson start date.
-     * @param   string|null  $end    Lesson end date.
+     * @param   mixed  $start  Lesson start date.
+     * @param   mixed  $end    Lesson end date.
      *
      * @return  bool
      *
      * @since   1.3.20
      */
-    public static function isValidLessonPeriod(?string $start, ?string $end): bool
+    public static function isValidLessonPeriod(mixed $start, mixed $end): bool
     {
         $startDate = self::parseLessonDate($start);
         $endDate = self::parseLessonDate($end);
@@ -404,31 +435,164 @@ class LessonModel extends AdminModel
     }
 
     /**
-     * Parse a lesson date string into a DateTime at midnight.
+     * Resolve the lesson period from the lessons table, then from the item.
      *
-     * @param   string|null  $date  Date in Y-m-d or a datetime starting with Y-m-d.
+     * The lessons table is the source of truth for start and end. The complete
+     * view used by LessonTable can miss those columns or return unusable values.
+     *
+     * @param   object|null  $item  Lesson record from the view/table.
+     *
+     * @return  array{start: DateTime, end: DateTime}|null
+     *
+     * @since   1.3.20
+     */
+    public function resolveLessonPeriod(?object $item): ?array
+    {
+        $id = (int) ($item->id ?? 0);
+
+        if ($id > 0) {
+            $row = $this->loadLessonDates($id);
+            $period = self::periodFromValues($row->start ?? null, $row->end ?? null);
+
+            if ($period !== null) {
+                return $period;
+            }
+        }
+
+        return self::periodFromValues($item->start ?? null, $item->end ?? null);
+    }
+
+    /**
+     * Load start and end from the lessons table.
+     *
+     * @param   int  $id  Lesson id.
+     *
+     * @return  object|null
+     *
+     * @since   1.3.20
+     */
+    private function loadLessonDates(int $id): ?object
+    {
+        try {
+            $db = $this->getDatabase();
+            $query = $db->getQuery(true)
+                ->select($db->quoteName(['start', 'end']))
+                ->from($db->quoteName('#__balancirk_lessons'))
+                ->where($db->quoteName('id') . ' = ' . $id);
+            $row = $db->setQuery($query)->loadObject();
+
+            return $row ?: null;
+        } catch (\Throwable $exception) {
+            return null;
+        }
+    }
+
+    /**
+     * Build a period from two date values.
+     *
+     * @param   mixed  $start  Start date.
+     * @param   mixed  $end    End date.
+     *
+     * @return  array{start: DateTime, end: DateTime}|null
+     *
+     * @since   1.3.20
+     */
+    public static function periodFromValues(mixed $start, mixed $end): ?array
+    {
+        $startDate = self::parseLessonDate($start);
+        $endDate = self::parseLessonDate($end);
+
+        if (!$startDate instanceof DateTime || !$endDate instanceof DateTime || $startDate > $endDate) {
+            return null;
+        }
+
+        return ['start' => $startDate, 'end' => $endDate];
+    }
+
+    /**
+     * Parse a lesson date into a DateTime at midnight.
+     *
+     * Accepts ISO dates, Belgian d/m/Y variants, DateTime objects, and
+     * datetime strings that start with a calendar date.
+     *
+     * @param   mixed  $date  Date value from the lesson record or form.
      *
      * @return  DateTime|null
      *
      * @since   1.3.20
      */
-    public static function parseLessonDate(?string $date): ?DateTime
+    public static function parseLessonDate(mixed $date): ?DateTime
     {
-        $date = trim((string) $date);
+        if ($date instanceof \DateTimeInterface) {
+            $parsed = DateTime::createFromInterface($date);
+            $parsed->setTime(0, 0, 0);
+
+            return $parsed;
+        }
+
+        $date = trim(html_entity_decode((string) $date, ENT_QUOTES, 'UTF-8'));
+        $date = preg_replace('/\s+/', ' ', $date) ?? $date;
 
         if ($date === '' || str_starts_with($date, '0000-00-00')) {
             return null;
         }
 
-        $parsed = DateTime::createFromFormat('Y-m-d', substr($date, 0, 10));
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})/', $date, $matches) === 1) {
+            return self::dateFromParts((int) $matches[1], (int) $matches[2], (int) $matches[3]);
+        }
 
-        if (!$parsed instanceof DateTime || $parsed->format('Y-m-d') !== substr($date, 0, 10)) {
+        if (preg_match('/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/', $date, $matches) === 1) {
+            return self::dateFromParts((int) $matches[3], (int) $matches[2], (int) $matches[1]);
+        }
+
+        foreach (['Y-m-d H:i:s', 'Y-m-d', 'd-m-Y H:i:s', 'd/m/Y H:i:s', 'd-m-Y', 'd/m/Y', 'd.m.Y', 'j-n-Y', 'j/n/Y'] as $format) {
+            $parsed = DateTime::createFromFormat('!' . $format, $date);
+
+            if (!$parsed instanceof DateTime) {
+                continue;
+            }
+
+            $errors = DateTime::getLastErrors();
+
+            if (is_array($errors) && (($errors['warning_count'] ?? 0) > 0 || ($errors['error_count'] ?? 0) > 0)) {
+                continue;
+            }
+
+            $parsed->setTime(0, 0, 0);
+
+            return $parsed;
+        }
+
+        try {
+            $parsed = new DateTime($date);
+            $parsed->setTime(0, 0, 0);
+
+            return $parsed;
+        } catch (\Exception $exception) {
+            return null;
+        }
+    }
+
+    /**
+     * Build a midnight DateTime from calendar parts.
+     *
+     * @param   int  $year   Year.
+     * @param   int  $month  Month.
+     * @param   int  $day    Day.
+     *
+     * @return  DateTime|null
+     *
+     * @since   1.3.20
+     */
+    private static function dateFromParts(int $year, int $month, int $day): ?DateTime
+    {
+        if (!checkdate($month, $day, $year)) {
             return null;
         }
 
-        $parsed->setTime(0, 0, 0);
+        $parsed = DateTime::createFromFormat('!Y-m-d', sprintf('%04d-%02d-%02d', $year, $month, $day));
 
-        return $parsed;
+        return $parsed instanceof DateTime ? $parsed : null;
     }
 
     /**

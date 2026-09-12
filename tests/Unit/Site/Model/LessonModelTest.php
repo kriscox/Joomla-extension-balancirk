@@ -202,8 +202,29 @@ class LessonModelTest extends TestCase
 
         $this->assertInstanceOf(\DateTime::class, $parsed);
         $this->assertSame('2026-09-09 00:00:00', $parsed->format('Y-m-d H:i:s'));
-        $this->assertNull(LessonModel::parseLessonDate('09/09/2026'));
+        $this->assertSame('2026-09-09', LessonModel::parseLessonDate('09/09/2026')?->format('Y-m-d'));
+        $this->assertSame('2026-09-09', LessonModel::parseLessonDate('09-09-2026')?->format('Y-m-d'));
+        $this->assertSame('2026-09-01', LessonModel::parseLessonDate('1/9/2026')?->format('Y-m-d'));
+        $this->assertSame('2026-09-09', LessonModel::parseLessonDate('09.09.2026')?->format('Y-m-d'));
+        $this->assertSame('2026-09-09', LessonModel::parseLessonDate('2026-09-09T14:30:00+02:00')?->format('Y-m-d'));
+        $this->assertSame('2026-09-01', LessonModel::parseLessonDate('01/09/2026 00:00:00')?->format('Y-m-d'));
         $this->assertNull(LessonModel::parseLessonDate(null));
+        $this->assertNull(LessonModel::parseLessonDate('not-a-date'));
+        $this->assertNull(LessonModel::parseLessonDate('32/13/2026'));
+    }
+
+    public function testParseLessonDateAcceptsDateTimeObjects(): void
+    {
+        $parsed = LessonModel::parseLessonDate(new \DateTime('2026-09-09 18:45:00'));
+
+        $this->assertSame('2026-09-09 00:00:00', $parsed?->format('Y-m-d H:i:s'));
+    }
+
+    public function testIsValidLessonPeriodAcceptsBelgianFormattedDates(): void
+    {
+        $this->assertTrue(LessonModel::isValidLessonPeriod('01/09/2026', '30/06/2027'));
+        $this->assertNotNull(LessonModel::periodFromValues('01-09-2026', '30-06-2027'));
+        $this->assertNotNull(LessonModel::periodFromValues('1/9/2026', '30/6/2027'));
     }
 
     public function testEmptyBitmaskDoesNotPreventUsingTheLessonPeriod(): void
