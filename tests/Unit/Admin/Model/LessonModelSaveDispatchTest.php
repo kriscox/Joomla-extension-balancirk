@@ -37,6 +37,11 @@ namespace Joomla\CMS\Language {
             {
                 return $string;
             }
+
+            public static function sprintf($string, mixed ...$args): string
+            {
+                return $string;
+            }
         }
     }
 }
@@ -109,6 +114,11 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
                     return $default;
                 }
 
+                public function getTeacherIdsForLesson(int $lessonId): array
+                {
+                    return [];
+                }
+
                 protected function saveLessonRecord(array $data): bool
                 {
                     return true;
@@ -156,9 +166,9 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
                     return [2];
                 }
 
-                public function hasTeachedRecords(int $memberId, ?int $lessonId = null): bool
+                public function countTeachedRecords(int $memberId, ?int $lessonId = null): int
                 {
-                    return $memberId === 2 && ($lessonId === null || $lessonId === 5);
+                    return ($memberId === 2 && $lessonId === 5) ? 1 : 0;
                 }
 
                 protected function saveLessonRecord(array $data): bool
@@ -188,6 +198,11 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
                     }
 
                     return $default;
+                }
+
+                public function getTeacherIdsForLesson(int $lessonId): array
+                {
+                    return [];
                 }
 
                 protected function saveLessonRecord(array $data): bool
