@@ -155,7 +155,6 @@ class MembersController extends ApiController
                 $db->quoteName('s.birthdate'),
                 $db->quoteName('s.mutuality'),
                 $db->quoteName('s.uitpas'),
-                $db->quoteName('p.primary', 'isPrimary'),
             ])
             ->from($db->quoteName('#__balancirk_students', 's'))
             ->join('INNER', $db->quoteName('#__balancirk_parents', 'p') . ' ON ' . $db->quoteName('p.child') . ' = ' . $db->quoteName('s.id'))
@@ -164,15 +163,7 @@ class MembersController extends ApiController
             ->order($db->quoteName('s.name') . ' ASC');
         $db->setQuery($query);
 
-        $rows = $db->loadAssocList() ?: [];
-
-        foreach ($rows as &$row) {
-            $row['id'] = (int) ($row['id'] ?? 0);
-            $row['isPrimary'] = (int) ($row['isPrimary'] ?? 0);
-        }
-        unset($row);
-
-        echo new JsonResponse($rows);
+        echo new JsonResponse($db->loadAssocList() ?: []);
         $app->close();
     }
 

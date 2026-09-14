@@ -16,7 +16,6 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
-use Joomla\CMS\Router\Route;
 
 /**
  * HTML Member view class for the balancirk component.
@@ -70,15 +69,6 @@ class HtmlView extends BaseHtmlView
      */
     public function display($tpl = null)
     {
-        // Legacy menu items still point at member&layout=spa|spaadmin.
-        if ($tpl === 'spa' || $tpl === 'spaadmin') {
-            Factory::getApplication()->redirect(
-                Route::_('index.php?option=com_balancirk&view=spa', false)
-            );
-
-            return;
-        }
-
         $this->form = $this->get('Form');
         $this->item = $this->get('Item');
 

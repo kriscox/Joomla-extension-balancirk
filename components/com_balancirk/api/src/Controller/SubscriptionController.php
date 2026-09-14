@@ -62,11 +62,9 @@ class SubscriptionController extends ApiController
             throw new ResourceNotFound();
         }
 
-        $deleteDenial = $this->getDeleteDenialReason((int) $item->student, (int) $item->lesson, (int) $item->id);
-
-        if ($deleteDenial !== null)
+        if (!$this->canDeleteSubscription((int) $item->student, (int) $item->lesson, (int) $item->id))
         {
-            throw new \RuntimeException($deleteDenial, 403);
+            throw new \RuntimeException(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'), 403);
         }
 
         if (!$model->delete($recordKey))
@@ -130,31 +128,11 @@ class SubscriptionController extends ApiController
      */
     private function canDeleteSubscription(int $studentId, int $lessonId, int $subscriptionId): bool
     {
-        return $this->getDeleteDenialReason($studentId, $lessonId, $subscriptionId) === null;
-    }
-
-    /**
-     * Return why the current user may not delete this subscription.
-     *
-     * Mirrors the site SubscriptionController rule from 1.3.20: primary parents
-     * may unsubscribe with at most two attendances; staff may always delete.
-     *
-     * @param   int  $studentId       Student id.
-     * @param   int  $lessonId        Lesson id.
-     * @param   int  $subscriptionId  Subscription id.
-     *
-     * @return  string|null  Denial message, or null when delete is allowed.
-     *
-     * @since   1.3.20
-     */
-    private function getDeleteDenialReason(int $studentId, int $lessonId, int $subscriptionId): ?string
-    {
         $user = Factory::getApplication()->getIdentity();
-        $this->app->getLanguage()->load('com_balancirk', JPATH_SITE);
 
         if ($user->guest || $studentId <= 0 || $lessonId <= 0 || $subscriptionId <= 0)
         {
-            return Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED');
+            return false;
         }
 
         if (
@@ -163,20 +141,11 @@ class SubscriptionController extends ApiController
             || $user->authorise('core.delete', 'com_balancirk')
             || $user->authorise('core.admin', 'com_balancirk')
         ) {
-            return null;
+            return true;
         }
 
-        if (!$this->isPrimaryParent((int) $user->id, $studentId))
-        {
-            return Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED');
-        }
-
-        if ($this->presenceCount($studentId, $lessonId) > 2)
-        {
-            return Text::_('COM_BALANCIRK_SUBSCRIPTION_DELETE_TOO_MANY_PRESENCES');
-        }
-
-        return null;
+        return $this->isPrimaryParent((int) $user->id, $studentId)
+            && $this->presenceCount($studentId, $lessonId) <= 2;
     }
 
     /**
