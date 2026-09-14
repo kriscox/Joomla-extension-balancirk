@@ -1,0 +1,38 @@
+<section class="card">
+  <div class="card-title-row">
+    <h2>Berichten</h2>
+    <a class="btn-secondary small" routerLink="/member/dashboard">← Home</a>
+  </div>
+
+  <p class="lead">
+    Belangrijke updates over lessen en inschrijvingen krijg je per e-mail.
+    Nieuwsbrieven vind je in het archief.
+  </p>
+
+  <ul class="item-list">
+    <li class="item-card">
+      <div class="item-main">
+        <strong>Bevestigingsmails</strong>
+        <span class="meta">
+          Bij een inschrijving of wachtlijst plaatsing sturen we automatisch een e-mail.
+        </span>
+      </div>
+    </li>
+    <li class="item-card">
+      <div class="item-main">
+        <strong>Leswijzigingen</strong>
+        <span class="meta">
+          Lesgevers en beheer kunnen later vanuit de app berichten sturen. Voorlopig blijft e-mail de bron.
+        </span>
+      </div>
+    </li>
+  </ul>
+
+  <div class="actions actions-row">
+    @if (newsletterUrl) {
+      <a class="btn-primary" [href]="newsletterUrl">Nieuwsbrieven openen</a>
+    } @else {
+      <p class="muted">Nog geen nieuwsbrief-archief geconfigureerd in Balancirk-opties.</p>
+    }
+  </div>
+</section>

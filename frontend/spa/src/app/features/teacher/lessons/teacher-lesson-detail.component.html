@@ -1,0 +1,74 @@
+<section class="card">
+  <div class="card-title-row">
+    <h2>Lesdetails</h2>
+    <a class="btn-secondary small" routerLink="/teacher/lessons">← Lessen</a>
+  </div>
+
+  @if (loading()) {
+    <p class="status">Bezig met laden...</p>
+  } @else if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else if (lesson(); as lesson) {
+    <h1>{{ lesson.name }}</h1>
+    <p class="muted">Schooljaar {{ lesson.year || '—' }}</p>
+
+    <dl class="detail-grid">
+      <div class="detail-row">
+        <dt>Ingeschreven</dt>
+        <dd>
+          <strong>{{ lesson.enrolled ?? 0 }}</strong>
+          @if (lesson.max_students) {
+            / {{ lesson.max_students }}
+          }
+        </dd>
+      </div>
+      <div class="detail-row">
+        <dt>Wachtlijst</dt>
+        <dd>{{ lesson.waiting ?? 0 }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Lesdagen</dt>
+        <dd>{{ lesdaysLabel() }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Periode</dt>
+        <dd>
+          {{ lesson.start || '—' }}
+          –
+          {{ lesson.end || '—' }}
+        </dd>
+      </div>
+      @if (lesson.type) {
+        <div class="detail-row">
+          <dt>Type</dt>
+          <dd>{{ lesson.type }}</dd>
+        </div>
+      }
+      @if (lesson.min_age || lesson.max_age) {
+        <div class="detail-row">
+          <dt>Leeftijd</dt>
+          <dd>{{ lesson.min_age || '?' }} – {{ lesson.max_age || '?' }}</dd>
+        </div>
+      }
+      @if (lesson.fee != null && lesson.fee !== undefined) {
+        <div class="detail-row">
+          <dt>Tarief</dt>
+          <dd>{{ lesson.fee }}</dd>
+        </div>
+      }
+    </dl>
+
+    @if (lesson.description) {
+      <p class="lead">{{ lesson.description }}</p>
+    }
+
+    <div class="actions-row">
+      <a
+        class="btn-primary"
+        [routerLink]="['/teacher/attendance']"
+        [queryParams]="{ lesson: lesson.id }"
+      >Aanwezigheid</a>
+      <a class="btn-secondary" routerLink="/teacher/lessons">Terug naar lijst</a>
+    </div>
+  }
+</section>

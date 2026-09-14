@@ -1,0 +1,27 @@
+<section class="card">
+  <div class="card-title-row">
+    <h2>Leden</h2>
+    <a class="btn-secondary small" routerLink="/admin">← Beheer</a>
+  </div>
+  @if (loading()) {
+    <p class="status">Bezig met laden...</p>
+  } @else if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else if (members().length === 0) {
+    <p class="muted">Geen leden gevonden.</p>
+  } @else {
+    <ul class="item-list">
+      @for (member of members(); track member.id) {
+        <li class="item-card">
+          <div class="item-main">
+            <strong>{{ member.firstname }} {{ member.name }}</strong>
+            <span class="meta">{{ member.email }}</span>
+            @if (member.phone) {
+              <span class="meta">{{ member.phone }}</span>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

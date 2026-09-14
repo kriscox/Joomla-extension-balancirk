@@ -1,14 +1,15 @@
-# Balancirk - Joomla 4 Extension
+# Balancirk - Joomla 6 Extension
 
 ## Overview
 
-Balancirk is a Joomla 4 extension package for managing members, students, lessons, subscriptions, and attendance for a gymnastics/circus school. It consists of:
+Balancirk is a Joomla 6 extension package for managing members, students, lessons, subscriptions, and attendance for a gymnastics/circus school. It consists of:
 
 - **com_balancirk** — Main Joomla MVC component (admin + site + API)
 - **plg_webservices_balancirk** — Web services plugin (REST API routes)
 - **joomlaology** — Shared PHP utility library
+- **frontend/spa** — Angular PWA (members, teachers, accounting; admin later)
 
-This is NOT a standalone application. It requires installation into a Joomla 4 CMS instance.
+This is NOT a standalone application. It requires installation into a Joomla 6 CMS instance.
 
 The Angular member SPA is developed separately on the `Single-page-site-ontwikkeling` branch and is not part of `master`.
 
@@ -43,7 +44,7 @@ make -B packages/com_balancirk.zip packages/balancirk.zip pkg_balancirk.zip
 Cloud Agents use the install script in `.cursor/environment.json` to refresh dependencies after checkout:
 
 ```bash
-composer install --no-interaction
+composer install --no-interaction && cd frontend/spa && npm install --no-audit --no-fund
 ```
 
 ### Prerequisites (installed by update script)
@@ -51,6 +52,7 @@ composer install --no-interaction
 - PHP 8.3+ with extensions: cli, xml, mbstring, tokenizer, zip
 - Composer (for phpcs dev dependency)
 - GNU Make + zip (for building packages)
+- Node.js 22+ / npm (for Angular spa frontend)
 
 ### Lint
 
@@ -68,12 +70,20 @@ make -B packages/com_balancirk.zip packages/balancirk.zip pkg_balancirk.zip
 
 Rebuilds the installable Joomla package zip without bumping the version. Use this for test packages.
 
+To build the Angular spa frontend:
+
+```bash
+make spa-build
+```
+
+The update script pre-installs `frontend/spa/node_modules` so this target runs without network access.
+
 ### Testing
 
 There are no automated unit/integration tests in this repository. Validation is done via:
 1. `phpcs` linting (PSR-12 standard)
 2. Building `pkg_balancirk.zip` successfully
-3. Installing **`pkg_balancirk.zip`** into a Joomla 4 test instance (external)
+3. Installing **`pkg_balancirk.zip`** into a Joomla 6 test instance (external)
 
 ### Important notes
 
