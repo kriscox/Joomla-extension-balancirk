@@ -175,4 +175,14 @@
 			<item>Fixed saving a lesson when assigned teachers already have attendance records.</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.21</version>
+		<change>
+			<item>Administrators can enrol students in lessons and remove enrolments from a subscriptions list and from a Students tab on lesson edit.</item>
+			<item>Enrol and unenrol actions are gated by dedicated subscriptions.create and subscriptions.delete permissions.</item>
+			<item>The admin subscriptions list can be filtered by school year, defaulting to the latest available year.</item>
+		</change>
+	</changelog>
 </changelogs>

@@ -85,6 +85,34 @@ class HtmlView extends BaseHtmlView
     protected $availableTeachers;
 
     /**
+     * Students enrolled in this lesson.
+     *
+     * @var array
+     */
+    protected $subscribedStudents;
+
+    /**
+     * Students on the waiting list for this lesson.
+     *
+     * @var array
+     */
+    protected $waitingListStudents;
+
+    /**
+     * Whether the user may enrol students.
+     *
+     * @var bool
+     */
+    public $canCreateSubscription = false;
+
+    /**
+     * Whether the user may remove subscriptions.
+     *
+     * @var bool
+     */
+    public $canDeleteSubscription = false;
+
+    /**
      * Display the view.
      *
      * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
@@ -98,6 +126,18 @@ class HtmlView extends BaseHtmlView
         $this->hours = $this->get('hours');
         $this->teachers = $this->get('Teachers');
         $this->availableTeachers = $this->get('AvailableTeachers');
+        $this->subscribedStudents = $this->get('Students');
+        $this->waitingListStudents = $this->get('WaitingListStudents');
+
+        $actions = ContentHelper::getActions('com_balancirk');
+        $this->canCreateSubscription = $actions->get('subscriptions.create')
+            || $actions->get('lessons.admin')
+            || $actions->get('core.admin');
+        $this->canDeleteSubscription = $actions->get('subscriptions.delete')
+            || $actions->get('students.viewall')
+            || $actions->get('lessons.admin')
+            || $actions->get('core.delete')
+            || $actions->get('core.admin');
         $this->form->bind(["lesdays_field" => LessonModel::getLesdays($this->item->lesdays)]);
 
         if (count($errors = $this->get('Errors'))) {

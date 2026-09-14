@@ -9,7 +9,7 @@
 	<authorUrl>https://cococo.be</authorUrl>
 	<copyright>CoCoCo</copyright>
 	<license>GPL v3</license>
-	<version>1.3.20</version>
+	<version>1.3.21</version>
 	<description>COM_BALANCIRK_MODULE_DESCRIPTION</description>
 
 	<!-- This is the PHP namespace under which the extension's
@@ -119,6 +119,13 @@
 				<params>
 					<menu-quicktask-title>COM_BALANCIRK_LABEL_LESSONS_OVERVIEW</menu-quicktask-title>
 					<menu-quicktask>index.php?option=com_balancirk&amp;view=lesson&amp;layout=edit</menu-quicktask>
+				</params>
+			</menu>
+			<menu link="option=com_balancirk&amp;view=subscriptions">
+				COM_BALANCIRK_LABEL_SUBSCRIPTIONS_OVERVIEW
+				<params>
+					<menu-quicktask-title>COM_BALANCIRK_MENU_ADD_SUBSCRIPTION</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_balancirk&amp;view=subscription&amp;layout=edit</menu-quicktask>
 				</params>
 			</menu>
 		</submenu>

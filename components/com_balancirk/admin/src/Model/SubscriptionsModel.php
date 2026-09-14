@@ -13,12 +13,11 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\Database\ParameterType;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\CMS\Helper\ContentHelper;
 
 /**
- * SubscriptionsModel class to display the list off Subscriptions.
+ * SubscriptionsModel class to display the list of subscriptions.
  *
  * @since  0.0.1
  */
@@ -29,14 +28,66 @@ class SubscriptionsModel extends ListModel
      *
      * @param   array  $config  An optional associative array of configuration settings.
      *
-     * @see     \JControllerLegacy
-     * @see     \Joomla\CMS\MVC\Controller\BaseController
-     *
      * @since   __BUMP_VERSION__
      */
     public function __construct($config = [])
     {
+        if (empty($config['filter_fields'])) {
+            $config['filter_fields'] = [
+                'id',
+                'a.id',
+                'name',
+                'a.name',
+                'firstname',
+                'a.firstname',
+                'lesson',
+                'a.lesson',
+                'year',
+                'a.year',
+                'subscribed',
+                'a.subscribed',
+            ];
+        }
+
         parent::__construct($config);
+    }
+
+    /**
+     * Method to auto-populate the model state.
+     *
+     * @param   string  $ordering   An optional ordering field.
+     * @param   string  $direction  An optional direction (asc|desc).
+     *
+     * @return  void
+     *
+     * @since   1.3.21
+     */
+    protected function populateState($ordering = 'a.name', $direction = 'ASC')
+    {
+        $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search', '', 'string');
+        $this->setState('filter.search', $search);
+
+        $year = $this->getUserStateFromRequest($this->context . '.filter.year', 'filter_year', '');
+        $this->setState('filter.year', $year);
+
+        parent::populateState($ordering, $direction);
+    }
+
+    /**
+     * Method to get a store id based on model configuration state.
+     *
+     * @param   string  $id  A prefix for the store id.
+     *
+     * @return  string
+     *
+     * @since   1.3.21
+     */
+    protected function getStoreId($id = '')
+    {
+        $id .= ':' . $this->getState('filter.search');
+        $id .= ':' . $this->getState('filter.year');
+
+        return parent::getStoreId($id);
     }
 
     /**
@@ -48,11 +99,9 @@ class SubscriptionsModel extends ListModel
      */
     protected function getListQuery()
     {
-        // Create a new query object.
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
 
-        // Select the required fields from the table.
         $query->select(
             $db->quoteName(
                 [
@@ -70,7 +119,7 @@ class SubscriptionsModel extends ListModel
                     'a.start_registration',
                     'a.end_registration',
                     'a.state',
-                    'a.subscribed'
+                    'a.subscribed',
                 ],
                 [
                     'id',
@@ -87,14 +136,12 @@ class SubscriptionsModel extends ListModel
                     'start_registration',
                     'end_registration',
                     'state',
-                    'subscribed'
+                    'subscribed',
                 ]
             )
         );
         $query->from($db->quoteName('#__balancirk_subscriptions_view', 'a'));
 
-        // filter.parent_id: when set (e.g. by the member-portal API), always
-        // scope to that parent regardless of admin permissions.
         $parentId = (int) $this->getState('filter.parent_id', 0);
 
         if ($parentId > 0) {
@@ -104,33 +151,81 @@ class SubscriptionsModel extends ListModel
                 'a.studentid = p.child AND p.parent = ' . $parentId
             );
         } else {
-            // Fall back to permission-based filter for the admin backend.
             $this->canDo = ContentHelper::getActions('com_balancirk');
 
-            if (!$this->canDo->get('students.viewall')) {
+            if (!$this->canSeeAllSubscriptions()) {
                 $query->join(
                     'INNER',
                     $db->quoteName('#__balancirk_parents', 'p'),
-                    'a.studentid = p.child AND p.parent = ' . Factory::getApplication()->getIdentity()->id
+                    'a.studentid = p.child AND p.parent = ' . (int) Factory::getApplication()->getIdentity()->id
                 );
             }
         }
+
+        // Filter by school year — default to the latest year available.
+        $selectedYear = $this->getState('filter.year');
+
+        if ($selectedYear === '' || $selectedYear === null) {
+            $years = $this->getYears();
+            $selectedYear = $years[0] ?? null;
+            $this->setState('filter.year', $selectedYear);
+        }
+
+        if ($selectedYear !== null) {
+            $query->where($db->quoteName('a.year') . ' = ' . $db->quote($selectedYear));
+        }
+
+        $search = $this->getState('filter.search');
+
+        if (!empty($search)) {
+            $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
+            $query->where(
+                '(a.name LIKE ' . $search
+                . ' OR a.firstname LIKE ' . $search
+                . ' OR a.lesson LIKE ' . $search . ')'
+            );
+        }
+
+        $orderCol = $this->state->get('list.ordering', 'a.name');
+        $orderDirn = $this->state->get('list.direction', 'ASC');
+        $query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
 
         return $query;
     }
 
     /**
-     * Method to get a list of walks.
-     * Overridden to add a check for access levels.
+     * Get distinct school years from subscriptions for the filter dropdown.
      *
-     * @return  mixed  An array of data items on success, false on failure.
+     * @return  array
      *
-     * @since   __BUMP_VERSION__
+     * @since   1.3.21
      */
-    public function getItems()
+    public function getYears(): array
     {
-        $items = parent::getItems();
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('DISTINCT ' . $db->quoteName('year'))
+            ->from($db->quoteName('#__balancirk_subscriptions_view'))
+            ->order($db->quoteName('year') . ' DESC');
 
-        return $items;
+        return $db->setQuery($query)->loadColumn() ?: [];
+    }
+
+    /**
+     * Whether the current user may list all subscriptions.
+     *
+     * @return  boolean
+     *
+     * @since   1.3.21
+     */
+    private function canSeeAllSubscriptions(): bool
+    {
+        $canDo = $this->canDo ?? ContentHelper::getActions('com_balancirk');
+
+        return $canDo->get('students.viewall')
+            || $canDo->get('lessons.admin')
+            || $canDo->get('subscriptions.create')
+            || $canDo->get('subscriptions.delete')
+            || $canDo->get('core.admin');
     }
 }

@@ -79,7 +79,8 @@ class SubscriptionModel extends AdminModel
         $user = $app->getIdentity();
 
         if (
-            $user->authorise('students.viewall', 'com_balancirk')
+            $user->authorise('subscriptions.delete', 'com_balancirk')
+            || $user->authorise('students.viewall', 'com_balancirk')
             || $user->authorise('lessons.admin', 'com_balancirk')
             || $user->authorise('core.delete', 'com_balancirk')
             || $user->authorise('core.admin', 'com_balancirk')
@@ -160,6 +161,63 @@ class SubscriptionModel extends AdminModel
     }
 
     /**
+     * Whether the current user may create subscriptions as staff.
+     *
+     * @return  boolean
+     *
+     * @since   1.3.21
+     */
+    public function canCreate()
+    {
+        $user = Factory::getApplication()->getIdentity();
+
+        return $user->authorise('subscriptions.create', 'com_balancirk')
+            || $user->authorise('lessons.admin', 'com_balancirk')
+            || $user->authorise('core.admin', 'com_balancirk');
+    }
+
+    /**
+     * Method to get the data that should be injected in the form.
+     *
+     * @return  mixed  The data for the form.
+     *
+     * @since   1.3.21
+     */
+    protected function loadFormData()
+    {
+        $app = Factory::getApplication();
+        $data = $app->getUserState('com_balancirk.edit.subscription.data', []);
+
+        if (empty($data)) {
+            $data = $this->getItem();
+        }
+
+        $input = $app->input;
+        $studentId = $input->getInt('student');
+        $lessonId = $input->getInt('lesson');
+
+        if ($studentId > 0) {
+            if (is_object($data)) {
+                $data->student = $studentId;
+            } elseif (is_array($data)) {
+                $data['student'] = $studentId;
+            }
+        }
+
+        if ($lessonId > 0) {
+            if (is_object($data)) {
+                $data->lesson = $lessonId;
+            } elseif (is_array($data)) {
+                $data['lesson'] = $lessonId;
+            }
+        }
+
+        $this->preprocessData('com_balancirk.subscription', $data);
+
+        return $data;
+    }
+
+    /**
      * Add subscription to the database
      *
      * Add if not exists the subscription to the database
@@ -190,7 +248,13 @@ class SubscriptionModel extends AdminModel
         $model = $this->getMVCFactory()->createModel('Lesson', 'Site');
         $lesson = $model->getItem($lessonId, $lessonId);
 
-        if (!$lesson || !$this->isLessonOpenForRegistration($lesson)) {
+        if (!$lesson) {
+            $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_REGISTRATION_CLOSED'));
+
+            return false;
+        }
+
+        if (!$this->canCreate() && !$this->isLessonOpenForRegistration($lesson)) {
             $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_REGISTRATION_CLOSED'));
 
             return false;

@@ -546,4 +546,86 @@ class LessonModel extends AdminModel
 
         return $ids;
     }
+
+    /**
+     * Get enrolled students for a lesson.
+     *
+     * @param   int|null  $lessonId  Lesson id.
+     *
+     * @return  array
+     *
+     * @since   1.3.21
+     */
+    public function getStudents(?int $lessonId = null): array
+    {
+        return $this->getSubscribedStudents($lessonId, 0);
+    }
+
+    /**
+     * Get waiting-list students for a lesson.
+     *
+     * @param   int|null  $lessonId  Lesson id.
+     *
+     * @return  array
+     *
+     * @since   1.3.21
+     */
+    public function getWaitingListStudents(?int $lessonId = null): array
+    {
+        return $this->getSubscribedStudents($lessonId, 1);
+    }
+
+    /**
+     * Load students linked to a lesson for a subscription status.
+     *
+     * @param   int|null  $lessonId   Lesson id.
+     * @param   int       $subscribed 0 = enrolled, 1 = waiting list.
+     *
+     * @return  array
+     *
+     * @since   1.3.21
+     */
+    private function getSubscribedStudents(?int $lessonId, int $subscribed): array
+    {
+        $lessonId = $lessonId ?: (int) $this->getState('lesson.id');
+
+        if (!$lessonId) {
+            $lessonId = (int) ($this->getItem()->id ?? 0);
+        }
+
+        if (!$lessonId) {
+            return [];
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select(
+                $db->quoteName(
+                    [
+                        'a.id',
+                        'a.name',
+                        'a.firstname',
+                        'a.birthdate',
+                        's.id',
+                    ],
+                    [
+                        'id',
+                        'name',
+                        'firstname',
+                        'birthdate',
+                        'subscription_id',
+                    ]
+                )
+            )
+            ->from($db->quoteName('#__balancirk_students', 'a'))
+            ->join(
+                'INNER',
+                $db->quoteName('#__balancirk_subscriptions', 's')
+                . ' ON s.student = a.id AND s.subscribed = ' . (int) $subscribed
+            )
+            ->where($db->quoteName('s.lesson') . ' = ' . (int) $lessonId)
+            ->order($db->quoteName('a.name') . ' ASC, ' . $db->quoteName('a.firstname') . ' ASC');
+
+        return $db->setQuery($query)->loadObjectList() ?: [];
+    }
 }

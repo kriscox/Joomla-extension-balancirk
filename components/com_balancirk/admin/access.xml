@@ -40,5 +40,11 @@
 		<action name="accounting.export"
 			title="COM_BALANCIRK_JACTION_ACCOUNTING_EXPORT"
 			description="COM_BALANCIRK_JACTION_ACCOUNTING_EXPORT_DESC" />
+		<action name="subscriptions.create"
+			title="COM_BALANCIRK_JACTION_SUBSCRIPTIONS_CREATE"
+			description="COM_BALANCIRK_JACTION_SUBSCRIPTIONS_CREATE_DESC" />
+		<action name="subscriptions.delete"
+			title="COM_BALANCIRK_JACTION_SUBSCRIPTIONS_DELETE"
+			description="COM_BALANCIRK_JACTION_SUBSCRIPTIONS_DELETE_DESC" />
 	</section>
 </access>
