@@ -14,6 +14,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Layout\LayoutHelper;
+use Joomla\CMS\Session\Session;
 
 HTMLHelper::_('behavior.formvalidator');
 HTMLHelper::_('behavior.keepalive');
@@ -122,6 +123,104 @@ HTMLHelper::_('behavior.keepalive');
 				<div class="alert alert-warning">
 					<?= Text::_('COM_BALANCIRK_LESSON_NO_TEACHERS_AVAILABLE') ?>
 				</div>
+				<?php endif; ?>
+			</div>
+		</div>
+		<?= HTMLHelper::_('uitab.endTab'); ?>
+
+
+		<?= HTMLHelper::_('uitab.addTab', 'myTab', 'students', Text::_('COM_BALANCIRK_LESSON_TAB_STUDENTS')); ?>
+		<div class="row">
+			<div class="col-md-12">
+				<?php if ((int) ($this->item->id ?? 0) <= 0) : ?>
+					<div class="alert alert-info">
+						<?= Text::_('COM_BALANCIRK_LESSON_STUDENTS_SAVE_FIRST'); ?>
+					</div>
+				<?php else : ?>
+					<?php
+					$return = base64_encode('index.php?option=com_balancirk&view=lesson&layout=edit&id=' . (int) $this->item->id);
+					$token = Session::getFormToken();
+					?>
+					<?php if ($this->canCreateSubscription) : ?>
+						<p>
+							<a class="btn btn-success"
+								href="<?= Route::_('index.php?option=com_balancirk&view=subscription&layout=edit&lesson=' . (int) $this->item->id . '&return=' . $return); ?>">
+								<?= Text::_('COM_BALANCIRK_SUBSCRIPTION_TOOLBAR_ENROL'); ?>
+							</a>
+						</p>
+					<?php endif; ?>
+
+					<h3><?= Text::_('COM_BALANCIRK_LESSON_ENROLLED_STUDENTS'); ?></h3>
+					<?php if (empty($this->subscribedStudents)) : ?>
+						<div class="alert alert-info"><?= Text::_('COM_BALANCIRK_LESSON_NO_ENROLLED_STUDENTS'); ?></div>
+					<?php else : ?>
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_FIRSTNAME'); ?></th>
+									<th><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_NAME'); ?></th>
+									<th><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_BIRTHDATE'); ?></th>
+									<?php if ($this->canDeleteSubscription) : ?>
+										<th class="w-10 text-center"><?= Text::_('COM_BALANCIRK_SUBSCRIPTIONS_HEADING_ACTIONS'); ?></th>
+									<?php endif; ?>
+								</tr>
+							</thead>
+							<tbody>
+								<?php foreach ($this->subscribedStudents as $student) : ?>
+									<tr>
+										<td><?= $this->escape($student->firstname); ?></td>
+										<td><?= $this->escape($student->name); ?></td>
+										<td><?= $this->escape($student->birthdate); ?></td>
+										<?php if ($this->canDeleteSubscription) : ?>
+											<td class="text-center">
+												<a class="btn btn-sm btn-danger"
+													href="<?= Route::_('index.php?option=com_balancirk&task=subscription.delete&id=' . (int) $student->subscription_id . '&return=' . $return . '&' . $token . '=1'); ?>"
+													onclick="return confirm('<?= htmlspecialchars(Text::_('COM_BALANCIRK_SUBSCRIPTION_CONFIRM_DELETE'), ENT_QUOTES, 'UTF-8'); ?>');">
+													<?= Text::_('COM_BALANCIRK_SUBSCRIPTION_REMOVE'); ?>
+												</a>
+											</td>
+										<?php endif; ?>
+									</tr>
+								<?php endforeach; ?>
+							</tbody>
+						</table>
+					<?php endif; ?>
+
+					<h3 class="mt-4"><?= Text::_('COM_BALANCIRK_LESSON_WAITING_LIST'); ?></h3>
+					<?php if (empty($this->waitingListStudents)) : ?>
+						<div class="alert alert-info"><?= Text::_('COM_BALANCIRK_LESSON_NO_WAITING_STUDENTS'); ?></div>
+					<?php else : ?>
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_FIRSTNAME'); ?></th>
+									<th><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_NAME'); ?></th>
+									<th><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_BIRTHDATE'); ?></th>
+									<?php if ($this->canDeleteSubscription) : ?>
+										<th class="w-10 text-center"><?= Text::_('COM_BALANCIRK_SUBSCRIPTIONS_HEADING_ACTIONS'); ?></th>
+									<?php endif; ?>
+								</tr>
+							</thead>
+							<tbody>
+								<?php foreach ($this->waitingListStudents as $student) : ?>
+									<tr>
+										<td><?= $this->escape($student->firstname); ?></td>
+										<td><?= $this->escape($student->name); ?></td>
+										<td><?= $this->escape($student->birthdate); ?></td>
+										<?php if ($this->canDeleteSubscription) : ?>
+											<td class="text-center">
+												<a class="btn btn-sm btn-danger"
+													href="<?= Route::_('index.php?option=com_balancirk&task=subscription.delete&id=' . (int) $student->subscription_id . '&return=' . $return . '&' . $token . '=1'); ?>"
+													onclick="return confirm('<?= htmlspecialchars(Text::_('COM_BALANCIRK_SUBSCRIPTION_CONFIRM_DELETE'), ENT_QUOTES, 'UTF-8'); ?>');">
+													<?= Text::_('COM_BALANCIRK_SUBSCRIPTION_REMOVE'); ?>
+												</a>
+											</td>
+										<?php endif; ?>
+									</tr>
+								<?php endforeach; ?>
+							</tbody>
+						</table>
+					<?php endif; ?>
 				<?php endif; ?>
 			</div>
 		</div>

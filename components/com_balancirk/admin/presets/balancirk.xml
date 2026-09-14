@@ -41,6 +41,14 @@
 			quicktask="index.php?option=com_balancirk&amp;task=lesson.add"
 			quicktask-title="COM_BALANCIRK_MENU_ADD_LESSON"
 		/>
+		<menuitem
+			title="COM_BALANCIRK_SUBSCRIPTIONS_OVERVIEW"
+			type="component"
+			element="com_balancirk"
+			link="index.php?option=com_balancirk&amp;view=subscriptions"
+			quicktask="index.php?option=com_balancirk&amp;task=subscription.add"
+			quicktask-title="COM_BALANCIRK_MENU_ADD_SUBSCRIPTION"
+		/>
 		<menuitem 
 			type="component" 
 			title="COM_BALANCIRK_TYPES_OVERVIEW" 

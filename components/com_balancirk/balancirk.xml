@@ -121,6 +121,13 @@
 					<menu-quicktask>index.php?option=com_balancirk&amp;view=lesson&amp;layout=edit</menu-quicktask>
 				</params>
 			</menu>
+			<menu link="option=com_balancirk&amp;view=subscriptions">
+				COM_BALANCIRK_LABEL_SUBSCRIPTIONS_OVERVIEW
+				<params>
+					<menu-quicktask-title>COM_BALANCIRK_MENU_ADD_SUBSCRIPTION</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_balancirk&amp;view=subscription&amp;layout=edit</menu-quicktask>
+				</params>
+			</menu>
 		</submenu>
 	</administration>
 

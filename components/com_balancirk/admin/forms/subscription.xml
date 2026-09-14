@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fieldset name="details" label="COM_BALANCIRK_SUBSCRIPTION_TAB_DETAILS"
+		addfieldprefix="CoCoCo\Component\Balancirk\Administrator\Field">
+		<field
+			name="student"
+			type="Students"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_STUDENT"
+			required="true"
+			/>
+		<field
+			name="lesson"
+			type="Lessons"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_LESSON"
+			required="true"
+			/>
+	</fieldset>
+</form>
