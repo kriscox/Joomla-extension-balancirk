@@ -254,5 +254,122 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
 
             $this->assertFalse($model->save([]));
         }
+
+        /**
+         * save() without a data id but with a positive state 'member.id' must
+         * fall back to the state value and dispatch to edit().
+         *
+         * This path is used by API calls where the member id is in model state
+         * rather than in the request body.
+         *
+         * @return void
+         */
+        public function testSaveWithNoDataIdButPositiveStateCallsEdit(): void
+        {
+            $registerCalled = false;
+            $editCalled     = false;
+
+            $model = new class ($registerCalled, $editCalled) extends AdminMemberModel {
+                public function __construct(
+                    private bool &$registerCalled,
+                    private bool &$editCalled
+                ) {
+                }
+                public function getState($property = null, $default = null): mixed
+                {
+                    return $property === 'member.id' ? 15 : null;
+                }
+                public function register($data): bool
+                {
+                    $this->registerCalled = true;
+                    return true;
+                }
+                public function edit($data): bool
+                {
+                    $this->editCalled = true;
+                    return true;
+                }
+            };
+
+            $result = $model->save([]);
+
+            $this->assertTrue($result);
+            $this->assertFalse($registerCalled, 'register() must NOT be called when state has a positive member.id');
+            $this->assertTrue($editCalled, 'edit() must be called when state has a positive member.id');
+        }
+
+        /**
+         * save() with no data id and state 'member.id' = 0 must call register().
+         *
+         * @return void
+         */
+        public function testSaveWithNoDataIdAndZeroStateCallsRegister(): void
+        {
+            $registerCalled = false;
+            $editCalled     = false;
+
+            $model = new class ($registerCalled, $editCalled) extends AdminMemberModel {
+                public function __construct(
+                    private bool &$registerCalled,
+                    private bool &$editCalled
+                ) {
+                }
+                public function getState($property = null, $default = null): mixed
+                {
+                    return $property === 'member.id' ? 0 : null;
+                }
+                public function register($data): bool
+                {
+                    $this->registerCalled = true;
+                    return true;
+                }
+                public function edit($data): bool
+                {
+                    $this->editCalled = true;
+                    return true;
+                }
+            };
+
+            $result = $model->save([]);
+
+            $this->assertTrue($result);
+            $this->assertTrue($registerCalled, 'register() must be called when state member.id is 0');
+            $this->assertFalse($editCalled, 'edit() must NOT be called when state member.id is 0');
+        }
+
+        /**
+         * save() state fallback must forward the state-derived id into the data
+         * array passed to edit().
+         *
+         * @return void
+         */
+        public function testSaveStateIdIsForwardedToEdit(): void
+        {
+            $capturedData = null;
+
+            $model = new class ($capturedData) extends AdminMemberModel {
+                public function __construct(private mixed &$capturedData)
+                {
+                }
+                public function getState($property = null, $default = null): mixed
+                {
+                    return $property === 'member.id' ? 42 : null;
+                }
+                public function register($data): bool
+                {
+                    return false;
+                }
+                public function edit($data): bool
+                {
+                    $this->capturedData = $data;
+                    return true;
+                }
+            };
+
+            $model->save(['firstname' => 'Test']);
+
+            $this->assertIsArray($capturedData);
+            $this->assertSame(42, $capturedData['id'] ?? null, 'State-derived id must be injected into data[id]');
+        }
     }
 }
