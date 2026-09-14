@@ -67,6 +67,9 @@ class SubscriptionsModel extends ListModel
         $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search', '', 'string');
         $this->setState('filter.search', $search);
 
+        $year = $this->getUserStateFromRequest($this->context . '.filter.year', 'filter_year', '');
+        $this->setState('filter.year', $year);
+
         parent::populateState($ordering, $direction);
     }
 
@@ -82,6 +85,7 @@ class SubscriptionsModel extends ListModel
     protected function getStoreId($id = '')
     {
         $id .= ':' . $this->getState('filter.search');
+        $id .= ':' . $this->getState('filter.year');
 
         return parent::getStoreId($id);
     }
@@ -158,6 +162,19 @@ class SubscriptionsModel extends ListModel
             }
         }
 
+        // Filter by school year — default to the latest year available.
+        $selectedYear = $this->getState('filter.year');
+
+        if ($selectedYear === '' || $selectedYear === null) {
+            $years = $this->getYears();
+            $selectedYear = $years[0] ?? null;
+            $this->setState('filter.year', $selectedYear);
+        }
+
+        if ($selectedYear !== null) {
+            $query->where($db->quoteName('a.year') . ' = ' . $db->quote($selectedYear));
+        }
+
         $search = $this->getState('filter.search');
 
         if (!empty($search)) {
@@ -174,6 +191,24 @@ class SubscriptionsModel extends ListModel
         $query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
 
         return $query;
+    }
+
+    /**
+     * Get distinct school years from subscriptions for the filter dropdown.
+     *
+     * @return  array
+     *
+     * @since   1.3.21
+     */
+    public function getYears(): array
+    {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('DISTINCT ' . $db->quoteName('year'))
+            ->from($db->quoteName('#__balancirk_subscriptions_view'))
+            ->order($db->quoteName('year') . ' DESC');
+
+        return $db->setQuery($query)->loadColumn() ?: [];
     }
 
     /**

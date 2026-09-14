@@ -92,6 +92,20 @@ class HtmlView extends BaseHtmlView
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
 
+        // Populate year filter options from database.
+        $model = $this->getModel();
+        $years = $model->getYears();
+
+        if ($this->filterForm && !empty($years)) {
+            $yearField = $this->filterForm->getField('year', 'filter');
+
+            if ($yearField) {
+                foreach ($years as $year) {
+                    $yearField->addOption($year, ['value' => $year]);
+                }
+            }
+        }
+
         $actions = ContentHelper::getActions('com_balancirk');
         $this->canCreate = $actions->get('subscriptions.create')
             || $actions->get('lessons.admin')
