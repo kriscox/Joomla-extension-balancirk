@@ -75,15 +75,23 @@ class LessonsModel extends ListModel
         $published = $this->getUserStateFromRequest($this->context . '.filter.published', 'filter_published', '');
         $this->setState('filter.published', $published);
 
-        $year = $this->getUserStateFromRequest(
-            $this->context . '.filter.year',
-            'filter_year',
-            (string) SchoolYearHelper::getCurrentSchoolYear()
-        );
-        $this->setState('filter.year', $year);
-
-        // List state information.
         parent::populateState($ordering, $direction);
+        $this->initialiseYearFilter();
+    }
+
+    /**
+     * Default the year filter to the current school year and persist it.
+     *
+     * Searchtools stores filter[year] in the session. An empty leftover value
+     * would otherwise keep the dropdown on "all years".
+     *
+     * @return  void
+     */
+    private function initialiseYearFilter(): void
+    {
+        $year = SchoolYearHelper::formFilterYear($this->state->get('filter.year'));
+        $this->setState('filter.year', $year);
+        SchoolYearHelper::persistListFilterYear(Factory::getApplication(), $this->context, $year);
     }
 
     /**
@@ -107,6 +115,39 @@ class LessonsModel extends ListModel
         $id .= ':' . $this->getState('filter.year');
 
         return parent::getStoreId($id);
+    }
+
+    /**
+     * Inject the resolved year into the searchtools filter form.
+     *
+     * @return  mixed
+     */
+    protected function loadFormData()
+    {
+        $data = parent::loadFormData();
+        $year = (string) $this->getState('filter.year', '');
+
+        if ($year === '') {
+            return $data;
+        }
+
+        if (is_object($data)) {
+            $filter = $data->filter ?? [];
+
+            if (is_object($filter)) {
+                $filter->year = $year;
+                $data->filter = $filter;
+            } else {
+                $filter = (array) $filter;
+                $filter['year'] = $year;
+                $data->filter = $filter;
+            }
+        } elseif (is_array($data)) {
+            $data['filter'] = (array) ($data['filter'] ?? []);
+            $data['filter']['year'] = $year;
+        }
+
+        return $data;
     }
 
     /**
@@ -138,7 +179,6 @@ class LessonsModel extends ListModel
         $selectedYear = SchoolYearHelper::resolveListFilterYear($this->getState('filter.year'));
 
         if ($selectedYear !== null) {
-            $this->setState('filter.year', $selectedYear);
             $query->where($db->quoteName('a.year') . ' = ' . $db->quote($selectedYear));
         }
 
@@ -299,6 +339,6 @@ class LessonsModel extends ListModel
             ->from($db->quoteName('#__balancirk_lessons'))
             ->order($db->quoteName('year') . ' DESC');
 
-        return $db->setQuery($query)->loadColumn() ?: [];
+        return SchoolYearHelper::normaliseYearList($db->setQuery($query)->loadColumn() ?: []);
     }
 }

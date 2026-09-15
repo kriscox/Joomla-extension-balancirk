@@ -86,13 +86,16 @@ class HtmlView extends BaseHtmlView
             $model->getYears(),
             SchoolYearHelper::getCurrentSchoolYear()
         );
-        if ($this->filterForm && !empty($years)) {
+        if ($this->filterForm) {
             $yearField = $this->filterForm->getField('year', 'filter');
             if ($yearField) {
                 foreach ($years as $year) {
                     $yearField->addOption((string) $year, ['value' => (string) $year]);
                 }
             }
+
+            $selectedYear = SchoolYearHelper::formFilterYear($this->state->get('filter.year'));
+            $this->filterForm->setValue('year', 'filter', $selectedYear);
         }
 
         if (!count($this->items) && $this->get('IsEmptyState')) {

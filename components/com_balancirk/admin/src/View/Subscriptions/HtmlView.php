@@ -100,7 +100,7 @@ class HtmlView extends BaseHtmlView
             SchoolYearHelper::getCurrentSchoolYear()
         );
 
-        if ($this->filterForm && !empty($years)) {
+        if ($this->filterForm) {
             $yearField = $this->filterForm->getField('year', 'filter');
 
             if ($yearField) {
@@ -108,6 +108,9 @@ class HtmlView extends BaseHtmlView
                     $yearField->addOption((string) $year, ['value' => (string) $year]);
                 }
             }
+
+            $selectedYear = SchoolYearHelper::formFilterYear($this->state->get('filter.year'));
+            $this->filterForm->setValue('year', 'filter', $selectedYear);
         }
 
         $actions = ContentHelper::getActions('com_balancirk');

@@ -113,7 +113,7 @@ class SchoolYearHelper
             return (string) self::calculateSchoolYear($date, $offsetMonths);
         }
 
-        return $year;
+        return (string) (int) $year;
     }
 
     /**
@@ -128,16 +128,89 @@ class SchoolYearHelper
      */
     public static function ensureYearInList(array $years, int|string $year): array
     {
-        $year = (string) $year;
+        $year = (string) (int) $year;
+        $years = self::normaliseYearList($years);
 
-        foreach ($years as $existing) {
-            if ((string) $existing === $year) {
-                return array_values($years);
-            }
+        if (in_array($year, $years, true)) {
+            return $years;
         }
 
         array_unshift($years, $year);
 
         return $years;
+    }
+
+    /**
+     * Value stored in the year filter field. Never empty: either a year or "*".
+     *
+     * @param   mixed        $year          Submitted or stored filter value.
+     * @param   string|null  $date          Reference date in Y-m-d format.
+     * @param   int|null     $offsetMonths  Offset override; null uses component config.
+     *
+     * @return  string
+     *
+     * @since   1.3.22
+     */
+    public static function formFilterYear(mixed $year, ?string $date = null, ?int $offsetMonths = null): string
+    {
+        return self::resolveListFilterYear($year, $date, $offsetMonths) ?? self::ALL_YEARS_FILTER;
+    }
+
+    /**
+     * Persist the year filter to the Joomla user state used by searchtools.
+     *
+     * @param   object  $app      Application with getUserState/setUserState.
+     * @param   string  $context  List model context, e.g. com_balancirk.lessons.
+     * @param   string  $year     Filter value to store.
+     *
+     * @return  void
+     *
+     * @since   1.3.22
+     */
+    public static function persistListFilterYear(object $app, string $context, string $year): void
+    {
+        if (!method_exists($app, 'setUserState') || !method_exists($app, 'getUserState')) {
+            return;
+        }
+
+        $app->setUserState($context . '.filter.year', $year);
+        $filters = $app->getUserState($context . '.filter', []);
+
+        if (is_object($filters)) {
+            $filters = (array) $filters;
+        }
+
+        if (!is_array($filters)) {
+            $filters = [];
+        }
+
+        $filters['year'] = $year;
+        $app->setUserState($context . '.filter', $filters);
+    }
+
+    /**
+     * Normalise year values from MySQL DECIMAL to plain year strings.
+     *
+     * @param   array<int|string>  $years  Raw years.
+     *
+     * @return  string[]
+     *
+     * @since   1.3.22
+     */
+    public static function normaliseYearList(array $years): array
+    {
+        $normalised = [];
+
+        foreach ($years as $year) {
+            $year = trim((string) $year);
+
+            if ($year === '' || $year === self::ALL_YEARS_FILTER) {
+                continue;
+            }
+
+            $normalised[] = (string) (int) $year;
+        }
+
+        return array_values(array_unique($normalised));
     }
 }

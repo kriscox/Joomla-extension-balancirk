@@ -91,4 +91,43 @@ class SchoolYearHelperTest extends TestCase
     {
         $this->assertSame(['2026', '2025'], SchoolYearHelper::ensureYearInList(['2026', '2025'], '2026'));
     }
+
+    public function testFormFilterYearNeverReturnsEmpty(): void
+    {
+        $this->assertSame('2026', SchoolYearHelper::formFilterYear('', '2026-09-15', 6));
+        $this->assertSame('2025', SchoolYearHelper::formFilterYear(null, '2026-06-30', 6));
+        $this->assertSame('*', SchoolYearHelper::formFilterYear('*', '2026-09-15', 6));
+    }
+
+    public function testNormaliseYearListCastsDecimalYears(): void
+    {
+        $this->assertSame(['2026', '2025'], SchoolYearHelper::normaliseYearList(['2026.0000', '2025', '2026']));
+    }
+
+    public function testEnsureYearInListTreatsDecimalAsSameYear(): void
+    {
+        $this->assertSame(['2026', '2025'], SchoolYearHelper::ensureYearInList(['2026.0000', '2025'], 2026));
+    }
+
+    public function testPersistListFilterYearWritesNestedFilterArray(): void
+    {
+        $app = new class {
+            public array $state = [];
+
+            public function getUserState(string $key, mixed $default = null): mixed
+            {
+                return $this->state[$key] ?? $default;
+            }
+
+            public function setUserState(string $key, mixed $value): void
+            {
+                $this->state[$key] = $value;
+            }
+        };
+
+        SchoolYearHelper::persistListFilterYear($app, 'com_balancirk.lessons', '2026');
+
+        $this->assertSame('2026', $app->state['com_balancirk.lessons.filter.year']);
+        $this->assertSame('2026', $app->state['com_balancirk.lessons.filter']['year']);
+    }
 }
