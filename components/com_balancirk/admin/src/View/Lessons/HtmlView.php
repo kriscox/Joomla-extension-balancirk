@@ -19,6 +19,7 @@ use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\HTML\HTMLHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 
 /**
  * View class for a list of lessons
@@ -81,14 +82,20 @@ class HtmlView extends BaseHtmlView
 
         // Populate year filter options from database
         $model = $this->getModel();
-        $years = $model->getYears();
-        if ($this->filterForm && !empty($years)) {
+        $years = SchoolYearHelper::ensureYearInList(
+            $model->getYears(),
+            SchoolYearHelper::getCurrentSchoolYear()
+        );
+        if ($this->filterForm) {
             $yearField = $this->filterForm->getField('year', 'filter');
             if ($yearField) {
                 foreach ($years as $year) {
-                    $yearField->addOption($year, ['value' => $year]);
+                    $yearField->addOption((string) $year, ['value' => (string) $year]);
                 }
             }
+
+            $selectedYear = SchoolYearHelper::formFilterYear($this->state->get('filter.year'));
+            $this->filterForm->setValue('year', 'filter', $selectedYear);
         }
 
         if (!count($this->items) && $this->get('IsEmptyState')) {

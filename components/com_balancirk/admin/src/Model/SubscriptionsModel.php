@@ -15,6 +15,7 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\CMS\Helper\ContentHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 
 /**
  * SubscriptionsModel class to display the list of subscriptions.
@@ -67,10 +68,20 @@ class SubscriptionsModel extends ListModel
         $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search', '', 'string');
         $this->setState('filter.search', $search);
 
-        $year = $this->getUserStateFromRequest($this->context . '.filter.year', 'filter_year', '');
-        $this->setState('filter.year', $year);
-
         parent::populateState($ordering, $direction);
+        $this->initialiseYearFilter();
+    }
+
+    /**
+     * Default the year filter to the current school year and persist it.
+     *
+     * @return  void
+     */
+    private function initialiseYearFilter(): void
+    {
+        $year = SchoolYearHelper::formFilterYear($this->state->get('filter.year'));
+        $this->setState('filter.year', $year);
+        SchoolYearHelper::persistListFilterYear(Factory::getApplication(), $this->context, $year);
     }
 
     /**
@@ -88,6 +99,39 @@ class SubscriptionsModel extends ListModel
         $id .= ':' . $this->getState('filter.year');
 
         return parent::getStoreId($id);
+    }
+
+    /**
+     * Inject the resolved year into the searchtools filter form.
+     *
+     * @return  mixed
+     */
+    protected function loadFormData()
+    {
+        $data = parent::loadFormData();
+        $year = (string) $this->getState('filter.year', '');
+
+        if ($year === '') {
+            return $data;
+        }
+
+        if (is_object($data)) {
+            $filter = $data->filter ?? [];
+
+            if (is_object($filter)) {
+                $filter->year = $year;
+                $data->filter = $filter;
+            } else {
+                $filter = (array) $filter;
+                $filter['year'] = $year;
+                $data->filter = $filter;
+            }
+        } elseif (is_array($data)) {
+            $data['filter'] = (array) ($data['filter'] ?? []);
+            $data['filter']['year'] = $year;
+        }
+
+        return $data;
     }
 
     /**
@@ -162,14 +206,8 @@ class SubscriptionsModel extends ListModel
             }
         }
 
-        // Filter by school year — default to the latest year available.
-        $selectedYear = $this->getState('filter.year');
-
-        if ($selectedYear === '' || $selectedYear === null) {
-            $years = $this->getYears();
-            $selectedYear = $years[0] ?? null;
-            $this->setState('filter.year', $selectedYear);
-        }
+        // Filter by school year — default to the current school year.
+        $selectedYear = SchoolYearHelper::resolveListFilterYear($this->getState('filter.year'));
 
         if ($selectedYear !== null) {
             $query->where($db->quoteName('a.year') . ' = ' . $db->quote($selectedYear));
@@ -208,7 +246,7 @@ class SubscriptionsModel extends ListModel
             ->from($db->quoteName('#__balancirk_subscriptions_view'))
             ->order($db->quoteName('year') . ' DESC');
 
-        return $db->setQuery($query)->loadColumn() ?: [];
+        return SchoolYearHelper::normaliseYearList($db->setQuery($query)->loadColumn() ?: []);
     }
 
     /**
