@@ -140,6 +140,18 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
             $this->assertSame($data, $result);
         }
 
+        /**
+         * Multiple selected weekdays must bind as separate checkbox values.
+         *
+         * @return void
+         */
+        public function testGetLesdaysReturnsCheckboxValuesForMultipleDays(): void
+        {
+            $this->assertSame(['64', '16', '4'], AdminLessonModel::getLesdays(64 + 16 + 4));
+            $this->assertSame(['1'], AdminLessonModel::getLesdays(1));
+            $this->assertSame([], AdminLessonModel::getLesdays(0));
+        }
+
         // -----------------------------------------------------------------------
         // Rejection case — max_age < min_age must return false
         // -----------------------------------------------------------------------

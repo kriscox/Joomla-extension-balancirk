@@ -19,6 +19,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use CoCoCo\Component\Balancirk\Administrator\Model\HolidaysModel;
+use CoCoCo\Component\Balancirk\Site\Helper\LesdaysHelper;
 
 /**
  * LessonsModel class to display the list off lessons.
@@ -388,23 +389,18 @@ class LessonModel extends AdminModel
     }
 
     /**
-     * Method to get lesdays of timyint as an array
+     * Decode the stored lesson-days bitmask into weekday flags.
      *
-     * @param int lesdays Number representing days of lesson.
+     * 64 = Monday, 32 = Tuesday, 16 = Wednesday, 8 = Thursday,
+     * 4 = Friday, 2 = Saturday, 1 = Sunday.
      *
-     * @return array
+     * @param   int  $lesdays  Number representing days of lesson.
+     *
+     * @return  array<string, int>
      **/
     public static function getLesdays($lesdays)
     {
-        $returnvalue = array();
-        $returnvalue["Monday"] = (64 == (64 & $lesdays) ? 1 : 0);
-        $returnvalue["Tuesday"] = (32 == (32 & $lesdays) ? 1 : 0);
-        $returnvalue["Wednesday"] = (16 == (16 & $lesdays) ? 1 : 0);
-        $returnvalue["Thursday"] = (8 == (8 & $lesdays) ? 1 : 0);
-        $returnvalue["Friday"] = (4 == (4 & $lesdays) ? 1 : 0);
-        $returnvalue["Saturday"] = (2 == (2 & $lesdays) ? 1 : 0);
-        $returnvalue["Sunday"] = (1 == (1 & $lesdays) ? 1 : 0);
-        return $returnvalue;
+        return LesdaysHelper::toWeekdays((int) $lesdays);
     }
 
     /**
@@ -418,7 +414,7 @@ class LessonModel extends AdminModel
      */
     public static function hasConfiguredLesdays(array $lesdays): bool
     {
-        return in_array(1, $lesdays, true);
+        return LesdaysHelper::hasConfiguredDays($lesdays);
     }
 
     /**
@@ -630,9 +626,8 @@ class LessonModel extends AdminModel
         foreach ($period as $date) {
             // TODO: Check if the date is a holiday
 
-            // Check if date is lesday
-            if ($lesday[$date->format('l')] === 1) {
-                $dates[] = $date;
+            if (($lesday[$date->format('l')] ?? 0) === 1) {
+                $dates[] = clone $date;
             }
         }
 

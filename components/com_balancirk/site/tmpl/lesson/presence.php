@@ -15,6 +15,7 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\User\UserHelper;
 use CoCoCo\Component\Balancirk\Site\Model\LessonModel;
+use CoCoCo\Component\Balancirk\Site\Helper\LesdaysHelper;
 
 defined('_JEXEC') or die;
 
@@ -41,25 +42,14 @@ if ($period === null) {
 	$endDate = $period['end'];
 }
 
-$lesdayMask = LessonModel::getLesdays((int) ($item->lesdays ?? 0));
-$restrictToLesdays = LessonModel::hasConfiguredLesdays($lesdayMask);
-$matchedDates = $restrictToLesdays
-	? LessonModel::getDates($startDate->format('Y-m-d'), $endDate->format('Y-m-d'), $lesdayMask)
-	: [];
-
-if ($restrictToLesdays && empty($matchedDates)) {
-	$restrictToLesdays = false;
-}
-
-$lessons = [];
-foreach ($matchedDates as $lesday) {
-	$lessons[] = $lesday->format('d/m/Y');
-}
+$lesdaysMask = (int) ($item->lesdays ?? 0);
+$restrictToLesdays = LessonModel::hasConfiguredLesdays(LessonModel::getLesdays($lesdaysMask));
 
 $firstLesDay = $startDate->format('d/m/Y');
 $lastLesDay = $endDate->format('d/m/Y');
 $firstIso = $startDate->format('Y-m-d');
 $lastIso = $endDate->format('Y-m-d');
+$weekdayBitsJson = json_encode(LesdaysHelper::JS_GETDAY_BITS);
 $userid = Factory::getApplication()->getIdentity()->id;
 $joomlaToken = UserHelper::getProfile($userid)->get('joomlatoken');
 $api_token = is_array($joomlaToken) ? (string) ($joomlaToken['token'] ?? '') : '';
@@ -69,11 +59,8 @@ $presencesUrl = Route::_(
 );
 
 $today = (new DateTime())->setTime(0, 0, 0);
-$todayInRange = $today >= $startDate && $today <= $endDate;
-
-if ($restrictToLesdays && !in_array($today->format('d/m/Y'), $lessons, true)) {
-	$todayInRange = false;
-}
+$todayInRange = $today >= $startDate && $today <= $endDate
+	&& (!$restrictToLesdays || LesdaysHelper::matchesDate($today, $lesdaysMask));
 
 /** @var Joomla\CMS\Document\Document  */
 $doc = $app->getDocument();
@@ -96,16 +83,9 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 				maxViewMode: 0,
 				weekStart: 1,
 				beforeShowDay: function(date) {
-					' . ($restrictToLesdays ? '
-					var day = date.getDate();
-					var month = date.getMonth() + 1;
-					var year = date.getFullYear();
-					day = (day < 10) ? "0" + day : day;
-					month = (month < 10) ? "0" + month : month;
-					var formattedDate = day + "/" + month + "/" + year;
-					var lesdays = ["' . implode('","', $lessons) . '"];
-					return jQuery.inArray(formattedDate, lesdays) > -1;
-					' : 'return true;') . '
+					var lesdaysMask = ' . (int) $lesdaysMask . ';
+					var weekdayBits = ' . $weekdayBitsJson . ';
+					return !lesdaysMask || (lesdaysMask & weekdayBits[date.getDay()]) !== 0;
 				},
 				autoclose: true,
 			});

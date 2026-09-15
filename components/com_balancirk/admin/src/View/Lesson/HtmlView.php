@@ -138,7 +138,7 @@ class HtmlView extends BaseHtmlView
             || $actions->get('lessons.admin')
             || $actions->get('core.delete')
             || $actions->get('core.admin');
-        $this->form->bind(["lesdays_field" => LessonModel::getLesdays($this->item->lesdays)]);
+        $this->form->bind(["lesdays_field" => LessonModel::getLesdays((int) ($this->item->lesdays ?? 0))]);
 
         if (count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);

@@ -87,6 +87,7 @@
 			type="checkboxes"
 			label="COM_BALANCIRK_TABLE_TABLEHEAD_LESDAYS"
 			required="true">
+			<!-- Stored as bitmask: 64=Monday, 32=Tuesday, 16=Wednesday, 8=Thursday, 4=Friday, 2=Saturday, 1=Sunday -->
 			<option value="64">MONDAY</option>
 			<option value="32">TUESDAY</option>
 			<option value="16">WEDNESDAY</option>

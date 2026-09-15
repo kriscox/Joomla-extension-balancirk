@@ -16,6 +16,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\FormController;
+use CoCoCo\Component\Balancirk\Site\Helper\LesdaysHelper;
 
 /**
  * Controller for a single student.
@@ -76,23 +77,6 @@ class LessonController extends FormController
         $validData = $model->validate($form, $data);
         $app->setUserState($this->context . '.data', $validData);
 
-        // Add lesdays to the data
-        $lesdaysField = $data["lesdays_field"];
-        $lesday = 0;
-        foreach ($lesdaysField as $day) {
-            $lesday += $day;
-        }
-        $validData['lesdays'] = $lesday;
-
-        // Teachers are optional for API/SPA partial updates.
-        // The admin edit form always sends teachers_sync=1 so checkbox changes are applied
-        // (including "uncheck all", which would otherwise omit the teachers key).
-        if (\array_key_exists('teachers_sync', $data) || \array_key_exists('teachers', $data)) {
-            $validData['teachers'] = (isset($data['teachers']) && \is_array($data['teachers']))
-                ? $data['teachers']
-                : [];
-        }
-
         if ($validData === false) {
             $errors = $model->getErrors();
 
@@ -113,6 +97,18 @@ class LessonController extends FormController
             );
 
             return false;
+        }
+
+        $validData['lesdays'] = LesdaysHelper::fromFormValues($data['lesdays_field'] ?? []);
+        unset($validData['lesdays_field']);
+
+        // Teachers are optional for API/SPA partial updates.
+        // The admin edit form always sends teachers_sync=1 so checkbox changes are applied
+        // (including "uncheck all", which would otherwise omit the teachers key).
+        if (\array_key_exists('teachers_sync', $data) || \array_key_exists('teachers', $data)) {
+            $validData['teachers'] = (isset($data['teachers']) && \is_array($data['teachers']))
+                ? $data['teachers']
+                : [];
         }
 
         // Save the changes to the profile
