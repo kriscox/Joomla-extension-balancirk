@@ -15,6 +15,7 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\CMS\Helper\ContentHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 
 /**
  * SubscriptionsModel class to display the list of subscriptions.
@@ -67,7 +68,11 @@ class SubscriptionsModel extends ListModel
         $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search', '', 'string');
         $this->setState('filter.search', $search);
 
-        $year = $this->getUserStateFromRequest($this->context . '.filter.year', 'filter_year', '');
+        $year = $this->getUserStateFromRequest(
+            $this->context . '.filter.year',
+            'filter_year',
+            (string) SchoolYearHelper::getCurrentSchoolYear()
+        );
         $this->setState('filter.year', $year);
 
         parent::populateState($ordering, $direction);
@@ -162,16 +167,11 @@ class SubscriptionsModel extends ListModel
             }
         }
 
-        // Filter by school year — default to the latest year available.
-        $selectedYear = $this->getState('filter.year');
-
-        if ($selectedYear === '' || $selectedYear === null) {
-            $years = $this->getYears();
-            $selectedYear = $years[0] ?? null;
-            $this->setState('filter.year', $selectedYear);
-        }
+        // Filter by school year — default to the current school year.
+        $selectedYear = SchoolYearHelper::resolveListFilterYear($this->getState('filter.year'));
 
         if ($selectedYear !== null) {
+            $this->setState('filter.year', $selectedYear);
             $query->where($db->quoteName('a.year') . ' = ' . $db->quote($selectedYear));
         }
 

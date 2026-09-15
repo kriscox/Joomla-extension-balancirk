@@ -13,6 +13,7 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 \defined('_JEXEC') or die;
 
 use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 use Joomla\CMS\Factory;
 use Joomla\Database\ParameterType;
 use Joomla\CMS\MVC\Model\ListModel;
@@ -74,7 +75,11 @@ class LessonsModel extends ListModel
         $published = $this->getUserStateFromRequest($this->context . '.filter.published', 'filter_published', '');
         $this->setState('filter.published', $published);
 
-        $year = $this->getUserStateFromRequest($this->context . '.filter.year', 'filter_year', '');
+        $year = $this->getUserStateFromRequest(
+            $this->context . '.filter.year',
+            'filter_year',
+            (string) SchoolYearHelper::getCurrentSchoolYear()
+        );
         $this->setState('filter.year', $year);
 
         // List state information.
@@ -129,14 +134,11 @@ class LessonsModel extends ListModel
         );
         $query->from($db->quoteName('#__balancirk_lessons_complete', 'a'));
 
-        // Filter by year — default to the latest year available
-        $selectedYear = $this->getState('filter.year');
-        if ($selectedYear === '' || $selectedYear === null) {
-            $years = $this->getYears();
-            $selectedYear = $years[0] ?? null;
-            $this->setState('filter.year', $selectedYear);
-        }
+        // Filter by school year — default to the current school year.
+        $selectedYear = SchoolYearHelper::resolveListFilterYear($this->getState('filter.year'));
+
         if ($selectedYear !== null) {
+            $this->setState('filter.year', $selectedYear);
             $query->where($db->quoteName('a.year') . ' = ' . $db->quote($selectedYear));
         }
 
