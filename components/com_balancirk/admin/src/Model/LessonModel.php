@@ -19,6 +19,7 @@ use Joomla\CMS\Form\Form;
 use Joomla\CMS\Table\Table;
 use Jooma\CMS\CMSApplicationInterface;
 use Joomla\CMS\Application\CMSApplication;
+use CoCoCo\Component\Balancirk\Site\Helper\LesdaysHelper;
 
 /**
  * Item model for lesson.
@@ -178,7 +179,9 @@ class LessonModel extends AdminModel
         if (empty($data)) {
             $data = $this->getItem();
 
-            // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
+            if (is_object($data)) {
+                $data->lesdays_field = LesdaysHelper::toFormValues((int) ($data->lesdays ?? 0));
+            }
         }
 
         $this->preprocessData($this->typeAlias, $data);
@@ -214,23 +217,15 @@ class LessonModel extends AdminModel
     }
 
     /**
-     * Method to get lesdays of timyint as an array
+     * Selected lesson-day bit values for the checkboxes field.
      *
-     * @param int lesdays Number representing days of lesson.
+     * @param   int  $lesdays  Number representing days of lesson.
      *
-     * @return string	string with the values of the days
+     * @return  string[]  Bit values such as ["64", "4"], never a comma-separated string.
      **/
     public static function getLesdays($lesdays)
     {
-        $returnvalue = "";
-        $returnvalue .= (64 == (64 & $lesdays) ? "64, " : "");
-        $returnvalue .= (32 == (32 & $lesdays) ? "32, " : "");
-        $returnvalue .= (16 == (16 & $lesdays) ? "16, " : "");
-        $returnvalue .= (8 == (8 & $lesdays) ? "8, " : "");
-        $returnvalue .= (4 == (4 & $lesdays) ? "4, " : "");
-        $returnvalue .= (2 == (2 & $lesdays) ? "2, " : "");
-        $returnvalue .= (1 == (1 & $lesdays) ? "1" : "");
-        return $returnvalue;
+        return LesdaysHelper::toFormValues((int) $lesdays);
     }
 
     /**
