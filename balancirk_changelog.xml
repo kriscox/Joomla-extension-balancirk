@@ -185,4 +185,13 @@
 			<item>The admin subscriptions list can be filtered by school year, defaulting to the latest available year.</item>
 		</change>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.22</version>
+		<fix>
+			<item>Fixed multi-day lesson weekday bitmasks so lesson edit keeps Monday/Wednesday/Friday checked and attendance datepickers only offer those weekdays.</item>
+			<item>Admin lessons and subscriptions year filters now default to the current school year instead of all years or the latest year found in the database.</item>
+		</fix>
+	</changelog>
 </changelogs>
