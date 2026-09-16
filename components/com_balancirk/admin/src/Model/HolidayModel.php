@@ -12,12 +12,11 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
+use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Form\Form;
+use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Table\Table;
-use Jooma\CMS\CMSApplicationInterface;
 
 /**
  * Item model for Holiday.
@@ -53,13 +52,14 @@ class HolidayModel extends AdminModel
      */
     protected function canDelete($record)
     {
-        if (!empty($record->id)) {
-            $app = Factory::getApplication();
-
-            return $app->getIdentity()->authorise('core.delete', 'com_balancirk.holiday.' . (int) $record->id);
+        if (empty($record->id)) {
+            return false;
         }
 
-        return false;
+        $user = Factory::getApplication()->getIdentity();
+
+        return $user->authorise('core.delete', 'com_balancirk')
+            || $user->authorise('core.admin', 'com_balancirk');
     }
 
     /**
@@ -67,7 +67,8 @@ class HolidayModel extends AdminModel
      *
      * @param   object  $record  A record object.
      *
-     * @return  boolean  True if allowed to change the state of the record. Defaults to the permission set in the component.
+     * @return  boolean  True if allowed to change the state of the record.
+     *                   Defaults to the permission set in the component.
      *
      * @since   1.2.9
      */
@@ -77,7 +78,10 @@ class HolidayModel extends AdminModel
 
         // Check for existing article.
         if (!empty($record->id)) {
-            return $user->authorise('core.edit.state', 'com_balancirk.holiday.' . (int) $record->id);
+            return $user->authorise(
+                'core.edit.state',
+                'com_balancirk.holiday.' . (int) $record->id
+            );
         }
 
         // Default to component settings if neither article nor category known.
@@ -126,6 +130,7 @@ class HolidayModel extends AdminModel
         if (empty($form)) {
             return false;
         }
+
         return $form;
     }
 
@@ -144,12 +149,117 @@ class HolidayModel extends AdminModel
 
         if (empty($data)) {
             $data = $this->getItem();
-
-            // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
         }
+
+        $isNew = $this->holidayId($data) === 0;
+        $storedYear = $this->holidayYear($data);
+        $latestLessonYear = null;
+
+        if ($isNew && SchoolYearHelper::isEmptyYear($storedYear)) {
+            $latestLessonYear = $this->getLatestLessonSchoolYear();
+        }
+
+        $this->setHolidayYear(
+            $data,
+            SchoolYearHelper::defaultHolidayYear($storedYear, $isNew, $latestLessonYear)
+        );
 
         $this->preprocessData($this->typeAlias, $data);
 
         return $data;
+    }
+
+    /**
+     * Latest school year that already has lesson rows, or null.
+     *
+     * Reads `#__balancirk_lessons`. Does not invent a calendar year when
+     * the table is empty.
+     *
+     * @return  int|null
+     *
+     * @since   1.3.24
+     */
+    private function getLatestLessonSchoolYear(): ?int
+    {
+        try {
+            $db = $this->getDatabase();
+            $query = $db->getQuery(true)
+                ->select('MAX(' . $db->quoteName('year') . ')')
+                ->from($db->quoteName('#__balancirk_lessons'));
+            $year = (int) $db->setQuery($query)->loadResult();
+
+            return $year > 0 ? $year : null;
+        } catch (\Throwable $exception) {
+            return null;
+        }
+    }
+
+    /**
+     * Holiday id from form data.
+     *
+     * @param   mixed  $data  Item object or array.
+     *
+     * @return  int
+     *
+     * @since   1.3.24
+     */
+    private function holidayId(mixed $data): int
+    {
+        if (is_array($data)) {
+            return (int) ($data['id'] ?? 0);
+        }
+
+        if (is_object($data)) {
+            return (int) ($data->id ?? 0);
+        }
+
+        return 0;
+    }
+
+    /**
+     * Holiday year from form data.
+     *
+     * @param   mixed  $data  Item object or array.
+     *
+     * @return  mixed
+     *
+     * @since   1.3.24
+     */
+    private function holidayYear(mixed $data): mixed
+    {
+        if (is_array($data)) {
+            return $data['year'] ?? null;
+        }
+
+        if (is_object($data)) {
+            return $data->year ?? null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Bind the holiday year, using an empty string when there is no default.
+     *
+     * @param   mixed     $data  Item object or array.
+     * @param   int|null  $year  Year to show, or null for an empty field.
+     *
+     * @return  void
+     *
+     * @since   1.3.24
+     */
+    private function setHolidayYear(mixed &$data, ?int $year): void
+    {
+        $value = $year === null ? '' : $year;
+
+        if (is_array($data)) {
+            $data['year'] = $value;
+
+            return;
+        }
+
+        if (is_object($data)) {
+            $data->year = $value;
+        }
     }
 }

@@ -40,4 +40,41 @@ class HolidayHelperTest extends TestCase
         $this->assertTrue(HolidayHelper::containsIsoDate('2027-01-03', $ranges));
         $this->assertFalse(HolidayHelper::containsIsoDate('2027-01-04', $ranges));
     }
+
+    public function testResolveStoredDatesCopiesStartOntoEmptyEnd(): void
+    {
+        $this->assertSame(
+            ['start' => '2026-12-25', 'end' => '2026-12-25'],
+            HolidayHelper::resolveStoredDates('2026-12-25', '')
+        );
+        $this->assertSame(
+            ['start' => '2026-12-25', 'end' => '2026-12-25'],
+            HolidayHelper::resolveStoredDates('2026-12-25 00:00:00', null)
+        );
+    }
+
+    public function testResolveStoredDatesKeepsAnExplicitEndDate(): void
+    {
+        $this->assertSame(
+            ['start' => '2026-12-21', 'end' => '2027-01-03'],
+            HolidayHelper::resolveStoredDates('2026-12-21', '2027-01-03')
+        );
+    }
+
+    public function testResolveStoredDatesDoesNotInventStart(): void
+    {
+        $this->assertSame(
+            ['start' => '', 'end' => ''],
+            HolidayHelper::resolveStoredDates('', '')
+        );
+    }
+
+    public function testShouldReplaceEndFollowsEmptyOrPreviousStart(): void
+    {
+        $this->assertTrue(HolidayHelper::shouldReplaceEnd('2026-09-01', '', ''));
+        $this->assertTrue(HolidayHelper::shouldReplaceEnd('2026-09-10', '2026-09-01', '2026-09-01'));
+        $this->assertTrue(HolidayHelper::shouldReplaceEnd('2026-09-25', '2026-09-20', '2026-09-12'));
+        $this->assertFalse(HolidayHelper::shouldReplaceEnd('2026-09-12', '2026-09-20', '2026-09-10'));
+        $this->assertFalse(HolidayHelper::shouldReplaceEnd('', '', ''));
+    }
 }

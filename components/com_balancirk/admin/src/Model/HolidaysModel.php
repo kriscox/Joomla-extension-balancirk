@@ -47,13 +47,27 @@ class HolidaysModel extends ListModel
                 'year', 'a.year',
                 'startDate', 'a.startDate',
                 'endDate', 'a.endDate',
-                'Summary', 'a.summary'
+                'summary', 'a.summary'
             );
         }
 
         parent::__construct($config);
     }
 
+    /**
+     * Method to auto-populate the model state.
+     *
+     * @param   string  $ordering   An optional ordering field.
+     * @param   string  $direction  An optional direction (asc|desc).
+     *
+     * @return  void
+     *
+     * @since   1.3.24
+     */
+    protected function populateState($ordering = 'a.startDate', $direction = 'ASC')
+    {
+        parent::populateState($ordering, $direction);
+    }
 
     /**
      * Build an SQL query to load the list data.
@@ -89,7 +103,7 @@ class HolidaysModel extends ListModel
         }
 
         // Add the list ordering clause.
-        $orderCol  = $this->state->get('list.ordering', 'a.id');
+        $orderCol  = $this->state->get('list.ordering', 'a.startDate');
         $orderDirn = $this->state->get('list.direction', 'ASC');
 
         $query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));

@@ -29,7 +29,7 @@ class HtmlView extends BaseHtmlView
     /**
      * List of holidays of Balancirk.
      *
-     * @var	$items;
+     * @var  $items;
      * @since  1.2.9
      */
     protected $items;
@@ -73,7 +73,7 @@ class HtmlView extends BaseHtmlView
      */
     public function display($tpl = null): void
     {
-        /** @var array $items	List of holidays of Balancirk. */
+        /** @var array $items List of holidays of Balancirk. */
         $this->items = $this->get('Items');
         $this->pagination = $this->get('Pagination');
         $this->state = $this->get('State');
@@ -115,9 +115,9 @@ class HtmlView extends BaseHtmlView
             $toolbar->addNew('holiday.add');
         }
 
-        if ($this->state->get('filter.published') == -2 && $canDo->get('core.delete')) {
+        if ($canDo->get('core.delete')) {
             $toolbar->delete('holidays.delete')
-                ->text('JTOOLBAR_EMPTY_TRASH')
+                ->text('JTOOLBAR_DELETE')
                 ->message('JGLOBAL_CONFIRM_DELETE')
                 ->listCheck(true);
         }

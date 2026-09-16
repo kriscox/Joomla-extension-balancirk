@@ -107,6 +107,63 @@ class HolidayHelper
     }
 
     /**
+     * Fill an empty end date from the start date the user already entered.
+     *
+     * A one-day holiday is start === end. Do not invent dates when start
+     * is empty, and do not move an end date that is already set.
+     *
+     * @param   mixed  $start  Start date column value.
+     * @param   mixed  $end    End date column value.
+     *
+     * @return  array{start: string, end: string}  ISO dates, possibly empty.
+     *
+     * @since   1.3.24
+     */
+    public static function resolveStoredDates(mixed $start, mixed $end): array
+    {
+        $startIso = self::isoDate($start);
+        $endIso = self::isoDate($end);
+
+        if ($endIso === '' && $startIso !== '') {
+            $endIso = $startIso;
+        }
+
+        return ['start' => $startIso, 'end' => $endIso];
+    }
+
+    /**
+     * Whether the end date field should follow a new start date.
+     *
+     * True when end is empty, still equal to the previous start, or would
+     * fall before the new start. False when the user already chose a later
+     * end date.
+     *
+     * @param   string  $startIso          Current start date (Y-m-d or empty).
+     * @param   string  $endIso            Current end date (Y-m-d or empty).
+     * @param   string  $previousStartIso  Start date before this change.
+     *
+     * @return  bool
+     *
+     * @since   1.3.24
+     */
+    public static function shouldReplaceEnd(string $startIso, string $endIso, string $previousStartIso): bool
+    {
+        if ($startIso === '') {
+            return false;
+        }
+
+        if ($endIso === '') {
+            return true;
+        }
+
+        if ($previousStartIso !== '' && $endIso === $previousStartIso) {
+            return true;
+        }
+
+        return $endIso < $startIso;
+    }
+
+    /**
      * Normalise a stored date value to Y-m-d.
      *
      * @param   mixed  $value  Column value.

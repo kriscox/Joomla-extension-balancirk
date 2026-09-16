@@ -10,26 +10,40 @@
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Language\Text;
+use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Router\Route;
-use Joomla\CMS\Layout\LayoutHelper;
 
 HTMLHelper::_('behavior.formvalidator');
 HTMLHelper::_('behavior.keepalive');
 
+$document = Factory::getApplication()->getDocument();
+$wa = $document->getWebAssetManager();
+$wa->registerAndUseScript(
+    'balancirk-holiday-dates',
+    'media/com_balancirk/js/balancirk_holiday_dates.js',
+    ['version' => 'auto']
+);
 ?>
 
-<form action="<?= Route::_('index.php?option=com_balancirk&view=holiday&layout=edit&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="type-form" class="form-validate">
+<form action="<?= Route::_('index.php?option=com_balancirk&view=holiday&layout=edit&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="holiday-form" class="form-validate">
 
-	<div>
-		<div class="row">
-			<div class="col-md-12">
-				<?= $this->form->renderField('id'); ?>
-				<?= $this->form->renderField('year'); ?>
-				<?= $this->form->renderField('startDate'); ?>
-				<?= $this->form->renderField('endDate'); ?>
-				<?= $this->form->renderField('summary'); ?>
+	<div class="row">
+		<div class="col-lg-9">
+			<div class="card">
+				<div class="card-body">
+					<?= $this->form->renderField('id'); ?>
+					<?= $this->form->renderField('summary'); ?>
+					<?= $this->form->renderField('year'); ?>
+					<div class="row">
+						<div class="col-md-6">
+							<?= $this->form->renderField('startDate'); ?>
+						</div>
+						<div class="col-md-6">
+							<?= $this->form->renderField('endDate'); ?>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
