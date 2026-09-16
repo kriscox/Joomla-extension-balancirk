@@ -145,4 +145,39 @@ class SchoolYearHelperTest extends TestCase
         $this->assertFalse(SchoolYearHelper::isCurrentOrFutureYear('', '2026-09-15', 6));
         $this->assertFalse(SchoolYearHelper::isCurrentOrFutureYear(null, '2026-09-15', 6));
     }
+
+    public function testIsEmptyYearTreatsZeroAndBlanksAsEmpty(): void
+    {
+        $this->assertTrue(SchoolYearHelper::isEmptyYear(null));
+        $this->assertTrue(SchoolYearHelper::isEmptyYear(''));
+        $this->assertTrue(SchoolYearHelper::isEmptyYear('  '));
+        $this->assertTrue(SchoolYearHelper::isEmptyYear(0));
+        $this->assertTrue(SchoolYearHelper::isEmptyYear('0'));
+        $this->assertFalse(SchoolYearHelper::isEmptyYear(2026));
+        $this->assertFalse(SchoolYearHelper::isEmptyYear('2026.0000'));
+    }
+
+    public function testDefaultHolidayYearUsesLatestLessonYearForNewEmptyForm(): void
+    {
+        $this->assertSame(2026, SchoolYearHelper::defaultHolidayYear(0, true, 2026));
+        $this->assertSame(2026, SchoolYearHelper::defaultHolidayYear('', true, 2026));
+        $this->assertSame(2026, SchoolYearHelper::defaultHolidayYear(null, true, 2026));
+    }
+
+    public function testDefaultHolidayYearLeavesNewFormEmptyWhenNoLessonsExist(): void
+    {
+        $this->assertNull(SchoolYearHelper::defaultHolidayYear(0, true, null));
+        $this->assertNull(SchoolYearHelper::defaultHolidayYear('', true, 0));
+    }
+
+    public function testDefaultHolidayYearKeepsUserEnteredYearOnNewForm(): void
+    {
+        $this->assertSame(2027, SchoolYearHelper::defaultHolidayYear(2027, true, 2026));
+    }
+
+    public function testDefaultHolidayYearDoesNotRewriteExistingHolidayYear(): void
+    {
+        $this->assertSame(2024, SchoolYearHelper::defaultHolidayYear(2024, false, 2026));
+        $this->assertSame(0, SchoolYearHelper::defaultHolidayYear(0, false, 2026));
+    }
 }

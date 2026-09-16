@@ -45,6 +45,12 @@ class HolidaysTable extends Table
      */
     public function check()
     {
+        if ((int) $this->year <= 0) {
+            $this->setError(Text::_('COM_BALANCIRK_HOLIDAY_YEAR_REQUIRED'));
+
+            return false;
+        }
+
         $start = substr((string) $this->startDate, 0, 10);
         $end = substr((string) $this->endDate, 0, 10);
 

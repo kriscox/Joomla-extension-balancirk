@@ -19,10 +19,8 @@
 			type="number"
 			label="COM_BALANCIRK_HOLIDAY_FIELD_YEAR"
 			description="COM_BALANCIRK_HOLIDAY_YEAR_DESC"
-			min="2000"
-			max="2100"
-			step="1"
-			required="true" />
+			filter="integer"
+			step="1" />
 		<field
 			name="startDate"
 			type="calendar"

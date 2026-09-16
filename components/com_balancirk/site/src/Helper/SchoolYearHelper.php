@@ -239,4 +239,60 @@ class SchoolYearHelper
 
         return array_values(array_unique($normalised));
     }
+
+    /**
+     * Whether a school year value is unset for a form field.
+     *
+     * Zero, empty strings and null are empty. Do not treat those as a year.
+     *
+     * @param   mixed  $year  Stored or submitted year.
+     *
+     * @return  bool
+     *
+     * @since   1.3.24
+     */
+    public static function isEmptyYear(mixed $year): bool
+    {
+        if ($year === null) {
+            return true;
+        }
+
+        if (is_string($year) && trim($year) === '') {
+            return true;
+        }
+
+        return (int) $year <= 0;
+    }
+
+    /**
+     * Year to show on the holiday form.
+     *
+     * New holidays use the latest year that already has lessons. If none
+     * exist, leave the field empty — do not invent 0, 2000 or the calendar
+     * year. Existing holidays keep the stored year.
+     *
+     * @param   mixed     $storedYear         Year already on the item or in user state.
+     * @param   bool      $isNew              Whether this is a new holiday.
+     * @param   int|null  $latestLessonYear   MAX(year) from lessons, or null.
+     *
+     * @return  int|null  Year to bind, or null for an empty field.
+     *
+     * @since   1.3.24
+     */
+    public static function defaultHolidayYear(mixed $storedYear, bool $isNew, ?int $latestLessonYear): ?int
+    {
+        if (!$isNew) {
+            return (int) $storedYear;
+        }
+
+        if (!self::isEmptyYear($storedYear)) {
+            return (int) $storedYear;
+        }
+
+        if ($latestLessonYear === null || $latestLessonYear <= 0) {
+            return null;
+        }
+
+        return $latestLessonYear;
+    }
 }

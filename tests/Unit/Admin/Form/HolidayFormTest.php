@@ -38,6 +38,17 @@ class HolidayFormTest extends TestCase
         $this->assertSame('summary', strtolower($this->fieldName($form, 'summary')));
     }
 
+    public function testHolidayYearFieldHasNoDummyMinimumToOverwrite(): void
+    {
+        $form = $this->loadFormXml(dirname(__DIR__, 4) . '/components/com_balancirk/admin/forms/holiday.xml');
+        $year = $this->field($form, 'year');
+
+        $this->assertSame('', (string) $year['min']);
+        $this->assertSame('', (string) $year['default']);
+        $this->assertNotSame('true', (string) $year['required']);
+        $this->assertSame('COM_BALANCIRK_HOLIDAY_FIELD_YEAR', (string) $year['label']);
+    }
+
     public function testSharedHolidayFormUsesHolidayDateLabels(): void
     {
         $form = $this->loadFormXml(dirname(__DIR__, 4) . '/components/com_balancirk/forms/holiday.xml');
