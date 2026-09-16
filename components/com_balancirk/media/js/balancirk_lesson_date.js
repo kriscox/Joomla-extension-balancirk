@@ -28,8 +28,6 @@ function initDatepicker(options) {
 	}
 
 	if (jQuery.fn.datepicker) {
-		var startDate = parseIsoLocalDate(options.start);
-		var endDate = parseIsoLocalDate(options.end);
 		var pickerOptions = {
 			language: 'nl-BE',
 			format: 'dd/mm/yyyy',
@@ -45,12 +43,10 @@ function initDatepicker(options) {
 			autoclose: true
 		};
 
-		if (startDate) {
-			pickerOptions.startDate = startDate;
-		}
-
-		if (endDate) {
-			pickerOptions.endDate = endDate;
+		if (options.startDisplay && options.endDisplay) {
+			pickerOptions.startDate = options.startDisplay;
+			pickerOptions.endDate = options.endDisplay;
+			pickerOptions.defaultViewDate = options.autoSelectDate || options.startDisplay;
 		}
 
 		$input.datepicker(pickerOptions);
@@ -180,15 +176,11 @@ function isValidAttendanceDate(isoDate, options) {
 		return false;
 	}
 
-	if (!options.start || !options.end) {
+	if (options.start && isoDate < options.start) {
 		return false;
 	}
 
-	if (isoDate < options.start) {
-		return false;
-	}
-
-	if (isoDate > options.end) {
+	if (options.end && isoDate > options.end) {
 		return false;
 	}
 
@@ -207,22 +199,22 @@ function isValidAttendanceDate(isoDate, options) {
 	return true;
 }
 
-function parseIsoLocalDate(isoDate) {
-	if (!isoDate || !/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) {
-		return null;
-	}
+function pickerDateToIso(date) {
+	var year = date.getFullYear();
+	var month = String(date.getMonth() + 1).padStart(2, '0');
+	var day = String(date.getDate()).padStart(2, '0');
 
-	var parts = isoDate.split('-');
-
-	return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+	return year + '-' + month + '-' + day;
 }
 
 function isAllowedPickerDay(date, options) {
-	var start = parseIsoLocalDate(options.start);
-	var end = parseIsoLocalDate(options.end);
-	var day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+	var iso = pickerDateToIso(date);
 
-	if (!start || !end || day < start || day > end) {
+	if (options.start && iso < options.start) {
+		return false;
+	}
+
+	if (options.end && iso > options.end) {
 		return false;
 	}
 

@@ -100,7 +100,11 @@ $wa = $doc->getWebAssetManager();
 $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 	->registerAndUseScript('bootstrap-datepicker', 'https://unpkg.com/bootstrap-datepicker@latest/dist/js/bootstrap-datepicker.min.js')
 	->registerAndUseScript('bootstrap-datepicker-nl', 'https://unpkg.com/bootstrap-datepicker@latest/dist/locales/bootstrap-datepicker.nl-BE.min.js')
-	->registerAndUseScript('teacher-script', 'media/com_balancirk/js/balancirk_teacher_date.js');
+	->registerAndUseScript(
+		'teacher-script',
+		'media/com_balancirk/js/balancirk_teacher_date.js',
+		['version' => 'auto']
+	);
 $doc->addScriptOptions('teacher-script', [
 	'token' => $api_token,
 	'teachersUrl' => $teachersUrl,
