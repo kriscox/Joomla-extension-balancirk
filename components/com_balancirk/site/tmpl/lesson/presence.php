@@ -52,6 +52,9 @@ if ($hasConfiguredPeriod) {
 }
 
 $lesdaysMask = (int) ($item->lesdays ?? 0);
+$holidayRanges = $lessonModel instanceof LessonModel
+	? $lessonModel->getHolidayIsoRanges($period['start'] ?? null, $period['end'] ?? null)
+	: [];
 $userid = Factory::getApplication()->getIdentity()->id;
 $joomlaToken = UserHelper::getProfile($userid)->get('joomlatoken');
 $api_token = is_array($joomlaToken) ? (string) ($joomlaToken['token'] ?? '') : '';
@@ -61,7 +64,7 @@ $presencesUrl = Route::_(
 );
 
 $today = (new DateTime())->setTime(0, 0, 0);
-$todayInRange = LessonModel::shouldAutoSelectToday($period, $lesdaysMask, $today);
+$todayInRange = LessonModel::shouldAutoSelectToday($period, $lesdaysMask, $today, $holidayRanges);
 
 $presenceState = $app->getUserState('com_balancirk.presence.data', []);
 $restoredDate = '';
@@ -80,7 +83,8 @@ $restoredIsValid = $parsedRestoredDate instanceof DateTime
 		$parsedRestoredDate,
 		$hasConfiguredPeriod ? $startDate : null,
 		$hasConfiguredPeriod ? $endDate : null,
-		$lesdaysMask
+		$lesdaysMask,
+		$holidayRanges
 	);
 $autoSelectDate = '';
 $autoSelectIso = '';
@@ -114,6 +118,7 @@ $doc->addScriptOptions('lesson-script', [
 	'endDisplay' => $lastLesDay,
 	'lesdaysMask' => $lesdaysMask,
 	'weekdayBits' => LesdaysHelper::JS_GETDAY_BITS,
+	'holidays' => $holidayRanges,
 	'autoSelectDate' => $autoSelectDate,
 	'autoSelectIso' => $autoSelectIso,
 	'restoreSelection' => $restoredIsValid && $restoredStudents !== [],

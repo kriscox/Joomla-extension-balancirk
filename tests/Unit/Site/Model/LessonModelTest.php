@@ -314,5 +314,65 @@ class LessonModelTest extends TestCase
         $this->assertTrue(LessonModel::shouldAutoSelectToday($period, 64, $monday));
         $this->assertTrue(LessonModel::shouldAutoSelectToday($period, 0, $wednesday));
         $this->assertFalse(LessonModel::shouldAutoSelectToday($period, 64, new \DateTime('2026-08-31')));
+        $this->assertFalse(LessonModel::shouldAutoSelectToday(
+            $period,
+            0,
+            $wednesday,
+            [['start' => '2026-09-16', 'end' => '2026-09-16']]
+        ));
+    }
+
+    public function testIsHolidayDateDetectsInclusiveRanges(): void
+    {
+        $holidays = [['start' => '2026-09-01', 'end' => '2026-09-06']];
+
+        $this->assertTrue(LessonModel::isHolidayDate('2026-09-03', $holidays));
+        $this->assertTrue(LessonModel::isHolidayDate('2026-09-01', $holidays));
+        $this->assertTrue(LessonModel::isHolidayDate('2026-09-06', $holidays));
+        $this->assertFalse(LessonModel::isHolidayDate('2026-09-07', $holidays));
+        $this->assertFalse(LessonModel::isHolidayDate('2026-09-03', []));
+    }
+
+    public function testIsValidAttendanceDateRejectsAHolidayInsideThePeriod(): void
+    {
+        $holidays = [['start' => '2026-09-01', 'end' => '2026-09-06']];
+
+        $this->assertFalse(LessonModel::isValidAttendanceDate(
+            '2026-09-03',
+            '2026-09-01',
+            '2026-09-30',
+            8,
+            $holidays
+        ));
+        $this->assertTrue(LessonModel::isValidAttendanceDate(
+            '2026-09-10',
+            '2026-09-01',
+            '2026-09-30',
+            8,
+            $holidays
+        ));
+    }
+
+    public function testGetDatesExcludesHolidays(): void
+    {
+        $dates = LessonModel::getDates(
+            '2026-09-01',
+            '2026-09-17',
+            [
+                'Monday' => 0,
+                'Tuesday' => 0,
+                'Wednesday' => 0,
+                'Thursday' => 1,
+                'Friday' => 0,
+                'Saturday' => 0,
+                'Sunday' => 0,
+            ],
+            [['start' => '2026-09-01', 'end' => '2026-09-06']]
+        );
+
+        $this->assertSame(
+            ['2026-09-10', '2026-09-17'],
+            array_map(static fn(\DateTimeInterface $date): string => $date->format('Y-m-d'), $dates)
+        );
     }
 }

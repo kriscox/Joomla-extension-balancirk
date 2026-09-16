@@ -160,6 +160,10 @@ function isValidAttendanceDate(isoDate, options) {
 		return false;
 	}
 
+	if (isHolidayIso(isoDate, options)) {
+		return false;
+	}
+
 	var mask = parseInt(options.lesdaysMask, 10) || 0;
 
 	if (mask) {
@@ -173,6 +177,22 @@ function isValidAttendanceDate(isoDate, options) {
 	}
 
 	return true;
+}
+
+function isHolidayIso(isoDate, options) {
+	var holidays = options.holidays || [];
+
+	for (var i = 0; i < holidays.length; i++) {
+		var holiday = holidays[i] || {};
+		var start = holiday.start || '';
+		var end = holiday.end || '';
+
+		if (start && end && isoDate >= start && isoDate <= end) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 function pickerDateToIso(date) {
@@ -191,6 +211,10 @@ function isAllowedPickerDay(date, options) {
 	}
 
 	if (options.end && iso > options.end) {
+		return false;
+	}
+
+	if (isHolidayIso(iso, options)) {
 		return false;
 	}
 
