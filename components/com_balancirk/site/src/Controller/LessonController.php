@@ -64,30 +64,57 @@ class LessonController extends FormController
 
         $data = $this->input->post->get('jform', [], 'array');
         $lessonId = (int) ($data['id'] ?? 0);
-        $parsedDate = LessonModel::parseLessonDate($data['date'] ?? null);
-        $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=lesson&id=' . $lessonId, false);
+        $data['students'] = isset($data['students']) && is_array($data['students']) ? $data['students'] : [];
+        $presenceUrl = Route::_(
+            'index.php?option=' . $this->option . '&view=lesson&layout=presence&id=' . $lessonId,
+            false
+        );
+        $lessonUrl = Route::_('index.php?option=' . $this->option . '&view=lesson&id=' . $lessonId, false);
 
-        if ($lessonId <= 0 || !$parsedDate instanceof \DateTime) {
+        $app->setUserState('com_balancirk.presence.data', $data);
+
+        if ($lessonId <= 0) {
             $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_PRESENCE_INVALID_DATE'), 'warning');
-            $this->setRedirect($redirectUrl);
+            $this->setRedirect($lessonUrl);
+
+            return;
+        }
+
+        /** @var LessonModel $model */
+        $model = $this->getModel('Lesson');
+        $lesson = $model->getItem($lessonId);
+        $parsedDate = LessonModel::parseLessonDate($data['date'] ?? null);
+
+        if (
+            !is_object($lesson)
+            || !$parsedDate instanceof \DateTime
+            || !LessonModel::isValidAttendanceDate(
+                $parsedDate,
+                $lesson->start ?? null,
+                $lesson->end ?? null,
+                (int) ($lesson->lesdays ?? 0)
+            )
+        ) {
+            $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_PRESENCE_INVALID_DATE'), 'warning');
+            $this->setRedirect($presenceUrl);
 
             return;
         }
 
         $data['id'] = $lessonId;
         $data['date'] = $parsedDate->format('Y-m-d');
-        $data['students'] = isset($data['students']) && is_array($data['students']) ? $data['students'] : [];
-
-        /** @var LessonModel $model */
-        $model = $this->getModel('Lesson');
         $app->setUserState('com_balancirk.presence.data', $data);
-        $model->savePresence($data['id'], $data['date'], $data['students']);
 
-        // Set success message
+        if (!$model->savePresence($data['id'], $data['date'], $data['students'])) {
+            $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_PRESENCE_INVALID_DATE'), 'warning');
+            $this->setRedirect($presenceUrl);
+
+            return;
+        }
+
+        $app->setUserState('com_balancirk.presence.data', null);
         $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_PRESENCE_SAVED'), 'success');
-
-        // Redirect to the lesson page
-        $this->setRedirect($redirectUrl);
+        $this->setRedirect($lessonUrl);
     }
 
     /**
@@ -113,15 +140,28 @@ class LessonController extends FormController
         $lessonId = $this->input->getInt('id');
         $parsedDate = LessonModel::parseLessonDate($this->input->getString('date'));
 
-        if ($lessonId <= 0 || !$parsedDate instanceof \DateTime) {
+        /** @var LessonModel $model */
+        $model = $this->getModel('Lesson');
+        $lesson = $lessonId > 0 ? $model->getItem($lessonId) : null;
+
+        if (
+            !is_object($lesson)
+            || !$parsedDate instanceof \DateTime
+            || !LessonModel::isValidAttendanceDate(
+                $parsedDate,
+                $lesson->start ?? null,
+                $lesson->end ?? null,
+                (int) ($lesson->lesdays ?? 0)
+            )
+        ) {
             echo new JsonResponse(null, Text::_('COM_BALANCIRK_LESSON_PRESENCE_INVALID_DATE'), true);
             $app->close();
         }
 
-        /** @var LessonModel $model */
-        $model = $this->getModel('Lesson');
+        $students = $model->getPresentStudentIds($lessonId, $parsedDate->format('Y-m-d'));
         echo new JsonResponse([
-            'students' => $model->getPresentStudentIds($lessonId, $parsedDate->format('Y-m-d')),
+            'students' => $students,
+            'hasRecords' => $students !== [],
         ]);
         $app->close();
     }
@@ -147,30 +187,57 @@ class LessonController extends FormController
 
         $data = $this->input->post->get('jform', [], 'array');
         $lessonId = (int) ($data['id'] ?? 0);
-        $parsedDate = LessonModel::parseLessonDate($data['date'] ?? null);
-        $redirectUrl = Route::_('index.php?option=' . $this->option . '&view=lesson&id=' . $lessonId, false);
+        $data['teachers'] = isset($data['teachers']) && is_array($data['teachers']) ? $data['teachers'] : [];
+        $teacherUrl = Route::_(
+            'index.php?option=' . $this->option . '&view=lesson&layout=teacher&id=' . $lessonId,
+            false
+        );
+        $lessonUrl = Route::_('index.php?option=' . $this->option . '&view=lesson&id=' . $lessonId, false);
 
-        if ($lessonId <= 0 || !$parsedDate instanceof \DateTime) {
+        $app->setUserState('com_balancirk.teacher.data', $data);
+
+        if ($lessonId <= 0) {
             $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_TEACHER_INVALID_DATE'), 'warning');
-            $this->setRedirect($redirectUrl);
+            $this->setRedirect($lessonUrl);
+
+            return;
+        }
+
+        /** @var LessonModel $model */
+        $model = $this->getModel('Lesson');
+        $lesson = $model->getItem($lessonId);
+        $parsedDate = LessonModel::parseLessonDate($data['date'] ?? null);
+
+        if (
+            !is_object($lesson)
+            || !$parsedDate instanceof \DateTime
+            || !LessonModel::isValidAttendanceDate(
+                $parsedDate,
+                $lesson->start ?? null,
+                $lesson->end ?? null,
+                (int) ($lesson->lesdays ?? 0)
+            )
+        ) {
+            $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_TEACHER_INVALID_DATE'), 'warning');
+            $this->setRedirect($teacherUrl);
 
             return;
         }
 
         $data['id'] = $lessonId;
         $data['date'] = $parsedDate->format('Y-m-d');
-        $data['teachers'] = isset($data['teachers']) && is_array($data['teachers']) ? $data['teachers'] : [];
-
-        /** @var LessonModel $model */
-        $model = $this->getModel('Lesson');
         $app->setUserState('com_balancirk.teacher.data', $data);
-        $model->saveTeacher($data['id'], $data['date'], $data['teachers']);
 
-        // Set success message
+        if (!$model->saveTeacher($data['id'], $data['date'], $data['teachers'])) {
+            $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_TEACHER_INVALID_DATE'), 'warning');
+            $this->setRedirect($teacherUrl);
+
+            return;
+        }
+
+        $app->setUserState('com_balancirk.teacher.data', null);
         $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_TEACHER_SAVED'), 'success');
-
-        // Redirect to the lesson page
-        $this->setRedirect($redirectUrl);
+        $this->setRedirect($lessonUrl);
     }
 
     /**
@@ -196,13 +263,24 @@ class LessonController extends FormController
         $lessonId = $this->input->getInt('id');
         $parsedDate = LessonModel::parseLessonDate($this->input->getString('date'));
 
-        if ($lessonId <= 0 || !$parsedDate instanceof \DateTime) {
+        /** @var LessonModel $model */
+        $model = $this->getModel('Lesson');
+        $lesson = $lessonId > 0 ? $model->getItem($lessonId) : null;
+
+        if (
+            !is_object($lesson)
+            || !$parsedDate instanceof \DateTime
+            || !LessonModel::isValidAttendanceDate(
+                $parsedDate,
+                $lesson->start ?? null,
+                $lesson->end ?? null,
+                (int) ($lesson->lesdays ?? 0)
+            )
+        ) {
             echo new JsonResponse(null, Text::_('COM_BALANCIRK_LESSON_TEACHER_INVALID_DATE'), true);
             $app->close();
         }
 
-        /** @var LessonModel $model */
-        $model = $this->getModel('Lesson');
         echo new JsonResponse([
             'teachers' => $model->getTeachedTeacherIds($lessonId, $parsedDate->format('Y-m-d')),
         ]);

@@ -16,8 +16,10 @@ use DateTime;
 use DatePeriod;
 use DateInterval;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Mail\MailerFactoryInterface;
+use Joomla\CMS\Table\Table;
 use CoCoCo\Component\Balancirk\Administrator\Model\HolidaysModel;
 use CoCoCo\Component\Balancirk\Site\Helper\LesdaysHelper;
 
@@ -73,6 +75,33 @@ class LessonModel extends AdminModel
         }
 
         return $item;
+    }
+
+    /**
+     * Method to get a table object, load it if necessary.
+     *
+     * Always use the site Lesson table. Calling this model from the
+     * administrator application would otherwise look for Administrator\Table\LessonTable.
+     *
+     * @param   string  $name     The table name. Optional.
+     * @param   string  $prefix   The class prefix. Optional.
+     * @param   array   $options  Configuration array for model. Optional.
+     *
+     * @return  Table  A Table object
+     *
+     * @since   1.3.24
+     * @throws  \Exception
+     */
+    public function getTable($name = '', $prefix = '', $options = array())
+    {
+        $name = 'Lesson';
+        $prefix = 'Site';
+
+        if ($table = $this->_createTable($name, $prefix, $options)) {
+            return $table;
+        }
+
+        throw new \Exception(Text::sprintf('JLIB_APPLICATION_ERROR_TABLE_NAME_NOT_SUPPORTED', $name), 0);
     }
 
     /**
@@ -447,6 +476,44 @@ class LessonModel extends AdminModel
     }
 
     /**
+     * Whether a calendar date is a valid attendance day for a lesson.
+     *
+     * The date must fall inside the lesson period. When lesson weekdays are
+     * configured, the date must also match one of those days.
+     *
+     * @param   mixed  $date         Attendance date.
+     * @param   mixed  $start        Lesson start date.
+     * @param   mixed  $end          Lesson end date.
+     * @param   int    $lesdaysMask  Stored lesdays bitmask.
+     *
+     * @return  bool
+     *
+     * @since   1.3.24
+     */
+    public static function isValidAttendanceDate(mixed $date, mixed $start, mixed $end, int $lesdaysMask = 0): bool
+    {
+        $parsed = self::parseLessonDate($date);
+        $period = self::periodFromValues($start, $end);
+
+        if (!$parsed instanceof DateTime || $period === null) {
+            return false;
+        }
+
+        if ($parsed < $period['start'] || $parsed > $period['end']) {
+            return false;
+        }
+
+        if (
+            self::hasConfiguredLesdays(self::getLesdays($lesdaysMask))
+            && !LesdaysHelper::matchesDate($parsed, $lesdaysMask)
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Resolve the lesson period from the lessons table, then from the item.
      *
      * The lessons table is the source of truth for start and end. The complete
@@ -679,17 +746,34 @@ class LessonModel extends AdminModel
      * @param	date	$date		Date of the lesson
      * @param	array	$students	An array of the students present
      *
-     * @return void
+     * @return  bool
      */
     public function savePresence($id, $date, $students)
     {
+        $id = (int) $id;
+        $parsedDate = self::parseLessonDate($date);
+        $lesson = $id > 0 ? $this->getItem($id) : null;
+
+        if (
+            !is_object($lesson) || !$parsedDate instanceof DateTime
+            || !self::isValidAttendanceDate(
+                $parsedDate,
+                $lesson->start ?? null,
+                $lesson->end ?? null,
+                (int) ($lesson->lesdays ?? 0)
+            )
+        ) {
+            return false;
+        }
+
+        $date = $parsedDate->format('Y-m-d');
         $students = is_array($students) ? $students : [];
         $dbo = $this->getDatabase();
         $query = $dbo->getQuery(true);
 
         // Delete all presences for this lesson
         $query->delete($dbo->quoteName('#__balancirk_presences'))
-            ->where($dbo->quoteName('lesson') . ' = ' . (int) $id)
+            ->where($dbo->quoteName('lesson') . ' = ' . $id)
             ->where($dbo->quoteName('date') . ' = ' . $dbo->quote($date));
         $dbo->setQuery($query);
         $dbo->execute();
@@ -699,10 +783,12 @@ class LessonModel extends AdminModel
             $query->clear();
             $query->insert($dbo->quoteName('#__balancirk_presences'))
                 ->columns($dbo->quoteName(['lesson', 'student', 'date']))
-                ->values($id . ', ' . $student . ', ' . $dbo->quote($date));
+                ->values($id . ', ' . (int) $student . ', ' . $dbo->quote($date));
             $dbo->setQuery($query);
             $dbo->execute();
         }
+
+        return true;
     }
 
     /**
@@ -736,12 +822,30 @@ class LessonModel extends AdminModel
      * Method to save the teachers of the lesson
      *
      * @param	int		$id			Id of the lesson
+     * @param	mixed	$date		Date of the lesson
      * @param	array	$teachers	An array of the teachers
      *
-     * @return void
+     * @return  bool
      */
     public function saveTeacher($id, $date, $teachers)
     {
+        $id = (int) $id;
+        $parsedDate = self::parseLessonDate($date);
+        $lesson = $id > 0 ? $this->getItem($id) : null;
+
+        if (
+            !is_object($lesson) || !$parsedDate instanceof DateTime
+            || !self::isValidAttendanceDate(
+                $parsedDate,
+                $lesson->start ?? null,
+                $lesson->end ?? null,
+                (int) ($lesson->lesdays ?? 0)
+            )
+        ) {
+            return false;
+        }
+
+        $date = $parsedDate->format('Y-m-d');
         $teachers = is_array($teachers) ? $teachers : [];
         $dbo = $this->getDatabase();
         $query = $dbo->getQuery(true);
@@ -770,6 +874,8 @@ class LessonModel extends AdminModel
             $dbo->setQuery($query);
             $dbo->execute();
         }
+
+        return true;
     }
 
     /**

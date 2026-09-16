@@ -49,7 +49,6 @@ $firstLesDay = $startDate->format('d/m/Y');
 $lastLesDay = $endDate->format('d/m/Y');
 $firstIso = $startDate->format('Y-m-d');
 $lastIso = $endDate->format('Y-m-d');
-$weekdayBitsJson = json_encode(LesdaysHelper::JS_GETDAY_BITS);
 $userid = Factory::getApplication()->getIdentity()->id;
 $joomlaToken = UserHelper::getProfile($userid)->get('joomlatoken');
 $api_token = is_array($joomlaToken) ? (string) ($joomlaToken['token'] ?? '') : '';
@@ -62,6 +61,29 @@ $today = (new DateTime())->setTime(0, 0, 0);
 $todayInRange = $today >= $startDate && $today <= $endDate
 	&& (!$restrictToLesdays || LesdaysHelper::matchesDate($today, $lesdaysMask));
 
+$teacherState = $app->getUserState('com_balancirk.teacher.data', []);
+$restoredDate = '';
+$restoredTeachers = [];
+
+if ((int) ($teacherState['id'] ?? 0) === (int) ($item->id ?? 0)) {
+	$restoredDate = (string) ($teacherState['date'] ?? '');
+	$restoredTeachers = isset($teacherState['teachers']) && is_array($teacherState['teachers'])
+		? $teacherState['teachers']
+		: [];
+}
+
+$parsedRestoredDate = $restoredDate !== '' ? LessonModel::parseLessonDate($restoredDate) : null;
+$autoSelectDate = '';
+$autoSelectIso = '';
+
+if ($parsedRestoredDate instanceof DateTime) {
+	$autoSelectDate = $parsedRestoredDate->format('d/m/Y');
+	$autoSelectIso = $parsedRestoredDate->format('Y-m-d');
+} elseif ($todayInRange) {
+	$autoSelectDate = $today->format('d/m/Y');
+	$autoSelectIso = $today->format('Y-m-d');
+}
+
 /** @var Joomla\CMS\Document\Document  */
 $doc = $app->getDocument();
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
@@ -69,47 +91,34 @@ $wa = $doc->getWebAssetManager();
 $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 	->registerAndUseScript('bootstrap-datepicker', 'https://unpkg.com/bootstrap-datepicker@latest/dist/js/bootstrap-datepicker.min.js')
 	->registerAndUseScript('bootstrap-datepicker-nl', 'https://unpkg.com/bootstrap-datepicker@latest/dist/locales/bootstrap-datepicker.nl-BE.min.js')
-	->registerAndUseScript('teacher-script', 'media/com_balancirk/js/balancirk_teacher_date.js')
-	->addInlineScript('
-	var changed = false;
-	jQuery(document).ready(function() {
-		if (jQuery.fn.datepicker) {
-			jQuery("#jform_date").datepicker({
-				language: "nl-BE",
-				startDate: "' . $firstLesDay . '",
-				endDate: "' . $lastLesDay . '",
-				todayHighlight: true,
-				todayBtn: true,
-				maxViewMode: 0,
-				weekStart: 1,
-				beforeShowDay: function(date) {
-					var lesdaysMask = ' . (int) $lesdaysMask . ';
-					var weekdayBits = ' . $weekdayBitsJson . ';
-					return !lesdaysMask || (lesdaysMask & weekdayBits[date.getDay()]) !== 0;
-				},
-				autoclose: true,
-			});
-			' . ($todayInRange ? 'jQuery("#jform_date").datepicker("setDate", "' . $today->format('d/m/Y') . '");
-			changed = true;' : '') . '
-		} else {
-			jQuery("#jform_date").attr({type: "date", min: "' . $firstIso . '", max: "' . $lastIso . '"});
-			' . ($todayInRange ? 'jQuery("#jform_date").val("' . $today->format('Y-m-d') . '");
-			changed = true;' : '') . '
-		}
-	});
-	');
+	->registerAndUseScript('teacher-script', 'media/com_balancirk/js/balancirk_teacher_date.js');
 $doc->addScriptOptions('teacher-script', [
 	'token' => $api_token,
 	'teachersUrl' => $teachersUrl,
+	'start' => $firstIso,
+	'end' => $lastIso,
+	'startDisplay' => $firstLesDay,
+	'endDisplay' => $lastLesDay,
+	'lesdaysMask' => $lesdaysMask,
+	'weekdayBits' => LesdaysHelper::JS_GETDAY_BITS,
+	'autoSelectDate' => $autoSelectDate,
+	'autoSelectIso' => $autoSelectIso,
+	'restoreSelection' => $restoredTeachers !== [],
+	'strings' => [
+		'invalidDate' => Text::_('COM_BALANCIRK_LESSON_TEACHER_INVALID_DATE'),
+	],
 ]);
 
 $teachers = $this->get('Teachers') ?: [];
 $data = [];
 $data['id'] = (int) ($item->id ?? 0);
 
+if ($restoredTeachers !== []) {
+	$data['teachers'] = $restoredTeachers;
+}
+
 $form = $this->get('TeacherForm');
 if ($form) {
-	$form->bind($data);
 	$teachersField = $form->getField('teachers');
 
 	if ($teachersField) {
@@ -117,6 +126,8 @@ if ($form) {
 			$teachersField->addOption($teacher->firstname . " " . $teacher->name, ['value' => $teacher->id]);
 		}
 	}
+
+	$form->bind($data);
 }
 
 $presence_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=presence&id=' . (int) ($item->id ?? 0));
@@ -130,7 +141,7 @@ $url = Route::_('index.php?option=com_balancirk&view=lesson&id=' . (int) ($item-
 		<div class="col-md-12">
 			<h3><?= Text::_('COM_BALANCIRK_LESSON_TEACHED'); ?> <?= $this->escape($item->name ?? '') ?></h3>
 			<?= $form ? $form->renderField('id') : ''; ?>
-			<label for="lessonDate">Select Date:</label>
+			<label for="jform_date"><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_DATES'); ?></label>
 			<input type="text" id="jform_date" class="form-control" name="jform[date]" />
 
 			<?php if (empty($teachers)) : ?>
@@ -163,25 +174,5 @@ $url = Route::_('index.php?option=com_balancirk&view=lesson&id=' . (int) ($item-
 		</div>
 	</div>
 </form>
-<!-- Modal alerting in case of changed values -->
-<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="confirmModalLabel">Confirm Date Change</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				Are you sure you want to change the date?
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-				<button type="button" class="btn btn-primary" id="confirmChange">Confirm</button>
-			</div>
-		</div>
-	</div>
-</div>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-member-edit-bottom}'); ?>
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-bottom}'); ?>

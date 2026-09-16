@@ -237,4 +237,36 @@ class LessonModelTest extends TestCase
             LessonModel::getDates('2026-09-01', '2026-09-30', LessonModel::getLesdays(0))
         );
     }
+
+    public function testIsValidAttendanceDateAcceptsAConfiguredLessonDayInsideThePeriod(): void
+    {
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-07', '2026-09-01', '2026-09-30', 64));
+        $this->assertTrue(LessonModel::isValidAttendanceDate('07/09/2026', '01/09/2026', '30/09/2026', 64));
+    }
+
+    public function testIsValidAttendanceDateRejectsADateOutsideThePeriod(): void
+    {
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-08-31', '2026-09-01', '2026-09-30', 64));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-10-01', '2026-09-01', '2026-09-30', 64));
+    }
+
+    public function testIsValidAttendanceDateRejectsAWrongWeekdayWhenLesdaysAreSet(): void
+    {
+        // 2026-09-08 is a Tuesday; Monday-only mask is 64.
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-08', '2026-09-01', '2026-09-30', 64));
+    }
+
+    public function testIsValidAttendanceDateAllowsAnyDayInPeriodWhenNoLesdaysAreSet(): void
+    {
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-08', '2026-09-01', '2026-09-30', 0));
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-01', '2026-09-01', '2026-09-30', 0));
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-30', '2026-09-01', '2026-09-30', 0));
+    }
+
+    public function testIsValidAttendanceDateRejectsMissingDates(): void
+    {
+        $this->assertFalse(LessonModel::isValidAttendanceDate('', '2026-09-01', '2026-09-30', 0));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-07', '', '2026-09-30', 0));
+        $this->assertFalse(LessonModel::isValidAttendanceDate(null, '2026-09-01', '2026-09-30', 0));
+    }
 }
