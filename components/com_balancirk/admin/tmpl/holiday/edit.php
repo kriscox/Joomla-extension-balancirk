@@ -10,12 +10,20 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Router\Route;
 
 HTMLHelper::_('behavior.formvalidator');
 HTMLHelper::_('behavior.keepalive');
 
+$document = Factory::getApplication()->getDocument();
+$wa = $document->getWebAssetManager();
+$wa->registerAndUseScript(
+    'balancirk-holiday-dates',
+    'media/com_balancirk/js/balancirk_holiday_dates.js',
+    ['version' => 'auto']
+);
 ?>
 
 <form action="<?= Route::_('index.php?option=com_balancirk&view=holiday&layout=edit&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="holiday-form" class="form-validate">

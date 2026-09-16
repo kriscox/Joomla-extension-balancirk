@@ -12,6 +12,7 @@ namespace CoCoCo\Component\Balancirk\Administrator\Table;
 
 \defined('_JEXEC') or die;
 
+use CoCoCo\Component\Balancirk\Site\Helper\HolidayHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Table\Table;
 use Joomla\Database\DatabaseDriver;
@@ -51,8 +52,17 @@ class HolidaysTable extends Table
             return false;
         }
 
-        $start = substr((string) $this->startDate, 0, 10);
-        $end = substr((string) $this->endDate, 0, 10);
+        $dates = HolidayHelper::resolveStoredDates($this->startDate, $this->endDate);
+        $start = $dates['start'];
+        $end = $dates['end'];
+
+        if ($start !== '') {
+            $this->startDate = $start;
+        }
+
+        if ($end !== '') {
+            $this->endDate = $end;
+        }
 
         if ($start === '' || $end === '') {
             $this->setError(Text::_('COM_BALANCIRK_HOLIDAY_DATES_REQUIRED'));

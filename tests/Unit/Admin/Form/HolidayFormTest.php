@@ -79,6 +79,25 @@ class HolidayFormTest extends TestCase
         $this->assertStringNotContainsString('JGLOBAL_TITLE_ASC', $xml);
     }
 
+    public function testHolidayEditTemplateLoadsDateSyncScript(): void
+    {
+        $template = file_get_contents(
+            dirname(__DIR__, 4) . '/components/com_balancirk/admin/tmpl/holiday/edit.php'
+        );
+        $script = dirname(__DIR__, 4) . '/components/com_balancirk/media/js/balancirk_holiday_dates.js';
+
+        $this->assertFileExists($script);
+        $this->assertIsString($template);
+        $this->assertStringContainsString('balancirk_holiday_dates.js', $template);
+
+        $js = file_get_contents($script);
+        $this->assertIsString($js);
+        $this->assertStringContainsString('jform_startDate', $js);
+        $this->assertStringContainsString('jform_endDate', $js);
+        $this->assertStringContainsString('shouldReplaceEnd', $js);
+        $this->assertStringContainsString('seedEndBeforePicker', $js);
+    }
+
     private function loadFormXml(string $path): \SimpleXMLElement
     {
         $this->assertFileExists($path);
