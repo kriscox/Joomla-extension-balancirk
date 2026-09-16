@@ -502,8 +502,7 @@ class LessonModel extends AdminModel
      * Whether a calendar date is a valid attendance day for a lesson.
      *
      * When a lesson period is known, the date must fall inside it. A missing
-     * period is not treated as invalid: the weekday mask is still applied.
-     * When lesson weekdays are configured, the date must match one of them.
+     * period is invalid: attendance cannot be stored without start and end.
      *
      * @param   mixed  $date         Attendance date.
      * @param   mixed  $start        Lesson start date.
@@ -524,7 +523,7 @@ class LessonModel extends AdminModel
 
         $period = self::periodFromValues($start, $end);
 
-        if ($period !== null && ($parsed < $period['start'] || $parsed > $period['end'])) {
+        if ($period === null || $parsed < $period['start'] || $parsed > $period['end']) {
             return false;
         }
 
@@ -588,10 +587,14 @@ class LessonModel extends AdminModel
 
         $period = $this->resolveLessonPeriod($lesson);
 
+        if ($period === null) {
+            return false;
+        }
+
         return self::isValidAttendanceDate(
             $date,
-            $period['start'] ?? null,
-            $period['end'] ?? null,
+            $period['start'],
+            $period['end'],
             (int) ($lesson->lesdays ?? 0)
         );
     }

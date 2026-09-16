@@ -35,20 +35,23 @@ $period = $lessonModel instanceof LessonModel
 	: LessonModel::periodFromValues($item->start ?? null, $item->end ?? null);
 $hasConfiguredPeriod = $period !== null;
 
-if (!$hasConfiguredPeriod) {
-	$startDate = (new DateTime('today'))->modify('-18 months');
-	$endDate = (new DateTime('today'))->modify('+18 months');
-} else {
+if ($hasConfiguredPeriod) {
 	$startDate = $period['start'];
 	$endDate = $period['end'];
+	$firstLesDay = $startDate->format('d/m/Y');
+	$lastLesDay = $endDate->format('d/m/Y');
+	$firstIso = $startDate->format('Y-m-d');
+	$lastIso = $endDate->format('Y-m-d');
+} else {
+	$startDate = null;
+	$endDate = null;
+	$firstLesDay = '';
+	$lastLesDay = '';
+	$firstIso = '';
+	$lastIso = '';
 }
 
 $lesdaysMask = (int) ($item->lesdays ?? 0);
-
-$firstLesDay = $startDate->format('d/m/Y');
-$lastLesDay = $endDate->format('d/m/Y');
-$firstIso = $startDate->format('Y-m-d');
-$lastIso = $endDate->format('Y-m-d');
 $userid = Factory::getApplication()->getIdentity()->id;
 $joomlaToken = UserHelper::getProfile($userid)->get('joomlatoken');
 $api_token = is_array($joomlaToken) ? (string) ($joomlaToken['token'] ?? '') : '';

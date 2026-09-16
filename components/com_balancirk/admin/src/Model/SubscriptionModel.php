@@ -282,37 +282,10 @@ class SubscriptionModel extends AdminModel
         $db->setQuery($query)->execute();
         $this->lastInsertedId = (int) $db->insertid();
 
-        /** @var StudentModel */
-        $studentModel = $this->getMVCFactory()->createModel('Student', 'Site');
-        $student = $studentModel->getItem($studentId);
-        $parents = $studentModel->getParents($studentId);
-        /** @var MemberModel */
-        $memberModel = $this->getMVCFactory()->createModel('Member', 'Site');
-        $mailDefaults = $this->getSubscriptionMailDefaults();
-        $subscriptionDate = date('Y-m-d');
-
-        foreach ($parents as $parent)
-        {
-            $member = $memberModel->getItem($parent->parent);
-
-            if (!$student || !$member || empty($member->email)) {
-                continue;
-            }
-
-            $message = SubscriptionMailHelper::buildMailMessage(
-                $lesson,
-                $student,
-                $member,
-                $subscriptionDate,
-                (bool) $waitinglist,
-                $mailDefaults
-            );
-            $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
-            $mailer->setSender('info@balancirk.be', 'Circusatelier Balancirk VZW')
-                ->addRecipient($member->email)
-                ->setSubject($message['subject'])
-                ->setBody($message['body'])
-                ->Send();
+        try {
+            $this->sendEnrolmentMails($lesson, $studentId, (bool) $waitinglist);
+        } catch (\Throwable $exception) {
+            // The subscription is stored. Mail must not turn a successful enrol into a fatal error.
         }
 
         return true;
@@ -342,9 +315,7 @@ class SubscriptionModel extends AdminModel
      */
     private function isStudentEligibleForLesson(int $studentId, object $lesson): bool
     {
-        /** @var StudentModel */
-        $studentModel = $this->getMVCFactory()->createModel('Student', 'Admin');
-        $student = $studentModel->getItem($studentId);
+        $student = $this->loadStudent($studentId);
 
         if (!$student) {
             return false;
@@ -407,6 +378,104 @@ class SubscriptionModel extends AdminModel
         $lesson = $db->setQuery($query)->loadObject();
 
         return $lesson ?: null;
+    }
+
+    /**
+     * Load a student row.
+     *
+     * @param   int  $studentId  Student id.
+     *
+     * @return  object|null
+     *
+     * @since   1.3.24
+     */
+    private function loadStudent(int $studentId): ?object
+    {
+        if ($studentId <= 0) {
+            return null;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('*')
+            ->from($db->quoteName('#__balancirk_students'))
+            ->where($db->quoteName('id') . ' = ' . $studentId);
+        $student = $db->setQuery($query)->loadObject();
+
+        return $student ?: null;
+    }
+
+    /**
+     * Load parent member rows for a student.
+     *
+     * @param   int  $studentId  Student id.
+     *
+     * @return  object[]
+     *
+     * @since   1.3.24
+     */
+    private function loadParentMembers(int $studentId): array
+    {
+        if ($studentId <= 0) {
+            return [];
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select($db->quoteName(['m.id', 'm.name', 'm.firstname', 'm.email']))
+            ->from($db->quoteName('#__balancirk_parents', 'p'))
+            ->join(
+                'INNER',
+                $db->quoteName('#__balancirk_members', 'm')
+                . ' ON ' . $db->quoteName('p.parent') . ' = ' . $db->quoteName('m.id')
+            )
+            ->where($db->quoteName('p.child') . ' = ' . $studentId);
+
+        return $db->setQuery($query)->loadObjectList() ?: [];
+    }
+
+    /**
+     * Send enrolment confirmation mails to the student's parents.
+     *
+     * @param   object  $lesson       Lesson record.
+     * @param   int     $studentId    Student id.
+     * @param   bool    $waitingList  Whether the student is on the waiting list.
+     *
+     * @return  void
+     *
+     * @since   1.3.24
+     */
+    private function sendEnrolmentMails(object $lesson, int $studentId, bool $waitingList): void
+    {
+        $student = $this->loadStudent($studentId);
+
+        if (!$student) {
+            return;
+        }
+
+        $mailDefaults = $this->getSubscriptionMailDefaults();
+        $subscriptionDate = date('Y-m-d');
+
+        foreach ($this->loadParentMembers($studentId) as $member) {
+            if (empty($member->email)) {
+                continue;
+            }
+
+            $message = SubscriptionMailHelper::buildMailMessage(
+                $lesson,
+                $student,
+                $member,
+                $subscriptionDate,
+                $waitingList,
+                $mailDefaults
+            );
+            $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+            $mailer->setSender('info@balancirk.be', 'Circusatelier Balancirk VZW')
+                ->addRecipient($member->email)
+                ->setSubject($message['subject'])
+                ->setBody($message['body'])
+                ->Send();
+        }
     }
 
     /**

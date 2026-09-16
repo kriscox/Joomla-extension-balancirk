@@ -269,11 +269,11 @@ class LessonModelTest extends TestCase
         $this->assertFalse(LessonModel::isValidAttendanceDate(null, '2026-09-01', '2026-09-30', 0));
     }
 
-    public function testIsValidAttendanceDateAllowsADateWhenThePeriodIsUnknown(): void
+    public function testIsValidAttendanceDateRejectsADateWhenThePeriodIsUnknown(): void
     {
-        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-07', '', '', 64));
-        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-07', null, null, 0));
-        $this->assertTrue(LessonModel::isValidAttendanceDate('07/09/2026', '', '2026-09-30', 64));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-07', '', '', 64));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-07', null, null, 0));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('07/09/2026', '', '2026-09-30', 64));
     }
 
     public function testIsValidAttendanceDateRejectsWrongWeekdayWhenPeriodIsUnknown(): void

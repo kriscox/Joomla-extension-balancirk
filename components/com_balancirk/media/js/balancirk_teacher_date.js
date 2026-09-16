@@ -25,11 +25,11 @@ function initTeacherDatepicker(options) {
 	}
 
 	if (jQuery.fn.datepicker) {
-		$input.datepicker({
+		var startDate = parseIsoLocalDate(options.start);
+		var endDate = parseIsoLocalDate(options.end);
+		var pickerOptions = {
 			language: 'nl-BE',
 			format: 'dd/mm/yyyy',
-			startDate: options.startDisplay || '',
-			endDate: options.endDisplay || '',
 			todayHighlight: true,
 			todayBtn: false,
 			clearBtn: true,
@@ -37,13 +37,20 @@ function initTeacherDatepicker(options) {
 			maxViewMode: 0,
 			weekStart: 1,
 			beforeShowDay: function (date) {
-				var mask = parseInt(options.lesdaysMask, 10) || 0;
-				var bits = options.weekdayBits || [1, 64, 32, 16, 8, 4, 2];
-
-				return !mask || (mask & bits[date.getDay()]) !== 0;
+				return isAllowedPickerDay(date, options);
 			},
 			autoclose: true
-		});
+		};
+
+		if (startDate) {
+			pickerOptions.startDate = startDate;
+		}
+
+		if (endDate) {
+			pickerOptions.endDate = endDate;
+		}
+
+		$input.datepicker(pickerOptions);
 
 		applyInitialTeacherDate($input, options, true);
 	} else {
@@ -149,11 +156,15 @@ function isValidAttendanceDate(isoDate, options) {
 		return false;
 	}
 
-	if (options.start && isoDate < options.start) {
+	if (!options.start || !options.end) {
 		return false;
 	}
 
-	if (options.end && isoDate > options.end) {
+	if (isoDate < options.start) {
+		return false;
+	}
+
+	if (isoDate > options.end) {
 		return false;
 	}
 
@@ -170,6 +181,31 @@ function isValidAttendanceDate(isoDate, options) {
 	}
 
 	return true;
+}
+
+function parseIsoLocalDate(isoDate) {
+	if (!isoDate || !/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) {
+		return null;
+	}
+
+	var parts = isoDate.split('-');
+
+	return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+}
+
+function isAllowedPickerDay(date, options) {
+	var start = parseIsoLocalDate(options.start);
+	var end = parseIsoLocalDate(options.end);
+	var day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+	if (!start || !end || day < start || day > end) {
+		return false;
+	}
+
+	var mask = parseInt(options.lesdaysMask, 10) || 0;
+	var bits = options.weekdayBits || [1, 64, 32, 16, 8, 4, 2];
+
+	return !mask || (mask & bits[date.getDay()]) !== 0;
 }
 
 function showTeacherWarning(message) {
