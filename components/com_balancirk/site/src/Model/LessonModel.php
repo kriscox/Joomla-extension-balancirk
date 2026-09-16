@@ -503,6 +503,8 @@ class LessonModel extends AdminModel
      *
      * When a lesson period is known, the date must fall inside it. A missing
      * period does not block attendance: the weekday mask is still applied.
+     * Inverted start/end values are not rewritten here; those rows need to
+     * be corrected in the lesson data.
      *
      * @param   mixed  $date         Attendance date.
      * @param   mixed  $start        Lesson start date.
@@ -657,6 +659,9 @@ class LessonModel extends AdminModel
     /**
      * Build a period from two date values.
      *
+     * Start must not be after end. A school year that runs from September
+     * into June of the next calendar year must already be stored that way.
+     *
      * @param   mixed  $start  Start date.
      * @param   mixed  $end    End date.
      *
@@ -669,47 +674,11 @@ class LessonModel extends AdminModel
         $startDate = self::parseLessonDate($start);
         $endDate = self::parseLessonDate($end);
 
-        if (!$startDate instanceof DateTime || !$endDate instanceof DateTime) {
+        if (!$startDate instanceof DateTime || !$endDate instanceof DateTime || $startDate > $endDate) {
             return null;
-        }
-
-        if ($startDate > $endDate) {
-            $endDate = self::extendSchoolYearEnd($startDate, $endDate);
-
-            if (!$endDate instanceof DateTime || $startDate > $endDate) {
-                return null;
-            }
         }
 
         return ['start' => $startDate, 'end' => $endDate];
-    }
-
-    /**
-     * Move an inverted school-year end date into the following calendar year.
-     *
-     * Lessons often start in September and end in June. Some rows store that
-     * as 2026-09-01 .. 2026-06-30 instead of 2027-06-30.
-     *
-     * @param   DateTime  $start  Lesson start.
-     * @param   DateTime  $end    Lesson end before the start.
-     *
-     * @return  DateTime|null
-     *
-     * @since   1.3.24
-     */
-    private static function extendSchoolYearEnd(DateTime $start, DateTime $end): ?DateTime
-    {
-        $startMonth = (int) $start->format('n');
-        $endMonth = (int) $end->format('n');
-
-        if ($startMonth < 7 || $endMonth > 8) {
-            return null;
-        }
-
-        $extended = clone $end;
-        $extended->modify('+1 year');
-
-        return $extended >= $start ? $extended : null;
     }
 
     /**

@@ -276,15 +276,23 @@ class LessonModelTest extends TestCase
         $this->assertTrue(LessonModel::isValidAttendanceDate('07/09/2026', '', '2026-09-30', 64));
     }
 
-    public function testPeriodFromValuesExtendsASchoolYearWhenEndIsBeforeStart(): void
+    public function testPeriodFromValuesDoesNotRewriteAnInvertedEndDate(): void
     {
-        $period = LessonModel::periodFromValues('2026-09-01', '2026-06-30');
+        $this->assertNull(LessonModel::periodFromValues('2026-09-01', '2026-06-30'));
+        $this->assertFalse(LessonModel::isValidLessonPeriod('2026-09-01', '2026-06-30'));
+    }
+
+    public function testPeriodFromValuesAcceptsACrossYearSchoolYear(): void
+    {
+        $period = LessonModel::periodFromValues('2026-09-01', '2027-06-30');
 
         $this->assertNotNull($period);
         $this->assertSame('2026-09-01', $period['start']->format('Y-m-d'));
         $this->assertSame('2027-06-30', $period['end']->format('Y-m-d'));
-        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-07', '2026-09-01', '2026-06-30', 64));
-        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-08-31', '2026-09-01', '2026-06-30', 64));
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-07', '2026-09-01', '2027-06-30', 64));
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2027-06-28', '2026-09-01', '2027-06-30', 64));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-08-31', '2026-09-01', '2027-06-30', 64));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2027-07-05', '2026-09-01', '2027-06-30', 64));
     }
 
     public function testIsValidAttendanceDateRejectsWrongWeekdayWhenPeriodIsUnknown(): void
