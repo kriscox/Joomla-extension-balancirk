@@ -194,4 +194,13 @@
 			<item>Admin lessons and subscriptions year filters now default to the current school year instead of all years or the latest year found in the database.</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.23</version>
+		<fix>
+			<item>Waiting-list students can now be marked present for a lesson and appear in the attendance overview, including last attendance and the presence chart scale.</item>
+			<item>Lesson capacity still counts only enrolled students, so marking a waiting-list student present does not take a regular place.</item>
+		</fix>
+	</changelog>
 </changelogs>
