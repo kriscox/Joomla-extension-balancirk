@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * @package     Balancirk.UnitTest
  * @subpackage  Admin
@@ -9,6 +7,8 @@ declare(strict_types=1);
  * @copyright   Copyright (C) 2022 CoCoCo. All rights reserved.
  * @license     GNU General Public License version 3.
  */
+
+declare(strict_types=1);
 
 namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Form;
 

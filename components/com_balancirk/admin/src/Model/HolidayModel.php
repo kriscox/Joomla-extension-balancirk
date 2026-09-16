@@ -66,7 +66,8 @@ class HolidayModel extends AdminModel
      *
      * @param   object  $record  A record object.
      *
-     * @return  boolean  True if allowed to change the state of the record. Defaults to the permission set in the component.
+     * @return  boolean  True if allowed to change the state of the record.
+     *                   Defaults to the permission set in the component.
      *
      * @since   1.2.9
      */
@@ -76,7 +77,10 @@ class HolidayModel extends AdminModel
 
         // Check for existing article.
         if (!empty($record->id)) {
-            return $user->authorise('core.edit.state', 'com_balancirk.holiday.' . (int) $record->id);
+            return $user->authorise(
+                'core.edit.state',
+                'com_balancirk.holiday.' . (int) $record->id
+            );
         }
 
         // Default to component settings if neither article nor category known.
@@ -144,8 +148,6 @@ class HolidayModel extends AdminModel
 
         if (empty($data)) {
             $data = $this->getItem();
-
-            // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
         }
 
         $this->preprocessData($this->typeAlias, $data);
