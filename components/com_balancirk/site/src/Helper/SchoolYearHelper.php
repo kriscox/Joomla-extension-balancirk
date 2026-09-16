@@ -54,6 +54,32 @@ class SchoolYearHelper
     }
 
     /**
+     * Whether a lesson school year is the current year or a later year.
+     *
+     * DECIMAL year values from MySQL are normalised to integers.
+     *
+     * @param   mixed        $year          Lesson year.
+     * @param   string|null  $date          Reference date in Y-m-d format.
+     * @param   int|null     $offsetMonths  Offset override; null uses component config.
+     *
+     * @return  bool
+     *
+     * @since   1.3.24
+     */
+    public static function isCurrentOrFutureYear(mixed $year, ?string $date = null, ?int $offsetMonths = null): bool
+    {
+        $normalised = (int) $year;
+
+        if ($normalised <= 0) {
+            return false;
+        }
+
+        $offsetMonths = $offsetMonths ?? self::getOffsetMonths();
+
+        return $normalised >= self::calculateSchoolYear($date, $offsetMonths);
+    }
+
+    /**
      * Calculate the school year for a date and offset.
      *
      * @param   string|null  $date          Reference date in Y-m-d format.

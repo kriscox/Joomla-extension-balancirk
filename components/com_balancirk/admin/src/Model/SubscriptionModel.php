@@ -15,6 +15,7 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 use RuntimeException;
 use CoCoCo\Component\Balancirk\Site\Helper\AccountingExportHelper;
 use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 use CoCoCo\Component\Balancirk\Site\Helper\SubscriptionMailHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
@@ -239,17 +240,16 @@ class SubscriptionModel extends AdminModel
             return false;
         }
 
-        $values = array();
-        array_push($values, $studentId);
-        array_push($values, $lessonId);
-
-        // Check ik max numbers of students is not reached, if not subscribed == 0 else subscribed == 1
-        /** @var lessonModel*/
-        $model = $this->getMVCFactory()->createModel('Lesson', 'Site');
-        $lesson = $model->getItem($lessonId, $lessonId);
+        $lesson = $this->loadLesson($lessonId);
 
         if (!$lesson) {
             $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_REGISTRATION_CLOSED'));
+
+            return false;
+        }
+
+        if (!SchoolYearHelper::isCurrentOrFutureYear($lesson->year ?? null)) {
+            $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_YEAR_NOT_ALLOWED'));
 
             return false;
         }
@@ -272,7 +272,7 @@ class SubscriptionModel extends AdminModel
             return false;
         }
 
-        $waitinglist = ($model->getNumberOfStudents($lessonId) < $lesson->max_students) ? 0 : 1;
+        $waitinglist = ($this->countLessonSubscriptions($lessonId) < (int) $lesson->max_students) ? 0 : 1;
 
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
@@ -378,6 +378,55 @@ class SubscriptionModel extends AdminModel
         $today = date('Y-m-d');
 
         return $today >= $startRegistration && $today <= $endRegistration;
+    }
+
+    /**
+     * Load a lesson row from the lessons table.
+     *
+     * Admin enrolment must not go through the site LessonModel table, which
+     * is missing in the administrator MVC context.
+     *
+     * @param   int  $lessonId  Lesson id.
+     *
+     * @return  object|null
+     *
+     * @since   1.3.24
+     */
+    private function loadLesson(int $lessonId): ?object
+    {
+        if ($lessonId <= 0) {
+            return null;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('*')
+            ->from($db->quoteName('#__balancirk_lessons'))
+            ->where($db->quoteName('id') . ' = ' . $lessonId);
+
+        $lesson = $db->setQuery($query)->loadObject();
+
+        return $lesson ?: null;
+    }
+
+    /**
+     * Count subscriptions already linked to a lesson.
+     *
+     * @param   int  $lessonId  Lesson id.
+     *
+     * @return  int
+     *
+     * @since   1.3.24
+     */
+    private function countLessonSubscriptions(int $lessonId): int
+    {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__balancirk_subscriptions'))
+            ->where($db->quoteName('lesson') . ' = ' . $lessonId);
+
+        return (int) $db->setQuery($query)->loadResult();
     }
 
     /**

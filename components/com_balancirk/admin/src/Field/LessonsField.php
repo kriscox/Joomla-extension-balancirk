@@ -16,6 +16,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Field\ListField;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\Database\DatabaseInterface;
+use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 
 /**
  * Lesson chooser for administrator enrolments.
@@ -42,19 +43,25 @@ class LessonsField extends ListField
     protected function getOptions()
     {
         $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $currentYear = SchoolYearHelper::getCurrentSchoolYear();
         $query = $db->getQuery(true)
             ->select($db->quoteName(['id', 'name', 'year']))
             ->from($db->quoteName('#__balancirk_lessons'))
+            ->where($db->quoteName('year') . ' >= ' . (int) $currentYear)
             ->order($db->quoteName('year') . ' DESC, ' . $db->quoteName('name') . ' ASC');
 
         $lessons = $db->setQuery($query)->loadObjectList() ?: [];
         $options = [HTMLHelper::_('select.option', '', '-')];
 
         foreach ($lessons as $lesson) {
+            if (!SchoolYearHelper::isCurrentOrFutureYear($lesson->year ?? null)) {
+                continue;
+            }
+
             $label = trim((string) $lesson->name);
 
             if (!empty($lesson->year)) {
-                $label .= ' (' . $lesson->year . ')';
+                $label .= ' (' . (int) $lesson->year . ')';
             }
 
             $options[] = HTMLHelper::_('select.option', (int) $lesson->id, $label);

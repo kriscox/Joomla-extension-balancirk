@@ -130,4 +130,19 @@ class SchoolYearHelperTest extends TestCase
         $this->assertSame('2026', $app->state['com_balancirk.lessons.filter.year']);
         $this->assertSame('2026', $app->state['com_balancirk.lessons.filter']['year']);
     }
+
+    public function testIsCurrentOrFutureYearAcceptsCurrentAndLaterYears(): void
+    {
+        $this->assertTrue(SchoolYearHelper::isCurrentOrFutureYear(2026, '2026-09-15', 6));
+        $this->assertTrue(SchoolYearHelper::isCurrentOrFutureYear(2027, '2026-09-15', 6));
+        $this->assertTrue(SchoolYearHelper::isCurrentOrFutureYear('2026.0000', '2026-09-15', 6));
+    }
+
+    public function testIsCurrentOrFutureYearRejectsPastAndEmptyYears(): void
+    {
+        $this->assertFalse(SchoolYearHelper::isCurrentOrFutureYear(2025, '2026-09-15', 6));
+        $this->assertFalse(SchoolYearHelper::isCurrentOrFutureYear(0, '2026-09-15', 6));
+        $this->assertFalse(SchoolYearHelper::isCurrentOrFutureYear('', '2026-09-15', 6));
+        $this->assertFalse(SchoolYearHelper::isCurrentOrFutureYear(null, '2026-09-15', 6));
+    }
 }
