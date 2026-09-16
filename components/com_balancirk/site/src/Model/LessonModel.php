@@ -502,7 +502,7 @@ class LessonModel extends AdminModel
      * Whether a calendar date is a valid attendance day for a lesson.
      *
      * When a lesson period is known, the date must fall inside it. A missing
-     * period is invalid: attendance cannot be stored without start and end.
+     * period does not block attendance: the weekday mask is still applied.
      *
      * @param   mixed  $date         Attendance date.
      * @param   mixed  $start        Lesson start date.
@@ -523,7 +523,7 @@ class LessonModel extends AdminModel
 
         $period = self::periodFromValues($start, $end);
 
-        if ($period === null || $parsed < $period['start'] || $parsed > $period['end']) {
+        if ($period !== null && ($parsed < $period['start'] || $parsed > $period['end'])) {
             return false;
         }
 
@@ -587,14 +587,10 @@ class LessonModel extends AdminModel
 
         $period = $this->resolveLessonPeriod($lesson);
 
-        if ($period === null) {
-            return false;
-        }
-
         return self::isValidAttendanceDate(
             $date,
-            $period['start'],
-            $period['end'],
+            $period['start'] ?? null,
+            $period['end'] ?? null,
             (int) ($lesson->lesdays ?? 0)
         );
     }
@@ -624,7 +620,10 @@ class LessonModel extends AdminModel
             }
         }
 
-        return self::periodFromValues($item->start ?? null, $item->end ?? null);
+        return self::periodFromValues(
+            $item->start ?? $item->startdate ?? $item->start_date ?? null,
+            $item->end ?? $item->enddate ?? $item->end_date ?? null
+        );
     }
 
     /**
@@ -641,7 +640,10 @@ class LessonModel extends AdminModel
         try {
             $db = $this->getDatabase();
             $query = $db->getQuery(true)
-                ->select($db->quoteName(['start', 'end']))
+                ->select([
+                    $db->quoteName('start', 'start'),
+                    $db->quoteName('end', 'end'),
+                ])
                 ->from($db->quoteName('#__balancirk_lessons'))
                 ->where($db->quoteName('id') . ' = ' . $id);
             $row = $db->setQuery($query)->loadObject();
@@ -667,11 +669,47 @@ class LessonModel extends AdminModel
         $startDate = self::parseLessonDate($start);
         $endDate = self::parseLessonDate($end);
 
-        if (!$startDate instanceof DateTime || !$endDate instanceof DateTime || $startDate > $endDate) {
+        if (!$startDate instanceof DateTime || !$endDate instanceof DateTime) {
             return null;
         }
 
+        if ($startDate > $endDate) {
+            $endDate = self::extendSchoolYearEnd($startDate, $endDate);
+
+            if (!$endDate instanceof DateTime || $startDate > $endDate) {
+                return null;
+            }
+        }
+
         return ['start' => $startDate, 'end' => $endDate];
+    }
+
+    /**
+     * Move an inverted school-year end date into the following calendar year.
+     *
+     * Lessons often start in September and end in June. Some rows store that
+     * as 2026-09-01 .. 2026-06-30 instead of 2027-06-30.
+     *
+     * @param   DateTime  $start  Lesson start.
+     * @param   DateTime  $end    Lesson end before the start.
+     *
+     * @return  DateTime|null
+     *
+     * @since   1.3.24
+     */
+    private static function extendSchoolYearEnd(DateTime $start, DateTime $end): ?DateTime
+    {
+        $startMonth = (int) $start->format('n');
+        $endMonth = (int) $end->format('n');
+
+        if ($startMonth < 7 || $endMonth > 8) {
+            return null;
+        }
+
+        $extended = clone $end;
+        $extended->modify('+1 year');
+
+        return $extended >= $start ? $extended : null;
     }
 
     /**
@@ -693,6 +731,14 @@ class LessonModel extends AdminModel
             $parsed->setTime(0, 0, 0);
 
             return $parsed;
+        }
+
+        if (is_array($date) && isset($date['date'])) {
+            return self::parseLessonDate($date['date']);
+        }
+
+        if (is_object($date) && isset($date->date)) {
+            return self::parseLessonDate($date->date);
         }
 
         $date = trim(html_entity_decode((string) $date, ENT_QUOTES, 'UTF-8'));
