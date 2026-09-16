@@ -237,4 +237,142 @@ class LessonModelTest extends TestCase
             LessonModel::getDates('2026-09-01', '2026-09-30', LessonModel::getLesdays(0))
         );
     }
+
+    public function testIsValidAttendanceDateAcceptsAConfiguredLessonDayInsideThePeriod(): void
+    {
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-07', '2026-09-01', '2026-09-30', 64));
+        $this->assertTrue(LessonModel::isValidAttendanceDate('07/09/2026', '01/09/2026', '30/09/2026', 64));
+    }
+
+    public function testIsValidAttendanceDateRejectsADateOutsideThePeriod(): void
+    {
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-08-31', '2026-09-01', '2026-09-30', 64));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-10-01', '2026-09-01', '2026-09-30', 64));
+    }
+
+    public function testIsValidAttendanceDateRejectsAWrongWeekdayWhenLesdaysAreSet(): void
+    {
+        // 2026-09-08 is a Tuesday; Monday-only mask is 64.
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-08', '2026-09-01', '2026-09-30', 64));
+    }
+
+    public function testIsValidAttendanceDateAllowsAnyDayInPeriodWhenNoLesdaysAreSet(): void
+    {
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-08', '2026-09-01', '2026-09-30', 0));
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-01', '2026-09-01', '2026-09-30', 0));
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-30', '2026-09-01', '2026-09-30', 0));
+    }
+
+    public function testIsValidAttendanceDateRejectsMissingDates(): void
+    {
+        $this->assertFalse(LessonModel::isValidAttendanceDate('', '2026-09-01', '2026-09-30', 0));
+        $this->assertFalse(LessonModel::isValidAttendanceDate(null, '2026-09-01', '2026-09-30', 0));
+    }
+
+    public function testIsValidAttendanceDateRejectsADateWhenThePeriodIsUnknown(): void
+    {
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-07', '', '', 64));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-07', null, null, 0));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('07/09/2026', '', '2026-09-30', 64));
+    }
+
+    public function testPeriodFromValuesDoesNotRewriteAnInvertedEndDate(): void
+    {
+        $this->assertNull(LessonModel::periodFromValues('2026-09-01', '2026-06-30'));
+        $this->assertFalse(LessonModel::isValidLessonPeriod('2026-09-01', '2026-06-30'));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-07', '2026-09-01', '2026-06-30', 64));
+    }
+
+    public function testPeriodFromValuesAcceptsACrossYearSchoolYear(): void
+    {
+        $period = LessonModel::periodFromValues('2026-09-01', '2027-06-30');
+
+        $this->assertNotNull($period);
+        $this->assertSame('2026-09-01', $period['start']->format('Y-m-d'));
+        $this->assertSame('2027-06-30', $period['end']->format('Y-m-d'));
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-07', '2026-09-01', '2027-06-30', 64));
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2027-06-28', '2026-09-01', '2027-06-30', 64));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-08-31', '2026-09-01', '2027-06-30', 64));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2027-07-05', '2026-09-01', '2027-06-30', 64));
+    }
+
+    public function testIsValidAttendanceDateRejectsWrongWeekdayWhenPeriodIsUnknown(): void
+    {
+        // 2026-09-08 is a Tuesday; Monday-only mask is 64.
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-08', '', '', 64));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-08', null, null, 64));
+    }
+
+    public function testShouldAutoSelectTodayRequiresARealPeriodAndALessonWeekday(): void
+    {
+        $period = LessonModel::periodFromValues('2026-09-01', '2026-09-30');
+        $wednesday = new \DateTime('2026-09-16');
+        $monday = new \DateTime('2026-09-07');
+
+        $this->assertFalse(LessonModel::shouldAutoSelectToday(null, 64, $wednesday));
+        $this->assertFalse(LessonModel::shouldAutoSelectToday($period, 64, $wednesday));
+        $this->assertTrue(LessonModel::shouldAutoSelectToday($period, 64, $monday));
+        $this->assertTrue(LessonModel::shouldAutoSelectToday($period, 0, $wednesday));
+        $this->assertFalse(LessonModel::shouldAutoSelectToday($period, 64, new \DateTime('2026-08-31')));
+        $this->assertFalse(LessonModel::shouldAutoSelectToday(
+            $period,
+            0,
+            $wednesday,
+            [['start' => '2026-09-16', 'end' => '2026-09-16']]
+        ));
+    }
+
+    public function testIsHolidayDateDetectsInclusiveRanges(): void
+    {
+        $holidays = [['start' => '2026-09-01', 'end' => '2026-09-06']];
+
+        $this->assertTrue(LessonModel::isHolidayDate('2026-09-03', $holidays));
+        $this->assertTrue(LessonModel::isHolidayDate('2026-09-01', $holidays));
+        $this->assertTrue(LessonModel::isHolidayDate('2026-09-06', $holidays));
+        $this->assertFalse(LessonModel::isHolidayDate('2026-09-07', $holidays));
+        $this->assertFalse(LessonModel::isHolidayDate('2026-09-03', []));
+    }
+
+    public function testIsValidAttendanceDateRejectsAHolidayInsideThePeriod(): void
+    {
+        $holidays = [['start' => '2026-09-01', 'end' => '2026-09-06']];
+
+        $this->assertFalse(LessonModel::isValidAttendanceDate(
+            '2026-09-03',
+            '2026-09-01',
+            '2026-09-30',
+            8,
+            $holidays
+        ));
+        $this->assertTrue(LessonModel::isValidAttendanceDate(
+            '2026-09-10',
+            '2026-09-01',
+            '2026-09-30',
+            8,
+            $holidays
+        ));
+    }
+
+    public function testGetDatesExcludesHolidays(): void
+    {
+        $dates = LessonModel::getDates(
+            '2026-09-01',
+            '2026-09-17',
+            [
+                'Monday' => 0,
+                'Tuesday' => 0,
+                'Wednesday' => 0,
+                'Thursday' => 1,
+                'Friday' => 0,
+                'Saturday' => 0,
+                'Sunday' => 0,
+            ],
+            [['start' => '2026-09-01', 'end' => '2026-09-06']]
+        );
+
+        $this->assertSame(
+            ['2026-09-10', '2026-09-17'],
+            array_map(static fn(\DateTimeInterface $date): string => $date->format('Y-m-d'), $dates)
+        );
+    }
 }

@@ -12,12 +12,13 @@ namespace CoCoCo\Component\Balancirk\Api\Controller;
 
 \defined('_JEXEC') or die;
 
-use DateTimeImmutable;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\ApiController;
 use Joomla\CMS\Response\JsonResponse;
 use Joomla\Database\DatabaseInterface;
+use CoCoCo\Component\Balancirk\Site\Helper\HolidayHelper;
+use CoCoCo\Component\Balancirk\Site\Model\LessonModel;
 
 /**
  * undocumented class
@@ -46,8 +47,8 @@ class PresencesController extends ApiController
         $lesson = $this->input->getInt('lesson');
         $date = $this->normalizeDate($this->input->getString('date'));
 
-        if ($lesson <= 0) {
-            echo new JsonResponse(null, Text::_('JGLOBAL_FIELD_ID_NOT_VALID'), true);
+        if ($lesson <= 0 || $date === '' || !$this->isValidLessonDate($lesson, $date)) {
+            echo new JsonResponse(null, Text::_('COM_BALANCIRK_LESSON_PRESENCE_INVALID_DATE'), true);
             $app->close();
         }
 
@@ -66,6 +67,7 @@ class PresencesController extends ApiController
             'lesson' => (int) $lesson,
             'date' => $date,
             'students' => $students,
+            'hasRecords' => $students !== [],
         ]);
         $app->close();
     }
@@ -90,10 +92,13 @@ class PresencesController extends ApiController
         $lesson = $this->input->getInt('lesson', (int) ($payload['lesson'] ?? 0));
         $date = $this->normalizeDate((string) ($payload['date'] ?? $this->input->getString('date')));
         $students = isset($payload['students']) && \is_array($payload['students']) ? $payload['students'] : [];
-        $students = array_values(array_unique(array_filter(array_map('intval', $students), static fn(int $id): bool => $id > 0)));
+        $students = array_values(array_unique(array_filter(
+            array_map('intval', $students),
+            static fn(int $id): bool => $id > 0
+        )));
 
-        if ($lesson <= 0) {
-            echo new JsonResponse(null, Text::_('JGLOBAL_FIELD_ID_NOT_VALID'), true);
+        if ($lesson <= 0 || $date === '' || !$this->isValidLessonDate($lesson, $date)) {
+            echo new JsonResponse(null, Text::_('COM_BALANCIRK_LESSON_PRESENCE_INVALID_DATE'), true);
             $app->close();
         }
 
@@ -185,16 +190,57 @@ class PresencesController extends ApiController
      */
     private function normalizeDate(?string $date): string
     {
-        if ($date === null || trim($date) === '') {
-            return date('Y-m-d');
+        $parsed = LessonModel::parseLessonDate($date);
+
+        return $parsed instanceof \DateTimeInterface ? $parsed->format('Y-m-d') : '';
+    }
+
+    /**
+     * Whether the date is a scheduled lesson day.
+     *
+     * @param   int     $lessonId  Lesson id.
+     * @param   string  $date      Date in Y-m-d.
+     *
+     * @return  bool
+     *
+     * @since   1.3.24
+     */
+    private function isValidLessonDate(int $lessonId, string $date): bool
+    {
+        if ($lessonId <= 0 || $date === '') {
+            return false;
         }
 
-        $normalized = DateTimeImmutable::createFromFormat('Y-m-d', $date);
+        /** @var DatabaseInterface $db */
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $query = $db->getQuery(true)
+            ->select($db->quoteName(['start', 'end', 'lesdays']))
+            ->from($db->quoteName('#__balancirk_lessons'))
+            ->where($db->quoteName('id') . ' = ' . $lessonId);
+        $lesson = $db->setQuery($query)->loadObject();
 
-        if ($normalized instanceof DateTimeImmutable) {
-            return $normalized->format('Y-m-d');
+        if (!$lesson) {
+            return false;
         }
 
-        return date('Y-m-d');
+        $from = LessonModel::parseLessonDate($lesson->start ?? null);
+        $to = LessonModel::parseLessonDate($lesson->end ?? null);
+        $holidays = [];
+
+        if ($from instanceof \DateTime && $to instanceof \DateTime) {
+            $holidays = HolidayHelper::loadOverlappingRanges(
+                $db,
+                $from->format('Y-m-d'),
+                $to->format('Y-m-d')
+            );
+        }
+
+        return LessonModel::isValidAttendanceDate(
+            $date,
+            $lesson->start ?? null,
+            $lesson->end ?? null,
+            (int) ($lesson->lesdays ?? 0),
+            $holidays
+        );
     }
 }

@@ -33,23 +33,28 @@ $item = is_object($this->item) ? $this->item : (object) [];
 $period = $lessonModel instanceof LessonModel
 	? $lessonModel->resolveLessonPeriod($item)
 	: LessonModel::periodFromValues($item->start ?? null, $item->end ?? null);
+$hasConfiguredPeriod = $period !== null;
 
-if ($period === null) {
-	$startDate = (new DateTime('today'))->modify('-18 months');
-	$endDate = (new DateTime('today'))->modify('+18 months');
-} else {
+if ($hasConfiguredPeriod) {
 	$startDate = $period['start'];
 	$endDate = $period['end'];
+	$firstLesDay = $startDate->format('d/m/Y');
+	$lastLesDay = $endDate->format('d/m/Y');
+	$firstIso = $startDate->format('Y-m-d');
+	$lastIso = $endDate->format('Y-m-d');
+} else {
+	$startDate = null;
+	$endDate = null;
+	$firstLesDay = '';
+	$lastLesDay = '';
+	$firstIso = '';
+	$lastIso = '';
 }
 
 $lesdaysMask = (int) ($item->lesdays ?? 0);
-$restrictToLesdays = LessonModel::hasConfiguredLesdays(LessonModel::getLesdays($lesdaysMask));
-
-$firstLesDay = $startDate->format('d/m/Y');
-$lastLesDay = $endDate->format('d/m/Y');
-$firstIso = $startDate->format('Y-m-d');
-$lastIso = $endDate->format('Y-m-d');
-$weekdayBitsJson = json_encode(LesdaysHelper::JS_GETDAY_BITS);
+$holidayRanges = $lessonModel instanceof LessonModel
+	? $lessonModel->getHolidayIsoRanges($period['start'] ?? null, $period['end'] ?? null)
+	: [];
 $userid = Factory::getApplication()->getIdentity()->id;
 $joomlaToken = UserHelper::getProfile($userid)->get('joomlatoken');
 $api_token = is_array($joomlaToken) ? (string) ($joomlaToken['token'] ?? '') : '';
@@ -59,8 +64,38 @@ $presencesUrl = Route::_(
 );
 
 $today = (new DateTime())->setTime(0, 0, 0);
-$todayInRange = $today >= $startDate && $today <= $endDate
-	&& (!$restrictToLesdays || LesdaysHelper::matchesDate($today, $lesdaysMask));
+$todayInRange = LessonModel::shouldAutoSelectToday($period, $lesdaysMask, $today, $holidayRanges);
+
+$presenceState = $app->getUserState('com_balancirk.presence.data', []);
+$restoredDate = '';
+$restoredStudents = [];
+
+if ((int) ($presenceState['id'] ?? 0) === (int) ($item->id ?? 0)) {
+	$restoredDate = (string) ($presenceState['date'] ?? '');
+	$restoredStudents = isset($presenceState['students']) && is_array($presenceState['students'])
+		? $presenceState['students']
+		: [];
+}
+
+$parsedRestoredDate = $restoredDate !== '' ? LessonModel::parseLessonDate($restoredDate) : null;
+$restoredIsValid = $parsedRestoredDate instanceof DateTime
+	&& LessonModel::isValidAttendanceDate(
+		$parsedRestoredDate,
+		$hasConfiguredPeriod ? $startDate : null,
+		$hasConfiguredPeriod ? $endDate : null,
+		$lesdaysMask,
+		$holidayRanges
+	);
+$autoSelectDate = '';
+$autoSelectIso = '';
+
+if ($restoredIsValid) {
+	$autoSelectDate = $parsedRestoredDate->format('d/m/Y');
+	$autoSelectIso = $parsedRestoredDate->format('Y-m-d');
+} elseif ($todayInRange) {
+	$autoSelectDate = $today->format('d/m/Y');
+	$autoSelectIso = $today->format('Y-m-d');
+}
 
 /** @var Joomla\CMS\Document\Document  */
 $doc = $app->getDocument();
@@ -69,47 +104,39 @@ $wa = $doc->getWebAssetManager();
 $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 	->registerAndUseScript('bootstrap-datepicker', 'https://unpkg.com/bootstrap-datepicker@latest/dist/js/bootstrap-datepicker.min.js')
 	->registerAndUseScript('bootstrap-datepicker-nl', 'https://unpkg.com/bootstrap-datepicker@latest/dist/locales/bootstrap-datepicker.nl-BE.min.js')
-	->registerAndUseScript('lesson-script', 'media/com_balancirk/js/balancirk_lesson_date.js')
-	->addInlineScript('
-	var changed = false;
-	jQuery(document).ready(function() {
-		if (jQuery.fn.datepicker) {
-			jQuery("#jform_date").datepicker({
-				language: "nl-BE",
-				startDate: "' . $firstLesDay . '",
-				endDate: "' . $lastLesDay . '",
-				todayHighlight: true,
-				todayBtn: true,
-				maxViewMode: 0,
-				weekStart: 1,
-				beforeShowDay: function(date) {
-					var lesdaysMask = ' . (int) $lesdaysMask . ';
-					var weekdayBits = ' . $weekdayBitsJson . ';
-					return !lesdaysMask || (lesdaysMask & weekdayBits[date.getDay()]) !== 0;
-				},
-				autoclose: true,
-			});
-			' . ($todayInRange ? 'jQuery("#jform_date").datepicker("setDate", "' . $today->format('d/m/Y') . '");
-			changed = true;' : '') . '
-		} else {
-			jQuery("#jform_date").attr({type: "date", min: "' . $firstIso . '", max: "' . $lastIso . '"});
-			' . ($todayInRange ? 'jQuery("#jform_date").val("' . $today->format('Y-m-d') . '");
-			changed = true;' : '') . '
-		}
-	});
-	');
+	->registerAndUseScript(
+		'lesson-script',
+		'media/com_balancirk/js/balancirk_lesson_date.js',
+		['version' => 'auto']
+	);
 $doc->addScriptOptions('lesson-script', [
 	'token' => $api_token,
 	'presencesUrl' => $presencesUrl,
+	'start' => $firstIso,
+	'end' => $lastIso,
+	'startDisplay' => $firstLesDay,
+	'endDisplay' => $lastLesDay,
+	'lesdaysMask' => $lesdaysMask,
+	'weekdayBits' => LesdaysHelper::JS_GETDAY_BITS,
+	'holidays' => $holidayRanges,
+	'autoSelectDate' => $autoSelectDate,
+	'autoSelectIso' => $autoSelectIso,
+	'restoreSelection' => $restoredIsValid && $restoredStudents !== [],
+	'strings' => [
+		'invalidDate' => Text::_('COM_BALANCIRK_LESSON_PRESENCE_INVALID_DATE'),
+	],
 ]);
 
 $students = $this->get('PresenceStudents') ?: [];
 $data = [];
 $data['id'] = (int) ($item->id ?? 0);
 
+if ($restoredIsValid && $restoredStudents !== []) {
+	$data['students'] = $restoredStudents;
+}
+
 $form = $this->get('PresenceForm');
 if ($form) {
-	$form->bind($data);
 	$studentsField = $form->getField('students');
 
 	if ($studentsField) {
@@ -125,6 +152,8 @@ if ($form) {
 			$studentsField->addOption($label, $option);
 		}
 	}
+
+	$form->bind($data);
 }
 
 $teached_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=teacher&id=' . (int) ($item->id ?? 0));
@@ -138,7 +167,7 @@ $url = Route::_('index.php?option=com_balancirk&view=lesson&id=' . (int) ($item-
 		<div class="col-md-12">
 			<h3><?= Text::_('COM_BALANCIRK_LESSONS_PRESENCES'); ?><?= $this->escape($item->name ?? '') ?></h3>
 			<?= $form ? $form->renderField('id') : ''; ?>
-			<label for="lessonDate">Select Date:</label>
+			<label for="jform_date"><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_DATES'); ?></label>
 			<input type="text" id="jform_date" class="form-control" name="jform[date]" />
 
 			<?= HTMLHelper::_('uitab.startTabSet', 'myTab', array('active' => 'students')); ?>
@@ -167,22 +196,19 @@ $url = Route::_('index.php?option=com_balancirk&view=lesson&id=' . (int) ($item-
 			</div>
 		</div>
 </form>
-<!-- Modal alerting in case of changed values -->
-<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+<div class="modal fade" id="presenceConflictModal" tabindex="-1" aria-labelledby="presenceConflictModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="confirmModalLabel">Confirm Date Change</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
+				<h5 class="modal-title" id="presenceConflictModalLabel"><?= Text::_('COM_BALANCIRK_LESSON_PRESENCE_CONFLICT_TITLE') ?></h5>
 			</div>
 			<div class="modal-body">
-				Are you sure you want to change the date?
+				<?= Text::_('COM_BALANCIRK_LESSON_PRESENCE_CONFLICT_BODY') ?>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-				<button type="button" class="btn btn-primary" id="confirmChange">Confirm</button>
+				<button type="button" class="btn btn-secondary" id="presenceKeep"><?= Text::_('COM_BALANCIRK_LESSON_PRESENCE_KEEP') ?></button>
+				<button type="button" class="btn btn-outline-primary" id="presenceMerge"><?= Text::_('COM_BALANCIRK_LESSON_PRESENCE_MERGE') ?></button>
+				<button type="button" class="btn btn-primary" id="presenceOverwrite"><?= Text::_('COM_BALANCIRK_LESSON_PRESENCE_OVERWRITE') ?></button>
 			</div>
 		</div>
 	</div>

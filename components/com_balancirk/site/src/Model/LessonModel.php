@@ -16,10 +16,13 @@ use DateTime;
 use DatePeriod;
 use DateInterval;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Mail\MailerFactoryInterface;
-use CoCoCo\Component\Balancirk\Administrator\Model\HolidaysModel;
+use Joomla\CMS\Table\Table;
+use CoCoCo\Component\Balancirk\Site\Helper\HolidayHelper;
 use CoCoCo\Component\Balancirk\Site\Helper\LesdaysHelper;
+use CoCoCo\Component\Balancirk\Site\Table\LessonTable;
 
 /**
  * LessonsModel class to display the list off lessons.
@@ -73,6 +76,55 @@ class LessonModel extends AdminModel
         }
 
         return $item;
+    }
+
+    /**
+     * Method to get a table object, load it if necessary.
+     *
+     * Always use the site Lesson table. Calling this model from the
+     * administrator application would otherwise look for Administrator\Table\LessonTable.
+     *
+     * @param   string  $name     The table name. Optional.
+     * @param   string  $prefix   The class prefix. Optional.
+     * @param   array   $options  Configuration array for model. Optional.
+     *
+     * @return  Table  A Table object
+     *
+     * @since   1.3.24
+     * @throws  \Exception
+     */
+    public function getTable($name = '', $prefix = '', $options = array())
+    {
+        $candidates = [
+            ['Lesson', 'Site'],
+            ['Lessons', 'Administrator'],
+            ['lessons', 'Table'],
+            ['Lesson', 'Table'],
+        ];
+
+        foreach ($candidates as $candidate) {
+            try {
+                $table = $this->_createTable($candidate[0], $candidate[1], $options);
+
+                if ($table) {
+                    return $table;
+                }
+            } catch (\Throwable $exception) {
+                continue;
+            }
+        }
+
+        try {
+            $db = $this->getDatabase();
+
+            if ($db) {
+                return new LessonTable($db);
+            }
+        } catch (\Throwable $exception) {
+            // Fall through to the standard table error.
+        }
+
+        throw new \Exception(Text::sprintf('JLIB_APPLICATION_ERROR_TABLE_NAME_NOT_SUPPORTED', $name ?: 'Lesson'), 0);
     }
 
     /**
@@ -447,6 +499,127 @@ class LessonModel extends AdminModel
     }
 
     /**
+     * Whether a calendar date is a valid attendance day for a lesson.
+     *
+     * When a lesson period is known, the date must fall inside it. A missing
+     * period is invalid: attendance cannot be stored without start and end.
+     *
+     * @param   mixed  $date           Attendance date.
+     * @param   mixed  $start          Lesson start date.
+     * @param   mixed  $end            Lesson end date.
+     * @param   int    $lesdaysMask    Stored lesdays bitmask.
+     * @param   array  $holidayRanges  Holiday ranges with start/end keys.
+     *
+     * @return  bool
+     *
+     * @since   1.3.24
+     */
+    public static function isValidAttendanceDate(
+        mixed $date,
+        mixed $start,
+        mixed $end,
+        int $lesdaysMask = 0,
+        array $holidayRanges = []
+    ): bool {
+        $parsed = self::parseLessonDate($date);
+
+        if (!$parsed instanceof DateTime) {
+            return false;
+        }
+
+        $period = self::periodFromValues($start, $end);
+
+        if ($period === null || $parsed < $period['start'] || $parsed > $period['end']) {
+            return false;
+        }
+
+        if (self::isHolidayDate($parsed, $holidayRanges)) {
+            return false;
+        }
+
+        if (
+            self::hasConfiguredLesdays(self::getLesdays($lesdaysMask))
+            && !LesdaysHelper::matchesDate($parsed, $lesdaysMask)
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Whether today should be pre-filled on the attendance form.
+     *
+     * Only a real lesson period may auto-select today, and only when today is
+     * a configured lesson weekday. A fallback calendar range must not fill
+     * the date field.
+     *
+     * @param   array{start: DateTime, end: DateTime}|null  $period         Lesson period.
+     * @param   int                                         $lesdaysMask    Stored lesdays bitmask.
+     * @param   DateTime|null                               $today          Reference day; defaults to today.
+     * @param   array                                       $holidayRanges  Holiday ranges with start/end keys.
+     *
+     * @return  bool
+     *
+     * @since   1.3.24
+     */
+    public static function shouldAutoSelectToday(
+        ?array $period,
+        int $lesdaysMask,
+        ?DateTime $today = null,
+        array $holidayRanges = []
+    ): bool {
+        if ($period === null) {
+            return false;
+        }
+
+        $today = $today instanceof DateTime ? clone $today : new DateTime('today');
+        $today->setTime(0, 0, 0);
+
+        if ($today < $period['start'] || $today > $period['end']) {
+            return false;
+        }
+
+        if (self::isHolidayDate($today, $holidayRanges)) {
+            return false;
+        }
+
+        return !self::hasConfiguredLesdays(self::getLesdays($lesdaysMask))
+            || LesdaysHelper::matchesDate($today, $lesdaysMask);
+    }
+
+    /**
+     * Whether a date may be used for attendance on this lesson record.
+     *
+     * @param   object|null  $lesson  Lesson item.
+     * @param   mixed        $date    Submitted date.
+     *
+     * @return  bool
+     *
+     * @since   1.3.24
+     */
+    public function isAttendanceDateAllowed(?object $lesson, mixed $date): bool
+    {
+        if (!is_object($lesson) || (int) ($lesson->id ?? 0) <= 0) {
+            return false;
+        }
+
+        $period = $this->resolveLessonPeriod($lesson);
+
+        if ($period === null) {
+            return false;
+        }
+
+        return self::isValidAttendanceDate(
+            $date,
+            $period['start'],
+            $period['end'],
+            (int) ($lesson->lesdays ?? 0),
+            $this->getHolidayRanges($period['start'], $period['end'])
+        );
+    }
+
+    /**
      * Resolve the lesson period from the lessons table, then from the item.
      *
      * The lessons table is the source of truth for start and end. The complete
@@ -464,14 +637,20 @@ class LessonModel extends AdminModel
 
         if ($id > 0) {
             $row = $this->loadLessonDates($id);
-            $period = self::periodFromValues($row->start ?? null, $row->end ?? null);
+            $period = self::periodFromValues(
+                $row->start_date ?? $row->start ?? null,
+                $row->end_date ?? $row->end ?? null
+            );
 
             if ($period !== null) {
                 return $period;
             }
         }
 
-        return self::periodFromValues($item->start ?? null, $item->end ?? null);
+        return self::periodFromValues(
+            $item->start ?? $item->startdate ?? $item->start_date ?? null,
+            $item->end ?? $item->enddate ?? $item->end_date ?? null
+        );
     }
 
     /**
@@ -488,7 +667,10 @@ class LessonModel extends AdminModel
         try {
             $db = $this->getDatabase();
             $query = $db->getQuery(true)
-                ->select($db->quoteName(['start', 'end']))
+                ->select([
+                    $db->quoteName('start', 'start_date'),
+                    $db->quoteName('end', 'end_date'),
+                ])
                 ->from($db->quoteName('#__balancirk_lessons'))
                 ->where($db->quoteName('id') . ' = ' . $id);
             $row = $db->setQuery($query)->loadObject();
@@ -501,6 +683,9 @@ class LessonModel extends AdminModel
 
     /**
      * Build a period from two date values.
+     *
+     * Start must not be after end. A school year that runs from September
+     * into June of the next calendar year must already be stored that way.
      *
      * @param   mixed  $start  Start date.
      * @param   mixed  $end    End date.
@@ -522,6 +707,100 @@ class LessonModel extends AdminModel
     }
 
     /**
+     * Whether a date falls inside any holiday range.
+     *
+     * @param   mixed  $date           Calendar date.
+     * @param   array  $holidayRanges  Ranges with start/end keys.
+     *
+     * @return  bool
+     *
+     * @since   1.3.24
+     */
+    public static function isHolidayDate(mixed $date, array $holidayRanges): bool
+    {
+        $parsed = self::parseLessonDate($date);
+
+        if (!$parsed instanceof DateTime) {
+            return false;
+        }
+
+        $isoRanges = [];
+
+        foreach ($holidayRanges as $range) {
+            $start = self::parseLessonDate(is_array($range) ? ($range['start'] ?? null) : null);
+            $end = self::parseLessonDate(is_array($range) ? ($range['end'] ?? null) : null);
+
+            if ($start instanceof DateTime && $end instanceof DateTime) {
+                $isoRanges[] = [
+                    'start' => $start->format('Y-m-d'),
+                    'end' => $end->format('Y-m-d'),
+                ];
+            }
+        }
+
+        return HolidayHelper::containsIsoDate($parsed->format('Y-m-d'), $isoRanges);
+    }
+
+    /**
+     * Holiday ranges overlapping a period, as DateTime pairs.
+     *
+     * @param   DateTime|null  $from  Period start.
+     * @param   DateTime|null  $to    Period end.
+     *
+     * @return  array<int, array{start: DateTime, end: DateTime}>
+     *
+     * @since   1.3.24
+     */
+    public function getHolidayRanges(?DateTime $from = null, ?DateTime $to = null): array
+    {
+        $ranges = [];
+
+        foreach ($this->getHolidayIsoRanges($from, $to) as $range) {
+            $start = self::parseLessonDate($range['start'] ?? null);
+            $end = self::parseLessonDate($range['end'] ?? null);
+
+            if ($start instanceof DateTime && $end instanceof DateTime) {
+                $ranges[] = ['start' => $start, 'end' => $end];
+            }
+        }
+
+        return $ranges;
+    }
+
+    /**
+     * Holiday ranges overlapping a period, as ISO date pairs for the picker.
+     *
+     * Reads `#__balancirk_holidays`. When no period is given, load holidays
+     * around today so the picker can still grey vacation days.
+     *
+     * @param   DateTime|null  $from  Period start.
+     * @param   DateTime|null  $to    Period end.
+     *
+     * @return  array<int, array{start: string, end: string}>
+     *
+     * @since   1.3.24
+     */
+    public function getHolidayIsoRanges(?DateTime $from = null, ?DateTime $to = null): array
+    {
+        try {
+            if (!$from instanceof DateTime || !$to instanceof DateTime) {
+                $from = new DateTime('today');
+                $from->modify('-6 months');
+                $to = new DateTime('today');
+                $to->modify('+18 months');
+            }
+
+            return HolidayHelper::loadOverlappingRanges(
+                $this->getDatabase(),
+                $from->format('Y-m-d'),
+                $to->format('Y-m-d')
+            );
+        } catch (\Throwable $exception) {
+            return [];
+        }
+    }
+
+    /**
      * Parse a lesson date into a DateTime at midnight.
      *
      * Accepts ISO dates, Belgian d/m/Y variants, DateTime objects, and
@@ -540,6 +819,14 @@ class LessonModel extends AdminModel
             $parsed->setTime(0, 0, 0);
 
             return $parsed;
+        }
+
+        if (is_array($date) && isset($date['date'])) {
+            return self::parseLessonDate($date['date']);
+        }
+
+        if (is_object($date) && isset($date->date)) {
+            return self::parseLessonDate($date->date);
         }
 
         $date = trim(html_entity_decode((string) $date, ENT_QUOTES, 'UTF-8'));
@@ -622,20 +909,23 @@ class LessonModel extends AdminModel
     /**
      * Method to get the dates of the lessons based on startdate, enddate, lesdays and holidays
      *
-     * @param	date	$startDate	Starting date of the lessons
-     * @param	date	$endDate	Ending date of the lessons
-     * @param	array	$lesdays	An array of the days of the week the lessons take place
+     * @param   date   $startDate      Starting date of the lessons
+     * @param   date   $endDate        Ending date of the lessons
+     * @param   array  $lesdays        An array of the days of the week the lessons take place
+     * @param   array  $holidayRanges  Holiday ranges with start/end keys.
      *
      * @return array dates of the lessons
      */
-    public static function getDates($start, $end, $lesday)
+    public static function getDates($start, $end, $lesday, array $holidayRanges = [])
     {
         $endDate = (new DateTime($end))->modify('+1 day');
         $period = new DatePeriod(new DateTime($start), new DateInterval('P1D'), $endDate);
         $dates = array();
 
         foreach ($period as $date) {
-            // TODO: Check if the date is a holiday
+            if (self::isHolidayDate($date, $holidayRanges)) {
+                continue;
+            }
 
             if (($lesday[$date->format('l')] ?? 0) === 1) {
                 $dates[] = clone $date;
@@ -679,17 +969,30 @@ class LessonModel extends AdminModel
      * @param	date	$date		Date of the lesson
      * @param	array	$students	An array of the students present
      *
-     * @return void
+     * @return  bool
      */
     public function savePresence($id, $date, $students)
     {
+        $id = (int) $id;
+        $parsedDate = self::parseLessonDate($date);
+        $lesson = $id > 0 ? $this->getItem($id) : null;
+
+        if (
+            !is_object($lesson)
+            || !$parsedDate instanceof DateTime
+            || !$this->isAttendanceDateAllowed($lesson, $parsedDate)
+        ) {
+            return false;
+        }
+
+        $date = $parsedDate->format('Y-m-d');
         $students = is_array($students) ? $students : [];
         $dbo = $this->getDatabase();
         $query = $dbo->getQuery(true);
 
         // Delete all presences for this lesson
         $query->delete($dbo->quoteName('#__balancirk_presences'))
-            ->where($dbo->quoteName('lesson') . ' = ' . (int) $id)
+            ->where($dbo->quoteName('lesson') . ' = ' . $id)
             ->where($dbo->quoteName('date') . ' = ' . $dbo->quote($date));
         $dbo->setQuery($query);
         $dbo->execute();
@@ -699,10 +1002,12 @@ class LessonModel extends AdminModel
             $query->clear();
             $query->insert($dbo->quoteName('#__balancirk_presences'))
                 ->columns($dbo->quoteName(['lesson', 'student', 'date']))
-                ->values($id . ', ' . $student . ', ' . $dbo->quote($date));
+                ->values($id . ', ' . (int) $student . ', ' . $dbo->quote($date));
             $dbo->setQuery($query);
             $dbo->execute();
         }
+
+        return true;
     }
 
     /**
@@ -736,12 +1041,26 @@ class LessonModel extends AdminModel
      * Method to save the teachers of the lesson
      *
      * @param	int		$id			Id of the lesson
+     * @param	mixed	$date		Date of the lesson
      * @param	array	$teachers	An array of the teachers
      *
-     * @return void
+     * @return  bool
      */
     public function saveTeacher($id, $date, $teachers)
     {
+        $id = (int) $id;
+        $parsedDate = self::parseLessonDate($date);
+        $lesson = $id > 0 ? $this->getItem($id) : null;
+
+        if (
+            !is_object($lesson)
+            || !$parsedDate instanceof DateTime
+            || !$this->isAttendanceDateAllowed($lesson, $parsedDate)
+        ) {
+            return false;
+        }
+
+        $date = $parsedDate->format('Y-m-d');
         $teachers = is_array($teachers) ? $teachers : [];
         $dbo = $this->getDatabase();
         $query = $dbo->getQuery(true);
@@ -770,6 +1089,8 @@ class LessonModel extends AdminModel
             $dbo->setQuery($query);
             $dbo->execute();
         }
+
+        return true;
     }
 
     /**

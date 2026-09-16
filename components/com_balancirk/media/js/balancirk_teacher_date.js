@@ -1,55 +1,269 @@
-var changed = false;
-var oldDate = '';
+var previousDate = '';
+var restoringDate = false;
 
 jQuery(document).ready(function () {
-	const fieldset = document.querySelectorAll('fieldset#jform_teachers')[0];
+	var options = Joomla.getOptions('teacher-script') || {};
+	var fieldset = document.getElementById('jform_teachers');
 
 	if (fieldset) {
-		fieldset.addEventListener('change', function () { changed = true; });
+		fieldset.addEventListener('change', function () { });
 	}
 
-	jQuery("#jform_date").on("change", function () {
-		document.body.style.cursor = 'wait';
+	initTeacherDatepicker(options);
+	bindTeacherSave(options);
+});
 
-		var selectedDate = jQuery(this).val();
+function getTeacherOptions() {
+	return Joomla.getOptions('teacher-script') || {};
+}
 
-		if (changed && oldDate != selectedDate) {
-			$('#confirmModal').modal('show');
+function initTeacherDatepicker(options) {
+	var $input = jQuery('#jform_date');
 
-			$('#confirmChange').on('click', function () {
-				$('#confirmModal').modal('hide');
+	if (!$input.length) {
+		return;
+	}
 
-				update();
-			});
+	if (jQuery.fn.datepicker) {
+		var pickerOptions = {
+			language: 'nl-BE',
+			format: 'dd/mm/yyyy',
+			todayHighlight: true,
+			todayBtn: false,
+			clearBtn: true,
+			forceParse: false,
+			maxViewMode: 0,
+			weekStart: 1,
+			beforeShowDay: function (date) {
+				return isAllowedPickerDay(date, options);
+			},
+			autoclose: true
+		};
 
-			$('#confirmModal').on('hidden.bs.modal', function (e) {
-				$('#dateInput').val(oldDate);
-
-				return;
-			});
-		} else {
-			update();
+		if (options.startDisplay && options.endDisplay) {
+			pickerOptions.startDate = options.startDisplay;
+			pickerOptions.endDate = options.endDisplay;
+			pickerOptions.defaultViewDate = options.autoSelectDate || options.startDisplay;
 		}
 
-		function update() {
-			changed = false;
-			oldDate = selectedDate;
+		$input.datepicker(pickerOptions);
 
-			var lesson = jQuery("#jform_id").val();
-			if (lesson && selectedDate) {
-				loadTeachersData(lesson, selectedDate).then(function (teacherIds) {
-					updateCheckboxes(teacherIds);
-				}).catch(function (error) {
-					console.error('Error fetching data:', error);
-					document.body.style.cursor = 'default';
-				});
-			} else {
-				document.body.style.cursor = 'default';
-			}
+		applyInitialTeacherDate($input, options, true);
+	} else {
+		$input.attr({
+			type: 'date',
+			min: options.start || '',
+			max: options.end || ''
+		});
+
+		applyInitialTeacherDate($input, options, false);
+	}
+
+	$input.on('change', function () {
+		if (restoringDate) {
+			return;
 		}
+
+		handleTeacherDateChange(options, this);
 	});
 
-});
+	if (previousDate && !options.restoreSelection) {
+		loadTeacherCheckboxes(toIsoDate(previousDate));
+	}
+}
+
+function applyInitialTeacherDate($input, options, useDatepicker) {
+	var autoIso = toIsoDate(options.autoSelectDate || options.autoSelectIso || '');
+
+	if (autoIso && isValidAttendanceDate(autoIso, options)) {
+		if (useDatepicker) {
+			$input.datepicker('setDate', options.autoSelectDate || autoIso);
+			previousDate = $input.val();
+		} else {
+			$input.val(options.autoSelectIso || autoIso);
+			previousDate = $input.val();
+		}
+
+		return;
+	}
+
+	if (useDatepicker) {
+		$input.datepicker('update', '');
+	}
+
+	$input.val('');
+	previousDate = '';
+}
+
+function handleTeacherDateChange(options, input) {
+	var selectedDate = jQuery(input).val();
+	var iso = toIsoDate(selectedDate);
+
+	if (!iso) {
+		previousDate = '';
+		document.body.style.cursor = 'default';
+
+		return;
+	}
+
+	if (!isValidAttendanceDate(iso, options)) {
+		restoreTeacherDate(previousDate);
+
+		return;
+	}
+
+	previousDate = selectedDate;
+	loadTeacherCheckboxes(iso);
+}
+
+function loadTeacherCheckboxes(iso) {
+	document.body.style.cursor = 'wait';
+
+	loadTeachersData(jQuery('#jform_id').val(), iso).then(function (teacherIds) {
+		updateCheckboxes(teacherIds || []);
+		document.body.style.cursor = 'default';
+	}).catch(function (error) {
+		console.error('Error fetching data:', error);
+		document.body.style.cursor = 'default';
+	});
+}
+
+function restoreTeacherDate(value) {
+	var $input = jQuery('#jform_date');
+
+	restoringDate = true;
+
+	if (jQuery.fn.datepicker && $input.data('datepicker')) {
+		if (value) {
+			$input.datepicker('update', value);
+		} else {
+			$input.datepicker('update', '');
+			$input.val('');
+		}
+	} else {
+		$input.val(value || '');
+	}
+
+	restoringDate = false;
+}
+
+function isValidAttendanceDate(isoDate, options) {
+	if (!isoDate || !/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) {
+		return false;
+	}
+
+	if (options.start && isoDate < options.start) {
+		return false;
+	}
+
+	if (options.end && isoDate > options.end) {
+		return false;
+	}
+
+	if (isHolidayIso(isoDate, options)) {
+		return false;
+	}
+
+	var mask = parseInt(options.lesdaysMask, 10) || 0;
+
+	if (mask) {
+		var parts = isoDate.split('-');
+		var date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+		var bits = options.weekdayBits || [1, 64, 32, 16, 8, 4, 2];
+
+		if ((mask & bits[date.getDay()]) === 0) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+function isHolidayIso(isoDate, options) {
+	var holidays = options.holidays || [];
+
+	for (var i = 0; i < holidays.length; i++) {
+		var holiday = holidays[i] || {};
+		var start = holiday.start || '';
+		var end = holiday.end || '';
+
+		if (start && end && isoDate >= start && isoDate <= end) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function pickerDateToIso(date) {
+	var year = date.getFullYear();
+	var month = String(date.getMonth() + 1).padStart(2, '0');
+	var day = String(date.getDate()).padStart(2, '0');
+
+	return year + '-' + month + '-' + day;
+}
+
+function isAllowedPickerDay(date, options) {
+	var iso = pickerDateToIso(date);
+
+	if (options.start && iso < options.start) {
+		return false;
+	}
+
+	if (options.end && iso > options.end) {
+		return false;
+	}
+
+	if (isHolidayIso(iso, options)) {
+		return false;
+	}
+
+	var mask = parseInt(options.lesdaysMask, 10) || 0;
+	var bits = options.weekdayBits || [1, 64, 32, 16, 8, 4, 2];
+
+	return !mask || (mask & bits[date.getDay()]) !== 0;
+}
+
+function showTeacherWarning(message) {
+	if (window.Joomla && typeof Joomla.renderMessages === 'function') {
+		Joomla.renderMessages({ warning: [message] });
+	} else {
+		window.alert(message);
+	}
+}
+
+function getTeacherString(options, key, fallback) {
+	return (options.strings && options.strings[key]) ? options.strings[key] : fallback;
+}
+
+function bindTeacherSave(options) {
+	var originalSubmitbutton = typeof Joomla.submitbutton === 'function' ? Joomla.submitbutton : null;
+
+	Joomla.submitbutton = function (task) {
+		if (task === 'lesson.teacher' && !validateTeacherDateForSave(options)) {
+			return false;
+		}
+
+		if (originalSubmitbutton) {
+			return originalSubmitbutton(task);
+		}
+
+		Joomla.submitform(task);
+	};
+}
+
+function validateTeacherDateForSave(options) {
+	var selectedDate = jQuery('#jform_date').val();
+	var iso = toIsoDate(selectedDate);
+
+	if (!iso || !isValidAttendanceDate(iso, options)) {
+		showTeacherWarning(getTeacherString(options, 'invalidDate', 'Choose a valid teacher attendance date.'));
+
+		return false;
+	}
+
+	return true;
+}
 
 function toIsoDate(selectedDate) {
 	if (!selectedDate) {
@@ -102,7 +316,7 @@ function extractTeacherIds(response) {
 
 function loadTeachersData(lesson, selectedDate) {
 	selectedDate = toIsoDate(selectedDate);
-	var options = Joomla.getOptions('teacher-script') || {};
+	var options = getTeacherOptions();
 	var url = options.teachersUrl;
 
 	if (url) {
