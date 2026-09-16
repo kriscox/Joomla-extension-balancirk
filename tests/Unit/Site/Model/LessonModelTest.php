@@ -271,15 +271,16 @@ class LessonModelTest extends TestCase
 
     public function testIsValidAttendanceDateRejectsADateWhenThePeriodIsUnknown(): void
     {
-        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-07', '', '', 64));
-        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-07', null, null, 0));
-        $this->assertTrue(LessonModel::isValidAttendanceDate('07/09/2026', '', '2026-09-30', 64));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-07', '', '', 64));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-07', null, null, 0));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('07/09/2026', '', '2026-09-30', 64));
     }
 
     public function testPeriodFromValuesDoesNotRewriteAnInvertedEndDate(): void
     {
         $this->assertNull(LessonModel::periodFromValues('2026-09-01', '2026-06-30'));
         $this->assertFalse(LessonModel::isValidLessonPeriod('2026-09-01', '2026-06-30'));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-07', '2026-09-01', '2026-06-30', 64));
     }
 
     public function testPeriodFromValuesAcceptsACrossYearSchoolYear(): void
