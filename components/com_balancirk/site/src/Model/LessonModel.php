@@ -173,7 +173,7 @@ class LessonModel extends AdminModel
     /**
      * Method to get the studentslist
      *
-     * List of the students currently subscribed to the lesson
+     * List of the students currently enrolled in the lesson (not on the waiting list).
      *
      * @param int 		$lessonid  The id of the lesson
      *
@@ -182,60 +182,7 @@ class LessonModel extends AdminModel
      **/
     public function getStudents($lessonid = null)
     {
-        // Create a new query object.
-        $dbo = $this->getDatabase();
-        $query = $dbo->getQuery(true);
-
-        $today = new DateTime('now');
-        $startRange = date_sub($today, date_interval_create_from_date_string('7 days'));
-        $endRange = date_sub($today, date_interval_create_from_date_string('1 days'));
-
-        if ($lessonid == null) {
-            $lessonid = $this->getState('lesson.id');
-        }
-
-        // Select the required fields from the table.
-        $query->select(
-            $dbo->quoteName(
-                [
-                    'a.id',
-                    'a.name',
-                    'a.firstname',
-                    'a.phone',
-                    'a.email',
-                    'a.birthdate',
-                    'a.allow_photo',
-                    'a.state'
-                ],
-                [
-                    'id',
-                    'name',
-                    'firstname',
-                    'phone',
-                    'email',
-                    'birthdate',
-                    'allow_photo',
-                    'state'
-                ]
-            )
-        )
-            ->select('MAX(p.date) as last_presence')
-            ->from($dbo->quoteName('#__balancirk_students', 'a'))
-            ->join(
-                'INNER',
-                $dbo->quoteName('#__balancirk_subscriptions', 's') . ' ON s.student = a.id AND s.subscribed = 0'
-            )
-            ->join(
-                'LEFT',
-                $dbo->quoteName('#__balancirk_presences', 'p') . ' ON p.student = a.id AND p.lesson = s.lesson'
-            )
-            ->where('s.lesson = ' . $lessonid)
-            ->order(['a.name', 'a.firstname'])
-            ->group('a.id', 'a.name', 'a.firstname', 'a.phone', 'a.email', 'a.birthdate', 'a.allow_photo', 'a.state');
-
-        $dbo->setQuery($query);
-
-        return $dbo->loadObjectList();
+        return $this->loadLessonStudents($lessonid, 0);
     }
 
     /**
@@ -249,11 +196,52 @@ class LessonModel extends AdminModel
      */
     public function getWaitingListStudents($lessonid = null)
     {
+        return $this->loadLessonStudents($lessonid, 1);
+    }
+
+    /**
+     * Students that can be marked present for a lesson.
+     *
+     * Includes enrolled students and students on the waiting list so a
+     * substitute from the waiting list can be registered and shown in the
+     * attendance overview.
+     *
+     * @param   int|null  $lessonid  The id of the lesson
+     *
+     * @return  array  An array of students
+     */
+    public function getPresenceStudents($lessonid = null)
+    {
+        return $this->loadLessonStudents($lessonid, null);
+    }
+
+    /**
+     * Load students linked to a lesson, optionally filtered by subscription status.
+     *
+     * @param   int|null  $lessonid    Lesson id, or null to use model state.
+     * @param   int|null  $subscribed  0 = enrolled, 1 = waiting list, null = both.
+     *
+     * @return  array
+     */
+    private function loadLessonStudents($lessonid = null, ?int $subscribed = 0): array
+    {
         $dbo = $this->getDatabase();
         $query = $dbo->getQuery(true);
 
         if ($lessonid == null) {
             $lessonid = $this->getState('lesson.id');
+        }
+
+        $join = $dbo->quoteName('#__balancirk_subscriptions', 's') . ' ON s.student = a.id';
+
+        if ($subscribed !== null) {
+            $join .= ' AND s.subscribed = ' . (int) $subscribed;
+        }
+
+        $order = ['a.name', 'a.firstname'];
+
+        if ($subscribed === null) {
+            array_unshift($order, 's.subscribed');
         }
 
         $query->select(
@@ -262,27 +250,50 @@ class LessonModel extends AdminModel
                     'a.id',
                     'a.name',
                     'a.firstname',
+                    'a.phone',
+                    'a.email',
                     'a.birthdate',
+                    'a.allow_photo',
+                    'a.state',
+                    's.subscribed',
                 ],
                 [
                     'id',
                     'name',
                     'firstname',
+                    'phone',
+                    'email',
                     'birthdate',
+                    'allow_photo',
+                    'state',
+                    'on_waiting_list',
                 ]
             )
         )
+            ->select('MAX(p.date) as last_presence')
             ->from($dbo->quoteName('#__balancirk_students', 'a'))
+            ->join('INNER', $join)
             ->join(
-                'INNER',
-                $dbo->quoteName('#__balancirk_subscriptions', 's') . ' ON s.student = a.id AND s.subscribed = 1'
+                'LEFT',
+                $dbo->quoteName('#__balancirk_presences', 'p') . ' ON p.student = a.id AND p.lesson = s.lesson'
             )
             ->where('s.lesson = ' . (int) $lessonid)
-            ->order(['a.name', 'a.firstname']);
+            ->order($order)
+            ->group(
+                'a.id',
+                'a.name',
+                'a.firstname',
+                'a.phone',
+                'a.email',
+                'a.birthdate',
+                'a.allow_photo',
+                'a.state',
+                's.subscribed'
+            );
 
         $dbo->setQuery($query);
 
-        return $dbo->loadObjectList();
+        return $dbo->loadObjectList() ?: [];
     }
 
     /**

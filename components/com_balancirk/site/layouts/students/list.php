@@ -92,7 +92,13 @@ $hasWaitingList = !empty($waitingListStudents);
 								<td scope="row" class="d-md-table-cell">
 									<?= HtmlHelper::date($student->birthdate, Text::_('DATE_FORMAT_FILTER_DATE')); ?>
 								</td>
-								<td scope="row" class="d-md-table-cell">—</td>
+								<td scope="row" class="d-md-table-cell">
+									<?php if ($student->last_presence === null) :
+									    echo Text::_('COM_BALANCIRK_LESSON_NEVER');
+									else :
+									    echo HtmlHelper::date($student->last_presence, Text::_('DATE_FORMAT_FILTER_DATE'));
+									endif; ?>
+								</td>
 							</tr>
 							<?php endforeach;
 						endif; ?>

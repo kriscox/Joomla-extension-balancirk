@@ -26,6 +26,10 @@ div#jform {
 	width: 200px;
 }
 
+#jform_students .waiting-list-student {
+	font-style: italic;
+}
+
 div.balancirk_presence {
 	display: flex;
 	flex-direction: row-reverse;

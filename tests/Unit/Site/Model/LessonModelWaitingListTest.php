@@ -214,6 +214,10 @@ class LessonModelWaitingListTest extends TestCase
             {
                 return $this;
             }
+            public function group(mixed ...$g): static
+            {
+                return $this;
+            }
         };
 
         $db = new class ($qb, $loadResult) {

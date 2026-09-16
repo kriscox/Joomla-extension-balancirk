@@ -31,6 +31,8 @@ if (count($studentCount) == 0) {
     $mean = round(array_sum($studentCount) / count($studentCount), 1);
 }
 
+$presenceChartMax = count($this->students ?? []) + count($this->waitingListStudents ?? []);
+
 /** @var Joomla\CMS\Application $app */
 $app = Factory::getApplication();
 
@@ -64,7 +66,7 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 										},
 										y: {
 											beginAtZero: true,
-											max : "' . sizeOf($this->students) . '",
+											max : "' . $presenceChartMax . '",
 											ticks: {
           											// forces step size to be 1 unit
         											stepSize: 1,
