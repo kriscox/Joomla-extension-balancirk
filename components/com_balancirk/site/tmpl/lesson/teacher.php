@@ -33,8 +33,9 @@ $item = is_object($this->item) ? $this->item : (object) [];
 $period = $lessonModel instanceof LessonModel
 	? $lessonModel->resolveLessonPeriod($item)
 	: LessonModel::periodFromValues($item->start ?? null, $item->end ?? null);
+$hasConfiguredPeriod = $period !== null;
 
-if ($period === null) {
+if (!$hasConfiguredPeriod) {
 	$startDate = (new DateTime('today'))->modify('-18 months');
 	$endDate = (new DateTime('today'))->modify('+18 months');
 } else {
@@ -43,7 +44,6 @@ if ($period === null) {
 }
 
 $lesdaysMask = (int) ($item->lesdays ?? 0);
-$restrictToLesdays = LessonModel::hasConfiguredLesdays(LessonModel::getLesdays($lesdaysMask));
 
 $firstLesDay = $startDate->format('d/m/Y');
 $lastLesDay = $endDate->format('d/m/Y');
@@ -58,8 +58,7 @@ $teachersUrl = Route::_(
 );
 
 $today = (new DateTime())->setTime(0, 0, 0);
-$todayInRange = $today >= $startDate && $today <= $endDate
-	&& (!$restrictToLesdays || LesdaysHelper::matchesDate($today, $lesdaysMask));
+$todayInRange = LessonModel::shouldAutoSelectToday($period, $lesdaysMask, $today);
 
 $teacherState = $app->getUserState('com_balancirk.teacher.data', []);
 $restoredDate = '';
@@ -73,10 +72,17 @@ if ((int) ($teacherState['id'] ?? 0) === (int) ($item->id ?? 0)) {
 }
 
 $parsedRestoredDate = $restoredDate !== '' ? LessonModel::parseLessonDate($restoredDate) : null;
+$restoredIsValid = $parsedRestoredDate instanceof DateTime
+	&& LessonModel::isValidAttendanceDate(
+		$parsedRestoredDate,
+		$hasConfiguredPeriod ? $startDate : null,
+		$hasConfiguredPeriod ? $endDate : null,
+		$lesdaysMask
+	);
 $autoSelectDate = '';
 $autoSelectIso = '';
 
-if ($parsedRestoredDate instanceof DateTime) {
+if ($restoredIsValid) {
 	$autoSelectDate = $parsedRestoredDate->format('d/m/Y');
 	$autoSelectIso = $parsedRestoredDate->format('Y-m-d');
 } elseif ($todayInRange) {
@@ -103,7 +109,7 @@ $doc->addScriptOptions('teacher-script', [
 	'weekdayBits' => LesdaysHelper::JS_GETDAY_BITS,
 	'autoSelectDate' => $autoSelectDate,
 	'autoSelectIso' => $autoSelectIso,
-	'restoreSelection' => $restoredTeachers !== [],
+	'restoreSelection' => $restoredIsValid && $restoredTeachers !== [],
 	'strings' => [
 		'invalidDate' => Text::_('COM_BALANCIRK_LESSON_TEACHER_INVALID_DATE'),
 	],
@@ -113,7 +119,7 @@ $teachers = $this->get('Teachers') ?: [];
 $data = [];
 $data['id'] = (int) ($item->id ?? 0);
 
-if ($restoredTeachers !== []) {
+if ($restoredIsValid && $restoredTeachers !== []) {
 	$data['teachers'] = $restoredTeachers;
 }
 

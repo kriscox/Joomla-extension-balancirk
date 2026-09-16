@@ -1,6 +1,5 @@
 var previousDate = '';
 var restoringDate = false;
-var pendingInitialLoad = false;
 
 jQuery(document).ready(function () {
 	var options = Joomla.getOptions('teacher-script') || {};
@@ -9,16 +8,6 @@ jQuery(document).ready(function () {
 	if (fieldset) {
 		fieldset.addEventListener('change', function () { });
 	}
-
-	pendingInitialLoad = !!options.autoSelectDate || !!options.autoSelectIso;
-
-	jQuery('#jform_date').on('change', function () {
-		if (restoringDate) {
-			return;
-		}
-
-		handleTeacherDateChange(options, this);
-	});
 
 	initTeacherDatepicker(options);
 	bindTeacherSave(options);
@@ -38,10 +27,13 @@ function initTeacherDatepicker(options) {
 	if (jQuery.fn.datepicker) {
 		$input.datepicker({
 			language: 'nl-BE',
+			format: 'dd/mm/yyyy',
 			startDate: options.startDisplay || '',
 			endDate: options.endDisplay || '',
 			todayHighlight: true,
-			todayBtn: true,
+			todayBtn: false,
+			clearBtn: true,
+			forceParse: false,
 			maxViewMode: 0,
 			weekStart: 1,
 			beforeShowDay: function (date) {
@@ -53,9 +45,7 @@ function initTeacherDatepicker(options) {
 			autoclose: true
 		});
 
-		if (options.autoSelectDate) {
-			$input.datepicker('setDate', options.autoSelectDate);
-		}
+		applyInitialTeacherDate($input, options, true);
 	} else {
 		$input.attr({
 			type: 'date',
@@ -63,38 +53,57 @@ function initTeacherDatepicker(options) {
 			max: options.end || ''
 		});
 
-		if (options.autoSelectIso) {
-			$input.val(options.autoSelectIso);
-			$input.trigger('change');
-		}
+		applyInitialTeacherDate($input, options, false);
 	}
+
+	$input.on('change', function () {
+		if (restoringDate) {
+			return;
+		}
+
+		handleTeacherDateChange(options, this);
+	});
+
+	if (previousDate && !options.restoreSelection) {
+		loadTeacherCheckboxes(toIsoDate(previousDate));
+	}
+}
+
+function applyInitialTeacherDate($input, options, useDatepicker) {
+	var autoIso = toIsoDate(options.autoSelectDate || options.autoSelectIso || '');
+
+	if (autoIso && isValidAttendanceDate(autoIso, options)) {
+		if (useDatepicker) {
+			$input.datepicker('setDate', options.autoSelectDate || autoIso);
+			previousDate = $input.val();
+		} else {
+			$input.val(options.autoSelectIso || autoIso);
+			previousDate = $input.val();
+		}
+
+		return;
+	}
+
+	if (useDatepicker) {
+		$input.datepicker('update', '');
+	}
+
+	$input.val('');
+	previousDate = '';
 }
 
 function handleTeacherDateChange(options, input) {
 	var selectedDate = jQuery(input).val();
 	var iso = toIsoDate(selectedDate);
 
-	if (pendingInitialLoad) {
-		pendingInitialLoad = false;
-
-		if (!iso || !isValidAttendanceDate(iso, options)) {
-			previousDate = '';
-			document.body.style.cursor = 'default';
-
-			return;
-		}
-
-		previousDate = selectedDate;
-
-		if (!options.restoreSelection) {
-			loadTeacherCheckboxes(iso);
-		}
+	if (!iso) {
+		previousDate = '';
+		document.body.style.cursor = 'default';
 
 		return;
 	}
 
-	if (!iso || !isValidAttendanceDate(iso, options)) {
-		showTeacherWarning(getTeacherString(options, 'invalidDate', 'Choose a valid teacher attendance date.'));
+	if (!isValidAttendanceDate(iso, options)) {
 		restoreTeacherDate(previousDate);
 
 		return;

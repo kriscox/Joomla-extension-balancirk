@@ -71,8 +71,6 @@ class LessonController extends FormController
         );
         $lessonUrl = Route::_('index.php?option=' . $this->option . '&view=lesson&id=' . $lessonId, false);
 
-        $app->setUserState('com_balancirk.presence.data', $data);
-
         if ($lessonId <= 0) {
             $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_PRESENCE_INVALID_DATE'), 'warning');
             $this->setRedirect($lessonUrl);
@@ -86,14 +84,8 @@ class LessonController extends FormController
         $parsedDate = LessonModel::parseLessonDate($data['date'] ?? null);
 
         if (
-            !is_object($lesson)
-            || !$parsedDate instanceof \DateTime
-            || !LessonModel::isValidAttendanceDate(
-                $parsedDate,
-                $lesson->start ?? null,
-                $lesson->end ?? null,
-                (int) ($lesson->lesdays ?? 0)
-            )
+            !$parsedDate instanceof \DateTime
+            || !$model->isAttendanceDateAllowed(is_object($lesson) ? $lesson : null, $parsedDate)
         ) {
             $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_PRESENCE_INVALID_DATE'), 'warning');
             $this->setRedirect($presenceUrl);
@@ -145,14 +137,8 @@ class LessonController extends FormController
         $lesson = $lessonId > 0 ? $model->getItem($lessonId) : null;
 
         if (
-            !is_object($lesson)
-            || !$parsedDate instanceof \DateTime
-            || !LessonModel::isValidAttendanceDate(
-                $parsedDate,
-                $lesson->start ?? null,
-                $lesson->end ?? null,
-                (int) ($lesson->lesdays ?? 0)
-            )
+            !$parsedDate instanceof \DateTime
+            || !$model->isAttendanceDateAllowed(is_object($lesson) ? $lesson : null, $parsedDate)
         ) {
             echo new JsonResponse(null, Text::_('COM_BALANCIRK_LESSON_PRESENCE_INVALID_DATE'), true);
             $app->close();
@@ -194,8 +180,6 @@ class LessonController extends FormController
         );
         $lessonUrl = Route::_('index.php?option=' . $this->option . '&view=lesson&id=' . $lessonId, false);
 
-        $app->setUserState('com_balancirk.teacher.data', $data);
-
         if ($lessonId <= 0) {
             $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_TEACHER_INVALID_DATE'), 'warning');
             $this->setRedirect($lessonUrl);
@@ -209,14 +193,8 @@ class LessonController extends FormController
         $parsedDate = LessonModel::parseLessonDate($data['date'] ?? null);
 
         if (
-            !is_object($lesson)
-            || !$parsedDate instanceof \DateTime
-            || !LessonModel::isValidAttendanceDate(
-                $parsedDate,
-                $lesson->start ?? null,
-                $lesson->end ?? null,
-                (int) ($lesson->lesdays ?? 0)
-            )
+            !$parsedDate instanceof \DateTime
+            || !$model->isAttendanceDateAllowed(is_object($lesson) ? $lesson : null, $parsedDate)
         ) {
             $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_TEACHER_INVALID_DATE'), 'warning');
             $this->setRedirect($teacherUrl);
@@ -268,14 +246,8 @@ class LessonController extends FormController
         $lesson = $lessonId > 0 ? $model->getItem($lessonId) : null;
 
         if (
-            !is_object($lesson)
-            || !$parsedDate instanceof \DateTime
-            || !LessonModel::isValidAttendanceDate(
-                $parsedDate,
-                $lesson->start ?? null,
-                $lesson->end ?? null,
-                (int) ($lesson->lesdays ?? 0)
-            )
+            !$parsedDate instanceof \DateTime
+            || !$model->isAttendanceDateAllowed(is_object($lesson) ? $lesson : null, $parsedDate)
         ) {
             echo new JsonResponse(null, Text::_('COM_BALANCIRK_LESSON_TEACHER_INVALID_DATE'), true);
             $app->close();

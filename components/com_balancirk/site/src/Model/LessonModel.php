@@ -22,6 +22,7 @@ use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\Table\Table;
 use CoCoCo\Component\Balancirk\Administrator\Model\HolidaysModel;
 use CoCoCo\Component\Balancirk\Site\Helper\LesdaysHelper;
+use CoCoCo\Component\Balancirk\Site\Table\LessonTable;
 
 /**
  * LessonsModel class to display the list off lessons.
@@ -94,14 +95,36 @@ class LessonModel extends AdminModel
      */
     public function getTable($name = '', $prefix = '', $options = array())
     {
-        $name = 'Lesson';
-        $prefix = 'Site';
+        $candidates = [
+            ['Lesson', 'Site'],
+            ['Lessons', 'Administrator'],
+            ['lessons', 'Table'],
+            ['Lesson', 'Table'],
+        ];
 
-        if ($table = $this->_createTable($name, $prefix, $options)) {
-            return $table;
+        foreach ($candidates as $candidate) {
+            try {
+                $table = $this->_createTable($candidate[0], $candidate[1], $options);
+
+                if ($table) {
+                    return $table;
+                }
+            } catch (\Throwable $exception) {
+                continue;
+            }
         }
 
-        throw new \Exception(Text::sprintf('JLIB_APPLICATION_ERROR_TABLE_NAME_NOT_SUPPORTED', $name), 0);
+        try {
+            $db = $this->getDatabase();
+
+            if ($db) {
+                return new LessonTable($db);
+            }
+        } catch (\Throwable $exception) {
+            // Fall through to the standard table error.
+        }
+
+        throw new \Exception(Text::sprintf('JLIB_APPLICATION_ERROR_TABLE_NAME_NOT_SUPPORTED', $name ?: 'Lesson'), 0);
     }
 
     /**
@@ -478,8 +501,9 @@ class LessonModel extends AdminModel
     /**
      * Whether a calendar date is a valid attendance day for a lesson.
      *
-     * The date must fall inside the lesson period. When lesson weekdays are
-     * configured, the date must also match one of those days.
+     * When a lesson period is known, the date must fall inside it. A missing
+     * period is not treated as invalid: the weekday mask is still applied.
+     * When lesson weekdays are configured, the date must match one of them.
      *
      * @param   mixed  $date         Attendance date.
      * @param   mixed  $start        Lesson start date.
@@ -493,13 +517,14 @@ class LessonModel extends AdminModel
     public static function isValidAttendanceDate(mixed $date, mixed $start, mixed $end, int $lesdaysMask = 0): bool
     {
         $parsed = self::parseLessonDate($date);
-        $period = self::periodFromValues($start, $end);
 
-        if (!$parsed instanceof DateTime || $period === null) {
+        if (!$parsed instanceof DateTime) {
             return false;
         }
 
-        if ($parsed < $period['start'] || $parsed > $period['end']) {
+        $period = self::periodFromValues($start, $end);
+
+        if ($period !== null && ($parsed < $period['start'] || $parsed > $period['end'])) {
             return false;
         }
 
@@ -511,6 +536,64 @@ class LessonModel extends AdminModel
         }
 
         return true;
+    }
+
+    /**
+     * Whether today should be pre-filled on the attendance form.
+     *
+     * Only a real lesson period may auto-select today, and only when today is
+     * a configured lesson weekday. A fallback calendar range must not fill
+     * the date field.
+     *
+     * @param   array{start: DateTime, end: DateTime}|null  $period       Lesson period.
+     * @param   int                                         $lesdaysMask  Stored lesdays bitmask.
+     * @param   DateTime|null                               $today        Reference day; defaults to today.
+     *
+     * @return  bool
+     *
+     * @since   1.3.24
+     */
+    public static function shouldAutoSelectToday(?array $period, int $lesdaysMask, ?DateTime $today = null): bool
+    {
+        if ($period === null) {
+            return false;
+        }
+
+        $today = $today instanceof DateTime ? clone $today : new DateTime('today');
+        $today->setTime(0, 0, 0);
+
+        if ($today < $period['start'] || $today > $period['end']) {
+            return false;
+        }
+
+        return !self::hasConfiguredLesdays(self::getLesdays($lesdaysMask))
+            || LesdaysHelper::matchesDate($today, $lesdaysMask);
+    }
+
+    /**
+     * Whether a date may be used for attendance on this lesson record.
+     *
+     * @param   object|null  $lesson  Lesson item.
+     * @param   mixed        $date    Submitted date.
+     *
+     * @return  bool
+     *
+     * @since   1.3.24
+     */
+    public function isAttendanceDateAllowed(?object $lesson, mixed $date): bool
+    {
+        if (!is_object($lesson) || (int) ($lesson->id ?? 0) <= 0) {
+            return false;
+        }
+
+        $period = $this->resolveLessonPeriod($lesson);
+
+        return self::isValidAttendanceDate(
+            $date,
+            $period['start'] ?? null,
+            $period['end'] ?? null,
+            (int) ($lesson->lesdays ?? 0)
+        );
     }
 
     /**
@@ -755,13 +838,9 @@ class LessonModel extends AdminModel
         $lesson = $id > 0 ? $this->getItem($id) : null;
 
         if (
-            !is_object($lesson) || !$parsedDate instanceof DateTime
-            || !self::isValidAttendanceDate(
-                $parsedDate,
-                $lesson->start ?? null,
-                $lesson->end ?? null,
-                (int) ($lesson->lesdays ?? 0)
-            )
+            !is_object($lesson)
+            || !$parsedDate instanceof DateTime
+            || !$this->isAttendanceDateAllowed($lesson, $parsedDate)
         ) {
             return false;
         }
@@ -834,13 +913,9 @@ class LessonModel extends AdminModel
         $lesson = $id > 0 ? $this->getItem($id) : null;
 
         if (
-            !is_object($lesson) || !$parsedDate instanceof DateTime
-            || !self::isValidAttendanceDate(
-                $parsedDate,
-                $lesson->start ?? null,
-                $lesson->end ?? null,
-                (int) ($lesson->lesdays ?? 0)
-            )
+            !is_object($lesson)
+            || !$parsedDate instanceof DateTime
+            || !$this->isAttendanceDateAllowed($lesson, $parsedDate)
         ) {
             return false;
         }

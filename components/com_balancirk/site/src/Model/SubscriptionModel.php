@@ -244,10 +244,10 @@ class SubscriptionModel extends AdminModel
             return false;
         }
 
-        // Check ik max numbers of students is not reached, if not subscribed == 0 else subscribed == 1
-        /** @var lessonModel*/
-        $model = $this->getMVCFactory()->createModel('Lesson', 'Site');
-        $lesson = $model->getItem($lessonId, $lessonId);
+        // Load the lesson from the lessons table. Site LessonModel::getItem()
+        // goes through LessonTable, which is missing when this model is used
+        // from the administrator application.
+        $lesson = $this->loadLesson($lessonId);
 
         if (!$lesson || !$this->isLessonOpenForRegistration($lesson)) {
             $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_REGISTRATION_CLOSED'));
@@ -267,7 +267,7 @@ class SubscriptionModel extends AdminModel
             return false;
         }
 
-        $waitinglist = ($model->getNumberOfStudents($lessonId) < $lesson->max_students) ? 0 : 1;
+        $waitinglist = ($this->countEnrolledStudents($lessonId) < (int) $lesson->max_students) ? 0 : 1;
 
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
@@ -458,6 +458,55 @@ class SubscriptionModel extends AdminModel
         $today = date('Y-m-d');
 
         return $today >= $startRegistration && $today <= $endRegistration;
+    }
+
+    /**
+     * Load a lesson row from the lessons table.
+     *
+     * Enrolment must not depend on Site LessonModel::getItem(), which needs
+     * LessonTable and fails in the administrator MVC context.
+     *
+     * @param   int  $lessonId  Lesson id.
+     *
+     * @return  object|null
+     *
+     * @since   1.3.24
+     */
+    private function loadLesson(int $lessonId): ?object
+    {
+        if ($lessonId <= 0) {
+            return null;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('*')
+            ->from($db->quoteName('#__balancirk_lessons'))
+            ->where($db->quoteName('id') . ' = ' . $lessonId);
+        $lesson = $db->setQuery($query)->loadObject();
+
+        return $lesson ?: null;
+    }
+
+    /**
+     * Count students already enrolled in a lesson (not on the waiting list).
+     *
+     * @param   int  $lessonId  Lesson id.
+     *
+     * @return  int
+     *
+     * @since   1.3.24
+     */
+    private function countEnrolledStudents(int $lessonId): int
+    {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__balancirk_subscriptions'))
+            ->where($db->quoteName('lesson') . ' = ' . $lessonId)
+            ->where($db->quoteName('subscribed') . ' = 0');
+
+        return (int) $db->setQuery($query)->loadResult();
     }
 
     /**

@@ -1,6 +1,5 @@
 var previousDate = '';
 var restoringDate = false;
-var pendingInitialLoad = false;
 var pendingFrontendIds = [];
 var pendingDbIds = [];
 
@@ -11,16 +10,6 @@ jQuery(document).ready(function () {
 	if (fieldset) {
 		fieldset.addEventListener('change', function () { });
 	}
-
-	pendingInitialLoad = !!options.autoSelectDate || !!options.autoSelectIso;
-
-	jQuery('#jform_date').on('change', function () {
-		if (restoringDate) {
-			return;
-		}
-
-		handleDateChange(options, this);
-	});
 
 	initDatepicker(options);
 	bindPresenceSave(options);
@@ -41,10 +30,13 @@ function initDatepicker(options) {
 	if (jQuery.fn.datepicker) {
 		$input.datepicker({
 			language: 'nl-BE',
+			format: 'dd/mm/yyyy',
 			startDate: options.startDisplay || '',
 			endDate: options.endDisplay || '',
 			todayHighlight: true,
-			todayBtn: true,
+			todayBtn: false,
+			clearBtn: true,
+			forceParse: false,
 			maxViewMode: 0,
 			weekStart: 1,
 			beforeShowDay: function (date) {
@@ -56,9 +48,7 @@ function initDatepicker(options) {
 			autoclose: true
 		});
 
-		if (options.autoSelectDate) {
-			$input.datepicker('setDate', options.autoSelectDate);
-		}
+		applyInitialDate($input, options, true);
 	} else {
 		$input.attr({
 			type: 'date',
@@ -66,38 +56,57 @@ function initDatepicker(options) {
 			max: options.end || ''
 		});
 
-		if (options.autoSelectIso) {
-			$input.val(options.autoSelectIso);
-			$input.trigger('change');
-		}
+		applyInitialDate($input, options, false);
 	}
+
+	$input.on('change', function () {
+		if (restoringDate) {
+			return;
+		}
+
+		handleDateChange(options, this);
+	});
+
+	if (previousDate && !options.restoreSelection) {
+		replaceWithDatabase(options, toIsoDate(previousDate));
+	}
+}
+
+function applyInitialDate($input, options, useDatepicker) {
+	var autoIso = toIsoDate(options.autoSelectDate || options.autoSelectIso || '');
+
+	if (autoIso && isValidAttendanceDate(autoIso, options)) {
+		if (useDatepicker) {
+			$input.datepicker('setDate', options.autoSelectDate || autoIso);
+			previousDate = $input.val();
+		} else {
+			$input.val(options.autoSelectIso || autoIso);
+			previousDate = $input.val();
+		}
+
+		return;
+	}
+
+	if (useDatepicker) {
+		$input.datepicker('update', '');
+	}
+
+	$input.val('');
+	previousDate = '';
 }
 
 function handleDateChange(options, input) {
 	var selectedDate = jQuery(input).val();
 	var iso = toIsoDate(selectedDate);
 
-	if (pendingInitialLoad) {
-		pendingInitialLoad = false;
-
-		if (!iso || !isValidAttendanceDate(iso, options)) {
-			previousDate = '';
-			document.body.style.cursor = 'default';
-
-			return;
-		}
-
-		previousDate = selectedDate;
-
-		if (!options.restoreSelection) {
-			replaceWithDatabase(options, iso);
-		}
+	if (!iso) {
+		previousDate = '';
+		document.body.style.cursor = 'default';
 
 		return;
 	}
 
-	if (!iso || !isValidAttendanceDate(iso, options)) {
-		showWarning(getString(options, 'invalidDate', 'Choose a valid attendance date.'));
+	if (!isValidAttendanceDate(iso, options)) {
 		restoreDate(previousDate, options);
 
 		return;

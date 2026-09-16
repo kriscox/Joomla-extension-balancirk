@@ -266,7 +266,33 @@ class LessonModelTest extends TestCase
     public function testIsValidAttendanceDateRejectsMissingDates(): void
     {
         $this->assertFalse(LessonModel::isValidAttendanceDate('', '2026-09-01', '2026-09-30', 0));
-        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-07', '', '2026-09-30', 0));
         $this->assertFalse(LessonModel::isValidAttendanceDate(null, '2026-09-01', '2026-09-30', 0));
+    }
+
+    public function testIsValidAttendanceDateAllowsADateWhenThePeriodIsUnknown(): void
+    {
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-07', '', '', 64));
+        $this->assertTrue(LessonModel::isValidAttendanceDate('2026-09-07', null, null, 0));
+        $this->assertTrue(LessonModel::isValidAttendanceDate('07/09/2026', '', '2026-09-30', 64));
+    }
+
+    public function testIsValidAttendanceDateRejectsWrongWeekdayWhenPeriodIsUnknown(): void
+    {
+        // 2026-09-08 is a Tuesday; Monday-only mask is 64.
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-08', '', '', 64));
+        $this->assertFalse(LessonModel::isValidAttendanceDate('2026-09-08', null, null, 64));
+    }
+
+    public function testShouldAutoSelectTodayRequiresARealPeriodAndALessonWeekday(): void
+    {
+        $period = LessonModel::periodFromValues('2026-09-01', '2026-09-30');
+        $wednesday = new \DateTime('2026-09-16');
+        $monday = new \DateTime('2026-09-07');
+
+        $this->assertFalse(LessonModel::shouldAutoSelectToday(null, 64, $wednesday));
+        $this->assertFalse(LessonModel::shouldAutoSelectToday($period, 64, $wednesday));
+        $this->assertTrue(LessonModel::shouldAutoSelectToday($period, 64, $monday));
+        $this->assertTrue(LessonModel::shouldAutoSelectToday($period, 0, $wednesday));
+        $this->assertFalse(LessonModel::shouldAutoSelectToday($period, 64, new \DateTime('2026-08-31')));
     }
 }
