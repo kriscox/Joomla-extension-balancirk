@@ -203,4 +203,17 @@
 			<item>Lesson capacity still counts only enrolled students, so marking a waiting-list student present does not take a regular place.</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.24</version>
+		<fix>
+			<item>Attendance date pickers and save/API only allow configured lesson weekdays inside the lesson period, and skip days listed in #__balancirk_holidays.</item>
+			<item>Administrators can only enrol students in lessons for the current or a future school year.</item>
+		</fix>
+		<change>
+			<item>Holiday admin uses Start holiday / End holiday instead of lesson start/end labels, prefills school year from the latest year that has lessons, and seeds the end date from the start date.</item>
+			<item>The holiday list sorts and deletes against the actual holiday date columns.</item>
+		</change>
+	</changelog>
 </changelogs>
