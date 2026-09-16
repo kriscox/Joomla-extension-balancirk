@@ -41,48 +41,45 @@ $editIcon = '<span class="fa fa-pen-square me-2" aria-hidden="true"></span>';
 								<td style="width:1%" class="text-center">
 									<?= HTMLHelper::_('grid.checkall'); ?>
 								</td>
-								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
+								<th scope="col" style="width:1%" class="text-center d-none d-md-table-cell">
 									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_ID', 'a.id', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
-									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_YEAR', 'a.year', $listDirn, $listOrder); ?>
+								<th scope="col">
+									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_SUMMARY', 'a.summary', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
-									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_START_HOLIDAY', 'a.start', $listDirn, $listOrder); ?>
+								<th scope="col" style="width:10%" class="d-none d-md-table-cell">
+									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_HOLIDAY_FIELD_YEAR', 'a.year', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
-									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_END_HOLIDAY', 'a.end', $listDirn, $listOrder); ?>
+								<th scope="col" style="width:15%" class="d-none d-md-table-cell">
+									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_START_HOLIDAY', 'a.startDate', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col" style="width:10px" class="text-center d-none d-md-table-cell">
-									<?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_SUMMARY'); ?>
+								<th scope="col" style="width:15%" class="d-none d-md-table-cell">
+									<?= HTMLHelper::_('searchtools.sort', 'COM_BALANCIRK_TABLE_TABLEHEAD_END_HOLIDAY', 'a.endDate', $listDirn, $listOrder); ?>
 								</th>
 							</tr>
 						</thead>
 						<tbody>
-							<?php
-                            $n = count($this->items);
-				    foreach ($this->items as $i => $item) :
-				        ?>
+							<?php foreach ($this->items as $i => $item) : ?>
 								<tr class="row<?= $i % 2; ?>">
 									<td class="text-center">
-										<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
+										<?= HTMLHelper::_('grid.id', $i, $item->id); ?>
 									</td>
-									<td scope="row" class="has-context">
-										<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&task=holiday.edit&id=' . $item->id); ?>">
-											<?= $editIcon; ?> <?= $this->escape(addslashes($item->id)) ?>
+									<td class="d-none d-md-table-cell text-center">
+										<?= (int) $item->id; ?>
+									</td>
+									<th scope="row" class="has-context">
+										<a class="hasTooltip" href="<?= Route::_('index.php?option=com_balancirk&task=holiday.edit&id=' . (int) $item->id); ?>">
+											<?= $editIcon; ?> <?= $this->escape($item->summary); ?>
 										</a>
-									</td>
-									<td scope="row" class="has-context">
+									</th>
+									<td class="d-none d-md-table-cell">
 										<?= $this->escape($item->year); ?>
 									</td>
-									<td scope="row" class="has-context">
-										<?= $this->escape($item->startDate); ?>
+									<td class="d-none d-md-table-cell">
+										<?= $this->escape(HTMLHelper::_('date', $item->startDate, Text::_('DATE_FORMAT_LC4'), 'UTC')); ?>
 									</td>
-									<td scope="row" class="has-context">
-										<?= $this->escape($item->endDate); ?>
-									</td>
-									<td scope="row" class="has-context">
-										<?= $this->escape($item->summary); ?>
+									<td class="d-none d-md-table-cell">
+										<?= $this->escape(HTMLHelper::_('date', $item->endDate, Text::_('DATE_FORMAT_LC4'), 'UTC')); ?>
 									</td>
 								</tr>
 							<?php endforeach; ?>

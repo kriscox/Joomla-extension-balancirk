@@ -95,12 +95,13 @@ class HtmlView extends BaseHtmlView
             Text::_('COM_BALANCIRK_HOLIDAY_PAGE_TITLE_' . ($isNew ? 'ADD_HOLIDAY' : 'EDIT_HOLIDAY'))
         );
 
-        if ($canDo->get('core.create')) {
-            if ($isNew) {
-                $toolbar->apply('holiday.save');
-            } else {
-                $toolbar->apply('holiday.save');
-            }
+        $canSave = $isNew
+            ? $canDo->get('core.create')
+            : ($canDo->get('core.edit') || $canDo->get('core.create'));
+
+        if ($canSave) {
+            $toolbar->apply('holiday.apply');
+            $toolbar->save('holiday.save');
         }
 
         $toolbar->cancel('holiday.cancel', 'JTOOLBAR_CLOSE');

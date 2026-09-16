@@ -1,30 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form>
-	<fieldset>
-		<field name="id"
-			type="number"
+	<fieldset name="details" label="COM_BALANCIRK_HOLIDAY_TAB_DETAILS">
+		<field
+			name="id"
+			type="hidden"
 			label="COM_BALANCIRK_TABLE_TABLEHEAD_ID"
 			class="readonly"
 			readonly="true" />
-		<field name="year"
-			type="number"
-			label="COM_BALANCIRK_TABLE_TABLEHEAD_YEAR"
-			maxlength="4"
-			required="true" />
-		<field name="startDate"
-			type="calendar"
-			label="COM_BALANCIRK_TABLE_TABLEHEAD_START"
-			maxlength="10"
-			required="true" />
-		<field name="endDate"
-			type="calendar"
-			label="COM_BALANCIRK_TABLE_TABLEHEAD_END"
-			maxlength="10"
-			required="true" />
-		<field name="summary"
+		<field
+			name="summary"
 			type="text"
 			label="COM_BALANCIRK_TABLE_TABLEHEAD_SUMMARY"
+			description="COM_BALANCIRK_HOLIDAY_SUMMARY_DESC"
 			maxlength="100"
+			required="true" />
+		<field
+			name="year"
+			type="number"
+			label="COM_BALANCIRK_HOLIDAY_FIELD_YEAR"
+			description="COM_BALANCIRK_HOLIDAY_YEAR_DESC"
+			min="2000"
+			max="2100"
+			step="1"
+			required="true" />
+		<field
+			name="startDate"
+			type="calendar"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_START_HOLIDAY"
+			description="COM_BALANCIRK_HOLIDAY_START_DESC"
+			showtime="false"
+			translateformat="true"
+			format="%Y-%m-%d"
+			required="true" />
+		<field
+			name="endDate"
+			type="calendar"
+			label="COM_BALANCIRK_TABLE_TABLEHEAD_END_HOLIDAY"
+			description="COM_BALANCIRK_HOLIDAY_END_DESC"
+			showtime="false"
+			translateformat="true"
+			format="%Y-%m-%d"
 			required="true" />
 	</fieldset>
 </form>

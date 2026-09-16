@@ -63,7 +63,7 @@
 			element="com_balancirk" 
 			link="index.php?option=com_balancirk&amp;view=holidays" 
 			quicktask="index.php?option=com_balancirk&amp;task=holiday.add"
-			quicktask-title="COM_BALANCIRK_MENU_ADD_TYPE"
+			quicktask-title="COM_BALANCIRK_MENU_ADD_HOLIDAY"
 		/>
 	</menuitem>
 </menu>

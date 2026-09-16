@@ -15,9 +15,7 @@ namespace CoCoCo\Component\Balancirk\Administrator\Model;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Form\Form;
 use Joomla\CMS\Table\Table;
-use Jooma\CMS\CMSApplicationInterface;
 
 /**
  * Item model for Holiday.
@@ -53,13 +51,14 @@ class HolidayModel extends AdminModel
      */
     protected function canDelete($record)
     {
-        if (!empty($record->id)) {
-            $app = Factory::getApplication();
-
-            return $app->getIdentity()->authorise('core.delete', 'com_balancirk.holiday.' . (int) $record->id);
+        if (empty($record->id)) {
+            return false;
         }
 
-        return false;
+        $user = Factory::getApplication()->getIdentity();
+
+        return $user->authorise('core.delete', 'com_balancirk')
+            || $user->authorise('core.admin', 'com_balancirk');
     }
 
     /**
@@ -126,6 +125,7 @@ class HolidayModel extends AdminModel
         if (empty($form)) {
             return false;
         }
+
         return $form;
     }
 

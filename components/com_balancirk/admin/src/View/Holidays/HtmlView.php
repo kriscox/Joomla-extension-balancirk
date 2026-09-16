@@ -115,9 +115,9 @@ class HtmlView extends BaseHtmlView
             $toolbar->addNew('holiday.add');
         }
 
-        if ($this->state->get('filter.published') == -2 && $canDo->get('core.delete')) {
+        if ($canDo->get('core.delete')) {
             $toolbar->delete('holidays.delete')
-                ->text('JTOOLBAR_EMPTY_TRASH')
+                ->text('JTOOLBAR_DELETE')
                 ->message('JGLOBAL_CONFIRM_DELETE')
                 ->listCheck(true);
         }
