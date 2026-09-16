@@ -103,7 +103,7 @@ $doc->addScriptOptions('lesson-script', [
 	'presencesUrl' => $presencesUrl,
 ]);
 
-$students = $this->get('Students') ?: [];
+$students = $this->get('PresenceStudents') ?: [];
 $data = [];
 $data['id'] = (int) ($item->id ?? 0);
 
@@ -114,7 +114,15 @@ if ($form) {
 
 	if ($studentsField) {
 		foreach ($students as $student) {
-			$studentsField->addOption($student->firstname . " " . $student->name, ['value' => $student->id]);
+			$label = $student->firstname . ' ' . $student->name;
+			$option = ['value' => $student->id];
+
+			if ((int) ($student->on_waiting_list ?? 0) === 1) {
+				$label .= ' (' . Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_WAITINGLIST') . ')';
+				$option['class'] = 'waiting-list-student';
+			}
+
+			$studentsField->addOption($label, $option);
 		}
 	}
 }
