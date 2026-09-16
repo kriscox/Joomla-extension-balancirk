@@ -20,7 +20,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\Table\Table;
-use CoCoCo\Component\Balancirk\Administrator\Model\HolidaysModel;
+use CoCoCo\Component\Balancirk\Site\Helper\HolidayHelper;
 use CoCoCo\Component\Balancirk\Site\Helper\LesdaysHelper;
 use CoCoCo\Component\Balancirk\Site\Table\LessonTable;
 
@@ -724,16 +724,21 @@ class LessonModel extends AdminModel
             return false;
         }
 
+        $isoRanges = [];
+
         foreach ($holidayRanges as $range) {
             $start = self::parseLessonDate(is_array($range) ? ($range['start'] ?? null) : null);
             $end = self::parseLessonDate(is_array($range) ? ($range['end'] ?? null) : null);
 
-            if ($start instanceof DateTime && $end instanceof DateTime && $parsed >= $start && $parsed <= $end) {
-                return true;
+            if ($start instanceof DateTime && $end instanceof DateTime) {
+                $isoRanges[] = [
+                    'start' => $start->format('Y-m-d'),
+                    'end' => $end->format('Y-m-d'),
+                ];
             }
         }
 
-        return false;
+        return HolidayHelper::containsIsoDate($parsed->format('Y-m-d'), $isoRanges);
     }
 
     /**
@@ -750,9 +755,9 @@ class LessonModel extends AdminModel
     {
         $ranges = [];
 
-        foreach ($this->loadHolidayRows($from, $to) as $row) {
-            $start = self::parseLessonDate($row->startDate ?? $row->start_date ?? null);
-            $end = self::parseLessonDate($row->endDate ?? $row->end_date ?? null);
+        foreach ($this->getHolidayIsoRanges($from, $to) as $range) {
+            $start = self::parseLessonDate($range['start'] ?? null);
+            $end = self::parseLessonDate($range['end'] ?? null);
 
             if ($start instanceof DateTime && $end instanceof DateTime) {
                 $ranges[] = ['start' => $start, 'end' => $end];
@@ -765,6 +770,9 @@ class LessonModel extends AdminModel
     /**
      * Holiday ranges overlapping a period, as ISO date pairs for the picker.
      *
+     * Reads `#__balancirk_holidays`. When no period is given, load holidays
+     * around today so the picker can still grey vacation days.
+     *
      * @param   DateTime|null  $from  Period start.
      * @param   DateTime|null  $to    Period end.
      *
@@ -774,33 +782,6 @@ class LessonModel extends AdminModel
      */
     public function getHolidayIsoRanges(?DateTime $from = null, ?DateTime $to = null): array
     {
-        $ranges = [];
-
-        foreach ($this->getHolidayRanges($from, $to) as $range) {
-            $ranges[] = [
-                'start' => $range['start']->format('Y-m-d'),
-                'end' => $range['end']->format('Y-m-d'),
-            ];
-        }
-
-        return $ranges;
-    }
-
-    /**
-     * Load holiday rows overlapping a period.
-     *
-     * When no period is given, load holidays around today so the picker can
-     * still grey vacation days.
-     *
-     * @param   DateTime|null  $from  Period start.
-     * @param   DateTime|null  $to    Period end.
-     *
-     * @return  object[]
-     *
-     * @since   1.3.24
-     */
-    private function loadHolidayRows(?DateTime $from, ?DateTime $to): array
-    {
         try {
             if (!$from instanceof DateTime || !$to instanceof DateTime) {
                 $from = new DateTime('today');
@@ -809,17 +790,11 @@ class LessonModel extends AdminModel
                 $to->modify('+18 months');
             }
 
-            $db = $this->getDatabase();
-            $query = $db->getQuery(true)
-                ->select([
-                    $db->quoteName('startDate', 'startDate'),
-                    $db->quoteName('endDate', 'endDate'),
-                ])
-                ->from($db->quoteName('#__balancirk_holidays'))
-                ->where($db->quoteName('startDate') . ' <= ' . $db->quote($to->format('Y-m-d')))
-                ->where($db->quoteName('endDate') . ' >= ' . $db->quote($from->format('Y-m-d')));
-
-            return $db->setQuery($query)->loadObjectList() ?: [];
+            return HolidayHelper::loadOverlappingRanges(
+                $this->getDatabase(),
+                $from->format('Y-m-d'),
+                $to->format('Y-m-d')
+            );
         } catch (\Throwable $exception) {
             return [];
         }

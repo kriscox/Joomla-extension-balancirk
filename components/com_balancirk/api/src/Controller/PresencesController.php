@@ -17,6 +17,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\ApiController;
 use Joomla\CMS\Response\JsonResponse;
 use Joomla\Database\DatabaseInterface;
+use CoCoCo\Component\Balancirk\Site\Helper\HolidayHelper;
 use CoCoCo\Component\Balancirk\Site\Model\LessonModel;
 
 /**
@@ -222,11 +223,24 @@ class PresencesController extends ApiController
             return false;
         }
 
+        $from = LessonModel::parseLessonDate($lesson->start ?? null);
+        $to = LessonModel::parseLessonDate($lesson->end ?? null);
+        $holidays = [];
+
+        if ($from instanceof \DateTime && $to instanceof \DateTime) {
+            $holidays = HolidayHelper::loadOverlappingRanges(
+                $db,
+                $from->format('Y-m-d'),
+                $to->format('Y-m-d')
+            );
+        }
+
         return LessonModel::isValidAttendanceDate(
             $date,
             $lesson->start ?? null,
             $lesson->end ?? null,
-            (int) ($lesson->lesdays ?? 0)
+            (int) ($lesson->lesdays ?? 0),
+            $holidays
         );
     }
 }
