@@ -16,6 +16,7 @@ The Angular member SPA is developed separately on the `Single-page-site-ontwikke
 
 - Write **code comments** and **in-repository documentation** (README sections, inline notes in source) in **English**. User-facing Joomla language strings stay in their locale files.
 - **`balancirk_changelog.xml` entries must be in English.**
+- If a bug looks caused by **incorrect stored data**, say so first and do **not** rewrite or invent those values in application code. The data owner corrects the rows. Example: a school year from September to June must be stored across two calendar years (`2026-09-01` .. `2027-06-30`); do not move an inverted end date such as `2026-06-30` in PHP.
 
 ## Packages & testing
 
