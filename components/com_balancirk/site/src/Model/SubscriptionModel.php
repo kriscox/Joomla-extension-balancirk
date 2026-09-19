@@ -17,6 +17,7 @@ use RuntimeException;
 use CoCoCo\Component\Balancirk\Site\Helper\AccountingExportHelper;
 use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
 use CoCoCo\Component\Balancirk\Site\Helper\SubscriptionMailHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\WaitlistPromotionHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
@@ -350,6 +351,8 @@ class SubscriptionModel extends AdminModel
      */
     public function delete(&$pks)
     {
+        $subscription = $this->loadSubscriptionForDelete($pks);
+
         $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->delete($db->quoteName('#__balancirk_subscriptions'));
@@ -380,7 +383,81 @@ class SubscriptionModel extends AdminModel
 
         $db->setQuery($query)->execute();
 
+        if ($subscription && (int) ($subscription->subscribed ?? 1) === 0) {
+            $this->promoteWaitingList((int) $subscription->lesson, 1);
+        }
+
         return true;
+    }
+
+    /**
+     * Promote the oldest waiting-list students for a lesson.
+     *
+     * @param   int  $lessonId  Lesson id.
+     * @param   int  $limit     Maximum students to promote.
+     *
+     * @return  object[]
+     *
+     * @since   1.3.24
+     */
+    public function promoteWaitingList(int $lessonId, int $limit = 1): array
+    {
+        $rows = WaitlistPromotionHelper::promoteFromWaitingList($this->getDatabase(), $lessonId, $limit);
+
+        foreach ($rows as $row) {
+            try {
+                $lesson = $this->loadLesson((int) ($row->lesson ?? $lessonId));
+
+                if ($lesson) {
+                    $this->sendPromotionMails($lesson, (int) ($row->student ?? 0));
+                }
+            } catch (\Throwable $exception) {
+                // The promotion is stored. Mail must not turn a successful promote into a fatal error.
+            }
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Load the subscription that will be deleted.
+     *
+     * @param   mixed  $pks  Subscription id or student/lesson pair.
+     *
+     * @return  object|null
+     *
+     * @since   1.3.24
+     */
+    private function loadSubscriptionForDelete(mixed $pks): ?object
+    {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select($db->quoteName(['id', 'student', 'lesson', 'subscribed']))
+            ->from($db->quoteName('#__balancirk_subscriptions'));
+
+        if (is_array($pks) && isset($pks['student'], $pks['lesson'])) {
+            $studentId = (int) $pks['student'];
+            $lessonId = (int) $pks['lesson'];
+
+            if ($studentId <= 0 || $lessonId <= 0) {
+                return null;
+            }
+
+            $query->where($db->quoteName('student') . ' = ' . $studentId)
+                ->where($db->quoteName('lesson') . ' = ' . $lessonId);
+        } else {
+            $id = (int) (is_array($pks) ? ($pks['id'] ?? reset($pks)) : $pks);
+
+            if ($id <= 0) {
+                return null;
+            }
+
+            $query->where($db->quoteName('id') . ' = ' . $id);
+        }
+
+        $row = $db->setQuery($query)->loadObject();
+
+        return $row ?: null;
     }
 
     /**
@@ -558,6 +635,52 @@ class SubscriptionModel extends AdminModel
     }
 
     /**
+     * Send waitlist-promotion mails to the student's parents.
+     *
+     * @param   object  $lesson     Lesson record.
+     * @param   int     $studentId  Student id.
+     *
+     * @return  void
+     *
+     * @since   1.3.24
+     */
+    private function sendPromotionMails(object $lesson, int $studentId): void
+    {
+        if ($studentId <= 0) {
+            return;
+        }
+
+        $student = $this->loadStudent($studentId);
+
+        if (!$student) {
+            return;
+        }
+
+        $mailDefaults = $this->getSubscriptionMailDefaults();
+        $subscriptionDate = date('Y-m-d');
+
+        foreach ($this->loadParentMembers($studentId) as $member) {
+            if (empty($member->email)) {
+                continue;
+            }
+
+            $message = SubscriptionMailHelper::buildPromotionMailMessage(
+                $lesson,
+                $student,
+                $member,
+                $subscriptionDate,
+                $mailDefaults
+            );
+            $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+            $mailer->setSender('info@balancirk.be', 'Circusatelier Balancirk VZW')
+                ->addRecipient($member->email)
+                ->setSubject($message['subject'])
+                ->setBody($message['body'])
+                ->Send();
+        }
+    }
+
+    /**
      * Count students already enrolled in a lesson (not on the waiting list).
      *
      * @param   int  $lessonId  Lesson id.
@@ -618,6 +741,8 @@ class SubscriptionModel extends AdminModel
             'subscription_body' => (string) $params->get('email_body_subscription', ''),
             'waitinglist_subject' => (string) $params->get('email_subject_waitinglist', ''),
             'waitinglist_body' => (string) $params->get('email_body_waitinglist', ''),
+            'promotion_subject' => (string) $params->get('email_subject_promotion', ''),
+            'promotion_body' => (string) $params->get('email_body_promotion', ''),
         ];
     }
 

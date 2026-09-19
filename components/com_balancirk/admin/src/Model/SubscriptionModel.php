@@ -17,6 +17,7 @@ use CoCoCo\Component\Balancirk\Site\Helper\AccountingExportHelper;
 use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
 use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 use CoCoCo\Component\Balancirk\Site\Helper\SubscriptionMailHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\WaitlistPromotionHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
@@ -485,6 +486,52 @@ class SubscriptionModel extends AdminModel
     }
 
     /**
+     * Send waitlist-promotion mails to the student's parents.
+     *
+     * @param   object  $lesson     Lesson record.
+     * @param   int     $studentId  Student id.
+     *
+     * @return  void
+     *
+     * @since   1.3.24
+     */
+    private function sendPromotionMails(object $lesson, int $studentId): void
+    {
+        if ($studentId <= 0) {
+            return;
+        }
+
+        $student = $this->loadStudent($studentId);
+
+        if (!$student) {
+            return;
+        }
+
+        $mailDefaults = $this->getSubscriptionMailDefaults();
+        $subscriptionDate = date('Y-m-d');
+
+        foreach ($this->loadParentMembers($studentId) as $member) {
+            if (empty($member->email)) {
+                continue;
+            }
+
+            $message = SubscriptionMailHelper::buildPromotionMailMessage(
+                $lesson,
+                $student,
+                $member,
+                $subscriptionDate,
+                $mailDefaults
+            );
+            $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+            $mailer->setSender('info@balancirk.be', 'Circusatelier Balancirk VZW')
+                ->addRecipient($member->email)
+                ->setSubject($message['subject'])
+                ->setBody($message['body'])
+                ->Send();
+        }
+    }
+
+    /**
      * Count subscriptions already linked to a lesson.
      *
      * @param   int  $lessonId  Lesson id.
@@ -544,6 +591,8 @@ class SubscriptionModel extends AdminModel
             'subscription_body' => (string) $params->get('email_body_subscription', ''),
             'waitinglist_subject' => (string) $params->get('email_subject_waitinglist', ''),
             'waitinglist_body' => (string) $params->get('email_body_waitinglist', ''),
+            'promotion_subject' => (string) $params->get('email_subject_promotion', ''),
+            'promotion_body' => (string) $params->get('email_body_promotion', ''),
         ];
     }
 
@@ -569,6 +618,9 @@ class SubscriptionModel extends AdminModel
             return false;
         }
 
+        $wasEnrolled = (int) ($subscription->subscribed ?? 1) === 0;
+        $lessonId = (int) ($subscription->lesson ?? 0);
+
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
 
@@ -577,7 +629,47 @@ class SubscriptionModel extends AdminModel
             ->where($db->quoteName('lesson') . ' = ' . $subscription->lesson);
         $db->setQuery($query)->execute();
 
+        if ($wasEnrolled && $lessonId > 0) {
+            $promoted = $this->promoteWaitingList($lessonId, 1);
+
+            if ($promoted !== []) {
+                Factory::getApplication()->enqueueMessage(
+                    Text::sprintf('COM_BALANCIRK_WAITLIST_N_PROMOTED', count($promoted)),
+                    'success'
+                );
+            }
+        }
+
         return true;
+    }
+
+    /**
+     * Promote the oldest waiting-list students for a lesson.
+     *
+     * @param   int  $lessonId  Lesson id.
+     * @param   int  $limit     Maximum students to promote.
+     *
+     * @return  object[]
+     *
+     * @since   1.3.24
+     */
+    public function promoteWaitingList(int $lessonId, int $limit = 1): array
+    {
+        $rows = WaitlistPromotionHelper::promoteFromWaitingList($this->getDatabase(), $lessonId, $limit);
+
+        foreach ($rows as $row) {
+            try {
+                $lesson = $this->loadLesson((int) ($row->lesson ?? $lessonId));
+
+                if ($lesson) {
+                    $this->sendPromotionMails($lesson, (int) ($row->student ?? 0));
+                }
+            } catch (\Throwable $exception) {
+                // The promotion is stored. Mail must not turn a successful promote into a fatal error.
+            }
+        }
+
+        return $rows;
     }
 
     /**

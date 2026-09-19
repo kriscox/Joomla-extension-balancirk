@@ -20,6 +20,7 @@ use Joomla\CMS\Table\Table;
 use Jooma\CMS\CMSApplicationInterface;
 use Joomla\CMS\Application\CMSApplication;
 use CoCoCo\Component\Balancirk\Site\Helper\LesdaysHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\WaitlistPromotionHelper;
 
 /**
  * Item model for lesson.
@@ -453,9 +454,13 @@ class LessonModel extends AdminModel
     {
         $syncTeachers = \array_key_exists('teachers', $data);
         $teacherIds = $syncTeachers ? $this->normalizeTeacherIds((array) ($data['teachers'] ?? [])) : [];
-        unset($data['teachers'], $data['teachers_sync']);
+        $promoteWaitlist = (int) ($data['promote_waitlist'] ?? 0);
+        unset($data['teachers'], $data['teachers_sync'], $data['promote_waitlist']);
 
         $lessonId = (int) ($this->getState('lesson.id') ?: $data['id'] ?? 0);
+        $previousMax = $this->getStoredMaxStudents($lessonId);
+        $newMax = \array_key_exists('max_students', $data) ? (int) $data['max_students'] : $previousMax;
+
         if ($syncTeachers && $lessonId > 0 && !$this->canSyncTeachers($lessonId, $teacherIds)) {
             return false;
         }
@@ -465,11 +470,125 @@ class LessonModel extends AdminModel
         }
 
         $lessonId = (int) ($this->getState('lesson.id') ?: $data['id'] ?? 0);
+        $this->handleCapacityChange($lessonId, $previousMax, $newMax, $promoteWaitlist);
+
         if ($syncTeachers && $lessonId > 0) {
             return $this->saveTeachers($lessonId, $teacherIds);
         }
 
         return true;
+    }
+
+    /**
+     * Load the stored max_students value for a lesson.
+     *
+     * @param   int  $lessonId  Lesson id.
+     *
+     * @return  int|null
+     *
+     * @since   1.3.24
+     */
+    protected function getStoredMaxStudents(int $lessonId): ?int
+    {
+        if ($lessonId <= 0) {
+            return null;
+        }
+
+        try {
+            return WaitlistPromotionHelper::loadMaxStudents($this->getDatabase(), $lessonId);
+        } catch (\Throwable $exception) {
+            return null;
+        }
+    }
+
+    /**
+     * Warn on capacity decrease or promote waitlist after a confirmed increase.
+     *
+     * @param   int       $lessonId         Lesson id.
+     * @param   int|null  $previousMax      Stored max_students before save.
+     * @param   int|null  $newMax           Posted max_students.
+     * @param   int       $promoteWaitlist  1 to promote after a real increase.
+     *
+     * @return  void
+     *
+     * @since   1.3.24
+     */
+    protected function handleCapacityChange(int $lessonId, ?int $previousMax, ?int $newMax, int $promoteWaitlist): void
+    {
+        if ($lessonId <= 0 || $previousMax === null || $newMax === null) {
+            return;
+        }
+
+        if ($newMax < $previousMax) {
+            $this->warnIfCapacityBelowEnrolled($lessonId, $newMax);
+
+            return;
+        }
+
+        if ($newMax > $previousMax && $promoteWaitlist === 1) {
+            $this->promoteWaitlistAfterCapacityIncrease($lessonId);
+        }
+    }
+
+    /**
+     * Warn when the new capacity is below the current enrolled count.
+     *
+     * @param   int  $lessonId  Lesson id.
+     * @param   int  $newMax    New max_students.
+     *
+     * @return  void
+     *
+     * @since   1.3.24
+     */
+    protected function warnIfCapacityBelowEnrolled(int $lessonId, int $newMax): void
+    {
+        try {
+            $enrolled = WaitlistPromotionHelper::countByStatus($this->getDatabase(), $lessonId, 0);
+        } catch (\Throwable $exception) {
+            return;
+        }
+
+        if ($enrolled > $newMax) {
+            Factory::getApplication()->enqueueMessage(
+                Text::_('COM_BALANCIRK_LESSON_CAPACITY_BELOW_ENROLLED'),
+                'warning'
+            );
+        }
+    }
+
+    /**
+     * Promote waiting-list students after a confirmed capacity increase.
+     *
+     * @param   int  $lessonId  Lesson id.
+     *
+     * @return  int  Number of promoted students.
+     *
+     * @since   1.3.24
+     */
+    protected function promoteWaitlistAfterCapacityIncrease(int $lessonId): int
+    {
+        try {
+            $model = $this->getMVCFactory()->createModel('Subscription', 'Administrator', ['ignore_request' => true]);
+
+            if (!$model instanceof SubscriptionModel) {
+                return 0;
+            }
+
+            $promoted = $model->promoteWaitingList($lessonId, PHP_INT_MAX);
+        } catch (\Throwable $exception) {
+            return 0;
+        }
+
+        $count = count($promoted);
+
+        if ($count > 0) {
+            Factory::getApplication()->enqueueMessage(
+                Text::sprintf('COM_BALANCIRK_WAITLIST_N_PROMOTED', $count),
+                'success'
+            );
+        }
+
+        return $count;
     }
 
     /**

@@ -104,6 +104,8 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_lessons` (
     `subscription_email_body` text DEFAULT NULL,
     `waitinglist_email_subject` varchar(255) DEFAULT NULL,
     `waitinglist_email_body` text DEFAULT NULL,
+    `promotion_email_subject` varchar(255) DEFAULT NULL,
+    `promotion_email_body` text DEFAULT NULL,
     `lesdays` int(11) DEFAULT NULL COMMENT '64 = maandag, \n32 = dinsdag, \n16 = woensdag, \n8 = donderdag, \n4 = vrijdag, \n2 = zaterdag, \n1 = zondag',
     `state` char(15) NOT NULL,
     `ordering` int(11) NOT NULL DEFAULT 0,

@@ -129,6 +129,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
         $this->ensureDefaultGroupsAndPermissions();
         $this->removeObsoleteSpaArtifacts();
         $this->migrateTeachedTeacherForeignKey();
+        $this->ensurePromotionEmailColumns();
 
         return true;
     }
@@ -201,6 +202,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
             $this->ensureDefaultGroupsAndPermissions();
             $this->removeObsoleteSpaArtifacts();
             $this->migrateTeachedTeacherForeignKey();
+            $this->ensurePromotionEmailColumns();
         }
 
         return true;
@@ -277,6 +279,47 @@ class Com_BalancirkInstallerScript extends InstallerScript
         {
             Log::add(
                 'Balancirk: could not migrate fk_teached_teacher to composite key: ' . $e->getMessage(),
+                Log::WARNING,
+                'jerror'
+            );
+        }
+    }
+
+    /**
+     * Add promotion email columns when a same-version upgrade skips schema SQL.
+     *
+     * Safe to run repeatedly: skips columns that already exist.
+     *
+     * @return  void
+     *
+     * @since   1.3.24
+     */
+    private function ensurePromotionEmailColumns(): void
+    {
+        try {
+            /** @var \Joomla\Database\DatabaseDriver $db */
+            $db = Factory::getContainer()->get('DatabaseDriver');
+            $table = $db->replacePrefix('#__balancirk_lessons');
+            $columns = $db->setQuery('SHOW COLUMNS FROM ' . $db->quoteName($table))->loadColumn() ?: [];
+
+            if (!in_array('promotion_email_subject', $columns, true)) {
+                $db->setQuery(
+                    'ALTER TABLE ' . $db->quoteName($table)
+                    . ' ADD COLUMN ' . $db->quoteName('promotion_email_subject')
+                    . ' varchar(255) DEFAULT NULL AFTER ' . $db->quoteName('waitinglist_email_body')
+                )->execute();
+            }
+
+            if (!in_array('promotion_email_body', $columns, true)) {
+                $db->setQuery(
+                    'ALTER TABLE ' . $db->quoteName($table)
+                    . ' ADD COLUMN ' . $db->quoteName('promotion_email_body')
+                    . ' text DEFAULT NULL AFTER ' . $db->quoteName('promotion_email_subject')
+                )->execute();
+            }
+        } catch (\Throwable $e) {
+            Log::add(
+                'Balancirk: could not add promotion email columns: ' . $e->getMessage(),
                 Log::WARNING,
                 'jerror'
             );

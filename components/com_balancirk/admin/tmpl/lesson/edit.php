@@ -10,6 +10,7 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Router\Route;
@@ -18,6 +19,21 @@ use Joomla\CMS\Session\Session;
 
 HTMLHelper::_('behavior.formvalidator');
 HTMLHelper::_('behavior.keepalive');
+
+$document = Factory::getApplication()->getDocument();
+$document->getWebAssetManager()->registerAndUseScript(
+	'balancirk-lesson-waitlist',
+	'media/com_balancirk/js/balancirk_lesson_waitlist.js',
+	['version' => 'auto']
+);
+$document->addScriptOptions('balancirk-lesson-waitlist', [
+	'originalMaxStudents' => (int) ($this->item->max_students ?? 0),
+	'enrolledCount' => count($this->subscribedStudents ?? []),
+	'waitingCount' => count($this->waitingListStudents ?? []),
+	'confirmTemplate' => Text::_('COM_BALANCIRK_LESSON_PROMOTE_WAITLIST_CONFIRM'),
+	'yesLabel' => Text::_('JYES'),
+	'noLabel' => Text::_('JNO'),
+]);
 
 ?>
 
@@ -79,6 +95,8 @@ HTMLHelper::_('behavior.keepalive');
 				<?= $this->form->renderField('subscription_email_body'); ?>
 				<?= $this->form->renderField('waitinglist_email_subject'); ?>
 				<?= $this->form->renderField('waitinglist_email_body'); ?>
+				<?= $this->form->renderField('promotion_email_subject'); ?>
+				<?= $this->form->renderField('promotion_email_body'); ?>
 			</div>
 		</div>
 		<?= HTMLHelper::_('uitab.endTab'); ?>
@@ -229,5 +247,23 @@ HTMLHelper::_('behavior.keepalive');
 		<?= HTMLHelper::_('uitab.endTabSet'); ?>
 	</div>
 	<input type="hidden" name="task" value="">
+	<input type="hidden" name="jform[promote_waitlist]" id="jform_promote_waitlist" value="0" />
+	<div class="modal fade" id="balancirk-promote-waitlist-modal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-body">
+					<p id="balancirk-promote-waitlist-message" class="mb-0"></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" id="balancirk-promote-waitlist-no" data-bs-dismiss="modal">
+						<?= Text::_('JNO'); ?>
+					</button>
+					<button type="button" class="btn btn-outline-secondary" id="balancirk-promote-waitlist-yes" data-bs-dismiss="modal">
+						<?= Text::_('JYES'); ?>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<?= HTMLHelper::_('form.token'); ?>
 </form>

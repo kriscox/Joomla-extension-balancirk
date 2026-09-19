@@ -63,6 +63,46 @@ class SubscriptionMailHelper
     }
 
     /**
+     * Build a rendered subject/body pair for a waitlist-promotion mail.
+     *
+     * Invoice hint uses the enrolled (not waiting-list) wording.
+     *
+     * @param   object  $lesson            Lesson record.
+     * @param   object  $student           Student record.
+     * @param   object  $member            Member record.
+     * @param   string  $subscriptionDate  Subscription date in Y-m-d format.
+     * @param   array   $defaults          Default subject/body templates.
+     *
+     * @return  array{subject:string, body:string}
+     *
+     * @since   1.3.24
+     */
+    public static function buildPromotionMailMessage(
+        object $lesson,
+        object $student,
+        object $member,
+        string $subscriptionDate,
+        array $defaults = []
+    ): array {
+        $subjectTemplate = self::resolveTemplate(
+            $lesson->promotion_email_subject ?? null,
+            $defaults['promotion_subject'] ?? null,
+            self::getDefaultPromotionSubjectTemplate()
+        );
+        $bodyTemplate = self::resolveTemplate(
+            $lesson->promotion_email_body ?? null,
+            $defaults['promotion_body'] ?? null,
+            self::getDefaultPromotionBodyTemplate()
+        );
+        $context = self::buildContext($lesson, $student, $member, $subscriptionDate, false);
+
+        return [
+            'subject' => self::renderTemplate($subjectTemplate, $context),
+            'body' => self::renderTemplate($bodyTemplate, $context),
+        ];
+    }
+
+    /**
      * Build placeholder context values.
      *
      * @param   object  $lesson            Lesson record.
@@ -237,6 +277,42 @@ Hallo {member_firstname},
 Bedankt voor de inschrijving van {student_firstname} voor "{lesson_name}".
 
 De lessenreeks start op {lesson_start_date}.
+
+{invoice_hint}
+
+Met vriendelijke groeten,
+
+Het Balancirk team
+TEXT;
+    }
+
+    /**
+     * Get the default promotion subject template.
+     *
+     * @return  string
+     *
+     * @since   1.3.24
+     */
+    public static function getDefaultPromotionSubjectTemplate(): string
+    {
+        return 'Plaats vrij in les "{lesson_name}"';
+    }
+
+    /**
+     * Get the default promotion body template.
+     *
+     * @return  string
+     *
+     * @since   1.3.24
+     */
+    public static function getDefaultPromotionBodyTemplate(): string
+    {
+        return <<<TEXT
+Hallo {member_firstname},
+
+Goed nieuws: {student_firstname} is van de wachtlijst naar een vaste plaats in "{lesson_name}" verplaatst.
+
+De lessenreeks loopt van {lesson_start_date} tot {lesson_end_date}.
 
 {invoice_hint}
 

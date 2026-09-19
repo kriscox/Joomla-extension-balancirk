@@ -29,6 +29,19 @@
 			rows="10"
 			default="Hallo {member_firstname},&#10;&#10;Bedankt voor de inschrijving van {student_firstname} voor &quot;{lesson_name}&quot;.&#10;&#10;Deze inschrijving staat momenteel op de wachtlijst.&#10;&#10;{invoice_hint}&#10;&#10;Met vriendelijke groeten,&#10;&#10;Het Balancirk team"
 			filter="raw" />
+		<field name="email_subject_promotion"
+			type="text"
+			label="COM_BALANCIRK_EMAIL_SUBJECT_PROMOTION_LABEL"
+			description="COM_BALANCIRK_EMAIL_TEMPLATE_DESCRIPTION"
+			default="Plaats vrij in les &quot;{lesson_name}&quot;"
+			filter="raw" />
+		<field name="email_body_promotion"
+			type="textarea"
+			label="COM_BALANCIRK_EMAIL_BODY_PROMOTION_LABEL"
+			description="COM_BALANCIRK_EMAIL_TEMPLATE_DESCRIPTION"
+			rows="10"
+			default="Hallo {member_firstname},&#10;&#10;Goed nieuws: {student_firstname} is van de wachtlijst naar een vaste plaats in &quot;{lesson_name}&quot; verplaatst.&#10;&#10;De lessenreeks loopt van {lesson_start_date} tot {lesson_end_date}.&#10;&#10;{invoice_hint}&#10;&#10;Met vriendelijke groeten,&#10;&#10;Het Balancirk team"
+			filter="raw" />
 	</fieldset>
 	<fieldset name="permissions"
 		label="JCONFIG_PERMISSIONS_LABEL"
