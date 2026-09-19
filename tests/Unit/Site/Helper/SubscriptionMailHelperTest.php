@@ -205,4 +205,61 @@ final class SubscriptionMailHelperTest extends TestCase
         $this->assertSame('Global subject Acro', $mail['subject']);
         $this->assertSame('Global body for Els', $mail['body']);
     }
+
+    public function testBuildPromotionMailMessageUsesLessonSpecificTemplates(): void
+    {
+        $lesson = (object) [
+            'name' => 'Acro',
+            'start' => '2026-09-10',
+            'end' => '2027-05-20',
+            'promotion_email_subject' => 'Plaats vrij {lesson_name}',
+            'promotion_email_body' => '{student_firstname} mag naar {lesson_name}',
+        ];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $mail = SubscriptionMailHelper::buildPromotionMailMessage($lesson, $student, $member, '2026-08-20');
+
+        $this->assertSame('Plaats vrij Acro', $mail['subject']);
+        $this->assertSame('Lena mag naar Acro', $mail['body']);
+    }
+
+    public function testBuildPromotionMailMessageFallsBackToDefaultTemplates(): void
+    {
+        $lesson = (object) [
+            'name' => 'Acro',
+            'start' => '2026-09-10',
+            'end' => '2027-05-20',
+        ];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $mail = SubscriptionMailHelper::buildPromotionMailMessage($lesson, $student, $member, '2026-08-20');
+
+        $this->assertStringContainsString('Acro', $mail['subject']);
+        $this->assertStringContainsString('wachtlijst', $mail['body']);
+        $this->assertStringContainsString('Lena', $mail['body']);
+    }
+
+    public function testPromotionInvoiceHintUsesEnrolledWording(): void
+    {
+        $lesson = (object) [
+            'name' => 'Acro',
+            'start' => '2026-09-10',
+            'end' => '2027-05-20',
+            'promotion_email_body' => '{invoice_hint}',
+        ];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $mail = SubscriptionMailHelper::buildPromotionMailMessage($lesson, $student, $member, '2026-08-20');
+
+        $this->assertStringNotContainsString('wachtlijst', strtolower($mail['body']));
+    }
+
+    public function testGetDefaultPromotionTemplatesMentionMoveFromWaitingList(): void
+    {
+        $this->assertStringContainsString('{lesson_name}', SubscriptionMailHelper::getDefaultPromotionSubjectTemplate());
+        $this->assertStringContainsString('wachtlijst', SubscriptionMailHelper::getDefaultPromotionBodyTemplate());
+    }
 }

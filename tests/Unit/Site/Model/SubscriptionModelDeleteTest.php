@@ -246,6 +246,40 @@ class SubscriptionModelDeleteTest extends TestCase
         $this->assertStringContainsString('99', implode(' ', $whereClauses));
     }
 
+    /**
+     * Deleting an enrolled row must request one waitlist promotion.
+     *
+     * @return void
+     */
+    public function testDeletePromotesWhenEnrolledRowIsRemoved(): void
+    {
+        $promoteCalls = [];
+        $row = (object) ['id' => 42, 'student' => 7, 'lesson' => 3, 'subscribed' => 0];
+        $db = $this->makeDeleteDb(subscription: $row);
+        $model = $this->makePromotingModel($db, $promoteCalls);
+        $pks = 42;
+
+        $this->assertTrue($model->delete($pks));
+        $this->assertSame([[3, 1]], $promoteCalls);
+    }
+
+    /**
+     * Deleting a waiting-list row must not promote anyone.
+     *
+     * @return void
+     */
+    public function testDeleteDoesNotPromoteWhenWaitingListRowIsRemoved(): void
+    {
+        $promoteCalls = [];
+        $row = (object) ['id' => 42, 'student' => 7, 'lesson' => 3, 'subscribed' => 1];
+        $db = $this->makeDeleteDb(subscription: $row);
+        $model = $this->makePromotingModel($db, $promoteCalls);
+        $pks = 42;
+
+        $this->assertTrue($model->delete($pks));
+        $this->assertSame([], $promoteCalls);
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
@@ -284,6 +318,37 @@ class SubscriptionModelDeleteTest extends TestCase
     }
 
     /**
+     * Create a SubscriptionModel that records promoteWaitingList() calls.
+     *
+     * @param   object  $db            Fake database.
+     * @param   array   &$promoteCalls Receives [lessonId, limit] pairs.
+     *
+     * @return  SubscriptionModel
+     */
+    private function makePromotingModel(object $db, array &$promoteCalls): SubscriptionModel
+    {
+        return new class ($db, $promoteCalls) extends SubscriptionModel {
+            public function __construct(
+                private readonly object $db,
+                private array &$promoteCalls
+            ) {
+            }
+
+            public function getDatabase(): object
+            {
+                return $this->db;
+            }
+
+            public function promoteWaitingList(int $lessonId, int $limit = 1): array
+            {
+                $this->promoteCalls[] = [$lessonId, $limit];
+
+                return [];
+            }
+        };
+    }
+
+    /**
      * Build a fake DB sufficient for delete() queries.
      *
      * The query builder captures WHERE clauses; $executed is set to true on execute().
@@ -293,11 +358,39 @@ class SubscriptionModelDeleteTest extends TestCase
      *
      * @return  object
      */
-    private function makeDeleteDb(array &$whereClauses = [], bool &$executed = false): object
-    {
+    private function makeDeleteDb(
+        array &$whereClauses = [],
+        bool &$executed = false,
+        ?object $subscription = null
+    ): object {
         $qb = new class ($whereClauses) {
             public function __construct(private array &$whereClauses)
             {
+            }
+
+            public function select(mixed $c): static
+            {
+                return $this;
+            }
+
+            public function from(mixed $t): static
+            {
+                return $this;
+            }
+
+            public function update(mixed $t): static
+            {
+                return $this;
+            }
+
+            public function set(mixed $s): static
+            {
+                return $this;
+            }
+
+            public function order(mixed $o): static
+            {
+                return $this;
             }
 
             public function delete(mixed $t): static
@@ -313,10 +406,11 @@ class SubscriptionModelDeleteTest extends TestCase
             }
         };
 
-        return new class ($qb, $executed) {
+        return new class ($qb, $executed, $subscription) {
             public function __construct(
                 private readonly object $qb,
-                private bool &$executed
+                private bool &$executed,
+                private readonly ?object $subscription
             ) {
             }
 
@@ -334,7 +428,7 @@ class SubscriptionModelDeleteTest extends TestCase
                 return "`$n`";
             }
 
-            public function setQuery(mixed $q): static
+            public function setQuery(mixed $q, int $offset = 0, int $limit = 0): static
             {
                 return $this;
             }
@@ -346,7 +440,12 @@ class SubscriptionModelDeleteTest extends TestCase
 
             public function loadObject(): ?object
             {
-                return null;
+                return $this->subscription;
+            }
+
+            public function loadObjectList(): array
+            {
+                return [];
             }
 
             public function loadResult(): mixed

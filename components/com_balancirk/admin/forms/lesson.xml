@@ -83,6 +83,17 @@
 			description="COM_BALANCIRK_LESSON_EMAIL_TEMPLATE_DESCRIPTION"
 			rows="10"
 			filter="raw" />
+		<field name="promotion_email_subject"
+			type="text"
+			label="COM_BALANCIRK_LESSON_EMAIL_SUBJECT_PROMOTION_LABEL"
+			description="COM_BALANCIRK_LESSON_EMAIL_TEMPLATE_DESCRIPTION"
+			filter="raw" />
+		<field name="promotion_email_body"
+			type="textarea"
+			label="COM_BALANCIRK_LESSON_EMAIL_BODY_PROMOTION_LABEL"
+			description="COM_BALANCIRK_LESSON_EMAIL_TEMPLATE_DESCRIPTION"
+			rows="10"
+			filter="raw" />
 		<field name="lesdays_field"
 			type="checkboxes"
 			label="COM_BALANCIRK_TABLE_TABLEHEAD_LESDAYS"

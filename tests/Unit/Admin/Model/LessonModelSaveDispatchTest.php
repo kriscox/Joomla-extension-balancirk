@@ -223,5 +223,129 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
 
             $this->assertFalse($model->save(['id' => 5, 'teachers' => [1]]));
         }
+
+        /**
+         * Unchanged max_students must not warn or promote.
+         *
+         * @return void
+         */
+        public function testSaveDoesNotPromoteWhenMaxStudentsUnchanged(): void
+        {
+            $promoted = false;
+            $warned = false;
+
+            $model = $this->makeCapacityModel(10, $promoted, $warned);
+
+            $this->assertTrue($model->save(['id' => 5, 'max_students' => 10]));
+            $this->assertFalse($promoted);
+            $this->assertFalse($warned);
+        }
+
+        /**
+         * Lowering max_students must warn and never promote.
+         *
+         * @return void
+         */
+        public function testSaveWarnsAndDoesNotPromoteWhenMaxStudentsDecreased(): void
+        {
+            $promoted = false;
+            $warned = false;
+
+            $model = $this->makeCapacityModel(10, $promoted, $warned);
+
+            $this->assertTrue($model->save(['id' => 5, 'max_students' => 8]));
+            $this->assertTrue($warned);
+            $this->assertFalse($promoted);
+        }
+
+        /**
+         * Increasing capacity without the confirm flag must leave the waitlist as-is.
+         *
+         * @return void
+         */
+        public function testSaveDoesNotPromoteWhenCapacityIncreasedWithoutFlag(): void
+        {
+            $promoted = false;
+            $warned = false;
+
+            $model = $this->makeCapacityModel(10, $promoted, $warned);
+
+            $this->assertTrue($model->save(['id' => 5, 'max_students' => 12]));
+            $this->assertFalse($promoted);
+            $this->assertFalse($warned);
+        }
+
+        /**
+         * Increasing capacity with promote_waitlist=1 must promote.
+         *
+         * @return void
+         */
+        public function testSavePromotesWhenCapacityIncreasedAndFlagSet(): void
+        {
+            $promoted = false;
+            $warned = false;
+
+            $model = $this->makeCapacityModel(10, $promoted, $warned);
+
+            $this->assertTrue($model->save([
+                'id' => 5,
+                'max_students' => 12,
+                'promote_waitlist' => 1,
+            ]));
+            $this->assertTrue($promoted);
+            $this->assertFalse($warned);
+        }
+
+        /**
+         * Build a lesson model that records capacity-side effects.
+         *
+         * @param   int   $storedMax  Previous max_students.
+         * @param   bool  &$promoted  Set when promote is requested.
+         * @param   bool  &$warned    Set when a capacity-down warning is requested.
+         *
+         * @return  AdminLessonModel
+         */
+        private function makeCapacityModel(int $storedMax, bool &$promoted, bool &$warned): AdminLessonModel
+        {
+            return new class ($storedMax, $promoted, $warned) extends AdminLessonModel {
+                public function __construct(
+                    private readonly int $storedMax,
+                    private bool &$promoted,
+                    private bool &$warned
+                ) {
+                }
+
+                public function getState($property = null, $default = null): mixed
+                {
+                    if ($property === 'lesson.id') {
+                        return 5;
+                    }
+
+                    return $default;
+                }
+
+                protected function getStoredMaxStudents(int $lessonId): ?int
+                {
+                    return $this->storedMax;
+                }
+
+                protected function saveLessonRecord(array $data): bool
+                {
+                    return true;
+                }
+
+                protected function warnIfCapacityBelowEnrolled(int $lessonId, int $newMax): void
+                {
+                    $this->warned = true;
+                }
+
+                protected function promoteWaitlistAfterCapacityIncrease(int $lessonId): int
+                {
+                    $this->promoted = true;
+
+                    return 1;
+                }
+            };
+        }
     }
 }
