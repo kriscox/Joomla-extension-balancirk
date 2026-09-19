@@ -216,4 +216,13 @@
 			<item>The holiday list sorts and deletes against the actual holiday date columns.</item>
 		</change>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.25</version>
+		<change>
+			<item>When an enrolled student is removed, the oldest waiting-list student is promoted into the freed seat and receives a configurable promotion email.</item>
+			<item>Increasing a lesson's max students asks whether to promote waiting-list students into the new seats (default No). Lowering capacity only warns; nobody is moved back to the waiting list.</item>
+		</change>
+	</changelog>
 </changelogs>
