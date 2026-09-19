@@ -160,6 +160,24 @@ class LessonModel extends AdminModel
             return false;
         }
 
+        $start = (string) ($validData['start'] ?? '');
+        $end = (string) ($validData['end'] ?? '');
+
+        if ($start !== '' && $end !== '' && $start > $end) {
+            $this->setError(Text::_('COM_BALANCIRK_LESSON_DATES_INVALID'));
+
+            return false;
+        }
+
+        $startRegistration = (string) ($validData['start_registration'] ?? '');
+        $endRegistration = (string) ($validData['end_registration'] ?? '');
+
+        if ($startRegistration !== '' && $endRegistration !== '' && $startRegistration > $endRegistration) {
+            $this->setError(Text::_('COM_BALANCIRK_LESSON_REGISTRATION_DATES_INVALID'));
+
+            return false;
+        }
+
         return $validData;
     }
 
