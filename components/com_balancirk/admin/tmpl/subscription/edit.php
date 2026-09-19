@@ -25,6 +25,7 @@ HTMLHelper::_('behavior.keepalive');
 				<div class="card-body">
 					<?= $this->form->renderField('student'); ?>
 					<?= $this->form->renderField('lesson'); ?>
+					<?= $this->form->renderField('override_age'); ?>
 					<p class="text-muted"><?= Text::_('COM_BALANCIRK_SUBSCRIPTION_ADMIN_HELP'); ?></p>
 				</div>
 			</div>

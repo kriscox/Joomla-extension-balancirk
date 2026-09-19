@@ -260,8 +260,14 @@ class SubscriptionModel extends AdminModel
             return false;
         }
 
-        if (!$this->isStudentEligibleForLesson($studentId, $lesson)) {
-            $this->setError(Text::_('COM_BALANCIRK_SUBSCRIPTION_AGE_MISMATCH'));
+        $overrideAge = (int) ($data['override_age'] ?? 0) === 1;
+
+        if (!$overrideAge && !$this->isStudentEligibleForLesson($studentId, $lesson)) {
+            $this->setError(
+                Text::_('COM_BALANCIRK_SUBSCRIPTION_AGE_MISMATCH')
+                . ' '
+                . Text::_('COM_BALANCIRK_SUBSCRIPTION_AGE_OVERRIDE_HINT')
+            );
 
             return false;
         }

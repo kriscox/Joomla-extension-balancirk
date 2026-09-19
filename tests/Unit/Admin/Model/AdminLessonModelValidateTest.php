@@ -181,9 +181,83 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
             $this->assertFalse($result, 'max_age < min_age must be rejected');
         }
 
+        /**
+         * Equal lesson start/end dates are valid (one-day period).
+         *
+         * @return void
+         */
+        public function testValidatePassesThroughWhenLessonEndEqualsStart(): void
+        {
+            $data = [
+                'start' => '2026-09-01',
+                'end' => '2026-09-01',
+                'start_registration' => '2026-08-01',
+                'end_registration' => '2026-08-31',
+            ];
+            $result = $this->makeModel()->validate(null, $data);
+
+            $this->assertSame($data, $result);
+        }
+
+        /**
+         * An inverted lesson period must be rejected.
+         *
+         * @return void
+         */
+        #[RunInSeparateProcess]
+        #[PreserveGlobalState(false)]
+        public function testValidateReturnsFalseWhenLessonEndBeforeStart(): void
+        {
+            $this->defineTextStub();
+
+            $result = $this->makeModel()->validate(null, [
+                'start' => '2026-09-01',
+                'end' => '2026-06-30',
+                'start_registration' => '2026-08-01',
+                'end_registration' => '2026-08-31',
+            ]);
+
+            $this->assertFalse($result, 'lesson end before start must be rejected');
+        }
+
+        /**
+         * An inverted registration window must be rejected.
+         *
+         * @return void
+         */
+        #[RunInSeparateProcess]
+        #[PreserveGlobalState(false)]
+        public function testValidateReturnsFalseWhenRegistrationEndBeforeStart(): void
+        {
+            $this->defineTextStub();
+
+            $result = $this->makeModel()->validate(null, [
+                'start' => '2026-09-01',
+                'end' => '2027-06-30',
+                'start_registration' => '2026-08-31',
+                'end_registration' => '2026-08-01',
+            ]);
+
+            $this->assertFalse($result, 'registration end before start must be rejected');
+        }
+
         // -----------------------------------------------------------------------
         // Helpers
         // -----------------------------------------------------------------------
+
+        /**
+         * Define a minimal Text stub if not already defined.
+         * Must only be called inside a #[RunInSeparateProcess] test method.
+         *
+         * @return void
+         */
+        private function defineTextStub(): void
+        {
+            if (!class_exists(\Joomla\CMS\Language\Text::class)) {
+                // phpcs:ignore Squiz.PHP.Eval.Discouraged
+                eval('namespace Joomla\\CMS\\Language; class Text { public static function _(string $k): string { return $k; } }');
+            }
+        }
 
         /**
          * Create a concrete AdminLessonModel instance with a minimal constructor.
