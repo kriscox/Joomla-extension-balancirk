@@ -186,7 +186,9 @@ class SettingsController extends ApiController
         }
 
         if (array_key_exists('redirect_url', $data)) {
-            $changes['redirect_url'] = max(0, (int) $data['redirect_url']);
+            // Ignore menu root (id 1) and non-positive values; those break post-register redirects.
+            $redirectMenuId = (int) $data['redirect_url'];
+            $changes['redirect_url'] = $redirectMenuId > 1 ? $redirectMenuId : 0;
         }
 
         return $changes;

@@ -109,17 +109,22 @@ class MemberController extends FormController
             // Rmove the form data in the session, using a unique identifier
             $app->setUserState('com_balancirk.member.data', null);
 
-            // Get the redirect URL from the configuration
-            $menuItemId = ComponentHelper::getParams('com_balancirk')->get('redirect_url', false);
+            // Get the redirect URL from the configuration.
+            // Menu root is always id 1 and has an empty link; treating it as a
+            // redirect target yields "Component not found".
+            $menuItemId = (int) ComponentHelper::getParams('com_balancirk')->get('redirect_url', 0);
+            $menuItem = $menuItemId > 1 ? $app->getMenu()->getItem($menuItemId) : null;
+            // Site menu items are already filtered to published entries; do not
+            // require a published flag that may be unset on the runtime object.
+            $canRedirectToMenu = $menuItem && !empty($menuItem->link);
 
-            if ($menuItemId)
+            if ($canRedirectToMenu)
             {
-                // If the redirect URL is set, use it
-                $redirectUrl = Route::_('index.php?Itemid=' . (int) $menuItemId, false);
+                $redirectUrl = Route::_('index.php?Itemid=' . $menuItemId, false);
             }
             else
             {
-                // Otherwise, redirect to the homepage
+                // Fall back to the site homepage when config is empty/invalid
                 $redirectUrl = Route::_('/', false);
             }
         }

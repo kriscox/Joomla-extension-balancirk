@@ -63,7 +63,8 @@
 			label="COM_BALANCIRK_REGISTRATION_REDIRECT_URL_LABEL"
 			description="COM_BALANCIRK_REGISTRATION_REDIRECT_URL_DESCRIPTION"
 			required="false"
-			menu_type="hiddenMenu" />
+			clientid="0"
+			disable="separator,alias,heading,url" />
 		<field name="mutuality_options"
 			type="textarea"
 			label="COM_BALANCIRK_MUTUALITY_OPTIONS_LABEL"
