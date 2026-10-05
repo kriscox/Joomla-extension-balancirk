@@ -221,6 +221,23 @@ class LessonModelTest extends TestCase
         $this->assertSame('2026-09-09 00:00:00', $parsed?->format('Y-m-d H:i:s'));
     }
 
+    public function testParseLessonDateUnwrapsArrayDateKey(): void
+    {
+        $parsed = LessonModel::parseLessonDate(['date' => '2026-09-09 14:30:00']);
+
+        $this->assertInstanceOf(\DateTime::class, $parsed);
+        $this->assertSame('2026-09-09', $parsed->format('Y-m-d'));
+    }
+
+    public function testParseLessonDateUnwrapsObjectDateProperty(): void
+    {
+        $wrapper = (object) ['date' => '2026-09-15 00:00:00'];
+        $parsed = LessonModel::parseLessonDate($wrapper);
+
+        $this->assertInstanceOf(\DateTime::class, $parsed);
+        $this->assertSame('2026-09-15', $parsed->format('Y-m-d'));
+    }
+
     public function testIsValidLessonPeriodAcceptsBelgianFormattedDates(): void
     {
         $this->assertTrue(LessonModel::isValidLessonPeriod('01/09/2026', '30/06/2027'));
