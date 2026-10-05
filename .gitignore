@@ -19,5 +19,10 @@ packages/*.zip
 
 # Dependencies and environment
 vendor/
+node_modules/
+frontend/
 .env.test
 tests/reports/
+
+# Local IDE leftovers
+*.code-workspace
