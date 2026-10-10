@@ -130,6 +130,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
         $this->removeObsoleteSpaArtifacts();
         $this->migrateTeachedTeacherForeignKey();
         $this->ensurePromotionEmailColumns();
+        $this->ensureRegistrationLifecycleColumns();
 
         return true;
     }
@@ -203,6 +204,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
             $this->removeObsoleteSpaArtifacts();
             $this->migrateTeachedTeacherForeignKey();
             $this->ensurePromotionEmailColumns();
+            $this->ensureRegistrationLifecycleColumns();
         }
 
         return true;
@@ -320,6 +322,85 @@ class Com_BalancirkInstallerScript extends InstallerScript
         } catch (\Throwable $e) {
             Log::add(
                 'Balancirk: could not add promotion email columns: ' . $e->getMessage(),
+                Log::WARNING,
+                'jerror'
+            );
+        }
+    }
+
+    /**
+     * Add registration_closed and lifecycle email columns when schema SQL is skipped.
+     *
+     * @return  void
+     *
+     * @since   1.3.25
+     */
+    private function ensureRegistrationLifecycleColumns(): void
+    {
+        try {
+            /** @var \Joomla\Database\DatabaseDriver $db */
+            $db = Factory::getContainer()->get('DatabaseDriver');
+            $table = $db->replacePrefix('#__balancirk_lessons');
+            $columns = $db->setQuery('SHOW COLUMNS FROM ' . $db->quoteName($table))->loadColumn() ?: [];
+
+            $additions = [
+                'registration_closed' => 'TINYINT(1) NOT NULL DEFAULT 0 AFTER ' . $db->quoteName('max_students'),
+                'yearstart_email_subject' => 'varchar(255) DEFAULT NULL AFTER ' . $db->quoteName('promotion_email_body'),
+                'yearstart_email_body' => 'text DEFAULT NULL AFTER ' . $db->quoteName('yearstart_email_subject'),
+                'rejection_email_subject' => 'varchar(255) DEFAULT NULL AFTER ' . $db->quoteName('yearstart_email_body'),
+                'rejection_email_body' => 'text DEFAULT NULL AFTER ' . $db->quoteName('rejection_email_subject'),
+                'cancellation_email_subject' => 'varchar(255) DEFAULT NULL AFTER ' . $db->quoteName('rejection_email_body'),
+                'cancellation_email_body' => 'text DEFAULT NULL AFTER ' . $db->quoteName('cancellation_email_subject'),
+            ];
+
+            foreach ($additions as $column => $definition) {
+                if (in_array($column, $columns, true)) {
+                    continue;
+                }
+
+                $db->setQuery(
+                    'ALTER TABLE ' . $db->quoteName($table)
+                    . ' ADD COLUMN ' . $db->quoteName($column) . ' ' . $definition
+                )->execute();
+                $columns[] = $column;
+            }
+
+            // Refresh lessons_complete view so registration_closed is available.
+            $db->setQuery(
+                'CREATE OR REPLACE VIEW ' . $db->quoteName($db->replacePrefix('#__balancirk_lessons_complete')) . ' AS
+SELECT a.`id`,
+    a.`name`,
+    b.`name` AS `type`,
+    a.`fee`,
+    a.`year`,
+    a.`start`,
+    a.`end`,
+    a.`start_registration`,
+    a.`end_registration`,
+    a.`state`,
+    a.`lesdays`,
+    a.`max_students`,
+    a.`registration_closed`,
+    a.`min_age`,
+    a.`max_age`,
+    (
+        SELECT COUNT(*)
+        FROM ' . $db->quoteName($db->replacePrefix('#__balancirk_subscriptions')) . '
+        WHERE `lesson` = a.`id`
+            AND `subscribed` = 0
+    ) AS `numberOfStudents`,
+    (
+        SELECT COUNT(*)
+        FROM ' . $db->quoteName($db->replacePrefix('#__balancirk_subscriptions')) . '
+        WHERE `lesson` = a.`id`
+            AND `subscribed` = 1
+    ) AS `numberOnWaitingList`
+FROM ' . $db->quoteName($table) . ' a
+    INNER JOIN ' . $db->quoteName($db->replacePrefix('#__balancirk_types')) . ' b ON a.`type` = b.`id`'
+            )->execute();
+        } catch (\Throwable $e) {
+            Log::add(
+                'Balancirk: could not add registration lifecycle columns: ' . $e->getMessage(),
                 Log::WARNING,
                 'jerror'
             );

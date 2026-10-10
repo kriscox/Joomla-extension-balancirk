@@ -21,6 +21,12 @@ use Jooma\CMS\CMSApplicationInterface;
 use Joomla\CMS\Application\CMSApplication;
 use CoCoCo\Component\Balancirk\Site\Helper\LesdaysHelper;
 use CoCoCo\Component\Balancirk\Site\Helper\WaitlistPromotionHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\WaitlistSettlementHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\LessonRegistrationHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\LessonCancellationHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\SubscriptionMailHelper;
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 
 /**
  * Item model for lesson.
@@ -759,5 +765,602 @@ class LessonModel extends AdminModel
             ->order($db->quoteName('a.name') . ' ASC, ' . $db->quoteName('a.firstname') . ' ASC');
 
         return $db->setQuery($query)->loadObjectList() ?: [];
+    }
+
+    /**
+     * Waiting list in FIFO order for year-start settlement UI/API.
+     *
+     * @param   int|null  $lessonId  Lesson id.
+     *
+     * @return  object[]
+     *
+     * @since   1.3.25
+     */
+    public function getWaitlistOrdered(?int $lessonId = null): array
+    {
+        $lessonId = $lessonId ?: (int) $this->getState('lesson.id');
+
+        if (!$lessonId) {
+            $lessonId = (int) ($this->getItem()->id ?? 0);
+        }
+
+        return WaitlistSettlementHelper::listWaitingOrdered($this->getDatabase(), $lessonId);
+    }
+
+    /**
+     * Settle waitlist: promote and/or dismiss selected subscription ids.
+     *
+     * @param   int    $lessonId             Lesson id.
+     * @param   int[]  $promoteIds           Subscription ids to enrol.
+     * @param   int[]  $dismissIds           Subscription ids to reject/delete.
+     * @param   bool   $confirmFifoOverride  Required when promote selection is not FIFO prefix.
+     * @param   bool   $closeRegistration    Close registrations after settle.
+     *
+     * @return  array{promoted:int, dismissed:int, closed:bool}|false
+     *
+     * @since   1.3.25
+     */
+    public function settleWaitlist(
+        int $lessonId,
+        array $promoteIds,
+        array $dismissIds,
+        bool $confirmFifoOverride = false,
+        bool $closeRegistration = true
+    ) {
+        if ($lessonId <= 0) {
+            $this->setError(Text::_('JLIB_APPLICATION_ERROR_SAVE_FAILED'));
+
+            return false;
+        }
+
+        $db = $this->getDatabase();
+        $waiting = WaitlistSettlementHelper::listWaitingOrdered($db, $lessonId);
+        $orderedIds = [];
+
+        foreach ($waiting as $row) {
+            $orderedIds[] = (int) $row->id;
+        }
+
+        $promoteIds = array_values(array_unique(array_filter(array_map('intval', $promoteIds))));
+        $dismissIds = array_values(array_unique(array_filter(array_map('intval', $dismissIds))));
+
+        if (array_intersect($promoteIds, $dismissIds) !== []) {
+            $this->setError(Text::_('COM_BALANCIRK_WAITLIST_SETTLE_OVERLAP'));
+
+            return false;
+        }
+
+        if ($promoteIds !== [] && !WaitlistSettlementHelper::isFifoPrefix($promoteIds, $orderedIds) && !$confirmFifoOverride) {
+            $this->setError(Text::_('COM_BALANCIRK_WAITLIST_SETTLE_FIFO_REQUIRED'));
+
+            return false;
+        }
+
+        $lesson = $this->loadLessonRow($lessonId);
+
+        if (!$lesson) {
+            $this->setError(Text::_('JLIB_APPLICATION_ERROR_SAVE_FAILED'));
+
+            return false;
+        }
+
+        $promoted = WaitlistSettlementHelper::promoteByIds($db, $lessonId, $promoteIds);
+        $dismissed = WaitlistSettlementHelper::dismissByIds($db, $lessonId, $dismissIds);
+
+        $mailDefaults = $this->getMailDefaults();
+        $today = date('Y-m-d');
+
+        foreach ($promoted as $row) {
+            $this->sendSettlementMails(
+                $lesson,
+                (int) $row->student,
+                $today,
+                $mailDefaults,
+                'yearstart'
+            );
+        }
+
+        foreach ($dismissed as $row) {
+            $this->sendSettlementMails(
+                $lesson,
+                (int) $row->student,
+                $today,
+                $mailDefaults,
+                'rejection'
+            );
+        }
+
+        $closed = false;
+
+        if ($closeRegistration) {
+            $closed = LessonRegistrationHelper::closeRegistration($db, $lessonId);
+        }
+
+        return [
+            'promoted' => count($promoted),
+            'dismissed' => count($dismissed),
+            'closed' => $closed,
+        ];
+    }
+
+    /**
+     * Close lesson registrations.
+     *
+     * @param   int  $lessonId  Lesson id.
+     *
+     * @return  bool
+     *
+     * @since   1.3.25
+     */
+    public function closeRegistration(int $lessonId): bool
+    {
+        return LessonRegistrationHelper::closeRegistration($this->getDatabase(), $lessonId);
+    }
+
+    /**
+     * Reopen lesson registrations.
+     *
+     * @param   int  $lessonId  Lesson id.
+     *
+     * @return  bool
+     *
+     * @since   1.3.25
+     */
+    public function reopenRegistration(int $lessonId): bool
+    {
+        return LessonRegistrationHelper::reopenRegistration($this->getDatabase(), $lessonId);
+    }
+
+    /**
+     * Build cancellation mail preview for enrolled students (and waiting list).
+     *
+     * @param   int  $lessonId  Lesson id.
+     *
+     * @return  array{lesson:object, enrolled:array, waiting:array}|false
+     *
+     * @since   1.3.25
+     */
+    public function getCancellationPreview(int $lessonId)
+    {
+        $lesson = $this->loadLessonRow($lessonId);
+
+        if (!$lesson) {
+            $this->setError(Text::_('JLIB_APPLICATION_ERROR_SAVE_FAILED'));
+
+            return false;
+        }
+
+        $db = $this->getDatabase();
+        $mailDefaults = $this->getMailDefaults();
+        $today = date('Y-m-d');
+
+        $enrolled = [];
+
+        foreach (LessonCancellationHelper::listEnrolledForCancellation($db, $lessonId) as $row) {
+            $enrolled[] = $this->buildRecipientPreview($lesson, $row, $today, $mailDefaults, 'cancellation');
+        }
+
+        $waiting = [];
+
+        foreach (LessonCancellationHelper::listWaitingForCancellation($db, $lessonId) as $row) {
+            $waiting[] = $this->buildRecipientPreview($lesson, $row, $today, $mailDefaults, 'rejection');
+        }
+
+        return [
+            'lesson' => $lesson,
+            'enrolled' => $enrolled,
+            'waiting' => $waiting,
+        ];
+    }
+
+    /**
+     * Cancel the lesson for the year, send personalized mails, remove enrolments and waitlist.
+     *
+     * @param   int    $lessonId          Lesson id.
+     * @param   array  $enrolledMessages  List of {subscription_id, member_id, subject, body}.
+     * @param   array  $waitingMessages   List of {subscription_id, member_id, subject, body} (optional dismiss).
+     * @param   bool   $dismissWaiting    Whether to dismiss waiting list after mails.
+     *
+     * @return  array{cancelled:bool, mailed:int, unenrolled:int, dismissed:int}|false
+     *
+     * @since   1.3.25
+     */
+    public function cancelLessonWithMails(
+        int $lessonId,
+        array $enrolledMessages,
+        array $waitingMessages = [],
+        bool $dismissWaiting = true
+    ) {
+        $lesson = $this->loadLessonRow($lessonId);
+
+        if (!$lesson) {
+            $this->setError(Text::_('JLIB_APPLICATION_ERROR_SAVE_FAILED'));
+
+            return false;
+        }
+
+        $db = $this->getDatabase();
+        LessonCancellationHelper::cancelLesson($db, $lessonId);
+
+        $mailed = 0;
+        $studentBySubscription = [];
+        $enrolledRows = LessonCancellationHelper::listEnrolledForCancellation($db, $lessonId);
+        $enrolledIds = [];
+
+        foreach ($enrolledRows as $row) {
+            $studentBySubscription[(int) $row->subscription_id] = (int) $row->student;
+            $enrolledIds[] = (int) $row->subscription_id;
+        }
+
+        $coveredEnrolled = [];
+
+        foreach ($enrolledMessages as $message) {
+            $subscriptionId = (int) ($message['subscription_id'] ?? 0);
+            $memberId = (int) ($message['member_id'] ?? 0);
+            $subject = (string) ($message['subject'] ?? '');
+            $body = (string) ($message['body'] ?? '');
+            $studentId = $studentBySubscription[$subscriptionId] ?? 0;
+
+            if ($studentId <= 0 || $subject === '' || $body === '') {
+                continue;
+            }
+
+            $coveredEnrolled[$subscriptionId] = true;
+
+            if ($this->sendCustomMailToMember($lesson, $studentId, $memberId, $subject, $body, 'cancellation')) {
+                $mailed++;
+            }
+        }
+
+        $mailDefaults = $this->getMailDefaults();
+        $today = date('Y-m-d');
+
+        foreach ($enrolledRows as $row) {
+            if (isset($coveredEnrolled[(int) $row->subscription_id])) {
+                continue;
+            }
+
+            $this->sendSettlementMails($lesson, (int) $row->student, $today, $mailDefaults, 'cancellation');
+            $mailed++;
+        }
+
+        $unenrolledRows = LessonCancellationHelper::dismissEnrolledByIds($db, $lessonId, $enrolledIds);
+        $unenrolled = count($unenrolledRows);
+
+        $dismissed = 0;
+
+        if ($dismissWaiting) {
+            $waitingRows = LessonCancellationHelper::listWaitingForCancellation($db, $lessonId);
+            $waitingIds = [];
+            $coveredSubscriptions = [];
+
+            foreach ($waitingRows as $row) {
+                $waitingIds[] = (int) $row->subscription_id;
+                $studentBySubscription[(int) $row->subscription_id] = (int) $row->student;
+            }
+
+            foreach ($waitingMessages as $message) {
+                $subscriptionId = (int) ($message['subscription_id'] ?? 0);
+                $memberId = (int) ($message['member_id'] ?? 0);
+                $subject = (string) ($message['subject'] ?? '');
+                $body = (string) ($message['body'] ?? '');
+                $studentId = $studentBySubscription[$subscriptionId] ?? 0;
+
+                if ($studentId <= 0 || $subject === '' || $body === '') {
+                    continue;
+                }
+
+                $coveredSubscriptions[$subscriptionId] = true;
+
+                if ($this->sendCustomMailToMember($lesson, $studentId, $memberId, $subject, $body, 'rejection')) {
+                    $mailed++;
+                }
+            }
+
+            foreach ($waitingRows as $row) {
+                $subscriptionId = (int) $row->subscription_id;
+
+                if (isset($coveredSubscriptions[$subscriptionId])) {
+                    continue;
+                }
+
+                $this->sendSettlementMails($lesson, (int) $row->student, $today, $mailDefaults, 'rejection');
+                $mailed++;
+            }
+
+            $dismissedRows = WaitlistSettlementHelper::dismissByIds($db, $lessonId, $waitingIds);
+            $dismissed = count($dismissedRows);
+        }
+
+        return [
+            'cancelled' => true,
+            'mailed' => $mailed,
+            'unenrolled' => $unenrolled,
+            'dismissed' => $dismissed,
+        ];
+    }
+
+    /**
+     * @param   int  $lessonId  Lesson id.
+     *
+     * @return  object|null
+     *
+     * @since   1.3.25
+     */
+    private function loadLessonRow(int $lessonId): ?object
+    {
+        if ($lessonId <= 0) {
+            return null;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('*')
+            ->from($db->quoteName('#__balancirk_lessons'))
+            ->where($db->quoteName('id') . ' = ' . $lessonId);
+        $lesson = $db->setQuery($query)->loadObject();
+
+        return $lesson ?: null;
+    }
+
+    /**
+     * @return  array<string, string>
+     *
+     * @since   1.3.25
+     */
+    private function getMailDefaults(): array
+    {
+        $params = ComponentHelper::getParams('com_balancirk');
+
+        return [
+            'yearstart_subject' => (string) $params->get('email_subject_yearstart', ''),
+            'yearstart_body' => (string) $params->get('email_body_yearstart', ''),
+            'rejection_subject' => (string) $params->get('email_subject_rejection', ''),
+            'rejection_body' => (string) $params->get('email_body_rejection', ''),
+            'cancellation_subject' => (string) $params->get('email_subject_cancellation', ''),
+            'cancellation_body' => (string) $params->get('email_body_cancellation', ''),
+        ];
+    }
+
+    /**
+     * @param   object  $lesson        Lesson.
+     * @param   object  $row           Subscription/student row.
+     * @param   string  $today         Date Y-m-d.
+     * @param   array   $mailDefaults  Defaults.
+     * @param   string  $type          cancellation|rejection.
+     *
+     * @return  array
+     *
+     * @since   1.3.25
+     */
+    private function buildRecipientPreview(
+        object $lesson,
+        object $row,
+        string $today,
+        array $mailDefaults,
+        string $type
+    ): array {
+        $student = (object) [
+            'firstname' => $row->firstname ?? '',
+            'name' => $row->name ?? '',
+        ];
+        $recipients = [];
+
+        foreach (LessonCancellationHelper::loadParentMembers($this->getDatabase(), (int) $row->student) as $member) {
+            if ($type === 'rejection') {
+                $message = SubscriptionMailHelper::buildRejectionMailMessage(
+                    $lesson,
+                    $student,
+                    $member,
+                    $today,
+                    $mailDefaults
+                );
+            } else {
+                $message = SubscriptionMailHelper::buildCancellationMailMessage(
+                    $lesson,
+                    $student,
+                    $member,
+                    $today,
+                    $mailDefaults
+                );
+            }
+
+            $recipients[] = [
+                'member_id' => (int) $member->id,
+                'member_name' => trim(($member->firstname ?? '') . ' ' . ($member->name ?? '')),
+                'email' => (string) ($member->email ?? ''),
+                'subject' => $message['subject'],
+                'body' => $message['body'],
+            ];
+        }
+
+        return [
+            'subscription_id' => (int) $row->subscription_id,
+            'student_id' => (int) $row->student,
+            'student_name' => trim(($row->firstname ?? '') . ' ' . ($row->name ?? '')),
+            'recipients' => $recipients,
+        ];
+    }
+
+    /**
+     * @param   object  $lesson        Lesson.
+     * @param   int     $studentId     Student id.
+     * @param   string  $today         Date.
+     * @param   array   $mailDefaults  Defaults.
+     * @param   string  $type          yearstart|rejection.
+     *
+     * @return  void
+     *
+     * @since   1.3.25
+     */
+    private function sendSettlementMails(
+        object $lesson,
+        int $studentId,
+        string $today,
+        array $mailDefaults,
+        string $type
+    ): void {
+        $student = $this->loadStudentRow($studentId);
+
+        if (!$student) {
+            return;
+        }
+
+        foreach (LessonCancellationHelper::loadParentMembers($this->getDatabase(), $studentId) as $member) {
+            if (empty($member->email)) {
+                continue;
+            }
+
+            try {
+                if ($type === 'rejection') {
+                    $message = SubscriptionMailHelper::buildRejectionMailMessage(
+                        $lesson,
+                        $student,
+                        $member,
+                        $today,
+                        $mailDefaults
+                    );
+                } elseif ($type === 'cancellation') {
+                    $message = SubscriptionMailHelper::buildCancellationMailMessage(
+                        $lesson,
+                        $student,
+                        $member,
+                        $today,
+                        $mailDefaults
+                    );
+                } else {
+                    $message = SubscriptionMailHelper::buildYearstartPromotionMailMessage(
+                        $lesson,
+                        $student,
+                        $member,
+                        $today,
+                        $mailDefaults
+                    );
+                }
+
+                $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+                $mailer->setSender('info@balancirk.be', 'Circusatelier Balancirk VZW')
+                    ->addRecipient($member->email)
+                    ->setSubject($message['subject'])
+                    ->setBody($message['body'])
+                    ->Send();
+            } catch (\Throwable $exception) {
+                // Mail failure must not roll back settlement.
+            }
+        }
+    }
+
+    /**
+     * Send a personalized mail; subject/body are used as templates (placeholders applied).
+     *
+     * @param   object  $lesson     Lesson.
+     * @param   int     $studentId  Student id.
+     * @param   int     $memberId   Parent member id (0 = all parents).
+     * @param   string  $subject    Subject template or final text.
+     * @param   string  $body       Body template or final text.
+     * @param   string  $type       cancellation|rejection.
+     *
+     * @return  bool  True if at least one mail was attempted.
+     *
+     * @since   1.3.25
+     */
+    private function sendCustomMailToMember(
+        object $lesson,
+        int $studentId,
+        int $memberId,
+        string $subject,
+        string $body,
+        string $type
+    ): bool {
+        $student = $this->loadStudentRow($studentId);
+
+        if (!$student) {
+            return false;
+        }
+
+        $sent = false;
+        $today = date('Y-m-d');
+
+        foreach (LessonCancellationHelper::loadParentMembers($this->getDatabase(), $studentId) as $member) {
+            if ($memberId > 0 && (int) $member->id !== $memberId) {
+                continue;
+            }
+
+            if (empty($member->email)) {
+                continue;
+            }
+
+            try {
+                if ($type === 'rejection') {
+                    $message = SubscriptionMailHelper::buildRejectionMailMessage(
+                        $lesson,
+                        $student,
+                        $member,
+                        $today,
+                        [
+                            'rejection_subject' => $subject,
+                            'rejection_body' => $body,
+                        ]
+                    );
+                    // Prefer exact personalized text when provided as already rendered.
+                    $message = [
+                        'subject' => SubscriptionMailHelper::renderTemplate(
+                            $subject,
+                            SubscriptionMailHelper::buildContext($lesson, $student, $member, $today, true)
+                        ),
+                        'body' => SubscriptionMailHelper::renderTemplate(
+                            $body,
+                            SubscriptionMailHelper::buildContext($lesson, $student, $member, $today, true)
+                        ),
+                    ];
+                } else {
+                    $message = [
+                        'subject' => SubscriptionMailHelper::renderTemplate(
+                            $subject,
+                            SubscriptionMailHelper::buildContext($lesson, $student, $member, $today, false)
+                        ),
+                        'body' => SubscriptionMailHelper::renderTemplate(
+                            $body,
+                            SubscriptionMailHelper::buildContext($lesson, $student, $member, $today, false)
+                        ),
+                    ];
+                }
+
+                $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+                $mailer->setSender('info@balancirk.be', 'Circusatelier Balancirk VZW')
+                    ->addRecipient($member->email)
+                    ->setSubject($message['subject'])
+                    ->setBody($message['body'])
+                    ->Send();
+                $sent = true;
+            } catch (\Throwable $exception) {
+                // Continue other recipients.
+            }
+        }
+
+        return $sent;
+    }
+
+    /**
+     * @param   int  $studentId  Student id.
+     *
+     * @return  object|null
+     *
+     * @since   1.3.25
+     */
+    private function loadStudentRow(int $studentId): ?object
+    {
+        if ($studentId <= 0) {
+            return null;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select('*')
+            ->from($db->quoteName('#__balancirk_students'))
+            ->where($db->quoteName('id') . ' = ' . $studentId);
+        $student = $db->setQuery($query)->loadObject();
+
+        return $student ?: null;
     }
 }

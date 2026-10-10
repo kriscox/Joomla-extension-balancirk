@@ -103,6 +103,135 @@ class SubscriptionMailHelper
     }
 
     /**
+     * Build a year-start (manual batch) promotion mail.
+     *
+     * @param   object  $lesson            Lesson record.
+     * @param   object  $student           Student record.
+     * @param   object  $member            Member record.
+     * @param   string  $subscriptionDate  Subscription date in Y-m-d format.
+     * @param   array   $defaults          Default subject/body templates.
+     *
+     * @return  array{subject:string, body:string}
+     *
+     * @since   1.3.25
+     */
+    public static function buildYearstartPromotionMailMessage(
+        object $lesson,
+        object $student,
+        object $member,
+        string $subscriptionDate,
+        array $defaults = []
+    ): array {
+        $subjectTemplate = self::resolveTemplate(
+            $lesson->yearstart_email_subject ?? null,
+            $defaults['yearstart_subject'] ?? null,
+            self::getDefaultYearstartPromotionSubjectTemplate()
+        );
+        $bodyTemplate = self::resolveTemplate(
+            $lesson->yearstart_email_body ?? null,
+            $defaults['yearstart_body'] ?? null,
+            self::getDefaultYearstartPromotionBodyTemplate()
+        );
+        $context = self::buildContext($lesson, $student, $member, $subscriptionDate, false);
+
+        return [
+            'subject' => self::renderTemplate($subjectTemplate, $context),
+            'body' => self::renderTemplate($bodyTemplate, $context),
+        ];
+    }
+
+    /**
+     * Build a waitlist rejection mail.
+     *
+     * @param   object  $lesson            Lesson record.
+     * @param   object  $student           Student record.
+     * @param   object  $member            Member record.
+     * @param   string  $subscriptionDate  Subscription date in Y-m-d format.
+     * @param   array   $defaults          Default subject/body templates.
+     *
+     * @return  array{subject:string, body:string}
+     *
+     * @since   1.3.25
+     */
+    public static function buildRejectionMailMessage(
+        object $lesson,
+        object $student,
+        object $member,
+        string $subscriptionDate,
+        array $defaults = []
+    ): array {
+        $subjectTemplate = self::resolveTemplate(
+            $lesson->rejection_email_subject ?? null,
+            $defaults['rejection_subject'] ?? null,
+            self::getDefaultRejectionSubjectTemplate()
+        );
+        $bodyTemplate = self::resolveTemplate(
+            $lesson->rejection_email_body ?? null,
+            $defaults['rejection_body'] ?? null,
+            self::getDefaultRejectionBodyTemplate()
+        );
+        $context = self::buildContext($lesson, $student, $member, $subscriptionDate, true);
+
+        return [
+            'subject' => self::renderTemplate($subjectTemplate, $context),
+            'body' => self::renderTemplate($bodyTemplate, $context),
+        ];
+    }
+
+    /**
+     * Build a lesson cancellation mail (optionally fully personalized subject/body).
+     *
+     * When $customSubject / $customBody are non-empty they are used as templates
+     * (placeholders still applied). Otherwise lesson → global → hardcoded defaults.
+     *
+     * @param   object       $lesson            Lesson record.
+     * @param   object       $student           Student record.
+     * @param   object       $member            Member record.
+     * @param   string       $subscriptionDate  Subscription date in Y-m-d format.
+     * @param   array        $defaults          Default subject/body templates.
+     * @param   string|null  $customSubject     Per-recipient subject override.
+     * @param   string|null  $customBody        Per-recipient body override.
+     *
+     * @return  array{subject:string, body:string}
+     *
+     * @since   1.3.25
+     */
+    public static function buildCancellationMailMessage(
+        object $lesson,
+        object $student,
+        object $member,
+        string $subscriptionDate,
+        array $defaults = [],
+        ?string $customSubject = null,
+        ?string $customBody = null
+    ): array {
+        $subjectTemplate = self::resolveTemplate(
+            $customSubject,
+            null,
+            self::resolveTemplate(
+                $lesson->cancellation_email_subject ?? null,
+                $defaults['cancellation_subject'] ?? null,
+                self::getDefaultCancellationSubjectTemplate()
+            )
+        );
+        $bodyTemplate = self::resolveTemplate(
+            $customBody,
+            null,
+            self::resolveTemplate(
+                $lesson->cancellation_email_body ?? null,
+                $defaults['cancellation_body'] ?? null,
+                self::getDefaultCancellationBodyTemplate()
+            )
+        );
+        $context = self::buildContext($lesson, $student, $member, $subscriptionDate, false);
+
+        return [
+            'subject' => self::renderTemplate($subjectTemplate, $context),
+            'body' => self::renderTemplate($bodyTemplate, $context),
+        ];
+    }
+
+    /**
      * Build placeholder context values.
      *
      * @param   object  $lesson            Lesson record.
@@ -315,6 +444,110 @@ Goed nieuws: {student_firstname} is van de wachtlijst naar een vaste plaats in "
 De lessenreeks loopt van {lesson_start_date} tot {lesson_end_date}.
 
 {invoice_hint}
+
+Met vriendelijke groeten,
+
+Het Balancirk team
+TEXT;
+    }
+
+    /**
+     * Default year-start promotion subject.
+     *
+     * @return  string
+     *
+     * @since   1.3.25
+     */
+    public static function getDefaultYearstartPromotionSubjectTemplate(): string
+    {
+        return 'Je bent ingeschreven voor "{lesson_name}"';
+    }
+
+    /**
+     * Default year-start promotion body.
+     *
+     * @return  string
+     *
+     * @since   1.3.25
+     */
+    public static function getDefaultYearstartPromotionBodyTemplate(): string
+    {
+        return <<<TEXT
+Hallo {member_firstname},
+
+Goed nieuws: {student_firstname} is definitief ingeschreven voor "{lesson_name}".
+
+De lessenreeks loopt van {lesson_start_date} tot {lesson_end_date}.
+
+{invoice_hint}
+
+Met vriendelijke groeten,
+
+Het Balancirk team
+TEXT;
+    }
+
+    /**
+     * Default waitlist rejection subject.
+     *
+     * @return  string
+     *
+     * @since   1.3.25
+     */
+    public static function getDefaultRejectionSubjectTemplate(): string
+    {
+        return 'Wachtlijst "{lesson_name}" — geen plaats';
+    }
+
+    /**
+     * Default waitlist rejection body.
+     *
+     * @return  string
+     *
+     * @since   1.3.25
+     */
+    public static function getDefaultRejectionBodyTemplate(): string
+    {
+        return <<<TEXT
+Hallo {member_firstname},
+
+Helaas kunnen we {student_firstname} dit schooljaar geen plaats bieden in "{lesson_name}".
+
+De inschrijving op de wachtlijst is daarom verwijderd.
+
+Met vriendelijke groeten,
+
+Het Balancirk team
+TEXT;
+    }
+
+    /**
+     * Default lesson cancellation subject.
+     *
+     * @return  string
+     *
+     * @since   1.3.25
+     */
+    public static function getDefaultCancellationSubjectTemplate(): string
+    {
+        return 'Les "{lesson_name}" is afgelast';
+    }
+
+    /**
+     * Default lesson cancellation body.
+     *
+     * @return  string
+     *
+     * @since   1.3.25
+     */
+    public static function getDefaultCancellationBodyTemplate(): string
+    {
+        return <<<TEXT
+Hallo {member_firstname},
+
+Helaas moeten we je laten weten dat de les "{lesson_name}" voor dit schooljaar is afgelast.
+
+We nemen contact op als er een alternatief is, of je kan ons mailen als je vragen hebt.
 
 Met vriendelijke groeten,
 
