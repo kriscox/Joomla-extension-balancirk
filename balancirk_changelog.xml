@@ -225,4 +225,15 @@
 			<item>Increasing a lesson's max students asks whether to promote waiting-list students into the new seats (default No). Lowering capacity only warns; nobody is moved back to the waiting list.</item>
 		</change>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.26</version>
+		<fix>
+			<item>Administrators can settle a lesson waiting list at year start: promote selected students into enrolled places (capacity may be exceeded) or reject them with a dedicated rejection email.</item>
+			<item>Deviating from FIFO waiting-list order requires an explicit confirmation.</item>
+			<item>Lessons can close registrations so the website shows them as full and blocks new enrolments.</item>
+			<item>An entire lesson can be cancelled for the school year with personalised notification mails; enrolled and waiting-list subscriptions are then removed.</item>
+		</fix>
+	</changelog>
 </changelogs>
