@@ -18,6 +18,7 @@ use CoCoCo\Component\Balancirk\Site\Helper\LessonAgeHelper;
 use CoCoCo\Component\Balancirk\Site\Helper\SchoolYearHelper;
 use CoCoCo\Component\Balancirk\Site\Helper\SubscriptionMailHelper;
 use CoCoCo\Component\Balancirk\Site\Helper\WaitlistPromotionHelper;
+use CoCoCo\Component\Balancirk\Site\Helper\LessonRegistrationHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
@@ -342,20 +343,7 @@ class SubscriptionModel extends AdminModel
      */
     private function isLessonOpenForRegistration(object $lesson): bool
     {
-        if ((string) ($lesson->state ?? '') !== '1') {
-            return false;
-        }
-
-        $startRegistration = (string) ($lesson->start_registration ?? '');
-        $endRegistration = (string) ($lesson->end_registration ?? '');
-
-        if ($startRegistration === '' || $endRegistration === '') {
-            return false;
-        }
-
-        $today = date('Y-m-d');
-
-        return $today >= $startRegistration && $today <= $endRegistration;
+        return LessonRegistrationHelper::isOpenForSubscription($lesson);
     }
 
     /**
@@ -593,6 +581,12 @@ class SubscriptionModel extends AdminModel
             'waitinglist_body' => (string) $params->get('email_body_waitinglist', ''),
             'promotion_subject' => (string) $params->get('email_subject_promotion', ''),
             'promotion_body' => (string) $params->get('email_body_promotion', ''),
+            'yearstart_subject' => (string) $params->get('email_subject_yearstart', ''),
+            'yearstart_body' => (string) $params->get('email_body_yearstart', ''),
+            'rejection_subject' => (string) $params->get('email_subject_rejection', ''),
+            'rejection_body' => (string) $params->get('email_body_rejection', ''),
+            'cancellation_subject' => (string) $params->get('email_subject_cancellation', ''),
+            'cancellation_body' => (string) $params->get('email_body_cancellation', ''),
         ];
     }
 

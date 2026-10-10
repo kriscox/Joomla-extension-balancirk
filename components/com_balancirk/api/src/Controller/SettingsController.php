@@ -140,6 +140,12 @@ class SettingsController extends ApiController
             $data['email_body_waitinglist'] = (string) $params->get('email_body_waitinglist', '');
             $data['email_subject_promotion'] = (string) $params->get('email_subject_promotion', '');
             $data['email_body_promotion'] = (string) $params->get('email_body_promotion', '');
+            $data['email_subject_yearstart'] = (string) $params->get('email_subject_yearstart', '');
+            $data['email_body_yearstart'] = (string) $params->get('email_body_yearstart', '');
+            $data['email_subject_rejection'] = (string) $params->get('email_subject_rejection', '');
+            $data['email_body_rejection'] = (string) $params->get('email_body_rejection', '');
+            $data['email_subject_cancellation'] = (string) $params->get('email_subject_cancellation', '');
+            $data['email_body_cancellation'] = (string) $params->get('email_body_cancellation', '');
             $data['redirect_url'] = (int) $params->get('redirect_url', 0);
         }
 
@@ -165,6 +171,12 @@ class SettingsController extends ApiController
             'email_body_waitinglist',
             'email_subject_promotion',
             'email_body_promotion',
+            'email_subject_yearstart',
+            'email_body_yearstart',
+            'email_subject_rejection',
+            'email_body_rejection',
+            'email_subject_cancellation',
+            'email_body_cancellation',
             'mutuality_options',
         ];
 

@@ -38,6 +38,12 @@ class PlgWebservicesBalancirk extends CMSPlugin
       new Route(['GET'], 'v1/settings', 'settings.getsettings', [], $defaults),
       new Route(['POST'], 'v1/settings', 'settings.savesettings', [], $defaults),
       new Route(['GET'], 'v1/settings/public', 'settings.getpublicsettings', [], $publicDefaults),
+      new Route(['GET'], 'v1/lessons/:id/waitlist', 'lessons.getWaitlist', ['id' => '\d+'], $defaults),
+      new Route(['POST'], 'v1/lessons/:id/waitlist/settle', 'lessons.settleWaitlist', ['id' => '\d+'], $defaults),
+      new Route(['POST'], 'v1/lessons/:id/registration/close', 'lessons.closeRegistration', ['id' => '\d+'], $defaults),
+      new Route(['POST'], 'v1/lessons/:id/registration/reopen', 'lessons.reopenRegistration', ['id' => '\d+'], $defaults),
+      new Route(['GET'], 'v1/lessons/:id/cancellation/preview', 'lessons.previewCancellation', ['id' => '\d+'], $defaults),
+      new Route(['POST'], 'v1/lessons/:id/cancellation', 'lessons.cancelLesson', ['id' => '\d+'], $defaults),
     ];
 
     // A more generic way to do it.

@@ -51,6 +51,16 @@
 			type="number"
 			label="COM_BALANCIRK_TABLE_TABLEHEAD_MAX_STUDENTS"
 			required="true" />
+		<field name="registration_closed"
+			type="radio"
+			label="COM_BALANCIRK_LESSON_REGISTRATION_CLOSED_LABEL"
+			description="COM_BALANCIRK_LESSON_REGISTRATION_CLOSED_DESC"
+			class="btn-group btn-group-yesno"
+			default="0"
+			filter="integer">
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
 		<field name="min_age"
 			type="number"
 			label="COM_BALANCIRK_TABLE_TABLEHEAD_MIN_AGE"
@@ -94,6 +104,39 @@
 			description="COM_BALANCIRK_LESSON_EMAIL_TEMPLATE_DESCRIPTION"
 			rows="10"
 			filter="raw" />
+		<field name="yearstart_email_subject"
+			type="text"
+			label="COM_BALANCIRK_LESSON_EMAIL_SUBJECT_YEARSTART_LABEL"
+			description="COM_BALANCIRK_LESSON_EMAIL_TEMPLATE_DESCRIPTION"
+			filter="raw" />
+		<field name="yearstart_email_body"
+			type="textarea"
+			label="COM_BALANCIRK_LESSON_EMAIL_BODY_YEARSTART_LABEL"
+			description="COM_BALANCIRK_LESSON_EMAIL_TEMPLATE_DESCRIPTION"
+			rows="10"
+			filter="raw" />
+		<field name="rejection_email_subject"
+			type="text"
+			label="COM_BALANCIRK_LESSON_EMAIL_SUBJECT_REJECTION_LABEL"
+			description="COM_BALANCIRK_LESSON_EMAIL_TEMPLATE_DESCRIPTION"
+			filter="raw" />
+		<field name="rejection_email_body"
+			type="textarea"
+			label="COM_BALANCIRK_LESSON_EMAIL_BODY_REJECTION_LABEL"
+			description="COM_BALANCIRK_LESSON_EMAIL_TEMPLATE_DESCRIPTION"
+			rows="10"
+			filter="raw" />
+		<field name="cancellation_email_subject"
+			type="text"
+			label="COM_BALANCIRK_LESSON_EMAIL_SUBJECT_CANCELLATION_LABEL"
+			description="COM_BALANCIRK_LESSON_EMAIL_TEMPLATE_DESCRIPTION"
+			filter="raw" />
+		<field name="cancellation_email_body"
+			type="textarea"
+			label="COM_BALANCIRK_LESSON_EMAIL_BODY_CANCELLATION_LABEL"
+			description="COM_BALANCIRK_LESSON_EMAIL_TEMPLATE_DESCRIPTION"
+			rows="10"
+			filter="raw" />
 		<field name="lesdays_field"
 			type="checkboxes"
 			label="COM_BALANCIRK_TABLE_TABLEHEAD_LESDAYS"
@@ -118,6 +161,7 @@
 			<option value="1">COM_BALANCIRK_STATUS_CURRENT</option>
 			<option value="0">COM_BALANCIRK_STATUS_PAST</option>
 			<option value="2">COM_BALANCIRK_STATUS_NEXT</option>
+			<option value="-1">COM_BALANCIRK_STATUS_CANCELLED</option>
 			<option value="-2">TRASHED</option>
 		</field>
 	</fieldset>

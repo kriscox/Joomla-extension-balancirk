@@ -262,4 +262,48 @@ final class SubscriptionMailHelperTest extends TestCase
         $this->assertStringContainsString('{lesson_name}', SubscriptionMailHelper::getDefaultPromotionSubjectTemplate());
         $this->assertStringContainsString('wachtlijst', SubscriptionMailHelper::getDefaultPromotionBodyTemplate());
     }
+
+    public function testBuildYearstartPromotionMailMessageUsesDefaults(): void
+    {
+        $lesson = (object) ['name' => 'Acro', 'start' => '2026-09-10', 'end' => '2027-05-20'];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $mail = SubscriptionMailHelper::buildYearstartPromotionMailMessage($lesson, $student, $member, '2026-08-20');
+
+        $this->assertStringContainsString('Acro', $mail['subject']);
+        $this->assertStringContainsString('definitief ingeschreven', $mail['body']);
+    }
+
+    public function testBuildRejectionMailMessageUsesDefaults(): void
+    {
+        $lesson = (object) ['name' => 'Acro', 'start' => '2026-09-10', 'end' => '2027-05-20'];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $mail = SubscriptionMailHelper::buildRejectionMailMessage($lesson, $student, $member, '2026-08-20');
+
+        $this->assertStringContainsString('Wachtlijst', $mail['subject']);
+        $this->assertStringContainsString('geen plaats', $mail['body']);
+    }
+
+    public function testBuildCancellationMailMessageUsesCustomSubjectAndBody(): void
+    {
+        $lesson = (object) ['name' => 'Acro', 'start' => '2026-09-10', 'end' => '2027-05-20'];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $mail = SubscriptionMailHelper::buildCancellationMailMessage(
+            $lesson,
+            $student,
+            $member,
+            '2026-08-20',
+            [],
+            'Custom cancel {lesson_name}',
+            'Beste {member_firstname}, les {lesson_name} gaat niet door. Alternatief: circus beginners.'
+        );
+
+        $this->assertSame('Custom cancel Acro', $mail['subject']);
+        $this->assertSame('Beste Els, les Acro gaat niet door. Alternatief: circus beginners.', $mail['body']);
+    }
 }

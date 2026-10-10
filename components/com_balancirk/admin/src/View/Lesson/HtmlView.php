@@ -113,6 +113,20 @@ class HtmlView extends BaseHtmlView
     public $canDeleteSubscription = false;
 
     /**
+     * Waiting list in FIFO order (year-start settlement).
+     *
+     * @var array
+     */
+    protected $waitlistOrdered = [];
+
+    /**
+     * Cancellation preview payload (layout=cancel).
+     *
+     * @var array|null
+     */
+    protected $cancellationPreview = null;
+
+    /**
      * Display the view.
      *
      * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
@@ -128,6 +142,16 @@ class HtmlView extends BaseHtmlView
         $this->availableTeachers = $this->get('AvailableTeachers');
         $this->subscribedStudents = $this->get('Students');
         $this->waitingListStudents = $this->get('WaitingListStudents');
+        $this->waitlistOrdered = $this->get('WaitlistOrdered');
+
+        $layout = $this->getLayout();
+
+        if ($layout === 'cancel' && (int) ($this->item->id ?? 0) > 0) {
+            /** @var LessonModel $model */
+            $model = $this->getModel();
+            $preview = $model->getCancellationPreview((int) $this->item->id);
+            $this->cancellationPreview = $preview === false ? null : $preview;
+        }
 
         $actions = ContentHelper::getActions('com_balancirk');
         $this->canCreateSubscription = $actions->get('subscriptions.create')
@@ -159,22 +183,34 @@ class HtmlView extends BaseHtmlView
     {
         Factory::getApplication()->input->set('hidemainmenu', true);
         $isNew = ($this->item->id == 0);
+        $layout = $this->getLayout();
 
         $canDo = ContentHelper::getActions('com_balancirk');
 
         $toolbar = Toolbar::getInstance();
+
+        if ($layout === 'cancel') {
+            ToolbarHelper::title(Text::_('COM_BALANCIRK_LESSON_PAGE_TITLE_CANCEL_LESSON'));
+            $toolbar->cancel('lesson.cancel', 'JTOOLBAR_CLOSE');
+
+            return;
+        }
 
         ToolbarHelper::title(
             Text::_('COM_BALANCIRK_LESSON_PAGE_TITLE_' . ($isNew ? 'ADD_LESSON' : 'EDIT_LESSON'))
         );
 
         if ($canDo->get('core.create')) {
-            if ($isNew) {
-                $toolbar->apply('lesson.save');
-            } else {
-                $toolbar->apply('lesson.save');
+            $toolbar->apply('lesson.save');
+
+            if (!$isNew) {
+                $toolbar->standardButton('cancel-lesson')
+                    ->text('COM_BALANCIRK_LESSON_TOOLBAR_CANCEL_LESSON')
+                    ->task('lesson.cancelPreview')
+                    ->icon('icon-unpublish');
             }
         }
+
         $toolbar->cancel('lesson.cancel', 'JTOOLBAR_CLOSE');
     }
 }
