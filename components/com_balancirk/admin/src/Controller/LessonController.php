@@ -138,4 +138,139 @@ class LessonController extends FormController
 
         return true;
     }
+
+    /**
+     * Settle waitlist (promote / dismiss) for year-start.
+     *
+     * @return  void
+     *
+     * @since   1.3.25
+     */
+    public function settleWaitlist(): void
+    {
+        $this->checkToken();
+
+        $app = Factory::getApplication();
+        $id = $this->input->getInt('id');
+        $promoteIds = (array) $this->input->get('promote_ids', [], 'array');
+        $dismissIds = (array) $this->input->get('dismiss_ids', [], 'array');
+        $confirmFifo = (int) $this->input->getInt('confirm_fifo_override', 0) === 1;
+        $closeRegistration = (int) $this->input->getInt('close_registration', 1) === 1;
+
+        /** @var \CoCoCo\Component\Balancirk\Administrator\Model\LessonModel $model */
+        $model = $this->getModel();
+        $result = $model->settleWaitlist($id, $promoteIds, $dismissIds, $confirmFifo, $closeRegistration);
+
+        if ($result === false) {
+            $app->enqueueMessage($model->getError() ?: Text::_('JLIB_APPLICATION_ERROR_SAVE_FAILED'), 'error');
+        } else {
+            $app->enqueueMessage(
+                Text::sprintf(
+                    'COM_BALANCIRK_WAITLIST_SETTLE_SUCCESS',
+                    (int) $result['promoted'],
+                    (int) $result['dismissed']
+                ),
+                'success'
+            );
+
+            if (!empty($result['closed'])) {
+                $app->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_REGISTRATION_CLOSED_NOTICE'), 'message');
+            }
+        }
+
+        $this->setRedirect(
+            Route::_('index.php?option=com_balancirk&view=lesson&layout=edit&id=' . $id, false)
+        );
+    }
+
+    /**
+     * Close registrations for a lesson.
+     *
+     * @return  void
+     *
+     * @since   1.3.25
+     */
+    public function closeRegistration(): void
+    {
+        $this->checkToken('get');
+        $id = $this->input->getInt('id');
+        /** @var \CoCoCo\Component\Balancirk\Administrator\Model\LessonModel $model */
+        $model = $this->getModel();
+        $model->closeRegistration($id);
+        Factory::getApplication()->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_REGISTRATION_CLOSED_NOTICE'), 'success');
+        $this->setRedirect(Route::_('index.php?option=com_balancirk&view=lesson&layout=edit&id=' . $id, false));
+    }
+
+    /**
+     * Reopen registrations for a lesson.
+     *
+     * @return  void
+     *
+     * @since   1.3.25
+     */
+    public function reopenRegistration(): void
+    {
+        $this->checkToken('get');
+        $id = $this->input->getInt('id');
+        /** @var \CoCoCo\Component\Balancirk\Administrator\Model\LessonModel $model */
+        $model = $this->getModel();
+        $model->reopenRegistration($id);
+        Factory::getApplication()->enqueueMessage(Text::_('COM_BALANCIRK_LESSON_REGISTRATION_REOPENED_NOTICE'), 'success');
+        $this->setRedirect(Route::_('index.php?option=com_balancirk&view=lesson&layout=edit&id=' . $id, false));
+    }
+
+    /**
+     * Show cancellation preview / personalization form.
+     *
+     * @return  void
+     *
+     * @since   1.3.25
+     */
+    public function cancelPreview(): void
+    {
+        $id = $this->input->getInt('id');
+        $this->setRedirect(
+            Route::_('index.php?option=com_balancirk&view=lesson&layout=cancel&id=' . $id, false)
+        );
+    }
+
+    /**
+     * Confirm lesson cancellation and send mails.
+     *
+     * @return  void
+     *
+     * @since   1.3.25
+     */
+    public function confirmCancel(): void
+    {
+        $this->checkToken();
+
+        $app = Factory::getApplication();
+        $id = $this->input->getInt('id');
+        $enrolledMessages = array_values((array) $this->input->get('enrolled_messages', [], 'array'));
+        $waitingMessages = array_values((array) $this->input->get('waiting_messages', [], 'array'));
+        $dismissWaiting = (int) $this->input->getInt('dismiss_waiting', 1) === 1;
+
+        /** @var \CoCoCo\Component\Balancirk\Administrator\Model\LessonModel $model */
+        $model = $this->getModel();
+        $result = $model->cancelLessonWithMails($id, $enrolledMessages, $waitingMessages, $dismissWaiting);
+
+        if ($result === false) {
+            $app->enqueueMessage($model->getError() ?: Text::_('JLIB_APPLICATION_ERROR_SAVE_FAILED'), 'error');
+            $this->setRedirect(Route::_('index.php?option=com_balancirk&view=lesson&layout=cancel&id=' . $id, false));
+
+            return;
+        }
+
+        $app->enqueueMessage(
+            Text::sprintf(
+                'COM_BALANCIRK_LESSON_CANCEL_SUCCESS',
+                (int) $result['mailed'],
+                (int) ($result['unenrolled'] ?? 0),
+                (int) $result['dismissed']
+            ),
+            'success'
+        );
+        $this->setRedirect(Route::_('index.php?option=com_balancirk&view=lesson&layout=edit&id=' . $id, false));
+    }
 }

@@ -19,6 +19,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Session\Session;
+use CoCoCo\Component\Balancirk\Site\Helper\LessonRegistrationHelper;
 
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
@@ -142,8 +143,15 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 										<?php
 										$total_number_of_subscriptions += $item->numberOfStudents;
 										$total_number_on_waiting_list += $item->numberOnWaitingList;
+										$isCancelled = LessonRegistrationHelper::isCancelled($item);
+										$isFull = LessonRegistrationHelper::isFull($item);
 										?>
 										<?= $this->escape($item->numberOfStudents); ?>&#47;<?= $this->escape($item->max_students); ?><?php if ($item->numberOnWaitingList > 0) : ?> (<?= (int) $item->numberOnWaitingList; ?>)<?php endif; ?>
+										<?php if ($isCancelled) : ?>
+											<span class="badge bg-danger"><?= Text::_('COM_BALANCIRK_LESSON_BADGE_CANCELLED'); ?></span>
+										<?php elseif ($isFull) : ?>
+											<span class="badge bg-warning text-dark"><?= Text::_('COM_BALANCIRK_LESSON_BADGE_FULL'); ?></span>
+										<?php endif; ?>
 									</th>
 									<th scope="row" class="has-context">
 										<?= $this->escape($item->state); ?>

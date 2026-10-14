@@ -355,6 +355,148 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
 
+  /v1/lessons/{id}/waitlist:
+    get:
+      summary: List waitlist in FIFO order
+      description: Returns waiting-list subscriptions for a lesson ordered by subscription id (oldest first).
+      operationId: getLessonWaitlist
+      tags:
+        - Lessons
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Waitlist payload.
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedError"
+  /v1/lessons/{id}/waitlist/settle:
+    post:
+      summary: Settle waitlist (year-start)
+      description: Promote and/or dismiss selected waitlist subscriptions. FIFO override requires confirm_fifo_override.
+      operationId: settleLessonWaitlist
+      tags:
+        - Lessons
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                promote_ids:
+                  type: array
+                  items:
+                    type: integer
+                dismiss_ids:
+                  type: array
+                  items:
+                    type: integer
+                confirm_fifo_override:
+                  type: boolean
+                close_registration:
+                  type: boolean
+      responses:
+        "200":
+          description: Settlement result.
+          content:
+            application/json:
+              schema:
+                type: object
+  /v1/lessons/{id}/registration/close:
+    post:
+      summary: Close lesson registrations
+      operationId: closeLessonRegistration
+      tags:
+        - Lessons
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Registration closed.
+  /v1/lessons/{id}/registration/reopen:
+    post:
+      summary: Reopen lesson registrations
+      operationId: reopenLessonRegistration
+      tags:
+        - Lessons
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Registration reopened.
+  /v1/lessons/{id}/cancellation/preview:
+    get:
+      summary: Preview lesson cancellation mails
+      operationId: previewLessonCancellation
+      tags:
+        - Lessons
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Preview recipients and default mails.
+  /v1/lessons/{id}/cancellation:
+    post:
+      summary: Cancel lesson for the school year
+      description: Marks the lesson cancelled, closes registration, sends personalized mails, optionally dismisses waitlist.
+      operationId: cancelLesson
+      tags:
+        - Lessons
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enrolled_messages:
+                  type: array
+                  items:
+                    type: object
+                waiting_messages:
+                  type: array
+                  items:
+                    type: object
+                dismiss_waiting:
+                  type: boolean
+      responses:
+        "200":
+          description: Cancellation result.
+
   /v1/members/{id}:
     get:
       summary: Get a member by ID

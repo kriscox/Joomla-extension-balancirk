@@ -125,7 +125,7 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
         public function testGetStudentsReturnsDbRowsForValidLessonId(): void
         {
             $expected = [
-                (object) ['id' => 3, 'name' => 'Baert', 'firstname' => 'Lena', 'birthdate' => '2015-06-01',
+                (object)['id' => 3, 'name' => 'Baert', 'firstname' => 'Lena', 'birthdate' => '2015-06-01',
                     'subscription_id' => 11],
             ];
 
@@ -183,7 +183,7 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
         public function testGetWaitingListStudentsReturnsDbRows(): void
         {
             $expected = [
-                (object) ['id' => 9, 'name' => 'Claes', 'firstname' => 'Tom', 'birthdate' => '2014-03-15',
+                (object)['id' => 9, 'name' => 'Claes', 'firstname' => 'Tom', 'birthdate' => '2014-03-15',
                     'subscription_id' => 22],
             ];
 
@@ -228,7 +228,7 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
         public function testGetStudentsUsesStateWhenNoExplicitLessonId(): void
         {
             $expected = [
-                (object) ['id' => 1, 'name' => 'A', 'firstname' => 'B', 'birthdate' => '2010-01-01',
+                (object)['id' => 1, 'name' => 'A', 'firstname' => 'B', 'birthdate' => '2010-01-01',
                     'subscription_id' => 5],
             ];
 
@@ -264,7 +264,7 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
 
                 public function getItem($pk = null): object
                 {
-                    return (object) ['id' => 0];
+                    return (object)['id' => 0];
                 }
 
                 public function getDatabase(): never

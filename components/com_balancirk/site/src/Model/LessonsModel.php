@@ -116,7 +116,8 @@ class LessonsModel extends ListModel
                     'a.state',
                     'a.numberOfStudents',
                     'a.numberOnWaitingList',
-                    'a.max_students'
+                    'a.max_students',
+                    'a.registration_closed'
                 ],
                 [
                     'id',
@@ -126,7 +127,8 @@ class LessonsModel extends ListModel
                     'state',
                     'numberOfStudents',
                     'numberOnWaitingList',
-                    'max_students'
+                    'max_students',
+                    'registration_closed'
                 ]
             )
         )
@@ -246,6 +248,7 @@ class LessonsModel extends ListModel
             ->from($db->quoteName('#__balancirk_lessons', 'a'))
             ->where($db->quote($today) . ' between `start_registration` and `end_registration`')
             ->where($db->quoteName('a.state') . ' = 1')
+            ->where($db->quoteName('a.registration_closed') . ' = 0')
             ->order('name');
 
         if ($studentId !== null && $studentId > 0)
