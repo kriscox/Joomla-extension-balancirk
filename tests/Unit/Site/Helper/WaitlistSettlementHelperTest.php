@@ -53,6 +53,50 @@ final class WaitlistSettlementHelperTest extends TestCase
         $this->assertCount(1, $dismissed);
         $this->assertSame([10], $db->dismissedIds);
     }
+
+    // ── listWaitingOrdered ────────────────────────────────────────────────────
+
+    public function testListWaitingOrderedReturnsEmptyForInvalidLessonId(): void
+    {
+        $db = new WaitlistSettlementFakeDatabase([]);
+        $this->assertSame([], WaitlistSettlementHelper::listWaitingOrdered($db, 0));
+        $this->assertSame([], WaitlistSettlementHelper::listWaitingOrdered($db, -1));
+    }
+
+    public function testListWaitingOrderedAddsSequentialFifoRanks(): void
+    {
+        $db = new WaitlistSettlementFakeDatabase([
+            (object) ['id' => 20, 'student' => 1, 'lesson' => 7],
+            (object) ['id' => 25, 'student' => 2, 'lesson' => 7],
+            (object) ['id' => 30, 'student' => 3, 'lesson' => 7],
+        ]);
+
+        $rows = WaitlistSettlementHelper::listWaitingOrdered($db, 7);
+
+        $this->assertCount(3, $rows);
+        $this->assertSame(1, $rows[0]->fifo_rank);
+        $this->assertSame(2, $rows[1]->fifo_rank);
+        $this->assertSame(3, $rows[2]->fifo_rank);
+    }
+
+    public function testListWaitingOrderedSetsSubscriptionIdFromRowId(): void
+    {
+        $db = new WaitlistSettlementFakeDatabase([
+            (object) ['id' => 42, 'student' => 5, 'lesson' => 7],
+        ]);
+
+        $rows = WaitlistSettlementHelper::listWaitingOrdered($db, 7);
+
+        $this->assertSame(42, $rows[0]->subscription_id);
+    }
+
+    public function testListWaitingOrderedReturnsEmptyWhenNoWaitingRows(): void
+    {
+        $db = new WaitlistSettlementFakeDatabase([]);
+        $rows = WaitlistSettlementHelper::listWaitingOrdered($db, 7);
+
+        $this->assertSame([], $rows);
+    }
 }
 
 /**
