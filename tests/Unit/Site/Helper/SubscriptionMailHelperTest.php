@@ -306,4 +306,94 @@ final class SubscriptionMailHelperTest extends TestCase
         $this->assertSame('Custom cancel Acro', $mail['subject']);
         $this->assertSame('Beste Els, les Acro gaat niet door. Alternatief: circus beginners.', $mail['body']);
     }
+
+    public function testBuildCancellationMailMessageUsesLessonSpecificTemplate(): void
+    {
+        $lesson = (object) [
+            'name' => 'Acro',
+            'start' => '2026-09-10',
+            'end' => '2027-05-20',
+            'cancellation_email_subject' => 'Les {lesson_name} afgelast',
+            'cancellation_email_body' => 'Hallo {member_firstname}, {lesson_name} gaat niet door dit jaar.',
+        ];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $mail = SubscriptionMailHelper::buildCancellationMailMessage(
+            $lesson,
+            $student,
+            $member,
+            '2026-08-20'
+        );
+
+        $this->assertSame('Les Acro afgelast', $mail['subject']);
+        $this->assertSame('Hallo Els, Acro gaat niet door dit jaar.', $mail['body']);
+    }
+
+    public function testBuildCancellationMailMessageFallsBackToGlobalDefaults(): void
+    {
+        $lesson = (object) ['name' => 'Acro', 'start' => '2026-09-10', 'end' => '2027-05-20'];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+        $defaults = [
+            'cancellation_subject' => 'Annulatie {lesson_name}',
+            'cancellation_body' => 'Les {lesson_name} is geannuleerd voor {member_firstname}.',
+        ];
+
+        $mail = SubscriptionMailHelper::buildCancellationMailMessage(
+            $lesson,
+            $student,
+            $member,
+            '2026-08-20',
+            $defaults
+        );
+
+        $this->assertSame('Annulatie Acro', $mail['subject']);
+        $this->assertSame('Les Acro is geannuleerd voor Els.', $mail['body']);
+    }
+
+    public function testBuildYearstartPromotionMailMessageUsesLessonSpecificTemplates(): void
+    {
+        $lesson = (object) [
+            'name' => 'Acro',
+            'start' => '2026-09-10',
+            'end' => '2027-05-20',
+            'yearstart_email_subject' => 'Jij mag meedoen aan {lesson_name}',
+            'yearstart_email_body' => '{student_firstname} is definitief in "{lesson_name}".',
+        ];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $mail = SubscriptionMailHelper::buildYearstartPromotionMailMessage(
+            $lesson,
+            $student,
+            $member,
+            '2026-09-01'
+        );
+
+        $this->assertSame('Jij mag meedoen aan Acro', $mail['subject']);
+        $this->assertSame('Lena is definitief in "Acro".', $mail['body']);
+    }
+
+    public function testBuildRejectionMailMessageUsesGlobalDefaultsWhenNoLessonTemplate(): void
+    {
+        $lesson = (object) ['name' => 'Acro', 'start' => '2026-09-10', 'end' => '2027-05-20'];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+        $defaults = [
+            'rejection_subject' => 'Geen plaats voor {student_firstname} in {lesson_name}',
+            'rejection_body' => 'Helaas, {student_firstname} kan niet meedoen aan {lesson_name}.',
+        ];
+
+        $mail = SubscriptionMailHelper::buildRejectionMailMessage(
+            $lesson,
+            $student,
+            $member,
+            '2026-08-20',
+            $defaults
+        );
+
+        $this->assertSame('Geen plaats voor Lena in Acro', $mail['subject']);
+        $this->assertSame('Helaas, Lena kan niet meedoen aan Acro.', $mail['body']);
+    }
 }
