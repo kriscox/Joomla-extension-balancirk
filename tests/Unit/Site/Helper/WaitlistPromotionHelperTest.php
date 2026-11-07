@@ -97,6 +97,112 @@ final class WaitlistPromotionHelperTest extends TestCase
 
         $this->assertSame([], WaitlistPromotionHelper::promoteFromWaitingList($db, 0, 1));
     }
+
+    // -------------------------------------------------------------------------
+    // loadMaxStudents() — direct tests
+    // -------------------------------------------------------------------------
+
+    public function testLoadMaxStudentsReturnsNullForZeroLessonId(): void
+    {
+        $db = new WaitlistPromotionFakeDatabase(maxStudents: 10, enrolled: 0, waiting: []);
+
+        $this->assertNull(WaitlistPromotionHelper::loadMaxStudents($db, 0));
+    }
+
+    public function testLoadMaxStudentsReturnsNullForNegativeLessonId(): void
+    {
+        $db = new WaitlistPromotionFakeDatabase(maxStudents: 10, enrolled: 0, waiting: []);
+
+        $this->assertNull(WaitlistPromotionHelper::loadMaxStudents($db, -1));
+    }
+
+    public function testLoadMaxStudentsReturnsIntegerForValidLesson(): void
+    {
+        $db = new WaitlistPromotionFakeDatabase(maxStudents: 25, enrolled: 10, waiting: []);
+
+        $this->assertSame(25, WaitlistPromotionHelper::loadMaxStudents($db, 3));
+    }
+
+    public function testLoadMaxStudentsReturnsNullWhenDbReturnsNull(): void
+    {
+        $db = new class {
+            public function getQuery(bool $new): object
+            {
+                return new class {
+                    public function select(mixed $c): static
+                    {
+                        return $this;
+                    }
+
+                    public function from(mixed $t): static
+                    {
+                        return $this;
+                    }
+
+                    public function where(mixed $w): static
+                    {
+                        return $this;
+                    }
+                };
+            }
+
+            public function quoteName(mixed $name): string
+            {
+                return "`$name`";
+            }
+
+            public function setQuery(mixed $query): static
+            {
+                return $this;
+            }
+
+            public function loadResult(): mixed
+            {
+                return null;
+            }
+        };
+
+        $this->assertNull(WaitlistPromotionHelper::loadMaxStudents($db, 5));
+    }
+
+    // -------------------------------------------------------------------------
+    // countByStatus() — direct tests
+    // -------------------------------------------------------------------------
+
+    public function testCountByStatusReturnsZeroForZeroLessonId(): void
+    {
+        $db = new WaitlistPromotionFakeDatabase(maxStudents: 10, enrolled: 5, waiting: []);
+
+        $this->assertSame(0, WaitlistPromotionHelper::countByStatus($db, 0, 0));
+    }
+
+    public function testCountByStatusReturnsZeroForNegativeLessonId(): void
+    {
+        $db = new WaitlistPromotionFakeDatabase(maxStudents: 10, enrolled: 5, waiting: []);
+
+        $this->assertSame(0, WaitlistPromotionHelper::countByStatus($db, -1, 0));
+    }
+
+    public function testCountByStatusReturnsEnrolledCountForSubscribedZero(): void
+    {
+        $db = new WaitlistPromotionFakeDatabase(maxStudents: 10, enrolled: 7, waiting: []);
+
+        $this->assertSame(7, WaitlistPromotionHelper::countByStatus($db, 3, 0));
+    }
+
+    public function testCountByStatusReturnsWaitingCountForSubscribedOne(): void
+    {
+        $db = new WaitlistPromotionFakeDatabase(
+            maxStudents: 10,
+            enrolled: 7,
+            waiting: [
+                (object) ['id' => 1, 'student' => 10, 'lesson' => 3],
+                (object) ['id' => 2, 'student' => 11, 'lesson' => 3],
+            ]
+        );
+
+        $this->assertSame(2, WaitlistPromotionHelper::countByStatus($db, 3, 1));
+    }
 }
 
 /**
