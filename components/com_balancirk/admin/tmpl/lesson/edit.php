@@ -17,20 +17,20 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Session\Session;
 
-HTMLHelper::_('behavior.formvalidator');
-HTMLHelper::_('behavior.keepalive');
-
 $document = Factory::getApplication()->getDocument();
-$document->getWebAssetManager()->registerAndUseScript(
-	'balancirk-lesson-waitlist',
-	'media/com_balancirk/js/balancirk_lesson_waitlist.js',
-	['version' => 'auto']
-);
-$document->getWebAssetManager()->registerAndUseScript(
-	'balancirk-lesson-settle',
-	'media/com_balancirk/js/balancirk_lesson_settle.js',
-	['version' => 'auto']
-);
+$wa = $document->getWebAssetManager();
+$wa->useScript('keepalive')
+	->useScript('form.validate')
+	->registerAndUseScript(
+		'balancirk-lesson-waitlist',
+		'media/com_balancirk/js/balancirk_lesson_waitlist.js',
+		['version' => 'auto']
+	)
+	->registerAndUseScript(
+		'balancirk-lesson-settle',
+		'media/com_balancirk/js/balancirk_lesson_settle.js',
+		['version' => 'auto']
+	);
 $document->addScriptOptions('balancirk-lesson-waitlist', [
 	'originalMaxStudents' => (int) ($this->item->max_students ?? 0),
 	'enrolledCount' => count($this->subscribedStudents ?? []),

@@ -51,7 +51,7 @@ class TeacherModel extends BaseDatabaseModel
 	public function getLessonsTeached($teacherId, $startDate, $endDate)
 	{
 		$db = $this->getDatabase();
-		$query = $db->getQuery(true)
+		$query = $db->createQuery()
 			->select($db->quoteName(
 				[
 					't.id',
@@ -89,7 +89,7 @@ class TeacherModel extends BaseDatabaseModel
 	public function getTeachers()
 	{
 		$db = $this->getDatabase();
-		$query = $db->getQuery(true)
+		$query = $db->createQuery()
 			->select($db->quoteName(
 				[
 					't.member',

@@ -66,6 +66,8 @@ class Com_BalancirkInstallerScript extends InstallerScript
         '/components/com_balancirk/src/Controller/DisplayController copy.php',
         '/components/com_balancirk/src/Controller/com_balancirk.code-workspace',
         '/administrator/components/com_balancirk/Makefile',
+        // Legacy flat webservices plugin entry (replaced by services/ + Extension class)
+        '/plugins/webservices/balancirk/balancirk.php',
     ];
 
     /**
@@ -76,6 +78,8 @@ class Com_BalancirkInstallerScript extends InstallerScript
      */
     protected $deleteFolders = [
         '/media/com_balancirk/member-spa',
+        '/plugins/webservices/balancirk/lib',
+        '/plugins/webservices/balancirk/tmpl',
     ];
 
     /**
@@ -131,6 +135,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
         $this->migrateTeachedTeacherForeignKey();
         $this->ensurePromotionEmailColumns();
         $this->ensureRegistrationLifecycleColumns();
+        $this->ensureIncreasedBenefitColumn();
 
         return true;
     }
@@ -205,6 +210,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
             $this->migrateTeachedTeacherForeignKey();
             $this->ensurePromotionEmailColumns();
             $this->ensureRegistrationLifecycleColumns();
+            $this->ensureIncreasedBenefitColumn();
         }
 
         return true;
@@ -234,7 +240,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
                 return;
             }
 
-            $columnsQuery = $db->getQuery(true)
+            $columnsQuery = $db->createQuery()
                 ->select($db->quoteName('COLUMN_NAME'))
                 ->from($db->quoteName('information_schema.KEY_COLUMN_USAGE'))
                 ->where($db->quoteName('CONSTRAINT_SCHEMA') . ' = ' . $db->quote($schema))
@@ -407,6 +413,7 @@ FROM ' . $db->quoteName($table) . ' a
         }
     }
 
+
     /**
      * Delete leftover Angular SPA / PWA files from previous installs.
      *
@@ -438,7 +445,7 @@ FROM ' . $db->quoteName($table) . ' a
 
         /** @var \Joomla\Database\DatabaseDriver $db */
         $db = Factory::getContainer()->get('DatabaseDriver');
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('COUNT(*)')
             ->from($db->quoteName('#__modules'))
             ->where(
@@ -563,7 +570,7 @@ FROM ' . $db->quoteName($table) . ' a
     private function getUserGroupId(string $title): ?int
     {
         $db = Factory::getContainer()->get('DatabaseDriver');
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__usergroups'))
             ->where($db->quoteName('title') . ' = ' . $db->quote($title));
@@ -587,7 +594,7 @@ FROM ' . $db->quoteName($table) . ' a
     private function setComponentPermissions(int $groupId, array $permissions): void
     {
         $db = Factory::getContainer()->get('DatabaseDriver');
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['id', 'rules']))
             ->from($db->quoteName('#__assets'))
             ->where($db->quoteName('name') . ' = ' . $db->quote('com_balancirk'));
@@ -617,7 +624,7 @@ FROM ' . $db->quoteName($table) . ' a
             $rules[$action][(string) $groupId] = $value ? 1 : 0;
         }
 
-        $update = $db->getQuery(true)
+        $update = $db->createQuery()
             ->update($db->quoteName('#__assets'))
             ->set($db->quoteName('rules') . ' = ' . $db->quote(json_encode($rules)))
             ->where($db->quoteName('id') . ' = ' . (int) $asset['id']);
@@ -630,7 +637,7 @@ FROM ' . $db->quoteName($table) . ' a
         /** @var \Joomla\Database\DatabaseDriver $db */
         $db = Factory::getContainer()->get('DatabaseDriver');
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__menu_types'))
             ->where($db->quoteName('menutype') . ' = ' . $db->quote('hiddenmenu'));

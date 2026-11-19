@@ -73,7 +73,7 @@ class StudentModel extends AdminModel
      * 
      * @param   integer  $pk  The id of the item.
      * 
-     * @return  CMSObject|boolean  Object on success, false on failure.
+     * @return  \stdClass|boolean  Object on success, false on failure.
      * 
      * @since   __BUMP_VERSION__
      */
@@ -95,7 +95,7 @@ class StudentModel extends AdminModel
      * @param   array   $data       Data from the form.
      * @param   boolean $loadData   True if the form is to load its own data (default case), false if not.
      *
-     * @return  \JForm|boolean  A \JForm object on success, false on failure
+     * @return  Form|boolean  A Form object on success, false on failure
      *
      * @since   0.0.1
      */
@@ -153,7 +153,7 @@ class StudentModel extends AdminModel
         // This is a very simple method to change the state of each item selected
         $db = $this->getDatabase();
 
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         $query->update('`#__balancirk_students`');
         $query->set('state = ' . $value);
@@ -178,7 +178,7 @@ class StudentModel extends AdminModel
             $pks = $this->getState('student.id');
         }
         $db     = $this->getDatabase();
-        $query     = $db->getQuery(true);
+        $query     = $db->createQuery();
         $query->select($db->quoteName(['m.id', 'm.name', 'm.firstname', 'm.phone']))
             ->from($db->quoteName('#__balancirk_parents', 'p'))
             ->join('INNER', $db->quoteName('#__balancirk_members', 'm') .
@@ -230,7 +230,7 @@ class StudentModel extends AdminModel
     {
         // Check if the user is the primary parent of the student
         $db     = $this->getDatabase();
-        $query     = $db->getQuery(true);
+        $query     = $db->createQuery();
         $query->select($db->quote('*'))
             ->from($db->quoteName('#__balancirk_parents'))
             ->where($db->quoteName('child') . ' = ' . $db->quote($student))

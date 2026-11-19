@@ -103,8 +103,7 @@ $wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 		});
 	');
 
-HTMLHelper::_('behavior.formvalidator');
-HTMLHelper::_('behavior.keepalive');
+$wa->useScript('keepalive')->useScript('form.validate');
 
 $url = Route::_('index.php?option=com_balancirk&view=lesson&layout=default&id=' . (int) $this->item->id);
 $presence_url = Route::_('index.php?option=com_balancirk&view=lesson&layout=presence&id=' . (int) $this->item->id);

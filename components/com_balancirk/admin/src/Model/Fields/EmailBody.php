@@ -3,8 +3,8 @@
 // No direct access
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Field\EditorField;
-use Joomla\CMS\HTML\HTMLHelper;
 
 /**
  * Custom field for email body with HTML formatting.
@@ -46,9 +46,7 @@ class JFormFieldEmailBody extends EditorField
             'context' => $this->form->getName(),
         );
 
-        // Add custom JavaScript.
-        HTMLHelper::_('jquery.framework');
-        HTMLHelper::_('script', 'system/editor.js', array('version' => 'auto', 'relative' => true));
+        Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('jquery');
 
         // Load the editor.
         $editor = \Joomla\CMS\Editor\Editor::getInstance($this->element['editor']);

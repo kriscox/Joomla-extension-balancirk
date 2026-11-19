@@ -53,14 +53,14 @@ class HtmlView extends BaseHtmlView
     /**
      * The actions the user is authorised to perform
      *
-     * @var  \JObject
+     * @var  \Joomla\Registry\Registry
      */
     protected $canDo;
 
     /**
-     * The \JForm object
+     * The Form object
      *
-     * @var  \JForm
+     * @var  \Joomla\CMS\Form\Form
      */
     protected $form;
 

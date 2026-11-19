@@ -44,7 +44,7 @@ class LessonsField extends ListField
     {
         $db = Factory::getContainer()->get(DatabaseInterface::class);
         $currentYear = SchoolYearHelper::getCurrentSchoolYear();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['id', 'name', 'year']))
             ->from($db->quoteName('#__balancirk_lessons'))
             ->where($db->quoteName('year') . ' >= ' . (int) $currentYear)

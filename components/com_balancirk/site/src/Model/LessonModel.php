@@ -133,7 +133,7 @@ class LessonModel extends AdminModel
      * @param	array   $data	    Data from the form.
      * @param	boolean $loadData   True if the form is to load its own data (default case), false if not.
      *
-     * @return  \JForm|boolean  A \JForm object on success, false on failure
+     * @return  Form|boolean  A Form object on success, false on failure
      *
      * @since   0.0.1
      */
@@ -155,7 +155,7 @@ class LessonModel extends AdminModel
      * @param	array   $data	    Data from the form.
      * @param	boolean $loadData   True if the form is to load its own data (default case), false if not.
      *
-     * @return  \JForm|boolean  A \JForm object on success, false on failure
+     * @return  Form|boolean  A Form object on success, false on failure
      *
      * @since   0.0.1
      */
@@ -177,7 +177,7 @@ class LessonModel extends AdminModel
      * @param	array   $data	    Data from the form.
      * @param	boolean $loadData   True if the form is to load its own data (default case), false if not.
      *
-     * @return  \JForm|boolean  A \JForm object on success, false on failure
+     * @return  Form|boolean  A Form object on success, false on failure
      *
      * @since   0.0.1
      */
@@ -204,7 +204,7 @@ class LessonModel extends AdminModel
     {
         // Create a new query object
         $dbo = $this->getDatabase();
-        $query = $dbo->getQuery(true);
+        $query = $dbo->createQuery();
 
         // Select the required fields from the table
         $query->select(
@@ -278,7 +278,7 @@ class LessonModel extends AdminModel
     private function loadLessonStudents($lessonid = null, ?int $subscribed = 0): array
     {
         $dbo = $this->getDatabase();
-        $query = $dbo->getQuery(true);
+        $query = $dbo->createQuery();
 
         if ($lessonid == null) {
             $lessonid = $this->getState('lesson.id');
@@ -373,7 +373,7 @@ class LessonModel extends AdminModel
     {
         // Create a new query object.
         $dbo = $this->getDatabase();
-        $query = $dbo->getQuery(true);
+        $query = $dbo->createQuery();
 
         if ($lessonid == null) {
             $lessonid = $this->getState('lesson.id');
@@ -666,7 +666,7 @@ class LessonModel extends AdminModel
     {
         try {
             $db = $this->getDatabase();
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->select([
                     $db->quoteName('start', 'start_date'),
                     $db->quoteName('end', 'end_date'),
@@ -952,7 +952,7 @@ class LessonModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('student'))
             ->from($db->quoteName('#__balancirk_presences'))
             ->where($db->quoteName('lesson') . ' = ' . $lessonId)
@@ -988,7 +988,7 @@ class LessonModel extends AdminModel
         $date = $parsedDate->format('Y-m-d');
         $students = is_array($students) ? $students : [];
         $dbo = $this->getDatabase();
-        $query = $dbo->getQuery(true);
+        $query = $dbo->createQuery();
 
         // Delete all presences for this lesson
         $query->delete($dbo->quoteName('#__balancirk_presences'))
@@ -1027,7 +1027,7 @@ class LessonModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('teacher'))
             ->from($db->quoteName('#__balancirk_teached'))
             ->where($db->quoteName('lesson') . ' = ' . $lessonId)
@@ -1063,7 +1063,7 @@ class LessonModel extends AdminModel
         $date = $parsedDate->format('Y-m-d');
         $teachers = is_array($teachers) ? $teachers : [];
         $dbo = $this->getDatabase();
-        $query = $dbo->getQuery(true);
+        $query = $dbo->createQuery();
 
         // Delete all teachers for this lesson
         $query->delete($dbo->quoteName('#__balancirk_teached'))
@@ -1110,7 +1110,7 @@ class LessonModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('member'))
             ->from($db->quoteName('#__balancirk_teachers'))
             ->where($db->quoteName('member') . ' = ' . $teacherId)
@@ -1120,7 +1120,7 @@ class LessonModel extends AdminModel
             return;
         }
 
-        $insert = $db->getQuery(true)
+        $insert = $db->createQuery()
             ->insert($db->quoteName('#__balancirk_teachers'))
             ->columns($db->quoteName(['member', 'lesson']))
             ->values($teacherId . ', ' . $lessonId);
@@ -1141,7 +1141,7 @@ class LessonModel extends AdminModel
 
         // Get the mailadresses of the parents
         $dbo = $this->getDatabase();
-        $query = $dbo->getQuery(true);
+        $query = $dbo->createQuery();
         $query->select($dbo->quoteName('p.email'))
             ->from('#__balancirk_subscriptions', 's')
             ->join('INNER', $dbo->quoteName('#__balancirk_parents', 'p'), 'p.id = s.parent', 's.subscribed = 0')

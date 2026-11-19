@@ -26,7 +26,7 @@ class MembersModel extends ListModel
      *
      * @param   array  $config  An optional associative array of configuration settings.
      *
-     * @see     \JControllerLegacy
+     * @see     \Joomla\CMS\MVC\Controller\BaseController
      *
      * @since   __BUMP_VERSION__
      */
@@ -100,7 +100,7 @@ class MembersModel extends ListModel
     /**
      * Build an SQL query to load the list datm.
      *
-     * @return  \JDatabaseQuery
+     * @return  \Joomla\Database\QueryInterface
      *
      * @since   __BUMP_VERSION__
      */
@@ -108,7 +108,7 @@ class MembersModel extends ListModel
     {
         // Create a new query object.
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Get the current logged in user.
         $app = \Joomla\CMS\Factory::getApplication();

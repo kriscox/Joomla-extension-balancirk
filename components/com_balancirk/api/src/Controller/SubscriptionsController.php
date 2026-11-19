@@ -449,7 +449,7 @@ class SubscriptionsController extends ApiController
 
         /** @var DatabaseInterface $db */
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('1')
             ->from($db->quoteName('#__balancirk_parents', 'p'))
             ->where($db->quoteName('p.child') . ' = ' . (int) $studentId)

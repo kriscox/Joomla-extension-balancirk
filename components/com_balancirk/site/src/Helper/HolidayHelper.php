@@ -51,7 +51,7 @@ class HolidayHelper
         }
 
         try {
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->select([
                     $db->quoteName('startDate', 'start'),
                     $db->quoteName('endDate', 'end'),

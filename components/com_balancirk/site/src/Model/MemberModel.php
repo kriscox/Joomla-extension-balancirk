@@ -17,6 +17,7 @@ use Joomla\CMS\User\User;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Form\Form;
+use Joomla\CMS\User\UserFactoryInterface;
 use Joomla\CMS\User\UserHelper;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Application\SiteApplication;
@@ -125,7 +126,7 @@ class MemberModel extends AdminModel
      * @param	array   $data	    Data from the form.
      * @param	boolean $loadData   True if the form is to load its own data (default case), false if not.
      *
-     * @return  \JForm|boolean  A \JForm object on success, false on failure
+     * @return  Form|boolean  A Form object on success, false on failure
      *
      * @since   0.0.1
      */
@@ -339,7 +340,7 @@ class MemberModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('1')
             ->from($db->quoteName('#__balancirk_members_additional'))
             ->where($db->quoteName('id') . ' = :userId')
@@ -368,7 +369,7 @@ class MemberModel extends AdminModel
             return true;
         }
 
-        $user = Factory::getUser($userId);
+        $user = Factory::getContainer()->get(UserFactoryInterface::class)->loadUserById($userId);
 
         if ($user->guest || (int) $user->id !== $userId) {
             return false;
@@ -419,7 +420,7 @@ class MemberModel extends AdminModel
             $data['phone'] ?? '',
         ];
 
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         if ($insert) {
             $query->insert($db->quoteName('#__balancirk_members_additional'))

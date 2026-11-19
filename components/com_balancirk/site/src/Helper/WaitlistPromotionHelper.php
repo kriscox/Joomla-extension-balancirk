@@ -59,7 +59,7 @@ class WaitlistPromotionHelper
             return 0;
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('COUNT(*)')
             ->from($db->quoteName('#__balancirk_subscriptions'))
             ->where($db->quoteName('lesson') . ' = ' . $lessonId)
@@ -140,7 +140,7 @@ class WaitlistPromotionHelper
             return null;
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('max_students'))
             ->from($db->quoteName('#__balancirk_lessons'))
             ->where($db->quoteName('id') . ' = ' . $lessonId);
@@ -162,7 +162,7 @@ class WaitlistPromotionHelper
      */
     private static function loadOldestWaiting(object $db, int $lessonId, int $limit): array
     {
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['id', 'student', 'lesson']))
             ->from($db->quoteName('#__balancirk_subscriptions'))
             ->where($db->quoteName('lesson') . ' = ' . $lessonId)
@@ -190,7 +190,7 @@ class WaitlistPromotionHelper
             return;
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->update($db->quoteName('#__balancirk_subscriptions'))
             ->set($db->quoteName('subscribed') . ' = 0')
             ->where($db->quoteName('id') . ' IN (' . implode(',', $ids) . ')')

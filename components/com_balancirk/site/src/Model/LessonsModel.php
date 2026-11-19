@@ -32,7 +32,7 @@ class LessonsModel extends ListModel
      *
      * @param   array  $config  An optional associative array of configuration settings.
      *
-     * @see     \JControllerLegacy
+     * @see     \Joomla\CMS\MVC\Controller\BaseController
      * @see     \Joomla\CMS\MVC\Controller\BaseController
      *
      * @since   __BUMP_VERSION__
@@ -92,7 +92,7 @@ class LessonsModel extends ListModel
     /**
      * Build an SQL query to load the list data.
      *
-     * @return  \JDatabaseQuery
+     * @return  \Joomla\Database\QueryInterface
      *
      * @since   __BUMP_VERSION__
      */
@@ -100,7 +100,7 @@ class LessonsModel extends ListModel
     {
         // Create a new query object.
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Get the current date
         $today = date("Y-m-d");
@@ -213,7 +213,7 @@ class LessonsModel extends ListModel
     {
         // Create a new query object.
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Get the current date
         $today = date("Y-m-d");
@@ -253,7 +253,7 @@ class LessonsModel extends ListModel
 
         if ($studentId !== null && $studentId > 0)
         {
-            $subscriptionQuery = $db->getQuery(true)
+            $subscriptionQuery = $db->createQuery()
                 ->select('1')
                 ->from($db->quoteName('#__balancirk_subscriptions', 's'))
                 ->where($db->quoteName('s.lesson') . ' = ' . $db->quoteName('a.id'))
@@ -290,7 +290,7 @@ class LessonsModel extends ListModel
     {
         // Create a new query object.
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Get the current date
         $today = date("Y-m-d");
@@ -333,7 +333,7 @@ class LessonsModel extends ListModel
     public function getYears()
     {
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select('DISTINCT ' . $db->quoteName('year'))
             ->from($db->quoteName('#__balancirk_lessons_complete'))
             ->order($db->quoteName('year') . ' DESC');
@@ -359,7 +359,7 @@ class LessonsModel extends ListModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('birthdate'))
             ->from($db->quoteName('#__balancirk_students'))
             ->where($db->quoteName('id') . ' = ' . (int) $studentId);

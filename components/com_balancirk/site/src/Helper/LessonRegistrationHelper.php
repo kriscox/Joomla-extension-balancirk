@@ -141,7 +141,7 @@ class LessonRegistrationHelper
             return false;
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->update($db->quoteName('#__balancirk_lessons'))
             ->set($db->quoteName('registration_closed') . ' = ' . ($closed ? 1 : 0))
             ->where($db->quoteName('id') . ' = ' . $lessonId);

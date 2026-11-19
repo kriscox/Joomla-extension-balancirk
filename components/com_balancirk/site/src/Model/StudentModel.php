@@ -156,7 +156,7 @@ class StudentModel extends AdminModel
 
         $trashedState = -2;
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('COUNT(*)')
             ->from($db->quoteName('#__balancirk_subscriptions', 's'))
             ->join(
@@ -204,7 +204,7 @@ class StudentModel extends AdminModel
      * @param	array   $data	    Data from the form.
      * @param	boolean $loadData   True if the form is to load its own data (default case), false if not.
      *
-     * @return  \JForm|boolean  A \JForm object on success, false on failure
+     * @return  Form|boolean  A Form object on success, false on failure
      *
      * @since   0.0.1
      */
@@ -301,7 +301,7 @@ class StudentModel extends AdminModel
                 array_push($values, 1);
 
                 $db = $this->getDatabase();
-                $query = $db->getQuery(true);
+                $query = $db->createQuery();
                 $query->insert($db->quoteName('#__balancirk_parents'))
                     ->columns($db->quoteName($columns))
                     ->values(implode(',', $values));
@@ -332,7 +332,7 @@ class StudentModel extends AdminModel
     {
         // Check if the user is the primary parent of the student
         $db     = $this->getDatabase();
-        $query     = $db->getQuery(true);
+        $query     = $db->createQuery();
         $query->select($db->quote('*'))
             ->from($db->quoteName('#__balancirk_parents'))
             ->where($db->quoteName('child') . ' = ' . $db->quote($student))
@@ -360,7 +360,7 @@ class StudentModel extends AdminModel
     public function getParents(?int $student = null, bool $primary = true)
     {
         $db     = $this->getDatabase();
-        $query     = $db->getQuery(true);
+        $query     = $db->createQuery();
         $query->select($db->quoteName('parent'))
             ->from($db->quoteName('#__balancirk_parents'))
             ->where($db->quoteName('child') . ' = ' . $db->quote($student));

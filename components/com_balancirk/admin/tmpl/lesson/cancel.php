@@ -10,11 +10,11 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
-use Joomla\CMS\HTML\HTMLHelper;
 
-HTMLHelper::_('behavior.keepalive');
+Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('keepalive');
 
 $preview = $this->cancellationPreview;
 $lessonId = (int) ($this->item->id ?? 0);

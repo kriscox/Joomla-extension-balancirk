@@ -32,7 +32,7 @@ class PresencesModel extends ListModel
      *
      * @param   array  $config  An optional associative array of configuration settings.
      *
-     * @see     \JControllerLegacy
+     * @see     \Joomla\CMS\MVC\Controller\BaseController
      *
      * @since   __BUMP_VERSION__
      */
@@ -57,7 +57,7 @@ class PresencesModel extends ListModel
     /**
      * Build an SQL query to load the list data.
      *
-     * @return  \JDatabaseQuery
+     * @return  \Joomla\Database\QueryInterface
      *
      * @since   __BUMP_VERSION__
      */
@@ -65,7 +65,7 @@ class PresencesModel extends ListModel
     {
         // Create a new query object.
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Select the required fields from the table.
         $query->select(
@@ -100,7 +100,7 @@ class PresencesModel extends ListModel
     {
         // Create a new query object.
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // if date = null then take date of today
         if ($this->date == null) {
@@ -139,7 +139,7 @@ class PresencesModel extends ListModel
     {
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // if date = null then take date of today
         if ($this->date == null) {
@@ -173,7 +173,7 @@ class PresencesModel extends ListModel
         $this->student = $student;
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // check the number of presences of a student in a lesson
         $query->select('COUNT(*)')
@@ -202,7 +202,7 @@ class PresencesModel extends ListModel
         $this->date = $date;
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // check the number of presences of a student in a lesson
         $query->select('date')

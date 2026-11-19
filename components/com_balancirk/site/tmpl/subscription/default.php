@@ -17,14 +17,13 @@ use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\WebAsset\WebAssetManager;
 
-HTMLHelper::_('behavior.formvalidator');
-HTMLHelper::_('behavior.keepalive');
-
 $selectedStudentId = (int) $this->form->getValue('student');
 $document = Factory::getApplication()->getDocument();
 /** @var WebAssetManager $wa */
 $wa = $document->getWebAssetManager();
-$wa->registerAndUseScript('subscription-lessons', 'media/com_balancirk/js/balancirk_subscription_lessons.js');
+$wa->useScript('keepalive')
+	->useScript('form.validate')
+	->registerAndUseScript('subscription-lessons', 'media/com_balancirk/js/balancirk_subscription_lessons.js');
 $document->addScriptOptions('subscription-lessons', [
     'endpoint' => Route::_('index.php?option=com_balancirk&task=subscription.lessons&format=json', false),
     'errorMessage' => Text::_('COM_BALANCIRK_SUBSCRIPTION_LESSONS_LOAD_ERROR'),

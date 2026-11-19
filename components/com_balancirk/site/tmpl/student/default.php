@@ -8,6 +8,7 @@
  * @license     GNU General Public License version 3.
  */
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -15,8 +16,9 @@ use Joomla\CMS\Layout\LayoutHelper;
 
 defined('_JEXEC') or die;
 
-HTMLHelper::_('behavior.formvalidator');
-HTMLHelper::_('behavior.keepalive');
+Factory::getApplication()->getDocument()->getWebAssetManager()
+	->useScript('keepalive')
+	->useScript('form.validate');
 ?>
 
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>

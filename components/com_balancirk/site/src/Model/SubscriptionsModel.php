@@ -28,7 +28,7 @@ class SubscriptionsModel extends ListModel
      *
      * @param   array  $config  An optional associative array of configuration settings.
      *
-     * @see     \JControllerLegacy
+     * @see     \Joomla\CMS\MVC\Controller\BaseController
      * @see     \Joomla\CMS\MVC\Controller\BaseController
      *
      * @since   __BUMP_VERSION__
@@ -100,7 +100,7 @@ class SubscriptionsModel extends ListModel
     /**
      * Build an SQL query to load the list data.
      *
-     * @return  \JDatabaseQuery
+     * @return  \Joomla\Database\QueryInterface
      *
      * @since   __BUMP_VERSION__
      */
@@ -108,7 +108,7 @@ class SubscriptionsModel extends ListModel
     {
         // Create a new query object.
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Get the current logged in user.
         $app = Factory::getApplication();
@@ -224,7 +224,7 @@ class SubscriptionsModel extends ListModel
         $user = $app->getIdentity();
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select('DISTINCT ' . $db->quoteName('year'))
             ->from($db->quoteName('#__balancirk_subscriptions_view', 'a'));
 
@@ -254,7 +254,7 @@ class SubscriptionsModel extends ListModel
         $user = $app->getIdentity();
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['s.id', 's.firstname', 's.name']))
             ->from($db->quoteName('#__balancirk_students', 's'))
             ->join(

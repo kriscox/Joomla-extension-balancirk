@@ -1,14 +1,14 @@
-# Balancirk - Joomla 4 Extension
+# Balancirk - Joomla 6 Extension
 
 ## Overview
 
-Balancirk is a Joomla 4 extension package for managing members, students, lessons, subscriptions, and attendance for a gymnastics/circus school. It consists of:
+Balancirk is a Joomla 6 extension package for managing members, students, lessons, subscriptions, and attendance for a gymnastics/circus school. It consists of:
 
 - **com_balancirk** — Main Joomla MVC component (admin + site + API)
 - **plg_webservices_balancirk** — Web services plugin (REST API routes)
 - **joomlaology** — Shared PHP utility library
 
-This is NOT a standalone application. It requires installation into a Joomla 4 CMS instance.
+This is NOT a standalone application. It requires installation into a Joomla 6 CMS instance (also installable on Joomla 4/5 where noted APIs overlap).
 
 The Angular member SPA is developed separately on the `Single-page-site-ontwikkeling` branch and is not part of `master`.
 
@@ -29,7 +29,7 @@ make -B packages/com_balancirk.zip packages/balancirk.zip pkg_balancirk.zip
 ```
 
 - Do **not** run `make` / `make all` or `./scripts/version.sh bump` for ordinary fixes or test packages. That bumps the version; version bumps are **release-only** (see below).
-- Joomla `method="upgrade"` does **not** delete files removed from a new zip. If files must disappear on upgrade, add them to `$deleteFiles` / `$deleteFolders` in `components/com_balancirk/script.php` and call `removeFiles()`. Never remove active API files used for presence/attendance (`PresencesController`, routes in `plugins/balancirk/balancirk.php`).
+- Joomla `method="upgrade"` does **not** delete files removed from a new zip. If files must disappear on upgrade, add them to `$deleteFiles` / `$deleteFolders` in `components/com_balancirk/script.php` and call `removeFiles()`. Never remove active API files used for presence/attendance (`PresencesController`, routes in `plugins/balancirk/src/Extension/Balancirk.php`).
 
 ## Releases (master only)
 

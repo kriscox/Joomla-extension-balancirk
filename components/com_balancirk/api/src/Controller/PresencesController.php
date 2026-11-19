@@ -54,7 +54,7 @@ class PresencesController extends ApiController
 
         /** @var DatabaseInterface $db */
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('student'))
             ->from($db->quoteName('#__balancirk_presences'))
             ->where($db->quoteName('lesson') . ' = ' . (int) $lesson)
@@ -105,7 +105,7 @@ class PresencesController extends ApiController
         /** @var DatabaseInterface $db */
         $db = Factory::getContainer()->get(DatabaseInterface::class);
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->delete($db->quoteName('#__balancirk_presences'))
             ->where($db->quoteName('lesson') . ' = ' . (int) $lesson)
             ->where($db->quoteName('date') . ' = ' . $db->quote($date));
@@ -113,7 +113,7 @@ class PresencesController extends ApiController
 
         foreach ($students as $student)
         {
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->insert($db->quoteName('#__balancirk_presences'))
                 ->columns($db->quoteName(['lesson', 'student', 'date']))
                 ->values((int) $lesson . ', ' . (int) $student . ', ' . $db->quote($date));
@@ -213,7 +213,7 @@ class PresencesController extends ApiController
 
         /** @var DatabaseInterface $db */
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['start', 'end', 'lesdays']))
             ->from($db->quoteName('#__balancirk_lessons'))
             ->where($db->quoteName('id') . ' = ' . $lessonId);
