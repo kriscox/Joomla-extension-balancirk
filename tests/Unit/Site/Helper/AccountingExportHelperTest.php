@@ -43,6 +43,7 @@ class AccountingExportHelperTest extends TestCase
                 'student_name' => 'Peeters',
                 'uitpas' => '',
                 'mutuality' => 'CM',
+                'increased_benefit' => '',
             ],
             $row
         );
@@ -64,13 +65,14 @@ class AccountingExportHelperTest extends TestCase
                 'student_name' => 'Janssens',
                 'uitpas' => '12345',
                 'mutuality' => 'CM',
+                'increased_benefit' => '1',
             ],
         ]);
 
         $lines = preg_split("/\r\n|\n|\r/", trim($csv));
 
-        $this->assertSame('"firstname";"name";"address";"bus";"postcode";"city";"email";"lesson";"student_firstname";"student_name";"uitpas";"mutuality"', $lines[0]);
-        $this->assertSame('"Anna";"Janssens";"Stationsstraat 1";"2";"9000";"Gent";"anna@example.com";"Acro";"Mila";"Janssens";"12345";"CM"', $lines[1]);
+        $this->assertSame('"firstname";"name";"address";"bus";"postcode";"city";"email";"lesson";"student_firstname";"student_name";"uitpas";"mutuality";"increased_benefit"', $lines[0]);
+        $this->assertSame('"Anna";"Janssens";"Stationsstraat 1";"2";"9000";"Gent";"anna@example.com";"Acro";"Mila";"Janssens";"12345";"CM";"1"', $lines[1]);
     }
 
     public function testRenderXlsEscapesValues(): void
@@ -127,6 +129,7 @@ class AccountingExportHelperTest extends TestCase
         $this->assertCount(1, $lines);
         $this->assertStringContainsString('"firstname"', $lines[0]);
         $this->assertStringContainsString('"mutuality"', $lines[0]);
+        $this->assertStringContainsString('"increased_benefit"', $lines[0]);
     }
 
     public function testNormalizeRowTrimsLeadingAndTrailingWhitespace(): void

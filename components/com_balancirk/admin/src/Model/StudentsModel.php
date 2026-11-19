@@ -27,7 +27,7 @@ class StudentsModel extends ListModel
     /**
      * Cached component actions.
      *
-     * @var    \JObject|null
+     * @var    \Joomla\Registry\Registry|null
      * @since  1.2.22
      */
     protected $canDo;
@@ -37,7 +37,7 @@ class StudentsModel extends ListModel
      *
      * @param   array  $config  An optional associative array of configuration settings.
      *
-     * @see     \JControllerLegacy
+     * @see     \Joomla\CMS\MVC\Controller\BaseController
      * @see     \Joomla\CMS\MVC\Controller\BaseController
      *
      * @since   __BUMP_VERSION__
@@ -129,7 +129,7 @@ class StudentsModel extends ListModel
     /**
      * Build an SQL query to load the list data.
      *
-     * @return  \JDatabaseQuery
+     * @return  \Joomla\Database\QueryInterface
      *
      * @since   __BUMP_VERSION__
      */
@@ -137,7 +137,7 @@ class StudentsModel extends ListModel
     {
         // Create a new query object.
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Select the required fields from the table.
         $query->select(

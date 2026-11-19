@@ -19,11 +19,6 @@ use CoCoCo\Component\Balancirk\Site\Helper\LesdaysHelper;
 
 defined('_JEXEC') or die;
 
-HTMLHelper::_('behavior.formvalidator');
-HTMLHelper::_('behavior.keepalive');
-
-HTMLHelper::_('jquery.framework');
-
 /** @var Joomla\CMS\Application $app */
 $app = Factory::getApplication();
 
@@ -56,7 +51,9 @@ $holidayRanges = $lessonModel instanceof LessonModel
 	? $lessonModel->getHolidayIsoRanges($period['start'] ?? null, $period['end'] ?? null)
 	: [];
 $userid = Factory::getApplication()->getIdentity()->id;
-$joomlaToken = UserHelper::getProfile($userid)->get('joomlatoken');
+// Joomla 6 UserHelper::getProfile() returns stdClass. CMSObject::get() was removed.
+$profile = UserHelper::getProfile($userid);
+$joomlaToken = is_object($profile) ? ($profile->joomlatoken ?? null) : null;
 $api_token = is_array($joomlaToken) ? (string) ($joomlaToken['token'] ?? '') : '';
 $teachersUrl = Route::_(
 	'index.php?option=com_balancirk&task=lesson.teachers&format=json&' . Session::getFormToken() . '=1',
@@ -101,7 +98,10 @@ if ($restoredIsValid) {
 $doc = $app->getDocument();
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $doc->getWebAssetManager();
-$wa->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
+$wa->useScript('keepalive')
+	->useScript('form.validate')
+	->useScript('jquery')
+	->registerAndUseStyle('lesson', 'media/com_balancirk/css/lesson.css')
 	->registerAndUseScript('bootstrap-datepicker', 'https://unpkg.com/bootstrap-datepicker@latest/dist/js/bootstrap-datepicker.min.js')
 	->registerAndUseScript('bootstrap-datepicker-nl', 'https://unpkg.com/bootstrap-datepicker@latest/dist/locales/bootstrap-datepicker.nl-BE.min.js')
 	->registerAndUseScript(

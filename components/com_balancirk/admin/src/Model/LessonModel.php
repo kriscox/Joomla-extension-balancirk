@@ -123,7 +123,7 @@ class LessonModel extends AdminModel
      * @param   array   $data       Data from the form.
      * @param   boolean $loadData   True if the form is to load its own data (default case), false if not.
      *
-     * @return  \JForm|boolean  A \JForm object on success, false on failure
+     * @return  Form|boolean  A Form object on success, false on failure
      *
      * @since   0.0.1
      */
@@ -231,7 +231,7 @@ class LessonModel extends AdminModel
         // Get the database connection
         $db = $this->getDatabase();
 
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Get all hours for the current lesson
         $query->select($db->quoteName(array('id', 'day')))
@@ -270,7 +270,7 @@ class LessonModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['m.id', 'm.firstname', 'u.name', 'u.email']))
             ->from($db->quoteName('#__balancirk_teachers', 't'))
             ->join(
@@ -300,7 +300,7 @@ class LessonModel extends AdminModel
     {
         $db = $this->getDatabase();
 
-        $groupQuery = $db->getQuery(true)
+        $groupQuery = $db->createQuery()
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__usergroups'))
             ->where($db->quoteName('title') . ' = ' . $db->quote('Teachers'));
@@ -310,7 +310,7 @@ class LessonModel extends AdminModel
             return [];
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['m.id', 'm.firstname', 'u.name', 'u.email']))
             ->from($db->quoteName('#__balancirk_members_additional', 'm'))
             ->join(
@@ -345,7 +345,7 @@ class LessonModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('member'))
             ->from($db->quoteName('#__balancirk_teachers'))
             ->where($db->quoteName('lesson') . ' = ' . (int) $lessonId);
@@ -391,7 +391,7 @@ class LessonModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('COUNT(*)')
             ->from($db->quoteName('#__balancirk_teached'))
             ->where($db->quoteName('teacher') . ' = ' . (int) $memberId);
@@ -429,7 +429,7 @@ class LessonModel extends AdminModel
         $db = $this->getDatabase();
 
         foreach ($toAdd as $memberId) {
-            $insertQuery = $db->getQuery(true)
+            $insertQuery = $db->createQuery()
                 ->insert($db->quoteName('#__balancirk_teachers'))
                 ->columns([$db->quoteName('member'), $db->quoteName('lesson')])
                 ->values((int) $memberId . ', ' . (int) $lessonId);
@@ -437,7 +437,7 @@ class LessonModel extends AdminModel
         }
 
         foreach ($toRemove as $memberId) {
-            $deleteQuery = $db->getQuery(true)
+            $deleteQuery = $db->createQuery()
                 ->delete($db->quoteName('#__balancirk_teachers'))
                 ->where($db->quoteName('lesson') . ' = ' . (int) $lessonId)
                 ->where($db->quoteName('member') . ' = ' . (int) $memberId);
@@ -736,7 +736,7 @@ class LessonModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select(
                 $db->quoteName(
                     [
@@ -1094,7 +1094,7 @@ class LessonModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('*')
             ->from($db->quoteName('#__balancirk_lessons'))
             ->where($db->quoteName('id') . ' = ' . $lessonId);
@@ -1355,7 +1355,7 @@ class LessonModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('*')
             ->from($db->quoteName('#__balancirk_students'))
             ->where($db->quoteName('id') . ' = ' . $studentId);

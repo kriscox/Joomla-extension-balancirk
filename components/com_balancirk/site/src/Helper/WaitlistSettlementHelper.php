@@ -35,7 +35,7 @@ class WaitlistSettlementHelper
             return [];
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select(
                 $db->quoteName(
                     [
@@ -140,7 +140,7 @@ class WaitlistSettlementHelper
             $promotedIds[] = (int) $row->id;
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->update($db->quoteName('#__balancirk_subscriptions'))
             ->set($db->quoteName('subscribed') . ' = 0')
             ->where($db->quoteName('id') . ' IN (' . implode(',', $promotedIds) . ')')
@@ -182,7 +182,7 @@ class WaitlistSettlementHelper
             $dismissedIds[] = (int) $row->id;
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->delete($db->quoteName('#__balancirk_subscriptions'))
             ->where($db->quoteName('id') . ' IN (' . implode(',', $dismissedIds) . ')')
             ->where($db->quoteName('lesson') . ' = ' . $lessonId)
@@ -215,7 +215,7 @@ class WaitlistSettlementHelper
      */
     private static function loadWaitingByIds(object $db, int $lessonId, array $ids): array
     {
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['id', 'student', 'lesson']))
             ->from($db->quoteName('#__balancirk_subscriptions'))
             ->where($db->quoteName('lesson') . ' = ' . $lessonId)

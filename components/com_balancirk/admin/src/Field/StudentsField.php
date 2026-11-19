@@ -42,7 +42,7 @@ class StudentsField extends ListField
     protected function getOptions()
     {
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['id', 'firstname', 'name']))
             ->from($db->quoteName('#__balancirk_students'))
             ->where('(' . $db->quoteName('state') . ' = 0 OR ' . $db->quoteName('state') . ' = 1)')

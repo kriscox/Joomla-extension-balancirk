@@ -118,7 +118,7 @@ class MemberModel extends AdminModel
      * @param   array   $data       Data from the form.
      * @param   boolean $loadData   True if the form is to load its own data (default case), false if not.
      *
-     * @return  \JForm|boolean  A \JForm object on success, false on failure
+     * @return  Form|boolean  A Form object on success, false on failure
      *
      * @since   0.0.1
      */
@@ -369,7 +369,7 @@ class MemberModel extends AdminModel
         );
 
         // Create query and don't forget to quote everything
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         if ($insert) {
             $query->insert($db->quoteName('#__balancirk_members_additional'))
@@ -405,7 +405,7 @@ class MemberModel extends AdminModel
     public function getStudents()
     {
         $db     = $this->getDatabase();
-        $query     = $db->getQuery(true);
+        $query     = $db->createQuery();
         $query->select($db->quoteName(['s.id', 's.name', 's.firstname']))
             ->from($db->quoteName('#__balancirk_parents', 'p'))
             ->join('INNER', $db->quoteName('#__balancirk_students', 's') .

@@ -22,7 +22,6 @@ use CoCoCo\Component\Balancirk\Site\Helper\LessonRegistrationHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Object\CMSObject;
 use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Mail\MailerFactoryInterface;
@@ -93,7 +92,7 @@ class SubscriptionModel extends AdminModel
 
         $db = $this->getDatabase();
 
-        $parentQuery = $db->getQuery(true)
+        $parentQuery = $db->createQuery()
             ->select('1')
             ->from($db->quoteName('#__balancirk_parents', 'p'))
             ->where($db->quoteName('p.parent') . ' = ' . (int) $user->id)
@@ -105,7 +104,7 @@ class SubscriptionModel extends AdminModel
             return false;
         }
 
-        $presenceQuery = $db->getQuery(true)
+        $presenceQuery = $db->createQuery()
             ->select('COUNT(*)')
             ->from($db->quoteName('#__balancirk_presences'))
             ->where($db->quoteName('student') . ' = ' . (int) $record->student)
@@ -146,7 +145,7 @@ class SubscriptionModel extends AdminModel
      * @param	array   $data	    Data from the form.
      * @param	boolean $loadData   True if the form is to load its own data (default case), false if not.
      *
-     * @return  \JForm|boolean  A \JForm object on success, false on failure
+     * @return  Form|boolean  A Form object on success, false on failure
      *
      * @since   0.0.1
      */
@@ -283,7 +282,7 @@ class SubscriptionModel extends AdminModel
         $waitinglist = ($this->countLessonSubscriptions($lessonId) < (int) $lesson->max_students) ? 0 : 1;
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->insert($db->quoteName('#__balancirk_subscriptions'))
             ->columns($db->quoteName(array('student', 'lesson', 'subscribed')))
             ->values($studentId . ',' . $lessonId . ',' . (int) $waitinglist);
@@ -365,7 +364,7 @@ class SubscriptionModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('*')
             ->from($db->quoteName('#__balancirk_lessons'))
             ->where($db->quoteName('id') . ' = ' . $lessonId);
@@ -391,7 +390,7 @@ class SubscriptionModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('*')
             ->from($db->quoteName('#__balancirk_students'))
             ->where($db->quoteName('id') . ' = ' . $studentId);
@@ -416,7 +415,7 @@ class SubscriptionModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['m.id', 'm.name', 'm.firstname', 'm.email']))
             ->from($db->quoteName('#__balancirk_parents', 'p'))
             ->join(
@@ -531,7 +530,7 @@ class SubscriptionModel extends AdminModel
     private function countLessonSubscriptions(int $lessonId): int
     {
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('COUNT(*)')
             ->from($db->quoteName('#__balancirk_subscriptions'))
             ->where($db->quoteName('lesson') . ' = ' . $lessonId);
@@ -552,7 +551,7 @@ class SubscriptionModel extends AdminModel
     private function subscriptionExists(int $studentId, int $lessonId): bool
     {
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('1')
             ->from($db->quoteName('#__balancirk_subscriptions'))
             ->where($db->quoteName('student') . ' = ' . $studentId)
@@ -616,7 +615,7 @@ class SubscriptionModel extends AdminModel
         $lessonId = (int) ($subscription->lesson ?? 0);
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         $query->delete($db->quoteName('#__balancirk_subscriptions'))
             ->where($db->quoteName('student') . ' = ' . $subscription->student)
@@ -671,7 +670,7 @@ class SubscriptionModel extends AdminModel
      *
      * @param   integer  $pk  The id of the primary key.
      *
-     * @return  CMSObject|boolean  Object on success, false on failure.
+     * @return  \stdClass|boolean  Object on success, false on failure.
      *
      * @since   __BUMP_VERIONS__
      */
@@ -683,7 +682,7 @@ class SubscriptionModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         $query->select(
             $db->quoteName(
@@ -788,7 +787,7 @@ class SubscriptionModel extends AdminModel
         }
 
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $addressExpression = "TRIM(CONCAT_WS(' ', NULLIF(" . $db->quoteName('m.street') . ", ''), NULLIF(" . $db->quoteName('m.number') . ", '')))";
         $parentJoin = $db->quoteName('#__balancirk_parents', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ('
             . 'SELECT ' . $db->quoteName('pp.id')
@@ -810,6 +809,7 @@ class SubscriptionModel extends AdminModel
             ->select($db->quoteName('s.name', 'student_name'))
             ->select($db->quoteName('s.uitpas', 'uitpas'))
             ->select($db->quoteName('s.mutuality', 'mutuality'))
+            ->select($db->quoteName('s.increased_benefit', 'increased_benefit'))
             ->from($db->quoteName('#__balancirk_subscriptions', 'sub'))
             ->join('INNER', $db->quoteName('#__balancirk_lessons', 'l') . ' ON ' . $db->quoteName('l.id') . ' = ' . $db->quoteName('sub.lesson'))
             ->join('INNER', $db->quoteName('#__balancirk_students', 's') . ' ON ' . $db->quoteName('s.id') . ' = ' . $db->quoteName('sub.student'))

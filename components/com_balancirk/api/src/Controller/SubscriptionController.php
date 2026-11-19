@@ -162,7 +162,7 @@ class SubscriptionController extends ApiController
     {
         /** @var DatabaseInterface $db */
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('1')
             ->from($db->quoteName('#__balancirk_parents', 'p'))
             ->where($db->quoteName('p.parent') . ' = ' . $userId)
@@ -187,7 +187,7 @@ class SubscriptionController extends ApiController
     {
         /** @var DatabaseInterface $db */
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('COUNT(*)')
             ->from($db->quoteName('#__balancirk_presences', 'p'))
             ->where($db->quoteName('p.student') . ' = ' . $studentId)

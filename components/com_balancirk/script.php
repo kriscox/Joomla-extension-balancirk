@@ -66,6 +66,8 @@ class Com_BalancirkInstallerScript extends InstallerScript
         '/components/com_balancirk/src/Controller/DisplayController copy.php',
         '/components/com_balancirk/src/Controller/com_balancirk.code-workspace',
         '/administrator/components/com_balancirk/Makefile',
+        // Legacy flat webservices plugin entry (replaced by services/ + Extension class)
+        '/plugins/webservices/balancirk/balancirk.php',
     ];
 
     /**
@@ -76,6 +78,8 @@ class Com_BalancirkInstallerScript extends InstallerScript
      */
     protected $deleteFolders = [
         '/media/com_balancirk/member-spa',
+        '/plugins/webservices/balancirk/lib',
+        '/plugins/webservices/balancirk/tmpl',
     ];
 
     /**
@@ -131,6 +135,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
         $this->migrateTeachedTeacherForeignKey();
         $this->ensurePromotionEmailColumns();
         $this->ensureRegistrationLifecycleColumns();
+        $this->ensureIncreasedBenefitColumn();
 
         return true;
     }
@@ -205,6 +210,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
             $this->migrateTeachedTeacherForeignKey();
             $this->ensurePromotionEmailColumns();
             $this->ensureRegistrationLifecycleColumns();
+            $this->ensureIncreasedBenefitColumn();
         }
 
         return true;
@@ -234,7 +240,7 @@ class Com_BalancirkInstallerScript extends InstallerScript
                 return;
             }
 
-            $columnsQuery = $db->getQuery(true)
+            $columnsQuery = $db->createQuery()
                 ->select($db->quoteName('COLUMN_NAME'))
                 ->from($db->quoteName('information_schema.KEY_COLUMN_USAGE'))
                 ->where($db->quoteName('CONSTRAINT_SCHEMA') . ' = ' . $db->quote($schema))
@@ -408,6 +414,61 @@ FROM ' . $db->quoteName($table) . ' a
     }
 
     /**
+     * Add increased_benefit on students when schema SQL is skipped.
+     *
+     * Safe to run repeatedly: skips the column when it already exists.
+     *
+     * @return  void
+     *
+     * @since   1.3.27
+     */
+    private function ensureIncreasedBenefitColumn(): void
+    {
+        try {
+            /** @var \Joomla\Database\DatabaseDriver $db */
+            $db = Factory::getContainer()->get('DatabaseDriver');
+            $table = $db->replacePrefix('#__balancirk_students');
+            $columns = $db->setQuery('SHOW COLUMNS FROM ' . $db->quoteName($table))->loadColumn() ?: [];
+
+            if (!in_array('increased_benefit', $columns, true)) {
+                $db->setQuery(
+                    'ALTER TABLE ' . $db->quoteName($table)
+                    . ' ADD COLUMN ' . $db->quoteName('increased_benefit')
+                    . ' boolean NOT NULL DEFAULT 0 AFTER ' . $db->quoteName('uitpas')
+                )->execute();
+            }
+
+            $db->setQuery(
+                'CREATE OR REPLACE VIEW ' . $db->quoteName($db->replacePrefix('#__balancirk_subscriptions_comptable')) . ' AS
+SELECT m.`firstname` AS `firstname`,
+    m.`name` AS `name`,
+    concat(m.`street`, \' \', m.`number`) AS `address`,
+    m.`bus` AS `bus`,
+    m.`postcode` AS `postcode`,
+    m.`city` AS `city`,
+    m.`email` AS `email`,
+    s.`lesson` AS `lesson`,
+    s.`firstname` AS `student_firstname`,
+    s.`name` AS `student_name`,
+    st.`uitpas` AS `uitpas`,
+    st.`mutuality` AS `mutuality`,
+    st.`increased_benefit` AS `increased_benefit`
+FROM ' . $db->quoteName($db->replacePrefix('#__balancirk_subscriptions_view')) . ' s
+    JOIN ' . $db->quoteName($table) . ' st ON s.`studentid` = st.`id`
+    JOIN ' . $db->quoteName($db->replacePrefix('#__balancirk_parents')) . ' p ON p.`child` = s.`studentid`
+    AND p.`primary` = 1
+    JOIN ' . $db->quoteName($db->replacePrefix('#__balancirk_members')) . ' m ON m.`id` = p.`parent`'
+            )->execute();
+        } catch (\Throwable $e) {
+            Log::add(
+                'Balancirk: could not add increased_benefit column: ' . $e->getMessage(),
+                Log::WARNING,
+                'jerror'
+            );
+        }
+    }
+
+    /**
      * Delete leftover Angular SPA / PWA files from previous installs.
      *
      * Joomla does not remove files that disappeared from an upgrade package;
@@ -438,7 +499,7 @@ FROM ' . $db->quoteName($table) . ' a
 
         /** @var \Joomla\Database\DatabaseDriver $db */
         $db = Factory::getContainer()->get('DatabaseDriver');
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('COUNT(*)')
             ->from($db->quoteName('#__modules'))
             ->where(
@@ -563,7 +624,7 @@ FROM ' . $db->quoteName($table) . ' a
     private function getUserGroupId(string $title): ?int
     {
         $db = Factory::getContainer()->get('DatabaseDriver');
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__usergroups'))
             ->where($db->quoteName('title') . ' = ' . $db->quote($title));
@@ -587,7 +648,7 @@ FROM ' . $db->quoteName($table) . ' a
     private function setComponentPermissions(int $groupId, array $permissions): void
     {
         $db = Factory::getContainer()->get('DatabaseDriver');
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['id', 'rules']))
             ->from($db->quoteName('#__assets'))
             ->where($db->quoteName('name') . ' = ' . $db->quote('com_balancirk'));
@@ -617,7 +678,7 @@ FROM ' . $db->quoteName($table) . ' a
             $rules[$action][(string) $groupId] = $value ? 1 : 0;
         }
 
-        $update = $db->getQuery(true)
+        $update = $db->createQuery()
             ->update($db->quoteName('#__assets'))
             ->set($db->quoteName('rules') . ' = ' . $db->quote(json_encode($rules)))
             ->where($db->quoteName('id') . ' = ' . (int) $asset['id']);
@@ -630,7 +691,7 @@ FROM ' . $db->quoteName($table) . ' a
         /** @var \Joomla\Database\DatabaseDriver $db */
         $db = Factory::getContainer()->get('DatabaseDriver');
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__menu_types'))
             ->where($db->quoteName('menutype') . ' = ' . $db->quote('hiddenmenu'));

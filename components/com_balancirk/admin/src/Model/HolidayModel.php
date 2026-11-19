@@ -118,7 +118,7 @@ class HolidayModel extends AdminModel
      * @param   array   $data       Data from the form.
      * @param   boolean $loadData   True if the form is to load its own data (default case), false if not.
      *
-     * @return  \JForm|boolean  A \JForm object on success, false on failure
+     * @return  Form|boolean  A Form object on success, false on failure
      *
      * @since   1.2.9
      */
@@ -183,7 +183,7 @@ class HolidayModel extends AdminModel
     {
         try {
             $db = $this->getDatabase();
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->select('MAX(' . $db->quoteName('year') . ')')
                 ->from($db->quoteName('#__balancirk_lessons'));
             $year = (int) $db->setQuery($query)->loadResult();

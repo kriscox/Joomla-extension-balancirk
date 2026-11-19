@@ -34,4 +34,21 @@ class StudentsTable extends Table
         $this->typeAlias = 'com_balancirk.student';
         parent::__construct('#__balancirk_students', 'id', $db);
     }
+
+    /**
+     * Ensure boolean columns keep an explicit 0/1 value before store.
+     *
+     * @param   boolean  $updateNulls  True to update null values as well.
+     *
+     * @return  boolean  True on success.
+     *
+     * @since   1.3.27
+     */
+    public function store($updateNulls = false)
+    {
+        $this->increased_benefit = !empty($this->increased_benefit) ? 1 : 0;
+        $this->allow_photo = !empty($this->allow_photo) ? 1 : 0;
+
+        return parent::store($updateNulls);
+    }
 }

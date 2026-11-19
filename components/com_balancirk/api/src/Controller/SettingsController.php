@@ -103,7 +103,7 @@ class SettingsController extends ApiController
 
         /** @var DatabaseInterface $db */
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->update($db->quoteName('#__extensions'))
             ->set($db->quoteName('params') . ' = ' . $db->quote((string) $params))
             ->where($db->quoteName('extension_id') . ' = ' . (int) $component->id);

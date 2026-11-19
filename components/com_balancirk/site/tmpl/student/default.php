@@ -8,6 +8,7 @@
  * @license     GNU General Public License version 3.
  */
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -15,8 +16,9 @@ use Joomla\CMS\Layout\LayoutHelper;
 
 defined('_JEXEC') or die;
 
-HTMLHelper::_('behavior.formvalidator');
-HTMLHelper::_('behavior.keepalive');
+Factory::getApplication()->getDocument()->getWebAssetManager()
+	->useScript('keepalive')
+	->useScript('form.validate');
 ?>
 
 <?php echo HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>
@@ -57,6 +59,10 @@ HTMLHelper::_('behavior.keepalive');
 		<div class="row mb-2">
 			<div class="col-md-4"><strong><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_UITPAS') ?></strong></div>
 			<div class="col-md-8"><?= $this->escape($this->item->uitpas) ?></div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-md-4"><strong><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_INCREASED_BENEFIT') ?></strong></div>
+			<div class="col-md-8"><?= !empty($this->item->increased_benefit) ? Text::_('JYES') : Text::_('JNO') ?></div>
 		</div>
 		<div class="row mb-2">
 			<div class="col-md-4"><strong><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_ALLOW_PHOTO') ?></strong></div>

@@ -41,14 +41,14 @@ class HtmlView extends BaseHtmlView
     /**
      * The model state
      *
-     * @var  \JObject
+     * @var  \Joomla\Registry\Registry
      */
     protected $state;
 
     /**
      * Form object for search filters
      *
-     * @var  \JForm
+     * @var  \Joomla\CMS\Form\Form
      */
     public $filterForm;
 

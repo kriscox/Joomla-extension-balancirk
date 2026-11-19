@@ -28,7 +28,7 @@ class MembersModel extends ListModel
      *
      * @param   array  $config  An optional associative array of configuration settings.
      *
-     * @see     \JControllerLegacy
+     * @see     \Joomla\CMS\MVC\Controller\BaseController
      *
      * @since   __BUMP_VERSION__
      */
@@ -103,7 +103,7 @@ class MembersModel extends ListModel
     /**
      * Build an SQL query to load the list data.
      *
-     * @return  \JDatabaseQuery
+     * @return  \Joomla\Database\QueryInterface
      *
      * @since   __BUMP_VERSION__
      */
@@ -111,7 +111,7 @@ class MembersModel extends ListModel
     {
         // Create a new query object.
         $db = $this->getDbo();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Select the required fields from the table.
         $query->select(
@@ -221,7 +221,7 @@ class MembersModel extends ListModel
 
             // remove addition information from user
             $dbo = $this->getDbo();
-            $query = $dbo->getQuery(true)->delete($dbo->quoteName('#__balancirk_members_additional'));
+            $query = $dbo->createQuery()->delete($dbo->quoteName('#__balancirk_members_additional'));
 
             $conditions = array(
                 $dbo->quoteName('id') . " = " . $id

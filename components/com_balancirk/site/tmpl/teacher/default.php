@@ -25,8 +25,9 @@ $teacherId = $input->getInt('teacher_id');
 $startDate = $input->get('start_date', '', 'string');
 $endDate = $input->get('end_date', '', 'string');
 
-HTMLHelper::_('behavior.formvalidator');
-HTMLHelper::_('behavior.keepalive');
+Factory::getApplication()->getDocument()->getWebAssetManager()
+	->useScript('keepalive')
+	->useScript('form.validate');
 ?>
 
 <?= HTMLHelper::_('content.prepare', '{loadposition balancirk-top}'); ?>

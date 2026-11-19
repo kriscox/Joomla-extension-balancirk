@@ -137,14 +137,14 @@ class SubscriptionsModel extends ListModel
     /**
      * Build an SQL query to load the list data.
      *
-     * @return  \JDatabaseQuery
+     * @return  \Joomla\Database\QueryInterface
      *
      * @since   __BUMP_VERSION__
      */
     protected function getListQuery()
     {
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         $query->select(
             $db->quoteName(
@@ -241,7 +241,7 @@ class SubscriptionsModel extends ListModel
     public function getYears(): array
     {
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('DISTINCT ' . $db->quoteName('year'))
             ->from($db->quoteName('#__balancirk_subscriptions_view'))
             ->order($db->quoteName('year') . ' DESC');

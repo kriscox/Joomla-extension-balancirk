@@ -46,12 +46,20 @@ class StudentsController extends ApiController
             if (!isset($data['state'])) {
                 $data['state'] = 1;
             }
+
+            if (!isset($data['increased_benefit'])) {
+                $data['increased_benefit'] = 0;
+            }
         } else {
             if (!$this->canUpdateStudent($recordKey)) {
                 throw new \RuntimeException(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'), 403);
             }
 
             $data['id'] = $recordKey;
+        }
+
+        if (array_key_exists('increased_benefit', $data)) {
+            $data['increased_benefit'] = !empty($data['increased_benefit']) ? 1 : 0;
         }
 
         $this->input->set('data', $data);
@@ -130,7 +138,7 @@ class StudentsController extends ApiController
     {
         /** @var DatabaseInterface $db */
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('1')
             ->from($db->quoteName('#__balancirk_parents', 'p'))
             ->where($db->quoteName('p.parent') . ' = ' . $userId)
@@ -186,7 +194,7 @@ class StudentsController extends ApiController
 
         /** @var DatabaseInterface $db */
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__balancirk_parents'))
             ->where($db->quoteName('child') . ' = ' . $studentId)
@@ -195,7 +203,7 @@ class StudentsController extends ApiController
         $existing = (int) $db->loadResult();
 
         if ($existing > 0) {
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->update($db->quoteName('#__balancirk_parents'))
                 ->set($db->quoteName('primary') . ' = 1')
                 ->where($db->quoteName('id') . ' = ' . $existing);
@@ -204,7 +212,7 @@ class StudentsController extends ApiController
             return;
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->insert($db->quoteName('#__balancirk_parents'))
             ->columns($db->quoteName(['child', 'parent', 'primary']))
             ->values($studentId . ', ' . $parentId . ', 1');

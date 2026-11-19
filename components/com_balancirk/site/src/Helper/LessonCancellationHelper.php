@@ -37,7 +37,7 @@ class LessonCancellationHelper
             return false;
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->update($db->quoteName('#__balancirk_lessons'))
             ->set($db->quoteName('state') . ' = ' . $db->quote(LessonRegistrationHelper::STATE_CANCELLED))
             ->set($db->quoteName('registration_closed') . ' = 1')
@@ -68,7 +68,7 @@ class LessonCancellationHelper
             return [];
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['id', 'student', 'lesson']))
             ->from($db->quoteName('#__balancirk_subscriptions'))
             ->where($db->quoteName('lesson') . ' = ' . $lessonId)
@@ -86,7 +86,7 @@ class LessonCancellationHelper
             $removedIds[] = (int) $row->id;
         }
 
-        $delete = $db->getQuery(true)
+        $delete = $db->createQuery()
             ->delete($db->quoteName('#__balancirk_subscriptions'))
             ->where($db->quoteName('id') . ' IN (' . implode(',', $removedIds) . ')')
             ->where($db->quoteName('lesson') . ' = ' . $lessonId)
@@ -142,7 +142,7 @@ class LessonCancellationHelper
             return [];
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select(
                 $db->quoteName(
                     ['m.id', 'm.firstname', 'm.name', 'm.email'],
@@ -175,7 +175,7 @@ class LessonCancellationHelper
             return [];
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select(
                 $db->quoteName(
                     [

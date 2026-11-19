@@ -53,7 +53,7 @@ class TeachersController extends ApiController
 
         /** @var DatabaseInterface $db */
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('teacher'))
             ->from($db->quoteName('#__balancirk_teached'))
             ->where($db->quoteName('lesson') . ' = ' . (int) $lesson)
@@ -100,7 +100,7 @@ class TeachersController extends ApiController
         /** @var DatabaseInterface $db */
         $db = Factory::getContainer()->get(DatabaseInterface::class);
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->delete($db->quoteName('#__balancirk_teached'))
             ->where($db->quoteName('lesson') . ' = ' . (int) $lesson)
             ->where($db->quoteName('date') . ' = ' . $db->quote($date));
@@ -108,7 +108,7 @@ class TeachersController extends ApiController
 
         foreach ($teachers as $teacher)
         {
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->insert($db->quoteName('#__balancirk_teached'))
                 ->columns($db->quoteName(['lesson', 'teacher', 'date']))
                 ->values((int) $lesson . ', ' . (int) $teacher . ', ' . $db->quote($date));
