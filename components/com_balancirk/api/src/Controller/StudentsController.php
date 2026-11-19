@@ -46,12 +46,20 @@ class StudentsController extends ApiController
             if (!isset($data['state'])) {
                 $data['state'] = 1;
             }
+
+            if (!isset($data['increased_benefit'])) {
+                $data['increased_benefit'] = 0;
+            }
         } else {
             if (!$this->canUpdateStudent($recordKey)) {
                 throw new \RuntimeException(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'), 403);
             }
 
             $data['id'] = $recordKey;
+        }
+
+        if (array_key_exists('increased_benefit', $data)) {
+            $data['increased_benefit'] = !empty($data['increased_benefit']) ? 1 : 0;
         }
 
         $this->input->set('data', $data);

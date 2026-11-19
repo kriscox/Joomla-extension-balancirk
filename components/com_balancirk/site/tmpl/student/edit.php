@@ -92,6 +92,33 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 				<?= $this->form->renderField('allow_photo'); ?>
 			</div>
 		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<?= $this->form->renderField('increased_benefit'); ?>
+				<?php
+				// Soft proof hint: rendered in the template because Helix/Sphere
+				// overrides break Joomla type="note" + showon for this field.
+				$increasedBenefitChecked = !empty($this->item->increased_benefit);
+				?>
+				<p id="increased_benefit_hint" class="form-text text-muted mb-3"<?= $increasedBenefitChecked ? '' : ' hidden' ?>>
+					<?= Text::_('COM_BALANCIRK_INCREASED_BENEFIT_PROOF_HINT') ?>
+				</p>
+				<script>
+					(function () {
+						var checkbox = document.getElementById('jform_increased_benefit');
+						var hint = document.getElementById('increased_benefit_hint');
+						if (!checkbox || !hint) {
+							return;
+						}
+						var sync = function () {
+							hint.hidden = !checkbox.checked;
+						};
+						checkbox.addEventListener('change', sync);
+						sync();
+					})();
+				</script>
+			</div>
+		</div>
 	</div>
 	<input type="hidden" name="jform[id]" id="jform_id" value="<?= $this->item->id ?>">
 	<input type="hidden" name="task" value="">

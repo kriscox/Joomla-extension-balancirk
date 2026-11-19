@@ -42,6 +42,27 @@ Factory::getApplication()->getDocument()->getWebAssetManager()
 						<?= $this->form->renderField('birthdate'); ?>
 						<?= $this->form->renderField('mutuality'); ?>
 						<?= $this->form->renderField('uitpas'); ?>
+						<?= $this->form->renderField('increased_benefit'); ?>
+						<?php
+						$increasedBenefitChecked = !empty($this->item->increased_benefit);
+						?>
+						<p id="increased_benefit_hint" class="form-text text-muted"<?= $increasedBenefitChecked ? '' : ' hidden' ?>>
+							<?= Text::_('COM_BALANCIRK_INCREASED_BENEFIT_PROOF_HINT') ?>
+						</p>
+						<script>
+							(function () {
+								var checkbox = document.getElementById('jform_increased_benefit');
+								var hint = document.getElementById('increased_benefit_hint');
+								if (!checkbox || !hint) {
+									return;
+								}
+								var sync = function () {
+									hint.hidden = !checkbox.checked;
+								};
+								checkbox.addEventListener('change', sync);
+								sync();
+							})();
+						</script>
 						<?= $this->form->renderField('allow_photo'); ?>
 					</div>
 				</div>

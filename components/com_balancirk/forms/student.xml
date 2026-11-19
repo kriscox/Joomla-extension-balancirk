@@ -58,13 +58,19 @@
             label="COM_BALANCIRK_TABLE_TABLEHEAD_UITPAS"
             maxlength="13"
             minlength="13" />
+        <field
+            name="increased_benefit"
+            type="checkbox"
+            label="COM_BALANCIRK_TABLE_TABLEHEAD_INCREASED_BENEFIT"
+            description="COM_BALANCIRK_INCREASED_BENEFIT_DESC"
+            value="1" />
         <field name="allow_photo"
             type="list"
             label="COM_BALANCIRK_TABLE_TABLEHEAD_ALLOW_PHOTO"
             default="1">
             <option value="1">COM_BALANCIRK_ALLOW_PHOTO</option>
             <option value="0">COM_BALANCIRK_DISALLOW_PHOTO</option>
-        </field>"
+        </field>
         <field name="state"
             type="list"
             label="JSTATUS"

@@ -413,6 +413,60 @@ FROM ' . $db->quoteName($table) . ' a
         }
     }
 
+    /**
+     * Add increased_benefit on students when schema SQL is skipped.
+     *
+     * Safe to run repeatedly: skips the column when it already exists.
+     *
+     * @return  void
+     *
+     * @since   1.3.27
+     */
+    private function ensureIncreasedBenefitColumn(): void
+    {
+        try {
+            /** @var \Joomla\Database\DatabaseDriver $db */
+            $db = Factory::getContainer()->get('DatabaseDriver');
+            $table = $db->replacePrefix('#__balancirk_students');
+            $columns = $db->setQuery('SHOW COLUMNS FROM ' . $db->quoteName($table))->loadColumn() ?: [];
+
+            if (!in_array('increased_benefit', $columns, true)) {
+                $db->setQuery(
+                    'ALTER TABLE ' . $db->quoteName($table)
+                    . ' ADD COLUMN ' . $db->quoteName('increased_benefit')
+                    . ' boolean NOT NULL DEFAULT 0 AFTER ' . $db->quoteName('uitpas')
+                )->execute();
+            }
+
+            $db->setQuery(
+                'CREATE OR REPLACE VIEW ' . $db->quoteName($db->replacePrefix('#__balancirk_subscriptions_comptable')) . ' AS
+SELECT m.`firstname` AS `firstname`,
+    m.`name` AS `name`,
+    concat(m.`street`, \' \', m.`number`) AS `address`,
+    m.`bus` AS `bus`,
+    m.`postcode` AS `postcode`,
+    m.`city` AS `city`,
+    m.`email` AS `email`,
+    s.`lesson` AS `lesson`,
+    s.`firstname` AS `student_firstname`,
+    s.`name` AS `student_name`,
+    st.`uitpas` AS `uitpas`,
+    st.`mutuality` AS `mutuality`,
+    st.`increased_benefit` AS `increased_benefit`
+FROM ' . $db->quoteName($db->replacePrefix('#__balancirk_subscriptions_view')) . ' s
+    JOIN ' . $db->quoteName($table) . ' st ON s.`studentid` = st.`id`
+    JOIN ' . $db->quoteName($db->replacePrefix('#__balancirk_parents')) . ' p ON p.`child` = s.`studentid`
+    AND p.`primary` = 1
+    JOIN ' . $db->quoteName($db->replacePrefix('#__balancirk_members')) . ' m ON m.`id` = p.`parent`'
+            )->execute();
+        } catch (\Throwable $e) {
+            Log::add(
+                'Balancirk: could not add increased_benefit column: ' . $e->getMessage(),
+                Log::WARNING,
+                'jerror'
+            );
+        }
+    }
 
     /**
      * Delete leftover Angular SPA / PWA files from previous installs.

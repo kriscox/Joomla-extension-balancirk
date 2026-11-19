@@ -113,6 +113,23 @@ class StudentModel extends AdminModel
     }
 
     /**
+     * Method to save the form data.
+     *
+     * @param   array  $data  The form data.
+     *
+     * @return  boolean  True on success, false on failure.
+     *
+     * @since   1.3.27
+     */
+    public function save($data)
+    {
+        // Unchecked checkboxes are omitted from POST; keep the stored boolean explicit.
+        $data['increased_benefit'] = !empty($data['increased_benefit']) ? 1 : 0;
+
+        return parent::save($data);
+    }
+
+    /**
      * Method to get the data that should be injected in the form.
      *
      * @return  mixed  The data for the form.

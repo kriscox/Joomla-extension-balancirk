@@ -38,6 +38,7 @@ class AccountingExportHelper
         'student_name',
         'uitpas',
         'mutuality',
+        'increased_benefit',
     ];
 
     /**

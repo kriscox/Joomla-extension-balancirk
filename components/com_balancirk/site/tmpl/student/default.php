@@ -61,6 +61,10 @@ Factory::getApplication()->getDocument()->getWebAssetManager()
 			<div class="col-md-8"><?= $this->escape($this->item->uitpas) ?></div>
 		</div>
 		<div class="row mb-2">
+			<div class="col-md-4"><strong><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_INCREASED_BENEFIT') ?></strong></div>
+			<div class="col-md-8"><?= !empty($this->item->increased_benefit) ? Text::_('JYES') : Text::_('JNO') ?></div>
+		</div>
+		<div class="row mb-2">
 			<div class="col-md-4"><strong><?= Text::_('COM_BALANCIRK_TABLE_TABLEHEAD_ALLOW_PHOTO') ?></strong></div>
 			<div class="col-md-8"><?= $this->item->allow_photo ? Text::_('COM_BALANCIRK_ALLOW_PHOTO') : Text::_('COM_BALANCIRK_DISALLOW_PHOTO') ?></div>
 		</div>

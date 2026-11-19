@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS `#__balancirk_students` (
     `birthdate` date NOT NULL,
     `mutuality` varchar(100),
     `uitpas` varchar(13),
+    `increased_benefit` boolean NOT NULL DEFAULT 0,
     `photo` varchar(255),
     `allow_photo` boolean NOT NULL DEFAULT 0,
     `state` char(15),
@@ -301,7 +302,8 @@ SELECT m.`firstname` AS `firstname`,
     s.`firstname` AS `student_firstname`,
     s.`name` AS `student_name`,
     st.`uitpas` AS `uitpas`,
-    st.`mutuality` AS `mutuality`
+    st.`mutuality` AS `mutuality`,
+    st.`increased_benefit` AS `increased_benefit`
 FROM `#__balancirk_subscriptions_view` s
     JOIN `#__balancirk_students` st ON s.`studentid` = st.`id`
     JOIN `#__balancirk_parents` p ON p.`child` = s.`studentid`

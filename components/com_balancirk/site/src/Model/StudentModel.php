@@ -264,6 +264,9 @@ class StudentModel extends AdminModel
         // Set default value of student to unsubscribed
         $data['state'] = 1;
 
+        // Unchecked checkboxes are omitted from POST; keep the stored boolean explicit.
+        $data['increased_benefit'] = !empty($data['increased_benefit']) ? 1 : 0;
+
         // For existing students, only the primary parent may save changes
         $studentId = (int) ($data['id'] ?? 0);
         if ($studentId > 0) {

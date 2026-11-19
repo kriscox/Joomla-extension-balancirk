@@ -809,6 +809,7 @@ class SubscriptionModel extends AdminModel
             ->select($db->quoteName('s.name', 'student_name'))
             ->select($db->quoteName('s.uitpas', 'uitpas'))
             ->select($db->quoteName('s.mutuality', 'mutuality'))
+            ->select($db->quoteName('s.increased_benefit', 'increased_benefit'))
             ->from($db->quoteName('#__balancirk_subscriptions', 'sub'))
             ->join('INNER', $db->quoteName('#__balancirk_lessons', 'l') . ' ON ' . $db->quoteName('l.id') . ' = ' . $db->quoteName('sub.lesson'))
             ->join('INNER', $db->quoteName('#__balancirk_students', 's') . ' ON ' . $db->quoteName('s.id') . ' = ' . $db->quoteName('sub.student'))
