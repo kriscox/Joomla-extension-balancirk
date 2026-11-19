@@ -236,4 +236,17 @@
 			<item>An entire lesson can be cancelled for the school year with personalised notification mails; enrolled and waiting-list subscriptions are then removed.</item>
 		</fix>
 	</changelog>
+	<changelog>
+		<element>pkg_balancirk</element>
+		<type>package</type>
+		<version>1.3.27</version>
+		<fix>
+			<item>Fixed attendance screens on Joomla 6: user profile tokens are read as stdClass properties instead of removed CMSObject::get().</item>
+			<item>Made the webservices plugin Joomla 6 compatible with SubscriberInterface and BeforeApiRouteEvent.</item>
+			<item>Replaced deprecated HTMLHelper behaviors/jQuery helpers with WebAssetManager and switched database queries to createQuery().</item>
+		</fix>
+		<change>
+			<item>Students can be marked as entitled to the increased social allowance; the flag is available in forms, API and accounting export.</item>
+		</change>
+	</changelog>
 </changelogs>
