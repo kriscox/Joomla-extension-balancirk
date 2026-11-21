@@ -4,7 +4,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Sniffs;
@@ -416,6 +416,11 @@ abstract class AbstractPatternSniff implements Sniff
         $lastAddedStackPtr = null;
         $patternLen        = count($pattern);
 
+        if (($stackPtr + $patternLen - $patternInfo['listen_pos']) > $phpcsFile->numTokens) {
+            // Pattern can never match as there are not enough tokens left in the file.
+            return false;
+        }
+
         for ($i = $patternInfo['listen_pos']; $i < $patternLen; $i++) {
             if (isset($tokens[$stackPtr]) === false) {
                 break;
@@ -739,17 +744,17 @@ abstract class AbstractPatternSniff implements Sniff
     }//end registerSupplementary()
 
 
-     /**
-      * Processes any tokens registered with registerSupplementary().
-      *
-      * @param \PHP_CodeSniffer\Files\File $phpcsFile The PHP_CodeSniffer file where to
-      *                                               process the skip.
-      * @param int                         $stackPtr  The position in the tokens stack to
-      *                                               process.
-      *
-      * @return void
-      * @see    registerSupplementary()
-      */
+    /**
+     * Processes any tokens registered with registerSupplementary().
+     *
+     * @param \PHP_CodeSniffer\Files\File $phpcsFile The PHP_CodeSniffer file where to
+     *                                               process the skip.
+     * @param int                         $stackPtr  The position in the tokens stack to
+     *                                               process.
+     *
+     * @return void
+     * @see    registerSupplementary()
+     */
     protected function processSupplementary(File $phpcsFile, $stackPtr)
     {
 

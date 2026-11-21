@@ -4,7 +4,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Standards\Generic\Tests\Classes;
@@ -72,6 +72,21 @@ final class DuplicateClassNameUnitTest extends AbstractSniffUnitTest
 
         case 'DuplicateClassNameUnitTest.6.inc':
             return [10 => 1];
+
+        case 'DuplicateClassNameUnitTest.8.inc':
+            return [
+                7 => 1,
+                8 => 1,
+            ];
+
+        case 'DuplicateClassNameUnitTest.9.inc':
+            return [
+                3 => 1,
+                4 => 1,
+            ];
+
+        case 'DuplicateClassNameUnitTest.11.inc':
+            return [13 => 1];
 
         default:
             return [];

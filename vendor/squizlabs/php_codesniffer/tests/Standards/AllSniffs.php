@@ -4,7 +4,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Tests\Standards;
@@ -47,8 +47,6 @@ class AllSniffs
         $GLOBALS['PHP_CODESNIFFER_SNIFF_CASE_FILES'] = [];
 
         $suite = new TestSuite('PHP CodeSniffer Standards');
-
-        $isInstalled = !is_file(__DIR__.'/../../autoload.php');
 
         // Optionally allow for ignoring the tests for one or more standards.
         $ignoreTestsForStandards = getenv('PHPCS_IGNORE_TESTS');

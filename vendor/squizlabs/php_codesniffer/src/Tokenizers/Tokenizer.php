@@ -4,7 +4,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Tokenizers;
@@ -54,7 +54,7 @@ abstract class Tokenizer
     /**
      * A list of tokens that end the scope.
      *
-     * @var array
+     * @var array<int|string, int|string>
      */
     public $endScopeTokens = [];
 
@@ -76,9 +76,9 @@ abstract class Tokenizer
     /**
      * Initialise and run the tokenizer.
      *
-     * @param string                         $content The content to tokenize.
-     * @param \PHP_CodeSniffer\Config | null $config  The config data for the run.
-     * @param string                         $eolChar The EOL char used in the content.
+     * @param string                       $content The content to tokenize.
+     * @param \PHP_CodeSniffer\Config|null $config  The config data for the run.
+     * @param string                       $eolChar The EOL char used in the content.
      *
      * @return void
      * @throws \PHP_CodeSniffer\Exceptions\TokenizerException If the file appears to be minified.
@@ -193,11 +193,14 @@ abstract class Tokenizer
             T_DOC_COMMENT_STRING       => true,
             T_CONSTANT_ENCAPSED_STRING => true,
             T_DOUBLE_QUOTED_STRING     => true,
+            T_START_HEREDOC            => true,
+            T_START_NOWDOC             => true,
             T_HEREDOC                  => true,
             T_NOWDOC                   => true,
             T_END_HEREDOC              => true,
             T_END_NOWDOC               => true,
             T_INLINE_HTML              => true,
+            T_YIELD_FROM               => true,
         ];
 
         $this->numTokens = count($this->tokens);
@@ -576,10 +579,10 @@ abstract class Tokenizer
      * is placed into an orig_content index and the new token length is also
      * set in the length index.
      *
-     * @param array  $token    The token to replace tabs inside.
-     * @param string $prefix   The character to use to represent the start of a tab.
-     * @param string $padding  The character to use to represent the end of a tab.
-     * @param int    $tabWidth The number of spaces each tab represents.
+     * @param array    $token    The token to replace tabs inside.
+     * @param string   $prefix   The character to use to represent the start of a tab.
+     * @param string   $padding  The character to use to represent the end of a tab.
+     * @param int|null $tabWidth The number of spaces each tab represents.
      *
      * @return void
      */
@@ -618,7 +621,7 @@ abstract class Tokenizer
                 if ($content !== '') {
                     $newContent .= $content;
                     if ($checkEncoding === true) {
-                        // Not using the default encoding, so take a bit more care.
+                        // Not using ASCII encoding, so take a bit more care.
                         $oldLevel = error_reporting();
                         error_reporting(0);
                         $contentLength = iconv_strlen($content, $this->config->encoding);

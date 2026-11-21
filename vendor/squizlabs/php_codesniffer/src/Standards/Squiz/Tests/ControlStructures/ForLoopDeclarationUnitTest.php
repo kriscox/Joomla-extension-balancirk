@@ -4,7 +4,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Standards\Squiz\Tests\ControlStructures;
@@ -67,7 +67,7 @@ final class ForLoopDeclarationUnitTest extends AbstractSniffUnitTest
                 116 => 2,
             ];
 
-        case 'ForLoopDeclarationUnitTest.js':
+        case 'ForLoopDeclarationUnitTest.1.js':
             return [
                 6   => 2,
                 9   => 2,
@@ -125,8 +125,8 @@ final class ForLoopDeclarationUnitTest extends AbstractSniffUnitTest
         case 'ForLoopDeclarationUnitTest.3.inc':
             return [6 => 1];
 
-        case 'ForLoopDeclarationUnitTest.js':
-            return [125 => 1];
+        case 'ForLoopDeclarationUnitTest.2.js':
+            return [2 => 1];
 
         default:
             return [];
