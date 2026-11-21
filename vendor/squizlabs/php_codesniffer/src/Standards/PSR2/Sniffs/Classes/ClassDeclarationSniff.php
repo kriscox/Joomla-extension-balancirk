@@ -4,7 +4,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Standards\PSR2\Sniffs\Classes;
@@ -525,11 +525,8 @@ class ClassDeclarationSniff extends PEARClassDeclarationSniff
             $ignoreTokens[] = T_WHITESPACE;
             $ignoreTokens[] = T_COMMENT;
             $ignoreTokens[] = T_SEMICOLON;
-            $ignoreTokens[] = T_COMMA;
             $nextContent    = $phpcsFile->findNext($ignoreTokens, ($closeBrace + 1), null, true);
-            if ($tokens[$nextContent]['content'] !== $phpcsFile->eolChar
-                && $tokens[$nextContent]['line'] === $tokens[$closeBrace]['line']
-            ) {
+            if ($tokens[$nextContent]['line'] === $tokens[$closeBrace]['line']) {
                 $type  = strtolower($tokens[$stackPtr]['content']);
                 $error = 'Closing %s brace must be on a line by itself';
                 $data  = [$type];

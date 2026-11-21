@@ -4,7 +4,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Standards\PSR2\Tests\Classes;
@@ -78,6 +78,8 @@ final class ClassDeclarationUnitTest extends AbstractSniffUnitTest
             282 => 1,
             310 => 1,
             316 => 1,
+            324 => 1,
+            344 => 1,
         ];
 
     }//end getErrorList()

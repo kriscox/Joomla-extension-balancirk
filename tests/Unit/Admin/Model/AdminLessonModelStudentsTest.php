@@ -44,6 +44,19 @@ namespace Joomla\CMS\MVC\Model {
             {
                 return $default;
             }
+
+            /**
+             * Stub save(): captures the last argument and returns true.
+             * Tests that need to inspect what data was passed can read $capturedSaveData.
+             */
+            public static ?array $capturedSaveData = null;
+
+            public function save($data)
+            {
+                self::$capturedSaveData = is_array($data) ? $data : null;
+
+                return true;
+            }
         }
     }
 }
@@ -378,6 +391,11 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
                 public function getQuery(bool $new = true): object
                 {
                     return $this->qb;
+                }
+
+                public function createQuery(): object
+                {
+                    return $this->getQuery(true);
                 }
 
                 public function quoteName(mixed $n, mixed $a = null): mixed

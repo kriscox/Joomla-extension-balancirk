@@ -4,7 +4,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Standards\Squiz\Tests\Functions;
@@ -75,6 +75,8 @@ final class MultiLineFunctionDeclarationUnitTest extends AbstractSniffUnitTest
                 252 => 1,
                 253 => 1,
                 254 => 1,
+                318 => 1,
+                323 => 1,
             ];
         } else {
             $errors = [

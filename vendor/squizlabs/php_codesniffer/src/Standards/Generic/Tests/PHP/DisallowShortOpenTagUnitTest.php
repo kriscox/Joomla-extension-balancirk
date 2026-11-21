@@ -4,7 +4,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Standards\Generic\Tests\PHP;
@@ -36,6 +36,7 @@ final class DisallowShortOpenTagUnitTest extends AbstractSniffUnitTest
             $testFiles[] = $testFileBase.'2.inc';
         } else {
             $testFiles[] = $testFileBase.'3.inc';
+            $testFiles[] = $testFileBase.'4.inc';
         }
 
         return $testFiles;
@@ -97,6 +98,7 @@ final class DisallowShortOpenTagUnitTest extends AbstractSniffUnitTest
                 3  => 1,
                 6  => 1,
                 11 => 1,
+                16 => 1,
             ];
         default:
             return [];

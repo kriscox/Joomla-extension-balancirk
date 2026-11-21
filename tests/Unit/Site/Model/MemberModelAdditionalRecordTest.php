@@ -236,6 +236,10 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Site\Model {
                 {
                     return $this->qb;
                 }
+                public function createQuery(): object
+                {
+                    return $this->getQuery(true);
+                }
                 public function quoteName(mixed $n, mixed $a = null): mixed
                 {
                     return is_array($n) ? array_map(static fn($x) => "`$x`", $n) : "`$n`";

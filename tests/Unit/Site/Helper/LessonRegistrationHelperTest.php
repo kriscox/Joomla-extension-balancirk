@@ -178,6 +178,11 @@ final class RegistrationFakeDb
         return $this->activeQuery = new RegistrationFakeQuery();
     }
 
+    public function createQuery(): RegistrationFakeQuery
+    {
+        return $this->getQuery(true);
+    }
+
     /**
      * @param   string|string[]  $name  Column or table name.
      * @param   string|null      $as    Alias (ignored).

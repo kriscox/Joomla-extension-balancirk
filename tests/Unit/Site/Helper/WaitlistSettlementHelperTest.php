@@ -130,6 +130,11 @@ final class WaitlistSettlementFakeDatabase
         return $this->lastQuery;
     }
 
+    public function createQuery(): WaitlistSettlementFakeQuery
+    {
+        return $this->getQuery(true);
+    }
+
     public function quoteName($name, $as = null)
     {
         if (is_array($name)) {

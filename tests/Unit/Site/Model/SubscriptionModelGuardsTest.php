@@ -141,6 +141,10 @@ class SubscriptionModelGuardsTest extends TestCase
             {
                 return $this->qb;
             }
+            public function createQuery(): object
+            {
+                return $this->getQuery(true);
+            }
             public function quoteName(mixed $n, mixed $a = null): mixed
             {
                 return "`$n`";
@@ -240,6 +244,10 @@ class SubscriptionModelGuardsTest extends TestCase
             public function getQuery(bool $new): object
             {
                 return $this->qb;
+            }
+            public function createQuery(): object
+            {
+                return $this->getQuery(true);
             }
             public function quoteName(mixed $n, mixed $a = null): mixed
             {

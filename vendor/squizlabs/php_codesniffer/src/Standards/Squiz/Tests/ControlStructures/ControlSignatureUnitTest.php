@@ -4,7 +4,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Standards\Squiz\Tests\ControlStructures;
@@ -55,7 +55,8 @@ final class ControlSignatureUnitTest extends AbstractSniffUnitTest
             112 => 1,
         ];
 
-        if ($testFile === 'ControlSignatureUnitTest.inc') {
+        switch ($testFile) {
+        case 'ControlSignatureUnitTest.1.inc':
             $errors[122] = 1;
             $errors[130] = 2;
             $errors[134] = 1;
@@ -84,9 +85,14 @@ final class ControlSignatureUnitTest extends AbstractSniffUnitTest
             $errors[306] = 3;
             $errors[309] = 1;
             $errors[315] = 1;
-        }//end if
+            return $errors;
 
-        return $errors;
+        case 'ControlSignatureUnitTest.js':
+            return $errors;
+
+        default:
+            return [];
+        }//end switch
 
     }//end getErrorList()
 
