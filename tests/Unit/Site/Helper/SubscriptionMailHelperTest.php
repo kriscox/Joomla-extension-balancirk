@@ -306,4 +306,203 @@ final class SubscriptionMailHelperTest extends TestCase
         $this->assertSame('Custom cancel Acro', $mail['subject']);
         $this->assertSame('Beste Els, les Acro gaat niet door. Alternatief: circus beginners.', $mail['body']);
     }
+
+    // -----------------------------------------------------------------------
+    // buildCancellationMailMessage() — template resolution priority chain
+    // -----------------------------------------------------------------------
+
+    /**
+     * When no custom template and no lesson-specific template are supplied,
+     * buildCancellationMailMessage() must fall back to the hardcoded Dutch
+     * default (getDefaultCancellationSubjectTemplate / getDefaultCancellationBodyTemplate).
+     *
+     * @return void
+     */
+    public function testBuildCancellationMailMessageFallsBackToHardcodedDefault(): void
+    {
+        $lesson = (object) ['name' => 'Turnen', 'start' => '2026-09-01', 'end' => '2027-06-30'];
+        $student = (object) ['firstname' => 'Sofie', 'name' => 'Claes'];
+        $member = (object) ['firstname' => 'Marc', 'name' => 'Claes'];
+
+        $mail = SubscriptionMailHelper::buildCancellationMailMessage(
+            $lesson,
+            $student,
+            $member,
+            '2026-08-20'
+        );
+
+        $this->assertStringContainsString('Turnen', $mail['subject']);
+        $this->assertStringContainsString('afgelast', $mail['subject']);
+        $this->assertStringContainsString('Marc', $mail['body']);
+        $this->assertStringContainsString('Turnen', $mail['body']);
+        $this->assertStringContainsString('afgelast', $mail['body']);
+    }
+
+    /**
+     * When the lesson row carries a cancellation_email_subject/body and no
+     * custom per-recipient template is provided, those lesson-specific values
+     * must be used (priority 1 in the resolution chain).
+     *
+     * @return void
+     */
+    public function testBuildCancellationMailMessageUsesLessonSpecificTemplates(): void
+    {
+        $lesson = (object) [
+            'name'                     => 'Turnen',
+            'start'                    => '2026-09-01',
+            'end'                      => '2027-06-30',
+            'cancellation_email_subject' => 'Afgelast: {lesson_name}',
+            'cancellation_email_body'    => 'Hallo {member_firstname}, {lesson_name} gaat dit jaar niet door.',
+        ];
+        $student = (object) ['firstname' => 'Sofie', 'name' => 'Claes'];
+        $member = (object) ['firstname' => 'Marc', 'name' => 'Claes'];
+
+        $mail = SubscriptionMailHelper::buildCancellationMailMessage(
+            $lesson,
+            $student,
+            $member,
+            '2026-08-20'
+        );
+
+        $this->assertSame('Afgelast: Turnen', $mail['subject']);
+        $this->assertSame('Hallo Marc, Turnen gaat dit jaar niet door.', $mail['body']);
+    }
+
+    /**
+     * When no custom and no lesson-specific templates are set but $defaults
+     * carries cancellation_subject / cancellation_body, those global defaults
+     * must be used (priority 2).
+     *
+     * @return void
+     */
+    public function testBuildCancellationMailMessageUsesGlobalDefaultsWhenNoLessonTemplate(): void
+    {
+        $lesson = (object) ['name' => 'Turnen', 'start' => '2026-09-01', 'end' => '2027-06-30'];
+        $student = (object) ['firstname' => 'Sofie', 'name' => 'Claes'];
+        $member = (object) ['firstname' => 'Marc', 'name' => 'Claes'];
+
+        $defaults = [
+            'cancellation_subject' => 'Geannuleerd: {lesson_name}',
+            'cancellation_body'    => 'Dag {member_firstname}, {lesson_name} wordt geannuleerd.',
+        ];
+
+        $mail = SubscriptionMailHelper::buildCancellationMailMessage(
+            $lesson,
+            $student,
+            $member,
+            '2026-08-20',
+            $defaults
+        );
+
+        $this->assertSame('Geannuleerd: Turnen', $mail['subject']);
+        $this->assertSame('Dag Marc, Turnen wordt geannuleerd.', $mail['body']);
+    }
+
+    // -----------------------------------------------------------------------
+    // buildYearstartPromotionMailMessage() — lesson-specific template
+    // -----------------------------------------------------------------------
+
+    /**
+     * When the lesson row carries yearstart_email_subject / yearstart_email_body,
+     * buildYearstartPromotionMailMessage() must prefer those over the hardcoded
+     * Dutch defaults.
+     *
+     * @return void
+     */
+    public function testBuildYearstartPromotionMailMessageUsesLessonSpecificTemplates(): void
+    {
+        $lesson = (object) [
+            'name'                    => 'Acro',
+            'start'                   => '2026-09-10',
+            'end'                     => '2027-05-20',
+            'yearstart_email_subject' => 'Jaarstart bevestiging {lesson_name}',
+            'yearstart_email_body'    => 'Hoi {member_firstname}, {student_firstname} is bevestigd voor {lesson_name}.',
+        ];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $mail = SubscriptionMailHelper::buildYearstartPromotionMailMessage(
+            $lesson,
+            $student,
+            $member,
+            '2026-08-01'
+        );
+
+        $this->assertSame('Jaarstart bevestiging Acro', $mail['subject']);
+        $this->assertSame('Hoi Els, Lena is bevestigd voor Acro.', $mail['body']);
+    }
+
+    // -----------------------------------------------------------------------
+    // buildRejectionMailMessage() — lesson-specific template
+    // -----------------------------------------------------------------------
+
+    /**
+     * When the lesson row carries rejection_email_subject / rejection_email_body,
+     * buildRejectionMailMessage() must prefer those over the hardcoded defaults.
+     *
+     * @return void
+     */
+    public function testBuildRejectionMailMessageUsesLessonSpecificTemplates(): void
+    {
+        $lesson = (object) [
+            'name'                    => 'Acro',
+            'start'                   => '2026-09-10',
+            'end'                     => '2027-05-20',
+            'rejection_email_subject' => 'Geen plaats in {lesson_name}',
+            'rejection_email_body'    => 'Dag {member_firstname}, er is geen plek voor {student_firstname} in {lesson_name}.',
+        ];
+        $student = (object) ['firstname' => 'Lena', 'name' => 'Peeters'];
+        $member = (object) ['firstname' => 'Els', 'name' => 'Peeters'];
+
+        $mail = SubscriptionMailHelper::buildRejectionMailMessage(
+            $lesson,
+            $student,
+            $member,
+            '2026-08-20'
+        );
+
+        $this->assertSame('Geen plaats in Acro', $mail['subject']);
+        $this->assertSame('Dag Els, er is geen plek voor Lena in Acro.', $mail['body']);
+    }
+
+    // -----------------------------------------------------------------------
+    // Default template content verification
+    // -----------------------------------------------------------------------
+
+    /**
+     * The hardcoded Dutch cancellation subject/body must mention "afgelast"
+     * so users who omit a custom template receive intelligible mail content.
+     *
+     * @return void
+     */
+    public function testGetDefaultCancellationTemplatesMentionAfgelast(): void
+    {
+        $this->assertStringContainsString('afgelast', SubscriptionMailHelper::getDefaultCancellationSubjectTemplate());
+        $this->assertStringContainsString('afgelast', SubscriptionMailHelper::getDefaultCancellationBodyTemplate());
+    }
+
+    /**
+     * The default yearstart promotion subject must contain {lesson_name} so
+     * the rendered mail refers to the correct lesson.
+     * The body must mention "definitief" to indicate a permanent booking.
+     *
+     * @return void
+     */
+    public function testGetDefaultYearstartPromotionTemplatesContainKeyContent(): void
+    {
+        $this->assertStringContainsString('{lesson_name}', SubscriptionMailHelper::getDefaultYearstartPromotionSubjectTemplate());
+        $this->assertStringContainsString('definitief', SubscriptionMailHelper::getDefaultYearstartPromotionBodyTemplate());
+    }
+
+    /**
+     * The default rejection subject must mention "Wachtlijst" and the body
+     * must explain there is no place available ("geen plaats bieden").
+     *
+     * @return void
+     */
+    public function testGetDefaultRejectionTemplatesMentionGeenPlaats(): void
+    {
+        $this->assertStringContainsString('Wachtlijst', SubscriptionMailHelper::getDefaultRejectionSubjectTemplate());
+        $this->assertStringContainsString('geen plaats bieden', SubscriptionMailHelper::getDefaultRejectionBodyTemplate());
+    }
 }
