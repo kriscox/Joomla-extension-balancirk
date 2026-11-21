@@ -119,6 +119,11 @@ final class WaitlistPromotionFakeDatabase
     ) {
     }
 
+    public function createQuery(): object
+    {
+        return $this->getQuery(true);
+    }
+
     public function getQuery(bool $new): object
     {
         return new class {

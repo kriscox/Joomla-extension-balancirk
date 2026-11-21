@@ -248,6 +248,11 @@ final class CancellationFakeDb
         return $this->lastQuery = new CancellationFakeQuery();
     }
 
+    public function createQuery(): CancellationFakeQuery
+    {
+        return $this->getQuery(true);
+    }
+
     /**
      * @param   string|string[]  $name  Column or table name.
      * @param   string|null      $as    Alias (ignored).

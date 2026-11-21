@@ -192,6 +192,11 @@ class LessonModelPresenceStudentsTest extends TestCase
                 return $this->qb;
             }
 
+            public function createQuery(): object
+            {
+                return $this->getQuery(true);
+            }
+
             public function quoteName(mixed $n, mixed $a = null): mixed
             {
                 if (is_array($n)) {

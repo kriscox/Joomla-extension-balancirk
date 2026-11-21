@@ -419,6 +419,11 @@ class SubscriptionModelDeleteTest extends TestCase
                 return $this->qb;
             }
 
+            public function createQuery(): object
+            {
+                return $this->getQuery(true);
+            }
+
             public function quoteName(mixed $n): string
             {
                 if (is_array($n)) {

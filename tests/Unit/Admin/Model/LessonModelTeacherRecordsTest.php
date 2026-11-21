@@ -475,6 +475,11 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
                     return $this->qb;
                 }
 
+                public function createQuery(): object
+                {
+                    return $this->getQuery(true);
+                }
+
                 public function quoteName(mixed $n): string
                 {
                     return "`$n`";
@@ -545,6 +550,11 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
                     return $this->qb;
                 }
 
+                public function createQuery(): object
+                {
+                    return $this->getQuery(true);
+                }
+
                 public function quoteName(mixed $n): string
                 {
                     return "`$n`";
@@ -581,6 +591,11 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
 
                 public function __construct(private array &$ops)
                 {
+                }
+
+                public function createQuery(): object
+                {
+                    return $this->getQuery(true);
                 }
 
                 public function getQuery(bool $new): object

@@ -408,6 +408,11 @@ namespace CoCoCo\Component\Balancirk\Tests\Unit\Admin\Model {
                     return $this->qb;
                 }
 
+                public function createQuery(): object
+                {
+                    return $this->getQuery(true);
+                }
+
                 public function quoteName(mixed $n, mixed $a = null): mixed
                 {
                     if (is_array($n)) {
